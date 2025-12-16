@@ -4,27 +4,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnGoogle = document.getElementById("btnGoogle");
   const errorMessage = document.getElementById("error-message");
 
-  // --- Función para parsear fecha de expiración ---
+  // --- Función para parsear fecha de expiración con horas >= 24 ---
   function parseFechaExpiracion(fechaExpStr) {
     if (!fechaExpStr) return null;
 
-    const parts = fechaExpStr.split(" ");
-    const fechaPart = parts[0];
-    let horaPart = parts[1] || "00:00:00";
-
+    const [fechaPart, horaPart = "00:00:00"] = fechaExpStr.split(" ");
     let [hh, mm, ss] = horaPart.split(":").map(Number);
-    let date = fechaPart.split("/").reverse().join("-"); // YYYY-MM-DD
+    let [dd, mmF, yyyy] = fechaPart.split("/").map(Number);
 
     if (hh >= 24) {
-      hh = hh - 24;
-      const fechaJS = new Date(date + "T00:00:00");
-      fechaJS.setDate(fechaJS.getDate() + 1);
-      date = fechaJS.toISOString().split("T")[0];
+      const extraDias = Math.floor(hh / 24);
+      hh = hh % 24;
+      dd += extraDias;
+      // Ajustar mes y año si se desborda el mes
+      const tempDate = new Date(yyyy, mmF - 1, dd, hh, mm, ss);
+      return tempDate;
     }
 
-    const fechaISO = `${date}T${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
-    const fecha = new Date(fechaISO);
-    return isNaN(fecha) ? null : fecha;
+    return new Date(yyyy, mmF - 1, dd, hh, mm, ss);
   }
 
   // --- Función para mostrar días restantes o vencidos ---
@@ -84,8 +81,9 @@ document.addEventListener("DOMContentLoaded", () => {
           const mensajeDias = mostrarDiasRestantes(fechaExpStr);
           alert(mensajeDias);
 
+          // Redirigir siempre que la fecha sea válida
           const fechaExp = parseFechaExpiracion(fechaExpStr);
-          if (fechaExp && new Date() <= fechaExp) {
+          if (fechaExp && !isNaN(fechaExp)) {
             window.location.href = "basededatos.html";
           }
 
