@@ -22,6 +22,82 @@
     #formNuevoDato { display:none; margin-bottom:10px; padding:5px; background:#eef; border-radius:4px; }
     #formNuevoDato input, #formNuevoDato textarea { width:100%; margin-bottom:5px; }
     #formNuevoDato button { width:48%; margin-right:2%; }
+   
+    /* Formulario inline interactivo */
+    #formNuevoDato {
+        display: none;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: linear-gradient(145deg, #eef2ff, #d9e4ff);
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        animation: slideFadeIn 0.3s ease forwards;
+    }
+
+    @keyframes slideFadeIn {
+        0% { opacity: 0; transform: translateY(-20px);}
+        100% { opacity: 1; transform: translateY(0);}
+    }
+
+    #formNuevoDato input, 
+    #formNuevoDato textarea {
+        width: 100%;
+        margin-bottom: 12px;
+        padding: 14px 12px 14px 40px; /* espacio para icono */
+        font-size: 16px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+        background: #fff url('data:image/svg+xml;base64,PHN2ZyB...') no-repeat 10px center; /* opcional icono */
+        background-size: 20px;
+        transition: all 0.3s;
+    }
+
+    #formNuevoDato input:focus,
+    #formNuevoDato textarea:focus {
+        border-color: #4a90e2;
+        box-shadow: 0 0 8px rgba(74,144,226,0.6);
+        outline: none;
+        background-color: #f0f8ff;
+    }
+
+    #formNuevoDato textarea {
+        resize: vertical;
+        min-height: 60px;
+    }
+
+    #formNuevoDato button {
+        width: 48%;
+        padding: 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-right: 2%;
+    }
+
+    #guardarDato {
+        background-color: #4CAF50;
+        color: white;
+    }
+    #guardarDato:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    #cancelarDato {
+        background-color: #f44336;
+        color: white;
+    }
+    #cancelarDato:hover {
+        background-color: #e53935;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+
 </style>
 </head>
 <body>
@@ -34,11 +110,15 @@
     </div>
 
     <!-- Formulario inline para nuevo dato -->
-   <div id="formNuevoDato">
-    <input type="text" id="inputNombre" placeholder="Nombre del ítem">
-    <input type="number" id="inputValor" placeholder="Valor">
-    <label><input type="checkbox" id="inputNegativo"> Negativo</label><br>
-    <textarea id="inputNota" placeholder="Nota o descripción"></textarea>
+   
+
+<div id="formNuevoDato">
+    <input type="text" id="inputNombre" placeholder="📝 Nombre del ítem">
+    <input type="number" id="inputValor" placeholder="💰 Valor">
+    <label style="font-size: 14px; display:block; margin-bottom:10px;">
+        <input type="checkbox" id="inputNegativo"> 🔻 Negativo
+    </label>
+    <textarea id="inputNota" placeholder="🗒️ Nota o descripción"></textarea>
     <button id="guardarDato">Guardar</button>
     <button id="cancelarDato">Cancelar</button>
 </div>
