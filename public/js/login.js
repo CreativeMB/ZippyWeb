@@ -1,3 +1,4 @@
+// public/js/login.js
 const auth = firebase.auth();
 const db = firebase.database();
 const btnGoogle = document.getElementById("btnGoogle");
@@ -6,106 +7,72 @@ const errorMessage = document.getElementById("error-message");
 // Proveedor de Google
 const provider = new firebase.auth.GoogleAuthProvider();
 
-// Click en login
+// Función de redirección al dashboard
+function navigateToDashboard() {
+  window.location.href = "dashboard.html";
+}
+
+// Login con Google
 btnGoogle.addEventListener("click", () => {
-  // 🔹 Cerrar sesión para permitir selección de cuenta
-  auth.signOut().then(() => {
-    firebase.auth().signInWithPopup(provider)
-      .then(result => {
-        const user = result.user;
+  auth.signOut(); // Cerrar sesión previa
+  auth.signInWithPopup(provider)
+    .then(async (result) => {
+      const user = result.user;
 
-        // Validar si existe "perfilempresa" en Realtime Database
-        const empresaRef = db.ref(`${user.uid}/perfilempresa`);
-        empresaRef.get().then(snapshot => {
-          if (!snapshot.exists()) {
-            auth.signOut();
-            errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
-            return;
-          }
+      if (!user) return;
 
-          // Validar fecha de expiración
-          const fechaExpStr = snapshot.child("fechaExpiracion").val();
-          if (!fechaExpStr) {
-            navigateToProfileCreation();
-            return;
-          }
+      // 🔹 Buscar idEmpresa asociado a este usuario
+      const userRef = db.ref(`Usuarios/${user.uid}/idEmpresa`);
+      const snapshot = await userRef.get();
 
-          // Obtener hora real del servidor
-          obtenerFechaServidor(fechaServidor => {
-            if (!fechaServidor) {
-              errorMessage.textContent = "Error al obtener fecha del servidor";
-              navigateToProfileCreation();
-              return;
-            }
-
-            const fechaExp = new Date(fechaExpStr);
-            const diffMillis = fechaExp.getTime() - fechaServidor.getTime();
-            const diasRestantes = Math.floor(diffMillis / (1000 * 60 * 60 * 24));
-
-            if (diffMillis > 0 && diasRestantes > 0) {
-              navigateToDashboard(); // Suscripción activa
-            } else {
-              errorMessage.textContent = "❌ Suscripción vencida o expirada";
-              navigateToProfileCreation();
-            }
-          });
-
-        }).catch(err => {
-          console.error(err);
-          errorMessage.textContent = "Error al verificar la empresa";
-        });
-
-      })
-      .catch(error => {
-        console.error(error);
-        errorMessage.textContent = error.message;
-      });
-  });
-});
-
-// Mantener sesión activa si ya está logueado
-auth.onAuthStateChanged(user => {
-  if (!user) return;
-
-  // 🔹 Obtener el idEmpresa asociado a este usuario
-  const userRef = db.ref(`Usuarios/${user.uid}/idEmpresa`);
-  userRef.get().then(snapshot => {
-    const idEmpresa = snapshot.val();
-    if (!idEmpresa) {
-      auth.signOut();
-      errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
-      return;
-    }
-
-    // Ahora usamos idEmpresa para acceder a los datos de la empresa
-    const empresaRef = db.ref(`${idEmpresa}/perfilempresa`);
-    empresaRef.get().then(empSnap => {
-      if (!empSnap.exists()) {
+      const idEmpresa = snapshot.val();
+      if (!idEmpresa) {
         auth.signOut();
         errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
         return;
       }
 
-      navigateToDashboard(); // todo ok
+      // 🔹 Validar que exista el perfil de empresa
+      const empresaRef = db.ref(`${idEmpresa}/perfilempresa`);
+      const empresaSnap = await empresaRef.get();
+
+      if (!empresaSnap.exists()) {
+        auth.signOut();
+        errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
+        return;
+      }
+
+      // Todo ok, redirigir
+      navigateToDashboard();
+    })
+    .catch((error) => {
+      console.error(error);
+      errorMessage.textContent = error.message;
     });
-  });
 });
 
-// Funciones de navegación
-function navigateToProfileCreation() {
-  window.location.href = "perfil.html"; // Crear perfil en la web
-}
+// Redirigir si ya está logueado y existe idEmpresa
+auth.onAuthStateChanged(async (user) => {
+  if (!user) return;
 
-function navigateToDashboard() {
-  window.location.href = "dashboard.html"; // Ir al dashboard
-}
+  const userRef = db.ref(`Usuarios/${user.uid}/idEmpresa`);
+  const snapshot = await userRef.get();
+  const idEmpresa = snapshot.val();
 
-// Obtener hora real del servidor
-function obtenerFechaServidor(callback) {
-  const offsetRef = db.ref(".info/serverTimeOffset");
-  offsetRef.once("value").then(snapshot => {
-    const offset = snapshot.val() || 0;
-    const fechaServidor = new Date(Date.now() + offset);
-    callback(fechaServidor);
-  }).catch(() => callback(null));
-}
+  if (!idEmpresa) {
+    auth.signOut();
+    errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
+    return;
+  }
+
+  const empresaRef = db.ref(`${idEmpresa}/perfilempresa`);
+  const empresaSnap = await empresaRef.get();
+  if (!empresaSnap.exists()) {
+    auth.signOut();
+    errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
+    return;
+  }
+
+  // Todo ok, redirigir
+  navigateToDashboard();
+});
