@@ -2,143 +2,178 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Base de Datos - Sidebar Interactivo</title>
+<title>Zippy Contabilidad - Bases de Datos</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-body { font-family: Arial, sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; }
-header { display: flex; justify-content: flex-end; padding: 10px; background-color: #f2f2f2; }
-#btnCerrarSesion { padding: 6px 12px; }
-
-#container { display: flex; flex: 1; height: calc(100% - 50px); }
-#sidebar { width: 20%; background-color: #f9f9f9; border-right: 1px solid #ccc; padding: 10px; overflow-y: auto; }
-#sidebar h2 { font-size: 16px; margin-top: 0; }
-#sidebar ul { list-style: none; padding: 0; }
-#sidebar li { padding: 8px; margin-bottom: 5px; background-color: #eee; border-radius: 4px; cursor: pointer; }
-#sidebar li:hover { background-color: #ddd; }
-button.sidebar-btn { margin: 5px 0; padding: 6px 10px; width: 100%; }
-
-#main { width: 80%; padding: 10px; overflow-y: auto; }
-#main h2 { margin-top: 0; }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-th { background-color: #f2f2f2; }
+    body { font-family: Arial, sans-serif; margin: 0; height: 100vh; display: flex; }
+    #sidebar { width: 20%; background: #f4f4f4; padding: 10px; overflow-y: auto; box-sizing: border-box; }
+    #sidebar h3 { margin-top: 0; }
+    #sidebar ul { list-style: none; padding: 0; margin: 10px 0; }
+    #sidebar li { padding: 8px; background: #fff; margin-bottom: 5px; cursor: pointer; border-radius: 4px; }
+    #sidebar li:hover { background: #ddd; }
+    #sidebar button { margin: 2px; }
+    #main { width: 80%; padding: 10px; overflow-y: auto; box-sizing: border-box; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+    th { background: #eee; }
 </style>
 </head>
 <body>
 
-<header>
-<button id="btnCerrarSesion">🚪 Cerrar Sesión</button>
-</header>
-
-<div id="container">
-    <div id="sidebar">
-        <h2 id="sidebarTitulo">📂 Bases de Datos</h2>
-        <ul id="sidebarList"></ul>
-        <button id="btnVolver" class="sidebar-btn" style="display:none;">🔙 Volver a Bases</button>
-        <button id="btnAgregarDato" class="sidebar-btn" style="display:none;">➕ Agregar Nuevo Dato</button>
+<div id="sidebar">
+    <h3 id="sidebarTitulo">📂 Bases de Datos</h3>
+    <div id="sidebarBotones">
+        <button id="btnVolver" style="display:none;">⬅️ Volver</button>
+        <button id="btnAgregarDato" style="display:none;">➕ Nuevo Dato</button>
+        <button id="btnCerrarSesion" style="margin-left:5px;">🚪 Cerrar Sesión</button>
     </div>
+    <ul id="sidebarList"></ul>
+</div>
 
-    <div id="main">
-        <h2>Área Principal</h2>
-        <p>Aquí puedes mostrar información general o dejarlo vacío.</p>
-    </div>
+<div id="main">
+    <h3>📝 Pedidos</h3>
+    <table id="tablaPedidos">
+        <thead>
+            <tr>
+                <th>Domiciliario</th>
+                <th>ID Pedido</th>
+                <th>Nombre</th>
+                <th>Nota</th>
+                <th>Valor</th>
+                <th>Fecha Entrega</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 </div>
 
 <script>
-// --- Configurar Firebase ---
-const firebaseConfig = {
-    apiKey: "AIzaSyBTphfyjQbU1AKt6sYFepJ8Q8mGp3sbtOA",
-    authDomain: "zippy-727d5.firebaseapp.com",
-    databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
-    projectId: "zippy-727d5"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
+    // --- CONFIGURAR FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyBTphfyjQbU1AKt6sYFepJ8Q8mGp3sbtOA",
+        authDomain: "zippy-727d5.firebaseapp.com",
+        databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
+        projectId: "zippy-727d5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
 
-let idEmpresa = null;
-let baseSeleccionada = null;
+    let idEmpresa = null;
+    let baseSeleccionada = null;
 
-// --- Cerrar sesión ---
-document.getElementById("btnCerrarSesion").onclick = () => {
-    auth.signOut().then(() => {
-        alert("Sesión cerrada correctamente");
-        window.location.href = "login.html";
-    }).catch(error => alert("Error al cerrar sesión: " + error.message));
-};
+    const sidebarList = document.getElementById("sidebarList");
+    const sidebarTitulo = document.getElementById("sidebarTitulo");
+    const btnVolver = document.getElementById("btnVolver");
+    const btnAgregarDato = document.getElementById("btnAgregarDato");
+    const btnCerrarSesion = document.getElementById("btnCerrarSesion");
 
-// --- Verificar usuario autenticado ---
-auth.onAuthStateChanged(user => {
-    if (user) {
-        idEmpresa = user.uid;
-        mostrarBases();
-    } else {
-        alert("Debe iniciar sesión primero");
-        window.location.href = "login.html";
+    // --- CERRAR SESIÓN ---
+    btnCerrarSesion.onclick = () => {
+        auth.signOut().then(() => window.location.reload())
+        .catch(err => alert("Error cerrando sesión: " + err.message));
+    };
+
+    // --- AUTH ---
+    auth.onAuthStateChanged(user => {
+        if(user){
+            idEmpresa = user.uid;
+            cargarBases();
+            cargarPedidos();
+        } else {
+            alert("Debe iniciar sesión primero");
+            window.location.href = "login.html";
+        }
+    });
+
+    // --- CARGAR LISTA DE BASES ---
+    function cargarBases() {
+        sidebarTitulo.textContent = "📂 Bases de Datos";
+        btnVolver.style.display = "none";
+        btnAgregarDato.style.display = "none";
+
+        const ref = db.ref(`${idEmpresa}/basededatos`);
+        ref.on('value', snapshot => {
+            sidebarList.innerHTML = '';
+            snapshot.forEach(baseSnap => {
+                const li = document.createElement('li');
+                li.textContent = baseSnap.key;
+                li.onclick = () => mostrarDatos(baseSnap.key);
+                sidebarList.appendChild(li);
+            });
+        });
     }
-});
 
-const sidebarList = document.getElementById("sidebarList");
-const sidebarTitulo = document.getElementById("sidebarTitulo");
-const btnVolver = document.getElementById("btnVolver");
-const btnAgregarDato = document.getElementById("btnAgregarDato");
+    // --- MOSTRAR DATOS DE LA BASE SELECCIONADA ---
+    function mostrarDatos(base) {
+        baseSeleccionada = base;
+        sidebarTitulo.textContent = `📄 Datos de: ${base}`;
+        btnVolver.style.display = "inline-block";
+        btnAgregarDato.style.display = "inline-block";
 
-// --- Mostrar listado de bases ---
-function mostrarBases() {
-    sidebarTitulo.textContent = "📂 Bases de Datos";
-    sidebarList.innerHTML = '';
-    btnVolver.style.display = "none";
-    btnAgregarDato.style.display = "none";
-    baseSeleccionada = null;
+        const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
+        ref.on('value', snapshot => {
+            sidebarList.innerHTML = '';
 
-    db.ref(`${idEmpresa}/basededatos`).once('value').then(snapshot => {
-        snapshot.forEach(baseSnap => {
-            const li = document.createElement('li');
-            li.textContent = baseSnap.key;
-            li.onclick = () => mostrarDatos(baseSnap.key);
-            sidebarList.appendChild(li);
+            const itemsArray = [];
+            snapshot.forEach(itemSnap => itemsArray.push(itemSnap.val()));
+
+            // Orden descendente por fechaHora
+            itemsArray.sort((a,b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+
+            itemsArray.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `${item.nombre || ''} - ${item.valor || ''}`;
+                sidebarList.appendChild(li);
+            });
         });
-    });
-}
+    }
 
-// --- Mostrar datos de la base en el sidebar ---
-function mostrarDatos(base) {
-    baseSeleccionada = base;
-    sidebarTitulo.textContent = `📄 Datos de: ${base}`;
-    sidebarList.innerHTML = '';
-    btnVolver.style.display = "inline-block";
-    btnAgregarDato.style.display = "inline-block";
+    // --- VOLVER AL LISTADO DE BASES ---
+    btnVolver.onclick = () => cargarBases();
 
-    const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-    ref.on('value', snapshot => {
-        sidebarList.innerHTML = '';
-        snapshot.forEach(itemSnap => {
-            const li = document.createElement('li');
-            const item = itemSnap.val();
-            li.textContent = `${item.nombre || itemSnap.key} - ${item.valor || ''}`;
-            sidebarList.appendChild(li);
+    // --- AGREGAR NUEVO DATO ---
+    btnAgregarDato.onclick = () => {
+        if(!baseSeleccionada) return;
+        const nombre = prompt("Nombre del dato:");
+        const valor = prompt("Valor del dato:");
+        if(!nombre) return;
+
+        const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
+        ref.push({
+            nombre,
+            valor,
+            fechaHora: new Date().toISOString()
         });
-    });
-}
+    };
 
-// --- Botón volver al listado de bases ---
-btnVolver.onclick = () => mostrarBases();
+    // --- CARGAR PEDIDOS ---
+    function cargarPedidos() {
+        const ref = db.ref(`${idEmpresa}/Pedidos`);
+        const tbody = document.querySelector("#tablaPedidos tbody");
 
-// --- Botón agregar nuevo dato ---
-btnAgregarDato.onclick = () => {
-    if (!baseSeleccionada) return alert("Seleccione primero una base.");
-
-    const nombre = prompt("Nombre del dato:");
-    if (!nombre) return;
-    const valor = prompt("Valor:");
-    const id = Date.now().toString();
-
-    const nuevoDato = { id, nombre, valor, fechaHora: new Date().toISOString() };
-    db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}/${id}`).set(nuevoDato);
-};
+        ref.on('value', snapshot => {
+            tbody.innerHTML = '';
+            snapshot.forEach(domicSnap => {
+                const idDomic = domicSnap.key;
+                domicSnap.forEach(pedidoSnap => {
+                    const p = pedidoSnap.val();
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${idDomic}</td>
+                        <td>${pedidoSnap.key}</td>
+                        <td>${p.nombre || ''}</td>
+                        <td>${p.nota || ''}</td>
+                        <td>${p.valor || ''}</td>
+                        <td>${p.diaEntrega || ''}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        });
+    }
 </script>
-
 </body>
 </html>
