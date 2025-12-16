@@ -374,42 +374,54 @@ function posicionarSugerencias(){
     suggestionsContainer.style.width = rect.width + 'px';
 }
 
-// Mostrar sugerencias según lo que escribe el usuario
-inputNombre.addEventListener('input', ()=>{
+// --- AUTOCOMPLETADO DE NOMBRE (solo la primera coincidencia) ---
+inputNombre.addEventListener('input', () => {
     const query = inputNombre.value.trim().toLowerCase();
-    if(query.length<1){ suggestionsContainer.style.display='none'; return; }
+    if(query.length < 2){
+        suggestionsContainer.innerHTML = '';
+        suggestionsContainer.style.display = 'none';
+        return;
+    }
 
     const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
-    ref.once('value', snapshot=>{
-        const nombresExistentes = [];
-        snapshot.forEach(itemSnap=>{
+    ref.once('value', snapshot => {
+        let primeraCoincidencia = null;
+        snapshot.forEach(itemSnap => {
             const item = itemSnap.val();
-            if(item && item.nombre && item.nombre.toLowerCase().startsWith(query)){
-                nombresExistentes.push(item.nombre);
+            if(item && item.nombre && item.nombre.toLowerCase().startsWith(query) && !primeraCoincidencia){
+                primeraCoincidencia = item.nombre;
             }
         });
 
-        suggestionsContainer.innerHTML='';
-        if(nombresExistentes.length>0){
-            posicionarSugerencias();
-            nombresExistentes.forEach(nombre=>{
-                const div = document.createElement('div');
-                div.textContent = nombre;
-                div.style.padding='8px';
-                div.style.cursor='pointer';
-                div.onmouseover = ()=> div.style.background='#eee';
-                div.onmouseout = ()=> div.style.background='#fff';
-                div.onclick = ()=>{
-                    inputNombre.value = nombre;
-                    suggestionsContainer.style.display='none';
-                    guardarDato(); // Guardar inmediatamente al hacer clic
-                };
-                suggestionsContainer.appendChild(div);
-            });
-            suggestionsContainer.style.display='block';
-        } else suggestionsContainer.style.display='none';
+        suggestionsContainer.innerHTML = '';
+        if(primeraCoincidencia){
+            const div = document.createElement('div');
+            div.textContent = primeraCoincidencia;
+            div.style.padding = '8px';
+            div.style.cursor = 'pointer';
+            div.style.background = '#fff';
+            div.onclick = () => {
+                inputNombre.value = primeraCoincidencia;
+                suggestionsContainer.innerHTML = '';
+                suggestionsContainer.style.display = 'none';
+
+                // Si ya hay valor, guardar inmediatamente
+                if(inputValor.value.trim() !== ''){
+                    guardarDato();
+                } else {
+                    // Pasar al siguiente campo (valor)
+                    inputValor.focus();
+                }
+            };
+            suggestionsContainer.appendChild(div);
+            suggestionsContainer.style.display = 'block';
+        } else {
+            suggestionsContainer.style.display = 'none';
+        }
     });
 });
+
+
 
 // ENTER en Valor pasa a Nombre
 inputValor.addEventListener('keydown', e=>{
