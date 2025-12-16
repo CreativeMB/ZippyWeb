@@ -1,74 +1,77 @@
-// public/js/login.js
-const auth = firebase.auth();
-const db = firebase.database();
+// login.js
+// 🔹 Asegúrate de que init.js ya inicializa Firebase correctamente
+
 const btnGoogle = document.getElementById("btnGoogle");
 const errorMessage = document.getElementById("error-message");
 
-// Redirigir al dashboard
-function navigateToDashboard() {
-  window.location.href = "dashboard.html";
-}
+btnGoogle.addEventListener("click", async () => {
+  try {
+    // Cerrar sesión previa para forzar selector de cuentas
+    await firebase.auth().signOut();
 
-// Login con Google
-btnGoogle.addEventListener("click", () => {
-  auth.signOut(); // Cerrar sesión previa
-  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-    .then(async (result) => {
-      const user = result.user;
-      if (!user) return;
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
 
-      // 🔹 Obtener idEmpresa desde Usuarios/<uid>/idEmpresa
-      const userRef = db.ref(`Usuarios/${user.uid}/idEmpresa`);
-      const snapshot = await userRef.get();
-      const idEmpresa = snapshot.val();
+    const result = await firebase.auth().signInWithPopup(provider);
 
-      if (!idEmpresa) {
-        auth.signOut();
-        errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
+    const user = result.user;
+    if (!user) throw new Error("No se pudo autenticar el usuario");
+
+    // 🔹 UID de Firebase = idEmpresa
+    const idEmpresa = user.uid;
+    const empresaRef = firebase.database().ref(`${idEmpresa}/perfilempresa`);
+
+    empresaRef.get().then(snapshot => {
+      if (!snapshot.exists()) {
+        errorMessage.textContent = "❌ No hay perfil de empresa registrado.";
+        firebase.auth().signOut();
         return;
       }
 
-      // 🔹 Verificar que exista perfilempresa
-      const empresaRef = db.ref(`${idEmpresa}/perfilempresa`);
-      const empresaSnap = await empresaRef.get();
+      const empresa = snapshot.val();
+      console.log("Empresa cargada:", empresa);
 
-      if (!empresaSnap.exists()) {
-        auth.signOut();
-        errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
-        return;
-      }
-
-      // ✅ Todo ok, redirigir
-      navigateToDashboard();
-    })
-    .catch((error) => {
-      console.error(error);
-      errorMessage.textContent = error.message;
+      // Validar suscripción usando fechaExpiracion
+      validarSuscripcion(empresa.fechaExpiracion).then(isActiva => {
+        if (!isActiva) {
+          alert("❌ Tu suscripción ha vencido. Contacta al administrador.");
+          // 🔹 Aquí podrías redirigir a una página de suscripción
+        } else {
+          // 🔹 Todo bien, ir al dashboard
+          window.location.href = "dashboard.html";
+        }
+      });
+    }).catch(err => {
+      console.error(err);
+      errorMessage.textContent = "Error al leer datos de la empresa";
     });
+
+  } catch (err) {
+    console.error(err);
+    errorMessage.textContent = "Error al iniciar sesión con Google";
+  }
 });
 
-// Redirigir si ya está logueado y idEmpresa existe
-auth.onAuthStateChanged(async (user) => {
-  if (!user) return;
+// Función para validar suscripción con fechaExpiracion
+async function validarSuscripcion(fechaExpStr) {
+  if (!fechaExpStr) return false;
 
-  const userRef = db.ref(`Usuarios/${user.uid}/idEmpresa`);
-  const snapshot = await userRef.get();
-  const idEmpresa = snapshot.val();
+  try {
+    // 🔹 Usar fecha local como aproximación (no hay offset server en web)
+    const fechaExp = new Date(fechaExpStr);
+    const fechaActual = new Date();
 
-  if (!idEmpresa) {
-    auth.signOut();
-    errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
-    return;
+    return fechaActual <= fechaExp;
+  } catch (err) {
+    console.error(err);
+    return false;
   }
+}
 
-  const empresaRef = db.ref(`${idEmpresa}/perfilempresa`);
-  const empresaSnap = await empresaRef.get();
-
-  if (!empresaSnap.exists()) {
-    auth.signOut();
-    errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
-    return;
+// 🔹 Detecta si ya hay sesión activa al cargar la página
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    // Usuario ya logueado, redirigir directamente
+    window.location.href = "dashboard.html";
   }
-
-  navigateToDashboard();
 });
