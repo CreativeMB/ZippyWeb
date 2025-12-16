@@ -21,6 +21,11 @@
 <body>
 
 <h2>📂 Bases de Datos</h2>
+<h2>📂 Bases de Datos</h2>
+<button id="btnCerrarSesion">🚪 Cerrar Sesión</button>
+<button id="btnCrearBase">➕ Crear Base</button>
+<button id="btnExportar">📤 Exportar Datos</button>
+
 <button id="btnCrearBase">➕ Crear Base</button>
 <button id="btnExportar">📤 Exportar Datos</button>
 <ul id="listaBases"></ul>
@@ -41,6 +46,16 @@
 </table>
 
 <script>
+    // --- CERRAR SESIÓN ---
+document.getElementById("btnCerrarSesion").onclick = () => {
+    auth.signOut().then(() => {
+        alert("Sesión cerrada correctamente");
+        window.location.href = "login.html"; // Redirige al login
+    }).catch(error => {
+        alert("Error al cerrar sesión: " + error.message);
+    });
+};
+
     // --- CONFIGURAR FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyBTphfyjQbU1AKt6sYFepJ8Q8mGp3sbtOA",
