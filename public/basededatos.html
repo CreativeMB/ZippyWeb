@@ -316,28 +316,30 @@ function guardarDato() {
     const ahora = new Date();
     const fechaHora = `${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')} ${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
 
-    const nuevoItem = {
+    ref.child(newKey).set({
         id: newKey,
         fechaHora: fechaHora,
         nombre: nombre,
         valor: valor,
         nota: nota || ""
-    };
-
-    ref.child(newKey).set(nuevoItem, () => {
-        // --- AGREGAR INMEDIATAMENTE A LA LISTA ---
+    }).then(() => {
+        // Agregar inmediatamente a la lista sin recargar la base
         const li = document.createElement('li');
-        li.textContent = `${nuevoItem.nombre} - ${nuevoItem.valor} (${nuevoItem.fechaHora})`;
+        li.textContent = `${nombre} - ${valor} (${fechaHora})`;
         sidebarList.insertBefore(li, sidebarList.firstChild);
 
-        // Limpiar formulario y dejar foco en nombre para nuevo dato rápido
+        // Limpiar y ocultar formulario
         inputNombre.value = "";
         inputValor.value = "";
         inputNegativo.checked = false;
         inputNota.value = "";
-        inputNombre.focus();
-    });
+        formNuevoDato.style.display = "none";
+        opcionesExtra.style.display = "none";
+
+        // Ahora, el usuario presiona F2 para agregar otro dato
+    }).catch(err => alert("Error guardando dato: " + err.message));
 }
+
 
 // --- CARGAR PEDIDOS ---
 function cargarPedidos(){
