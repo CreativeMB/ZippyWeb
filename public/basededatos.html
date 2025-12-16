@@ -322,7 +322,11 @@ function guardarDato(){
         valor: valor,
         nota: nota || ""
     });
-
+ ref.child(newKey).set(nuevoItem, () => {
+        // --- AGREGAR INMEDIATAMENTE A LA LISTA ---
+        const li = document.createElement('li');
+        li.textContent = `${nuevoItem.nombre} - ${nuevoItem.valor} (${nuevoItem.fechaHora})`;
+        sidebarList.insertBefore(li, sidebarList.firstChild);
     inputNombre.value = "";
     inputValor.value = "";
     inputNegativo.checked = false;
@@ -374,14 +378,10 @@ function posicionarSugerencias(){
     suggestionsContainer.style.width = rect.width + 'px';
 }
 
-// --- AUTOCOMPLETADO DE NOMBRE (solo la primera coincidencia) ---
+// --- AUTOCOMPLETADO INLINE (solo completa el input) ---
 inputNombre.addEventListener('input', () => {
     const query = inputNombre.value.trim().toLowerCase();
-    if(query.length < 2){
-        suggestionsContainer.innerHTML = '';
-        suggestionsContainer.style.display = 'none';
-        return;
-    }
+    if(query.length < 2) return;
 
     const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
     ref.once('value', snapshot => {
@@ -393,34 +393,12 @@ inputNombre.addEventListener('input', () => {
             }
         });
 
-        suggestionsContainer.innerHTML = '';
         if(primeraCoincidencia){
-            const div = document.createElement('div');
-            div.textContent = primeraCoincidencia;
-            div.style.padding = '8px';
-            div.style.cursor = 'pointer';
-            div.style.background = '#fff';
-            div.onclick = () => {
-                inputNombre.value = primeraCoincidencia;
-                suggestionsContainer.innerHTML = '';
-                suggestionsContainer.style.display = 'none';
-
-                // Si ya hay valor, guardar inmediatamente
-                if(inputValor.value.trim() !== ''){
-                    guardarDato();
-                } else {
-                    // Pasar al siguiente campo (valor)
-                    inputValor.focus();
-                }
-            };
-            suggestionsContainer.appendChild(div);
-            suggestionsContainer.style.display = 'block';
-        } else {
-            suggestionsContainer.style.display = 'none';
+            inputNombre.value = primeraCoincidencia;
+            inputNombre.setSelectionRange(query.length, primeraCoincidencia.length);
         }
     });
 });
-
 
 
 // ENTER en Valor pasa a Nombre
