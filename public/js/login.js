@@ -1,77 +1,60 @@
-// login.js
-// 🔹 Asegúrate de que init.js ya inicializa Firebase correctamente
+// public/js/login.js
 
-const btnGoogle = document.getElementById("btnGoogle");
-const errorMessage = document.getElementById("error-message");
+// Función para iniciar sesión con Google
+document.addEventListener("DOMContentLoaded", () => {
+  const btnGoogle = document.getElementById("btnGoogle");
+  const errorMessage = document.getElementById("error-message");
 
-btnGoogle.addEventListener("click", async () => {
-  try {
-    // Cerrar sesión previa para forzar selector de cuentas
-    await firebase.auth().signOut();
-
+  btnGoogle.addEventListener("click", () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
-    const result = await firebase.auth().signInWithPopup(provider);
-
-    const user = result.user;
-    if (!user) throw new Error("No se pudo autenticar el usuario");
-
-    // 🔹 UID de Firebase = idEmpresa
-    const idEmpresa = user.uid;
-    const empresaRef = firebase.database().ref(`${idEmpresa}/perfilempresa`);
-
-    empresaRef.get().then(snapshot => {
-      if (!snapshot.exists()) {
-        errorMessage.textContent = "❌ No hay perfil de empresa registrado.";
-        firebase.auth().signOut();
-        return;
-      }
-
-      const empresa = snapshot.val();
-      console.log("Empresa cargada:", empresa);
-
-      // Validar suscripción usando fechaExpiracion
-      validarSuscripcion(empresa.fechaExpiracion).then(isActiva => {
-        if (!isActiva) {
-          alert("❌ Tu suscripción ha vencido. Contacta al administrador.");
-          // 🔹 Aquí podrías redirigir a una página de suscripción
-        } else {
-          // 🔹 Todo bien, ir al dashboard
-          window.location.href = "dashboard.html";
+    firebase.auth().signInWithPopup(provider)
+      .then((result) => {
+        const user = result.user;
+        if (!user) {
+          errorMessage.textContent = "No se pudo obtener el usuario";
+          return;
         }
+
+        console.log("UID Google:", user.uid);
+
+        // Referencia al perfil de empresa en Realtime Database
+        const empresaRef = firebase.database().ref(user.uid + "/perfilempresa");
+
+        empresaRef.get().then((snapshot) => {
+          if (snapshot.exists()) {
+            const empresaData = snapshot.val();
+            console.log("Perfil empresa:", empresaData);
+
+            // Validar fechaExpiracion
+            const fechaExpStr = empresaData.fechaExpiracion;
+            if (fechaExpStr) {
+              const fechaExp = new Date(fechaExpStr.split(" ")[0].split("/").reverse().join("-") + "T" + fechaExpStr.split(" ")[1]);
+              const now = new Date();
+
+              if (now <= fechaExp) {
+                // Suscripción activa, redirigir al dashboard
+                window.location.href = "basededatos.html"; // Ajusta según tu web
+              } else {
+                alert(`❌ Suscripción vencida el ${fechaExpStr}. Contacta al administrador.`);
+              }
+            } else {
+              alert("❌ No se encontró la fecha de expiración de la empresa.");
+            }
+
+          } else {
+            alert("⚠️ Debes crear primero una empresa desde la app móvil.");
+          }
+        }).catch((err) => {
+          console.error(err);
+          errorMessage.textContent = "Error al leer perfil de empresa: " + err.message;
+        });
+
+      })
+      .catch((error) => {
+        console.error(error);
+        errorMessage.textContent = "Error al autenticar con Google: " + error.message;
       });
-    }).catch(err => {
-      console.error(err);
-      errorMessage.textContent = "Error al leer datos de la empresa";
-    });
-
-  } catch (err) {
-    console.error(err);
-    errorMessage.textContent = "Error al iniciar sesión con Google";
-  }
-});
-
-// Función para validar suscripción con fechaExpiracion
-async function validarSuscripcion(fechaExpStr) {
-  if (!fechaExpStr) return false;
-
-  try {
-    // 🔹 Usar fecha local como aproximación (no hay offset server en web)
-    const fechaExp = new Date(fechaExpStr);
-    const fechaActual = new Date();
-
-    return fechaActual <= fechaExp;
-  } catch (err) {
-    console.error(err);
-    return false;
-  }
-}
-
-// 🔹 Detecta si ya hay sesión activa al cargar la página
-firebase.auth().onAuthStateChanged(user => {
-  if (user) {
-    // Usuario ya logueado, redirigir directamente
-    window.location.href = "dashboard.html";
-  }
+  });
 });
