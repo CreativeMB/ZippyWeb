@@ -83,38 +83,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   btnGoogle.addEventListener("click", () => {
-    // Si ya hay usuario logueado, cerrar sesión primero
-    if (firebase.auth().currentUser) {
-      firebase.auth().signOut().then(() => {
-        iniciarSesionGoogle();
-      }).catch((err) => {
-        console.error("Error cerrando sesión:", err);
-        iniciarSesionGoogle(); // Intentar iniciar sesión de todas formas
-      });
-    } else {
+    // Siempre cerrar sesión primero para forzar login nuevo
+    firebase.auth().signOut().finally(() => {
       iniciarSesionGoogle();
-    }
+    });
   });
 
-  // Detectar si ya hay sesión activa al cargar la página
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      console.log("Usuario ya autenticado:", user.uid);
-      // Verificar empresa automáticamente
-      const empresaRef = firebase.database().ref(user.uid + "/perfilempresa");
-      empresaRef.get().then((snapshot) => {
-        if (snapshot.exists()) {
-          const empresaData = snapshot.val();
-          const mensajeDias = mostrarDiasRestantes(empresaData.fechaExpiracion);
-          alert("Ya logueado: " + mensajeDias);
-          const fechaParts = empresaData.fechaExpiracion.split(" ");
-          const fechaExp = new Date(fechaParts[0].split("/").reverse().join("-") + "T" + fechaParts[1]);
-          const ahora = new Date();
-          if (ahora <= fechaExp) {
-            window.location.href = "basededatos.html";
-          }
-        }
-      });
-    }
-  });
+  // ⚠️ Aquí quitamos la parte de onAuthStateChanged para que no verifique sesiones previas
 });
