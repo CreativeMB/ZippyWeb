@@ -5,9 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login Empresa - ZippyWeb</title>
   <link rel="stylesheet" href="css/styles.css">
-  <script defer src="/__/firebase/12.6.0/firebase-app-compat.js"></script>
-  <script defer src="/__/firebase/12.6.0/firebase-auth-compat.js"></script>
-  <script defer src="/__/firebase/init.js"></script>
+
+  <!-- Firebase desde CDN -->
+  <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-auth-compat.js"></script>
+
+  <!-- Inicialización de Firebase -->
+  <script defer src="js/init.js"></script>
+
+  <!-- Lógica del login -->
+  <script defer src="js/login.js"></script>
 </head>
 <body>
   <div class="container">
@@ -20,9 +27,6 @@
       <div id="error-message"></div>
     </div>
   </div>
-
-  <script type="module" src="js/login.js"></script>
-
 </body>
 </html>
 
