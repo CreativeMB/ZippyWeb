@@ -18,11 +18,7 @@
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
     th { background: #eee; }
-    /* Formulario inline */
-    #formNuevoDato { display:none; margin-bottom:10px; padding:5px; background:#eef; border-radius:4px; }
-    #formNuevoDato input, #formNuevoDato textarea { width:100%; margin-bottom:5px; }
-    #formNuevoDato button { width:48%; margin-right:2%; }
-   
+
     /* Formulario inline interactivo */
     #formNuevoDato {
         display: none;
@@ -33,26 +29,21 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         animation: slideFadeIn 0.3s ease forwards;
     }
-
     @keyframes slideFadeIn {
         0% { opacity: 0; transform: translateY(-20px);}
         100% { opacity: 1; transform: translateY(0);}
     }
-
     #formNuevoDato input, 
     #formNuevoDato textarea {
         width: 100%;
         margin-bottom: 12px;
-        padding: 14px 12px 14px 40px; /* espacio para icono */
+        padding: 14px 12px;
         font-size: 16px;
         border: 2px solid #ccc;
         border-radius: 8px;
         box-sizing: border-box;
-        background: #fff url('data:image/svg+xml;base64,PHN2ZyB...') no-repeat 10px center; /* opcional icono */
-        background-size: 20px;
         transition: all 0.3s;
     }
-
     #formNuevoDato input:focus,
     #formNuevoDato textarea:focus {
         border-color: #4a90e2;
@@ -60,12 +51,7 @@
         outline: none;
         background-color: #f0f8ff;
     }
-
-    #formNuevoDato textarea {
-        resize: vertical;
-        min-height: 60px;
-    }
-
+    #formNuevoDato textarea { resize: vertical; min-height: 60px; }
     #formNuevoDato button {
         width: 48%;
         padding: 12px;
@@ -76,28 +62,14 @@
         transition: all 0.2s;
         margin-right: 2%;
     }
+    #guardarDato { background-color: #4CAF50; color: white; }
+    #guardarDato:hover { background-color: #45a049; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    #cancelarDato { background-color: #f44336; color: white; }
+    #cancelarDato:hover { background-color: #e53935; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-    #guardarDato {
-        background-color: #4CAF50;
-        color: white;
-    }
-    #guardarDato:hover {
-        background-color: #45a049;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    #cancelarDato {
-        background-color: #f44336;
-        color: white;
-    }
-    #cancelarDato:hover {
-        background-color: #e53935;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-
+    /* Más opciones */
+    #opcionesExtra { display:none; margin-bottom:10px; }
+    #opcionesExtra label { display:flex; align-items:center; gap:5px; }
 </style>
 </head>
 <body>
@@ -110,19 +82,19 @@
     </div>
 
     <!-- Formulario inline para nuevo dato -->
-   
-
-<div id="formNuevoDato">
-    <input type="text" id="inputNombre" placeholder="📝 Nombre del ítem">
-    <input type="number" id="inputValor" placeholder="💰 Valor">
-    <label style="font-size: 14px; display:block; margin-bottom:10px;">
-        <input type="checkbox" id="inputNegativo"> 🔻 Negativo
-    </label>
-    <textarea id="inputNota" placeholder="🗒️ Nota o descripción"></textarea>
-    <button id="guardarDato">Guardar</button>
-    <button id="cancelarDato">Cancelar</button>
-</div>
-
+    <div id="formNuevoDato">
+        <input type="text" id="inputNombre" placeholder="📝 Nombre del ítem">
+        <input type="number" id="inputValor" placeholder="💰 Valor">
+        <button type="button" id="btnMasOpciones" style="margin-bottom:10px;">⚙️ Más opciones</button>
+        <div id="opcionesExtra">
+            <label><input type="checkbox" id="inputNegativo"> Negativo</label>
+            <textarea id="inputNota" placeholder="🗒️ Nota o descripción"></textarea>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+            <button id="btnGuardarDato">Guardar</button>
+            <button id="btnCancelarDato">Cancelar</button>
+        </div>
+    </div>
 
     <ul id="sidebarList"></ul>
 </div>
@@ -164,16 +136,20 @@
     const sidebarTitulo = document.getElementById("sidebarTitulo");
     const btnVolver = document.getElementById("btnVolver");
     const btnAgregarDato = document.getElementById("btnAgregarDato");
-
     const formNuevoDato = document.getElementById("formNuevoDato");
     const inputNombre = document.getElementById("inputNombre");
     const inputValor = document.getElementById("inputValor");
     const inputNegativo = document.getElementById("inputNegativo");
     const inputNota = document.getElementById("inputNota");
-    const btnGuardarDato = document.getElementById("guardarDato");
-    const btnCancelarDato = document.getElementById("cancelarDato");
-
+    const btnGuardarDato = document.getElementById("btnGuardarDato");
+    const btnCancelarDato = document.getElementById("btnCancelarDato");
     const btnCerrarSesion = document.getElementById("btnCerrarSesion");
+    const btnMasOpciones = document.getElementById("btnMasOpciones");
+    const opcionesExtra = document.getElementById("opcionesExtra");
+
+    btnMasOpciones.onclick = () => {
+        opcionesExtra.style.display = opcionesExtra.style.display === "none" ? "block" : "none";
+    };
 
     // --- CERRAR SESIÓN ---
     btnCerrarSesion.onclick = () => {
@@ -199,11 +175,11 @@
         btnVolver.style.display = "none";
         btnAgregarDato.style.display = "none";
         formNuevoDato.style.display = "none";
+        opcionesExtra.style.display = "none";
 
         const ref = db.ref(`${idEmpresa}/basededatos`);
         sidebarList.innerHTML = '';
 
-        // Escuchar cada base agregada
         ref.on('child_added', baseSnap => {
             if(!baseSnap.key) return; // evita items vacíos
             const li = document.createElement('li');
@@ -220,12 +196,12 @@
         btnVolver.style.display = "inline-block";
         btnAgregarDato.style.display = "inline-block";
         formNuevoDato.style.display = "none";
+        opcionesExtra.style.display = "none";
 
         const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-        ref.off(); // limpiar listeners previos
+        ref.off();
         sidebarList.innerHTML = '';
 
-        // Mostrar datos actuales
         ref.once('value', snapshot => {
             const itemsArray = [];
             snapshot.forEach(itemSnap => {
@@ -240,10 +216,9 @@
             });
         });
 
-        // Escuchar nuevos datos
         ref.on('child_added', itemSnap => {
             const item = itemSnap.val();
-            if(!item || !item.nombre) return; // evita items vacíos
+            if(!item || !item.nombre) return;
             const existe = Array.from(sidebarList.children).some(li => li.textContent.startsWith(item.nombre));
             if(!existe){
                 const li = document.createElement('li');
@@ -264,6 +239,7 @@
 
     btnCancelarDato.onclick = () => {
         formNuevoDato.style.display = "none";
+        opcionesExtra.style.display = "none";
         inputNombre.value = "";
         inputValor.value = "";
         inputNegativo.checked = false;
@@ -297,12 +273,12 @@
             nota: nota || ""
         });
 
-        // Limpiar formulario y ocultar
         inputNombre.value = "";
         inputValor.value = "";
         inputNegativo.checked = false;
         inputNota.value = "";
         formNuevoDato.style.display = "none";
+        opcionesExtra.style.display = "none";
     };
 
     // --- CARGAR PEDIDOS ---
@@ -330,7 +306,6 @@
             });
         });
     }
-
 </script>
 </body>
 </html>
