@@ -82,10 +82,18 @@ document.addEventListener("DOMContentLoaded", () => {
           alert(mensajeDias);
 
           // Redirigir siempre que la fecha sea válida
-          const fechaExp = parseFechaExpiracion(fechaExpStr);
-          if (fechaExp && !isNaN(fechaExp)) {
-            window.location.href = "basededatos.html";
-          }
+         const fechaExp = parseFechaExpiracion(fechaExpStr);
+const ahora = new Date();
+
+if (fechaExp && !isNaN(fechaExp)) {
+    if (ahora <= fechaExp) {
+        // Suscripción activa -> puede entrar
+        window.location.href = "basededatos.html";
+    } else {
+        // Suscripción vencida -> no entra
+        alert("❌ Su suscripción ha vencido, no puede ingresar.");
+    }
+}
 
         }).catch((err) => {
           console.error(err);
