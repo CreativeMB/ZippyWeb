@@ -4,10 +4,7 @@ const db = firebase.database();
 const btnGoogle = document.getElementById("btnGoogle");
 const errorMessage = document.getElementById("error-message");
 
-// Proveedor de Google
-const provider = new firebase.auth.GoogleAuthProvider();
-
-// Función de redirección al dashboard
+// Redirigir al dashboard
 function navigateToDashboard() {
   window.location.href = "dashboard.html";
 }
@@ -15,24 +12,23 @@ function navigateToDashboard() {
 // Login con Google
 btnGoogle.addEventListener("click", () => {
   auth.signOut(); // Cerrar sesión previa
-  auth.signInWithPopup(provider)
+  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
     .then(async (result) => {
       const user = result.user;
-
       if (!user) return;
 
-      // 🔹 Buscar idEmpresa asociado a este usuario
+      // 🔹 Obtener idEmpresa desde Usuarios/<uid>/idEmpresa
       const userRef = db.ref(`Usuarios/${user.uid}/idEmpresa`);
       const snapshot = await userRef.get();
-
       const idEmpresa = snapshot.val();
+
       if (!idEmpresa) {
         auth.signOut();
         errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
         return;
       }
 
-      // 🔹 Validar que exista el perfil de empresa
+      // 🔹 Verificar que exista perfilempresa
       const empresaRef = db.ref(`${idEmpresa}/perfilempresa`);
       const empresaSnap = await empresaRef.get();
 
@@ -42,7 +38,7 @@ btnGoogle.addEventListener("click", () => {
         return;
       }
 
-      // Todo ok, redirigir
+      // ✅ Todo ok, redirigir
       navigateToDashboard();
     })
     .catch((error) => {
@@ -51,7 +47,7 @@ btnGoogle.addEventListener("click", () => {
     });
 });
 
-// Redirigir si ya está logueado y existe idEmpresa
+// Redirigir si ya está logueado y idEmpresa existe
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
 
@@ -67,12 +63,12 @@ auth.onAuthStateChanged(async (user) => {
 
   const empresaRef = db.ref(`${idEmpresa}/perfilempresa`);
   const empresaSnap = await empresaRef.get();
+
   if (!empresaSnap.exists()) {
     auth.signOut();
     errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
     return;
   }
 
-  // Todo ok, redirigir
   navigateToDashboard();
 });
