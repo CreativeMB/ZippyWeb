@@ -271,7 +271,7 @@ function cargarBases() {
 
     // Asignar tecla para abrir formulario (ej: F2)
 document.addEventListener('keydown', (e) => {
-    if(e.key === "NumpadAdd") { // cambia "+" por la tecla que quieras
+    if(e.key === "F2") { // cambia "f2" por la tecla que quieras
         if(!baseSeleccionada) return;
         formNuevoDato.style.display = "block";
         inputNombre.focus();
@@ -355,6 +355,70 @@ function guardarDato() {
             });
         });
     }
+    // --- AUTOCOMPLETADO DE NOMBRES ---
+const suggestionsContainer = document.createElement('div');
+suggestionsContainer.id = 'suggestions';
+suggestionsContainer.style.position = 'absolute';
+suggestionsContainer.style.background = '#fff';
+suggestionsContainer.style.border = '1px solid #ccc';
+suggestionsContainer.style.borderRadius = '6px';
+suggestionsContainer.style.maxHeight = '120px';
+suggestionsContainer.style.overflowY = 'auto';
+suggestionsContainer.style.zIndex = '1000';
+formNuevoDato.appendChild(suggestionsContainer);
+
+// Posicionar sugerencias debajo del inputNombre
+inputNombre.addEventListener('input', () => {
+    const query = inputNombre.value.trim().toLowerCase();
+    if(query.length < 2){
+        suggestionsContainer.innerHTML = '';
+        suggestionsContainer.style.display = 'none';
+        return;
+    }
+
+    const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
+    ref.once('value', snapshot => {
+        const nombresExistentes = [];
+        snapshot.forEach(itemSnap => {
+            const item = itemSnap.val();
+            if(item && item.nombre && item.nombre.toLowerCase().startsWith(query)){
+                nombresExistentes.push(item.nombre);
+            }
+        });
+
+        // Mostrar sugerencias
+        suggestionsContainer.innerHTML = '';
+        if(nombresExistentes.length > 0){
+            nombresExistentes.forEach(nombre => {
+                const div = document.createElement('div');
+                div.textContent = nombre;
+                div.style.padding = '8px';
+                div.style.cursor = 'pointer';
+                div.onmouseover = () => div.style.background = '#eee';
+                div.onmouseout = () => div.style.background = '#fff';
+                div.onclick = () => {
+                    inputNombre.value = nombre;
+                    suggestionsContainer.innerHTML = '';
+                    suggestionsContainer.style.display = 'none';
+                    inputValor.focus(); // pasar al siguiente campo
+                };
+                suggestionsContainer.appendChild(div);
+            });
+            suggestionsContainer.style.display = 'block';
+        } else {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+});
+
+// Cerrar sugerencias al hacer clic fuera
+document.addEventListener('click', (e) => {
+    if(!formNuevoDato.contains(e.target)){
+        suggestionsContainer.innerHTML = '';
+        suggestionsContainer.style.display = 'none';
+    }
+});
+
 </script>
 
 </body>
