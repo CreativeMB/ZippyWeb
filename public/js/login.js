@@ -1,13 +1,18 @@
+// public/js/login.js
+
 document.addEventListener("DOMContentLoaded", () => {
   const btnGoogle = document.getElementById("btnGoogle");
   const errorMessage = document.getElementById("error-message");
 
+  // --- Función para parsear fecha de expiración con horas >= 24 ---
   function parseFechaExpiracion(fechaExpStr) {
     if (!fechaExpStr) return null;
+
     const [fechaPart, horaPart = "00:00:00"] = fechaExpStr.split(" ");
     let [hh, mm, ss] = horaPart.split(":").map(Number);
     let [dd, mmF, yyyy] = fechaPart.split("/").map(Number);
 
+    // Sumar días si hh >= 24
     const extraDias = Math.floor(hh / 24);
     hh = hh % 24;
     dd += extraDias;
@@ -16,9 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return isNaN(fecha) ? null : fecha;
   }
 
+  // --- Función para mostrar días restantes o vencidos ---
   function mostrarDiasRestantes(fechaExpStr) {
     const fecha = parseFechaExpiracion(fechaExpStr);
     if (!fecha) return "❌ Fecha de expiración inválida";
+
     const ahora = new Date();
     let mensaje = "";
 
@@ -36,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return mensaje;
   }
 
+  // --- Función para iniciar sesión con Google ---
   function iniciarSesionGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
@@ -56,19 +64,21 @@ document.addEventListener("DOMContentLoaded", () => {
           const mensajeDias = mostrarDiasRestantes(fechaExpStr);
           alert(mensajeDias);
 
+          // Validar suscripción
           const fechaExp = parseFechaExpiracion(fechaExpStr);
           const ahora = new Date();
           const fechaExpSoloDia = new Date(fechaExp.getFullYear(), fechaExp.getMonth(), fechaExp.getDate());
           const ahoraSoloDia = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
 
           if (ahoraSoloDia <= fechaExpSoloDia) {
-            // Suscripción activa -> marcar sesión válida
+            // Suscripción activa -> puede entrar
             sessionStorage.setItem("suscripcionValida", "true");
             window.location.href = "basededatos.html";
           } else {
+            // Suscripción vencida -> no entra
             alert("❌ Su suscripción ha vencido, no puede ingresar.");
             sessionStorage.setItem("suscripcionValida", "false");
-            firebase.auth().signOut(); // cerrar sesión para prevenir acceso
+            firebase.auth().signOut(); // cerrar sesión
           }
 
         }).catch(err => {
@@ -82,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
+  // --- Botón Google ---
   btnGoogle.addEventListener("click", () => {
     firebase.auth().signOut().finally(() => {
       iniciarSesionGoogle();
