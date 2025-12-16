@@ -296,8 +296,8 @@ document.addEventListener('keydown', e => {
     });
 });
 
-// --- GUARDAR DATO ---
-function guardarDato(){
+// --- FUNCION PARA GUARDAR DATO Y AGREGARLO A LA LISTA ---
+function guardarDato() {
     const nombre = inputNombre.value.trim();
     let valor = parseFloat(inputValor.value);
     const negativo = inputNegativo.checked;
@@ -307,6 +307,7 @@ function guardarDato(){
         alert("Nombre y valor son requeridos");
         return;
     }
+
     if(negativo) valor = -Math.abs(valor);
 
     const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
@@ -315,23 +316,27 @@ function guardarDato(){
     const ahora = new Date();
     const fechaHora = `${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')} ${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
 
-    ref.child(newKey).set({
+    const nuevoItem = {
         id: newKey,
         fechaHora: fechaHora,
         nombre: nombre,
         valor: valor,
         nota: nota || ""
-    });
- ref.child(newKey).set(nuevoItem, () => {
+    };
+
+    ref.child(newKey).set(nuevoItem, () => {
         // --- AGREGAR INMEDIATAMENTE A LA LISTA ---
         const li = document.createElement('li');
         li.textContent = `${nuevoItem.nombre} - ${nuevoItem.valor} (${nuevoItem.fechaHora})`;
         sidebarList.insertBefore(li, sidebarList.firstChild);
-    inputNombre.value = "";
-    inputValor.value = "";
-    inputNegativo.checked = false;
-    inputNota.value = "";
-    inputValor.focus();
+
+        // Limpiar formulario y dejar foco en nombre para nuevo dato rápido
+        inputNombre.value = "";
+        inputValor.value = "";
+        inputNegativo.checked = false;
+        inputNota.value = "";
+        inputNombre.focus();
+    });
 }
 
 // --- CARGAR PEDIDOS ---
