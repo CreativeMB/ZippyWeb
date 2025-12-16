@@ -1,23 +1,31 @@
-// Inicialización de Firebase ya está hecha por /__/firebase/init.js
+// Inicializar Firebase ya está hecho por /__/firebase/init.js
 const auth = firebase.auth();
 
 // Elementos del DOM
-const btnLogin = document.getElementById("btnLogin");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
+const btnGoogle = document.getElementById("btnGoogle");
 const errorMessage = document.getElementById("error-message");
 
-// Evento de login
-btnLogin.addEventListener("click", () => {
-  const email = emailInput.value;
-  const password = passwordInput.value;
+// Proveedor de Google
+const provider = new firebase.auth.GoogleAuthProvider();
 
-  auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      // Login exitoso
-      window.location.href = "dashboard.html"; // Página a redirigir después del login
+// Evento de login con Google
+btnGoogle.addEventListener("click", () => {
+  auth.signInWithPopup(provider)
+    .then((result) => {
+      // Usuario logueado
+      console.log("Usuario logueado:", result.user.email);
+      // Redirigir al dashboard
+      window.location.href = "dashboard.html";
     })
     .catch((error) => {
+      console.error(error);
       errorMessage.textContent = error.message;
     });
+});
+
+// Verificar si ya está logueado
+auth.onAuthStateChanged(user => {
+  if (user) {
+    window.location.href = "dashboard.html";
+  }
 });
