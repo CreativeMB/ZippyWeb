@@ -6,14 +6,13 @@
   <title>Login Empresa - ZippyWeb</title>
   <link rel="stylesheet" href="css/styles.css">
 
-  <!-- Firebase -->
+  <!-- Firebase compat -->
   <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-database-compat.js"></script>
 
-  <!-- Inicialización de Firebase -->
+  <!-- Inicialización y login -->
   <script defer src="js/init.js"></script>
-
-  <!-- Lógica del login -->
   <script defer src="js/login.js"></script>
 </head>
 <body>
@@ -24,8 +23,9 @@
       <h2 class="signInText">Zippy Administra tus finanzas</h2>
       <p class="subTitle">Toca la tarjeta para continuar</p>
       <button id="btnGoogle">Iniciar sesión con Google</button>
-      <div id="error-message"></div>
+      <div id="error-message" style="color: red; margin-top: 10px;"></div>
     </div>
   </div>
 </body>
 </html>
+
