@@ -165,34 +165,49 @@
         document.getElementById("modalDato").style.display = "none";
     };
 
-    document.getElementById("guardarDato").onclick = () => {
-        const nombre = document.getElementById("inputNombre").value.trim();
-        let valor = parseFloat(document.getElementById("inputValor").value);
-        const negativo = document.getElementById("inputNegativo").checked;
-        const nota = document.getElementById("inputNota").value.trim();
+   document.getElementById("guardarDato").onclick = () => {
+    const nombre = document.getElementById("inputNombre").value.trim();
+    let valor = parseFloat(document.getElementById("inputValor").value);
+    const negativo = document.getElementById("inputNegativo").checked;
+    const nota = document.getElementById("inputNota").value.trim();
 
-        if(!nombre || isNaN(valor)) {
-            alert("Nombre y valor son requeridos");
-            return;
-        }
+    if(!nombre || isNaN(valor)) {
+        alert("Nombre y valor son requeridos");
+        return;
+    }
 
-        if(negativo) valor = -Math.abs(valor);
+    if(negativo) valor = -Math.abs(valor);
 
-        const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
-        ref.push({
-            nombre,
-            valor,
-            nota,
-            fechaHora: new Date().toISOString()
-        });
+    const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
+    const newKey = ref.push().key;  // Genera id
 
-        // Limpiar modal
-        document.getElementById("inputNombre").value = "";
-        document.getElementById("inputValor").value = "";
-        document.getElementById("inputNegativo").checked = false;
-        document.getElementById("inputNota").value = "";
-        document.getElementById("modalDato").style.display = "none";
+    // Crear fechaHora en formato "YYYY-MM-DD HH:mm"
+    const ahora = new Date();
+    const yyyy = ahora.getFullYear();
+    const mm = String(ahora.getMonth() + 1).padStart(2,'0');
+    const dd = String(ahora.getDate()).padStart(2,'0');
+    const hh = String(ahora.getHours()).padStart(2,'0');
+    const min = String(ahora.getMinutes()).padStart(2,'0');
+    const fechaHora = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+
+    const dato = {
+        id: newKey,
+        fechaHora: fechaHora,
+        nombre: nombre,
+        valor: valor,
+        nota: nota || ""
     };
+
+    ref.child(newKey).set(dato);
+
+    // Limpiar modal
+    document.getElementById("inputNombre").value = "";
+    document.getElementById("inputValor").value = "";
+    document.getElementById("inputNegativo").checked = false;
+    document.getElementById("inputNota").value = "";
+    document.getElementById("modalDato").style.display = "none";
+};
+
 
     // --- CARGAR PEDIDOS ---
     function cargarPedidos() {
