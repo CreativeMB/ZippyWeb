@@ -170,21 +170,31 @@
         opcionesExtra.style.display = opcionesExtra.style.display === "none" ? "block" : "none";
     };
 
-    btnCerrarSesion.onclick = () => {
-        auth.signOut().then(() => window.location.reload())
-        .catch(err => alert("Error cerrando sesión: " + err.message));
-    };
+  // --- CERRAR SESIÓN ---
+btnCerrarSesion.onclick = () => {
+    const seguro = confirm("¿Está seguro que desea cerrar sesión?");
+    if(!seguro) return;
 
-    auth.onAuthStateChanged(user => {
-        if(user){
-            idEmpresa = user.uid;
-            cargarBases();
-            cargarPedidos();
-        } else {
-            alert("Debe iniciar sesión primero");
+    auth.signOut()
+        .then(() => {
+            // Opcional: redirigir al login
             window.location.href = "login.html";
-        }
-    });
+        })
+        .catch(err => alert("Error cerrando sesión: " + err.message));
+};
+
+// --- AUTH ---
+auth.onAuthStateChanged(user => {
+    if(!user){
+        // Solo redirigir si no hay usuario
+        window.location.href = "login.html";
+    } else {
+        idEmpresa = user.uid;
+        cargarBases();
+        cargarPedidos();
+    }
+});
+
 
     function cargarBases() {
         sidebarTitulo.textContent = "📂 Bases de Datos";
