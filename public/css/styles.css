@@ -1,32 +1,79 @@
+/* Fondo con gradiente */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f2f2f2;
+  margin: 0;
+  font-family: Roboto, Arial, sans-serif;
+  background: linear-gradient(to bottom right, #FF8F00, #FFC107);
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  margin: 0;
-}
-#login-container {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-  width: 300px;
-  text-align: center;
 }
 
-#login-container button {
-  width: 95%;
-  padding: 0.5rem;
+/* Contenedor de la tarjeta */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+}
+
+/* Tarjeta como CardView de Android */
+.card {
+  background-color: rgba(0, 0, 0, 0.49); /* #7C000000 */
+  border-radius: 5px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  max-width: 360px;
+  width: 100%;
+}
+
+/* Logo */
+.logo {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 12px;
+}
+
+/* Textos */
+.nombreEmpresa {
+  color: #FFC107;
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.signInText {
+  color: #FFFFFF;
+  font-size: 18px;
+  margin-top: 8px;
+}
+
+.subTitle {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+/* Botón Google */
+#btnGoogle {
+  margin-top: 20px;
+  padding: 12px 24px;
   background-color: #4285F4;
   color: white;
   border: none;
   border-radius: 4px;
+  font-size: 16px;
   cursor: pointer;
 }
 
+#btnGoogle:hover {
+  background-color: #357ae8;
+}
+
 #error-message {
-  color: red;
-  margin-top: 0.5rem;
+  color: #ff6666;
+  margin-top: 12px;
 }

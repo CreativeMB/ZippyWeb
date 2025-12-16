@@ -4,21 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login Empresa - ZippyWeb</title>
-
-  <!-- Firebase SDK -->
+  <link rel="stylesheet" href="css/styles.css">
   <script defer src="/__/firebase/12.6.0/firebase-app-compat.js"></script>
   <script defer src="/__/firebase/12.6.0/firebase-auth-compat.js"></script>
   <script defer src="/__/firebase/init.js"></script>
-
-  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <div id="login-container">
-    <h2>Login Empresa</h2>
-    <button id="btnGoogle">Iniciar sesión con Google</button>
-    <div id="error-message"></div>
+  <div class="container">
+    <div class="card" id="cardLogin">
+      <img src="img/icono.png" alt="Logo Floristería" class="logo">
+      <h1 class="nombreEmpresa">Todo en un solo lugar</h1>
+      <h2 class="signInText">Zippy Administra tus finanzas</h2>
+      <p class="subTitle">Toca la tarjeta para continuar</p>
+      <button id="btnGoogle">Iniciar sesión con Google</button>
+      <div id="error-message"></div>
+    </div>
   </div>
 
   <script src="js/login.js" defer></script>
 </body>
 </html>
+
