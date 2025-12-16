@@ -355,9 +355,16 @@ function cargarPedidos(){
     });
 }
 
-// --- AUTOCOMPLETADO CON ENTER ---
+// --- AUTOCOMPLETADO Y ENTER PARA GUARDAR ---
 const suggestionsContainer = document.createElement('div');
 suggestionsContainer.id='suggestions';
+suggestionsContainer.style.position='absolute';
+suggestionsContainer.style.background='#fff';
+suggestionsContainer.style.border='1px solid #ccc';
+suggestionsContainer.style.borderRadius='6px';
+suggestionsContainer.style.maxHeight='120px';
+suggestionsContainer.style.overflowY='auto';
+suggestionsContainer.style.zIndex='1000';
 document.body.appendChild(suggestionsContainer);
 
 function posicionarSugerencias(){
@@ -367,6 +374,7 @@ function posicionarSugerencias(){
     suggestionsContainer.style.width = rect.width + 'px';
 }
 
+// Mostrar sugerencias según lo que escribe el usuario
 inputNombre.addEventListener('input', ()=>{
     const query = inputNombre.value.trim().toLowerCase();
     if(query.length<1){ suggestionsContainer.style.display='none'; return; }
@@ -388,10 +396,13 @@ inputNombre.addEventListener('input', ()=>{
                 const div = document.createElement('div');
                 div.textContent = nombre;
                 div.style.padding='8px';
+                div.style.cursor='pointer';
+                div.onmouseover = ()=> div.style.background='#eee';
+                div.onmouseout = ()=> div.style.background='#fff';
                 div.onclick = ()=>{
                     inputNombre.value = nombre;
                     suggestionsContainer.style.display='none';
-                    inputNota.focus();
+                    guardarDato(); // Guardar inmediatamente al hacer clic
                 };
                 suggestionsContainer.appendChild(div);
             });
@@ -400,16 +411,23 @@ inputNombre.addEventListener('input', ()=>{
     });
 });
 
-// ENTER en Nombre selecciona primera sugerencia si existe
+// ENTER en Valor pasa a Nombre
+inputValor.addEventListener('keydown', e=>{
+    if(e.key === "Enter"){
+        e.preventDefault();
+        inputNombre.focus();
+    }
+});
+
+// ENTER en Nombre selecciona la primera sugerencia o guarda el dato
 inputNombre.addEventListener('keydown', e=>{
     if(e.key === "Enter"){
-        const primeraSugerencia = suggestionsContainer.firstChild;
-        if(primeraSugerencia){
-            e.preventDefault();
-            inputNombre.value = primeraSugerencia.textContent;
+        e.preventDefault();
+        if(suggestionsContainer.firstChild){
+            inputNombre.value = suggestionsContainer.firstChild.textContent;
             suggestionsContainer.style.display='none';
-            inputNota.focus();
         }
+        guardarDato(); // Guardar inmediatamente sin tocar botones
     }
 });
 
@@ -419,6 +437,7 @@ document.addEventListener('click', (e)=>{
         suggestionsContainer.style.display='none';
     }
 });
+
 
 </script>
 
