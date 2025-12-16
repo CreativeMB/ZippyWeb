@@ -5,24 +5,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorMessage = document.getElementById("error-message");
 
   // --- Función para parsear fecha de expiración con horas >= 24 ---
-  function parseFechaExpiracion(fechaExpStr) {
-    if (!fechaExpStr) return null;
+ function parseFechaExpiracion(fechaExpStr) {
+  if (!fechaExpStr) return null;
 
-    const [fechaPart, horaPart = "00:00:00"] = fechaExpStr.split(" ");
-    let [hh, mm, ss] = horaPart.split(":").map(Number);
-    let [dd, mmF, yyyy] = fechaPart.split("/").map(Number);
+  const [fechaPart, horaPart = "00:00:00"] = fechaExpStr.split(" ");
+  let [hh, mm, ss] = horaPart.split(":").map(Number);
+  let [dd, mmF, yyyy] = fechaPart.split("/").map(Number);
 
-    if (hh >= 24) {
-      const extraDias = Math.floor(hh / 24);
-      hh = hh % 24;
-      dd += extraDias;
-      // Ajustar mes y año si se desborda el mes
-      const tempDate = new Date(yyyy, mmF - 1, dd, hh, mm, ss);
-      return tempDate;
-    }
+  // Sumar días si hh >= 24
+  const extraDias = Math.floor(hh / 24);
+  hh = hh % 24;
+  dd += extraDias;
 
-    return new Date(yyyy, mmF - 1, dd, hh, mm, ss);
-  }
+  // Crear fecha JS correctamente
+  const fecha = new Date(yyyy, mmF - 1, dd, hh, mm, ss);
+
+  if (isNaN(fecha)) return null;
+  return fecha;
+}
+
 
   // --- Función para mostrar días restantes o vencidos ---
   function mostrarDiasRestantes(fechaExpStr) {
@@ -82,18 +83,19 @@ document.addEventListener("DOMContentLoaded", () => {
           alert(mensajeDias);
 
           // Redirigir siempre que la fecha sea válida
-         const fechaExp = parseFechaExpiracion(fechaExpStr);
+        const fechaExp = parseFechaExpiracion(fechaExpStr);
 const ahora = new Date();
 
-if (fechaExp && !isNaN(fechaExp)) {
-    if (ahora <= fechaExp) {
-        // Suscripción activa -> puede entrar
-        window.location.href = "basededatos.html";
-    } else {
-        // Suscripción vencida -> no entra
-        alert("❌ Su suscripción ha vencido, no puede ingresar.");
-    }
+if (!fechaExp) {
+  alert("❌ Fecha de expiración inválida");
+} else if (ahora <= fechaExp) {
+  // Suscripción activa
+  window.location.href = "basededatos.html";
+} else {
+  // Suscripción vencida
+  alert("❌ Su suscripción ha vencido, no puede ingresar.");
 }
+
 
         }).catch((err) => {
           console.error(err);
