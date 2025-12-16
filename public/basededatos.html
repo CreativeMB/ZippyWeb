@@ -205,40 +205,45 @@
     }
 
     function mostrarDatos(base) {
-        baseSeleccionada = base;
-        sidebarTitulo.textContent = `📄 Datos de: ${base}`;
-        btnVolver.style.display = "inline-block";
-        btnAgregarDato.style.display = "inline-block";
-        formNuevoDato.style.display = "none";
-        opcionesExtra.style.display = "none";
+    baseSeleccionada = base;
+    sidebarTitulo.textContent = `📄 Datos de: ${base}`;
+    btnVolver.style.display = "inline-block";
+    btnAgregarDato.style.display = "inline-block";
+    formNuevoDato.style.display = "none";
+    opcionesExtra.style.display = "none";
 
-        const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-        ref.off();
-        sidebarList.innerHTML = '';
-        ref.once('value', snapshot => {
-            const itemsArray = [];
-            snapshot.forEach(itemSnap => {
-                const item = itemSnap.val();
-                if(item && item.nombre) itemsArray.push({...item, key: itemSnap.key});
-            });
-            itemsArray.sort((a,b) => new Date(b.fechaHora) - new Date(a.fechaHora));
-            itemsArray.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = `${item.nombre} - ${item.valor}`;
-                sidebarList.appendChild(li);
-            });
-        });
-        ref.on('child_added', itemSnap => {
+    const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
+    ref.off();
+    sidebarList.innerHTML = '';
+
+    // Mostrar datos actuales
+    ref.once('value', snapshot => {
+        const itemsArray = [];
+        snapshot.forEach(itemSnap => {
             const item = itemSnap.val();
-            if(!item || !item.nombre) return;
-            const existe = Array.from(sidebarList.children).some(li => li.textContent.startsWith(item.nombre));
-            if(!existe){
-                const li = document.createElement('li');
-                li.textContent = `${item.nombre} - ${item.valor}`;
-                sidebarList.insertBefore(li, sidebarList.firstChild);
-            }
+            if(item && item.nombre) itemsArray.push({...item, key: itemSnap.key});
         });
-    }
+        itemsArray.sort((a,b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+        itemsArray.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.nombre} - ${item.valor} (${item.fechaHora})`;
+            sidebarList.appendChild(li);
+        });
+    });
+
+    // Escuchar nuevos datos en tiempo real
+    ref.on('child_added', itemSnap => {
+        const item = itemSnap.val();
+        if(!item || !item.nombre) return;
+        const existe = Array.from(sidebarList.children).some(li => li.textContent.startsWith(item.nombre));
+        if(!existe){
+            const li = document.createElement('li');
+            li.textContent = `${item.nombre} - ${item.valor} (${item.fechaHora})`;
+            sidebarList.insertBefore(li, sidebarList.firstChild);
+        }
+    });
+}
+
 
     btnVolver.onclick = () => cargarBases();
 
