@@ -355,7 +355,7 @@ function cargarPedidos(){
     });
 }
 
-// --- AUTOCOMPLETADO ---
+// --- AUTOCOMPLETADO CON ENTER ---
 const suggestionsContainer = document.createElement('div');
 suggestionsContainer.id='suggestions';
 document.body.appendChild(suggestionsContainer);
@@ -400,12 +400,26 @@ inputNombre.addEventListener('input', ()=>{
     });
 });
 
+// ENTER en Nombre selecciona primera sugerencia si existe
+inputNombre.addEventListener('keydown', e=>{
+    if(e.key === "Enter"){
+        const primeraSugerencia = suggestionsContainer.firstChild;
+        if(primeraSugerencia){
+            e.preventDefault();
+            inputNombre.value = primeraSugerencia.textContent;
+            suggestionsContainer.style.display='none';
+            inputNota.focus();
+        }
+    }
+});
+
 // Cerrar sugerencias al hacer clic fuera
 document.addEventListener('click', (e)=>{
     if(!formNuevoDato.contains(e.target)){
         suggestionsContainer.style.display='none';
     }
 });
+
 </script>
 
 </body>
