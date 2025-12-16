@@ -18,11 +18,10 @@
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
     th { background: #eee; }
-    /* Modal */
-    #modalDato { display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-        background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
-    #modalDato div { background:#fff; padding:20px; border-radius:8px; width:300px; }
-    #modalDato input, #modalDato textarea { width:100%; margin-bottom:5px; }
+    /* Formulario inline */
+    #formNuevoDato { display:none; margin-bottom:10px; padding:5px; background:#eef; border-radius:4px; }
+    #formNuevoDato input, #formNuevoDato textarea { width:100%; margin-bottom:5px; }
+    #formNuevoDato button { width:48%; margin-right:2%; }
 </style>
 </head>
 <body>
@@ -33,6 +32,17 @@
         <button id="btnVolver" style="display:none;">⬅️ Volver</button>
         <button id="btnAgregarDato" style="display:none;">➕ Nuevo Dato</button>
     </div>
+
+    <!-- Formulario inline para nuevo dato -->
+    <div id="formNuevoDato">
+        <input type="text" id="inputNombre" placeholder="Nombre">
+        <input type="number" id="inputValor" placeholder="Valor">
+        <label><input type="checkbox" id="inputNegativo"> Negativo</label><br>
+        <textarea id="inputNota" placeholder="Nota"></textarea>
+        <button id="guardarDato">Guardar</button>
+        <button id="cancelarDato">Cancelar</button>
+    </div>
+
     <ul id="sidebarList"></ul>
 </div>
 
@@ -54,22 +64,6 @@
     </table>
 </div>
 
-<!-- Modal para agregar dato -->
-<div id="modalDato">
-    <div>
-        <h3>Nuevo Dato</h3>
-        <label>Nombre:</label>
-        <input type="text" id="inputNombre"><br>
-        <label>Valor:</label>
-        <input type="number" id="inputValor"><br>
-        <label><input type="checkbox" id="inputNegativo"> Negativo</label><br>
-        <label>Nota:</label>
-        <textarea id="inputNota"></textarea><br>
-        <button id="guardarDato">Guardar</button>
-        <button id="cancelarDato">Cancelar</button>
-    </div>
-</div>
-
 <script>
     // --- CONFIGURAR FIREBASE ---
     const firebaseConfig = {
@@ -89,6 +83,15 @@
     const sidebarTitulo = document.getElementById("sidebarTitulo");
     const btnVolver = document.getElementById("btnVolver");
     const btnAgregarDato = document.getElementById("btnAgregarDato");
+
+    const formNuevoDato = document.getElementById("formNuevoDato");
+    const inputNombre = document.getElementById("inputNombre");
+    const inputValor = document.getElementById("inputValor");
+    const inputNegativo = document.getElementById("inputNegativo");
+    const inputNota = document.getElementById("inputNota");
+    const btnGuardarDato = document.getElementById("guardarDato");
+    const btnCancelarDato = document.getElementById("cancelarDato");
+
     const btnCerrarSesion = document.getElementById("btnCerrarSesion");
 
     // --- CERRAR SESIÓN ---
@@ -110,89 +113,89 @@
     });
 
     // --- CARGAR LISTA DE BASES ---
-function cargarBases() {
-    sidebarTitulo.textContent = "📂 Bases de Datos";
-    btnVolver.style.display = "none";
-    btnAgregarDato.style.display = "none";
+    function cargarBases() {
+        sidebarTitulo.textContent = "📂 Bases de Datos";
+        btnVolver.style.display = "none";
+        btnAgregarDato.style.display = "none";
+        formNuevoDato.style.display = "none";
 
-    const ref = db.ref(`${idEmpresa}/basededatos`);
-    sidebarList.innerHTML = '';
+        const ref = db.ref(`${idEmpresa}/basededatos`);
+        sidebarList.innerHTML = '';
 
-    // Escuchar cada base agregada
-    ref.on('child_added', baseSnap => {
-        const li = document.createElement('li');
-        li.textContent = baseSnap.key;
-        li.onclick = () => mostrarDatos(baseSnap.key);
-        // Insertar al inicio para más reciente primero
-        sidebarList.insertBefore(li, sidebarList.firstChild);
-    });
-}
-
-// --- MOSTRAR DATOS DE LA BASE SELECCIONADA ---
-function mostrarDatos(base) {
-    baseSeleccionada = base;
-    sidebarTitulo.textContent = `📄 Datos de: ${base}`;
-    btnVolver.style.display = "inline-block";
-    btnAgregarDato.style.display = "inline-block";
-
-    const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-
-    // Limpiar listeners previos para evitar duplicados
-    ref.off();
-
-    // Limpiar lista antes de mostrar
-    sidebarList.innerHTML = '';
-
-    // Mostrar todos los datos actuales ordenados por fechaHora descendente
-    ref.once('value', snapshot => {
-        const itemsArray = [];
-        snapshot.forEach(itemSnap => {
-            itemsArray.push({...itemSnap.val(), key: itemSnap.key});
-        });
-        itemsArray.sort((a,b) => new Date(b.fechaHora) - new Date(a.fechaHora));
-        itemsArray.forEach(item => {
+        // Escuchar cada base agregada
+        ref.on('child_added', baseSnap => {
+            if(!baseSnap.key) return; // evita items vacíos
             const li = document.createElement('li');
-            li.textContent = `${item.nombre || ''} - ${item.valor || ''}`;
+            li.textContent = baseSnap.key;
+            li.onclick = () => mostrarDatos(baseSnap.key);
             sidebarList.appendChild(li);
         });
-    });
+    }
 
-    // Escuchar nuevos datos en tiempo real
-    ref.on('child_added', itemSnap => {
-        const item = itemSnap.val();
-        // Evitar duplicar los existentes ya cargados
-        const existe = Array.from(sidebarList.children).some(li => li.textContent.includes(item.nombre));
-        if(!existe) {
-            const li = document.createElement('li');
-            li.textContent = `${item.nombre || ''} - ${item.valor || ''}`;
-            // Insertar al inicio para el más reciente primero
-            sidebarList.insertBefore(li, sidebarList.firstChild);
-        }
-    });
-}
+    // --- MOSTRAR DATOS DE LA BASE SELECCIONADA ---
+    function mostrarDatos(base) {
+        baseSeleccionada = base;
+        sidebarTitulo.textContent = `📄 Datos de: ${base}`;
+        btnVolver.style.display = "inline-block";
+        btnAgregarDato.style.display = "inline-block";
+        formNuevoDato.style.display = "none";
 
+        const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
+        ref.off(); // limpiar listeners previos
+        sidebarList.innerHTML = '';
 
+        // Mostrar datos actuales
+        ref.once('value', snapshot => {
+            const itemsArray = [];
+            snapshot.forEach(itemSnap => {
+                const item = itemSnap.val();
+                if(item && item.nombre) itemsArray.push({...item, key: itemSnap.key});
+            });
+            itemsArray.sort((a,b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+            itemsArray.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `${item.nombre} - ${item.valor}`;
+                sidebarList.appendChild(li);
+            });
+        });
 
-    // --- VOLVER AL LISTADO DE BASES ---
+        // Escuchar nuevos datos
+        ref.on('child_added', itemSnap => {
+            const item = itemSnap.val();
+            if(!item || !item.nombre) return; // evita items vacíos
+            const existe = Array.from(sidebarList.children).some(li => li.textContent.startsWith(item.nombre));
+            if(!existe){
+                const li = document.createElement('li');
+                li.textContent = `${item.nombre} - ${item.valor}`;
+                sidebarList.insertBefore(li, sidebarList.firstChild);
+            }
+        });
+    }
+
+    // --- VOLVER ---
     btnVolver.onclick = () => cargarBases();
 
-    // --- MODAL AGREGAR NUEVO DATO ---
+    // --- Mostrar formulario inline ---
     btnAgregarDato.onclick = () => {
         if(!baseSeleccionada) return;
-        document.getElementById("modalDato").style.display = "flex";
+        formNuevoDato.style.display = "block";
     };
 
-    document.getElementById("cancelarDato").onclick = () => {
-        document.getElementById("modalDato").style.display = "none";
+    btnCancelarDato.onclick = () => {
+        formNuevoDato.style.display = "none";
+        inputNombre.value = "";
+        inputValor.value = "";
+        inputNegativo.checked = false;
+        inputNota.value = "";
     };
 
-    document.getElementById("guardarDato").onclick = () => {
-        const nombre = document.getElementById("inputNombre").value.trim();
-        let valor = parseFloat(document.getElementById("inputValor").value);
-        const negativo = document.getElementById("inputNegativo").checked;
-        const nota = document.getElementById("inputNota").value.trim();
+    btnGuardarDato.onclick = () => {
+        const nombre = inputNombre.value.trim();
+        let valor = parseFloat(inputValor.value);
+        const negativo = inputNegativo.checked;
+        const nota = inputNota.value.trim();
 
-        if(!nombre || isNaN(valor)) {
+        if(!nombre || isNaN(valor)){
             alert("Nombre y valor son requeridos");
             return;
         }
@@ -200,33 +203,25 @@ function mostrarDatos(base) {
         if(negativo) valor = -Math.abs(valor);
 
         const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
-        const newKey = ref.push().key;  // Genera id
+        const newKey = ref.push().key;
 
-        // Crear fechaHora en formato "YYYY-MM-DD HH:mm"
         const ahora = new Date();
-        const yyyy = ahora.getFullYear();
-        const mm = String(ahora.getMonth() + 1).padStart(2,'0');
-        const dd = String(ahora.getDate()).padStart(2,'0');
-        const hh = String(ahora.getHours()).padStart(2,'0');
-        const min = String(ahora.getMinutes()).padStart(2,'0');
-        const fechaHora = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+        const fechaHora = `${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')} ${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
 
-        const dato = {
+        ref.child(newKey).set({
             id: newKey,
             fechaHora: fechaHora,
             nombre: nombre,
             valor: valor,
             nota: nota || ""
-        };
+        });
 
-        ref.child(newKey).set(dato);
-
-        // Limpiar modal
-        document.getElementById("inputNombre").value = "";
-        document.getElementById("inputValor").value = "";
-        document.getElementById("inputNegativo").checked = false;
-        document.getElementById("inputNota").value = "";
-        document.getElementById("modalDato").style.display = "none";
+        // Limpiar formulario y ocultar
+        inputNombre.value = "";
+        inputValor.value = "";
+        inputNegativo.checked = false;
+        inputNota.value = "";
+        formNuevoDato.style.display = "none";
     };
 
     // --- CARGAR PEDIDOS ---
@@ -254,6 +249,7 @@ function mostrarDatos(base) {
             });
         });
     }
+
 </script>
 </body>
 </html>
