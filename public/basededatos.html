@@ -269,30 +269,68 @@ function cargarBases() {
         inputNota.value = "";
     };
 
-    btnGuardarDato.onclick = () => {
-        const nombre = inputNombre.value.trim();
-        let valor = parseFloat(inputValor.value);
-        const negativo = inputNegativo.checked;
-        const nota = inputNota.value.trim();
+    // Asignar tecla para abrir formulario (ej: F2)
+document.addEventListener('keydown', (e) => {
+    if(e.key === "F2") { // cambia "F2" por la tecla que quieras
+        if(!baseSeleccionada) return;
+        formNuevoDato.style.display = "block";
+        inputNombre.focus();
+        e.preventDefault();
+    }
+});
 
-        if(!nombre || isNaN(valor)){ alert("Nombre y valor son requeridos"); return; }
-        if(negativo) valor = -Math.abs(valor);
+// Mover entre campos con Enter y guardar
+[inputNombre, inputValor, inputNota].forEach((input, index, arr) => {
+    input.addEventListener('keydown', (e) => {
+        if(e.key === "Enter") {
+            e.preventDefault();
+            // Si hay más campos, ir al siguiente
+            if(index < arr.length - 1) {
+                arr[index + 1].focus();
+            } else {
+                // Último campo, guardar dato
+                guardarDato();
+            }
+        }
+    });
+});
 
-        const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
-        const newKey = ref.push().key;
+// Función que guarda el dato
+function guardarDato() {
+    const nombre = inputNombre.value.trim();
+    let valor = parseFloat(inputValor.value);
+    const negativo = inputNegativo.checked;
+    const nota = inputNota.value.trim();
 
-        const ahora = new Date();
-        const fechaHora = `${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')} ${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
+    if(!nombre || isNaN(valor)){
+        alert("Nombre y valor son requeridos");
+        return;
+    }
 
-        ref.child(newKey).set({ id:newKey, fechaHora, nombre, valor, nota: nota || "" });
+    if(negativo) valor = -Math.abs(valor);
 
-        inputNombre.value = "";
-        inputValor.value = "";
-        inputNegativo.checked = false;
-        inputNota.value = "";
-        formNuevoDato.style.display = "none";
-        opcionesExtra.style.display = "none";
-    };
+    const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
+    const newKey = ref.push().key;
+
+    const ahora = new Date();
+    const fechaHora = `${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')} ${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
+
+    ref.child(newKey).set({
+        id: newKey,
+        fechaHora: fechaHora,
+        nombre: nombre,
+        valor: valor,
+        nota: nota || ""
+    });
+
+    // Limpiar formulario y dejar foco en nombre para nuevo dato rápido
+    inputNombre.value = "";
+    inputValor.value = "";
+    inputNegativo.checked = false;
+    inputNota.value = "";
+    inputNombre.focus();
+}
+
 
     function cargarPedidos() {
         const ref = db.ref(`${idEmpresa}/Pedidos`);
