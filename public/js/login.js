@@ -84,17 +84,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // Validar si la suscripción está activa
           const fechaExp = parseFechaExpiracion(fechaExpStr);
-          const ahora = new Date();
+const ahora = new Date();
 
-          if (!fechaExp) {
-            alert("❌ Fecha de expiración inválida");
-          } else if (ahora <= fechaExp) {
-            // Suscripción activa -> puede entrar
-            window.location.href = "basededatos.html";
-          } else {
-            // Suscripción vencida -> no entra
-            alert("❌ Su suscripción ha vencido, no puede ingresar.");
-          }
+// Solo comparar fechas, ignorando horas
+const fechaExpSoloDia = new Date(fechaExp.getFullYear(), fechaExp.getMonth(), fechaExp.getDate());
+const ahoraSoloDia = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+
+if (ahoraSoloDia <= fechaExpSoloDia) {
+    // Suscripción activa -> puede entrar
+    window.location.href = "basededatos.html";
+} else {
+    // Suscripción vencida -> no entra
+    alert("❌ Su suscripción ha vencido, no puede ingresar.");
+}
+
 
         }).catch((err) => {
           console.error(err);
