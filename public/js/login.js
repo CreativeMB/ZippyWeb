@@ -2,36 +2,46 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnGoogle = document.getElementById("btnGoogle");
   const errorMessage = document.getElementById("error-message");
 
-  // Función para mostrar los días restantes
   function mostrarDiasRestantes(fechaExpStr) {
     if (!fechaExpStr) return "❌ Fecha de expiración no disponible";
 
-    // Separar fecha y hora
     const parts = fechaExpStr.split(" ");
     const fechaPart = parts[0];
-    const horaPart = parts[1] || "00:00:00"; // Si no hay hora, usar medianoche
+    let horaPart = parts[1] || "00:00:00";
 
-    // Convertir DD/MM/YYYY a YYYY-MM-DD
-    const fechaISO = fechaPart.split("/").reverse().join("-") + "T" + horaPart;
+    // Ajustar hora si es >=24
+    let [hh, mm, ss] = horaPart.split(":").map(Number);
+    let date = fechaPart.split("/").reverse().join("-"); // YYYY-MM-DD
+
+    if (hh >= 24) {
+        hh = hh - 24;
+        const fechaJS = new Date(date + "T00:00:00");
+        fechaJS.setDate(fechaJS.getDate() + 1); // sumar un día
+        date = fechaJS.toISOString().split("T")[0]; // nuevo YYYY-MM-DD
+    }
+
+    const fechaISO = `${date}T${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
     const fecha = new Date(fechaISO);
+
     if (isNaN(fecha)) return "❌ Fecha de expiración inválida";
 
     const ahora = new Date();
     let mensaje = "";
 
     if (ahora < fecha) {
-      const diff = fecha - ahora;
-      const diasRestantes = Math.ceil(diff / (1000 * 60 * 60 * 24));
-      mensaje = `⏳ Suscripción activa. Vence en ${diasRestantes} día(s).`;
+        const diff = fecha - ahora;
+        const diasRestantes = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        mensaje = `⏳ Suscripción activa. Vence en ${diasRestantes} día(s).`;
     } else if (ahora.toDateString() === fecha.toDateString()) {
-      mensaje = "⚠️ Tu suscripción vence hoy";
+        mensaje = "⚠️ Tu suscripción vence hoy";
     } else {
-      const diff = ahora - fecha;
-      const diasVencidos = Math.ceil(diff / (1000 * 60 * 60 * 24));
-      mensaje = `❌ Suscripción vencida hace ${diasVencidos} día(s)`;
+        const diff = ahora - fecha;
+        const diasVencidos = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        mensaje = `❌ Suscripción vencida hace ${diasVencidos} día(s)`;
     }
     return mensaje;
-  }
+}
+
 
   // Función para iniciar sesión con Google
   function iniciarSesionGoogle() {
