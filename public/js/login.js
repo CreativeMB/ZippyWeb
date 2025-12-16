@@ -1,16 +1,24 @@
-// public/js/login.js
-
 document.addEventListener("DOMContentLoaded", () => {
   const btnGoogle = document.getElementById("btnGoogle");
   const errorMessage = document.getElementById("error-message");
 
   // Función para mostrar los días restantes
   function mostrarDiasRestantes(fechaExpStr) {
-    const fechaParts = fechaExpStr.split(" ");
-    const fecha = new Date(fechaParts[0].split("/").reverse().join("-") + "T" + fechaParts[1]);
-    const ahora = new Date();
+    if (!fechaExpStr) return "❌ Fecha de expiración no disponible";
 
+    // Separar fecha y hora
+    const parts = fechaExpStr.split(" ");
+    const fechaPart = parts[0];
+    const horaPart = parts[1] || "00:00:00"; // Si no hay hora, usar medianoche
+
+    // Convertir DD/MM/YYYY a YYYY-MM-DD
+    const fechaISO = fechaPart.split("/").reverse().join("-") + "T" + horaPart;
+    const fecha = new Date(fechaISO);
+    if (isNaN(fecha)) return "❌ Fecha de expiración inválida";
+
+    const ahora = new Date();
     let mensaje = "";
+
     if (ahora < fecha) {
       const diff = fecha - ahora;
       const diasRestantes = Math.ceil(diff / (1000 * 60 * 60 * 24));
@@ -40,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log("UID Google:", user.uid);
 
-        // Referencia al perfil de empresa
         const empresaRef = firebase.database().ref(user.uid + "/perfilempresa");
 
         empresaRef.get().then((snapshot) => {
@@ -48,7 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const empresaData = snapshot.val();
             console.log("Perfil empresa:", empresaData);
 
-            // Validar fechaExpiracion
             const fechaExpStr = empresaData.fechaExpiracion;
             if (!fechaExpStr) {
               alert("❌ No se encontró la fecha de expiración de la empresa.");
@@ -58,13 +64,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const mensajeDias = mostrarDiasRestantes(fechaExpStr);
             alert(mensajeDias);
 
-            const fechaParts = fechaExpStr.split(" ");
-            const fechaExp = new Date(fechaParts[0].split("/").reverse().join("-") + "T" + fechaParts[1]);
-            const ahora = new Date();
-
-            if (ahora <= fechaExp) {
-              // Suscripción activa, redirigir
-              window.location.href = "basededatos.html"; // Ajusta según tu web
+            // Redirigir solo si la suscripción no está vencida
+            const parts = fechaExpStr.split(" ");
+            const fechaISO = parts[0].split("/").reverse().join("-") + "T" + (parts[1] || "00:00:00");
+            const fechaExp = new Date(fechaISO);
+            if (!isNaN(fechaExp) && new Date() <= fechaExp) {
+              window.location.href = "basededatos.html";
             }
 
           } else {
@@ -83,11 +88,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   btnGoogle.addEventListener("click", () => {
-    // Siempre cerrar sesión primero para forzar login nuevo
     firebase.auth().signOut().finally(() => {
       iniciarSesionGoogle();
     });
   });
-
-  // ⚠️ Aquí quitamos la parte de onAuthStateChanged para que no verifique sesiones previas
 });
