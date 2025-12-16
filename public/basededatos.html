@@ -110,47 +110,44 @@
     });
 
     // --- CARGAR LISTA DE BASES ---
-    function cargarBases() {
-        sidebarTitulo.textContent = "📂 Bases de Datos";
-        btnVolver.style.display = "none";
-        btnAgregarDato.style.display = "none";
+function cargarBases() {
+    sidebarTitulo.textContent = "📂 Bases de Datos";
+    btnVolver.style.display = "none";
+    btnAgregarDato.style.display = "none";
 
-        const ref = db.ref(`${idEmpresa}/basededatos`);
-        ref.on('value', snapshot => {
-            sidebarList.innerHTML = '';
-            const basesArray = [];
-            snapshot.forEach(baseSnap => basesArray.push(baseSnap.key));
-            basesArray.reverse(); // Más reciente primero
-            basesArray.forEach(nombreBase => {
-                const li = document.createElement('li');
-                li.textContent = nombreBase;
-                li.onclick = () => mostrarDatos(nombreBase);
-                sidebarList.appendChild(li);
-            });
-        });
-    }
+    const ref = db.ref(`${idEmpresa}/basededatos`);
+    sidebarList.innerHTML = '';
 
-    // --- MOSTRAR DATOS DE LA BASE SELECCIONADA ---
-    function mostrarDatos(base) {
-        baseSeleccionada = base;
-        sidebarTitulo.textContent = `📄 Datos de: ${base}`;
-        btnVolver.style.display = "inline-block";
-        btnAgregarDato.style.display = "inline-block";
+    // Escuchar cada base agregada
+    ref.on('child_added', baseSnap => {
+        const li = document.createElement('li');
+        li.textContent = baseSnap.key;
+        li.onclick = () => mostrarDatos(baseSnap.key);
+        // Insertar al inicio para más reciente primero
+        sidebarList.insertBefore(li, sidebarList.firstChild);
+    });
+}
 
-        const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-        ref.on('value', snapshot => {
-            sidebarList.innerHTML = '';
-            const itemsArray = [];
-            snapshot.forEach(itemSnap => itemsArray.push({...itemSnap.val(), key:itemSnap.key}));
-            // Orden descendente por fechaHora
-            itemsArray.sort((a,b) => new Date(b.fechaHora) - new Date(a.fechaHora));
-            itemsArray.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = `${item.nombre || ''} - ${item.valor || ''}`;
-                sidebarList.appendChild(li);
-            });
-        });
-    }
+// --- MOSTRAR DATOS DE LA BASE SELECCIONADA ---
+function mostrarDatos(base) {
+    baseSeleccionada = base;
+    sidebarTitulo.textContent = `📄 Datos de: ${base}`;
+    btnVolver.style.display = "inline-block";
+    btnAgregarDato.style.display = "inline-block";
+
+    const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
+    sidebarList.innerHTML = '';
+
+    // Escuchar cada dato agregado
+    ref.on('child_added', itemSnap => {
+        const item = itemSnap.val();
+        const li = document.createElement('li');
+        li.textContent = `${item.nombre || ''} - ${item.valor || ''}`;
+        // Insertar al inicio para que el más reciente quede primero
+        sidebarList.insertBefore(li, sidebarList.firstChild);
+    });
+}
+
 
     // --- VOLVER AL LISTADO DE BASES ---
     btnVolver.onclick = () => cargarBases();
