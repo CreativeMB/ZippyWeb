@@ -7,92 +7,112 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-    body { font-family: Arial, sans-serif; margin: 0; height: 100vh; display: flex; }
-    #sidebar { width: 20%; background: #f4f4f4; padding: 10px; overflow-y: auto; box-sizing: border-box; }
+    body { font-family: 'Roboto', sans-serif; margin: 0; height: 100vh; display: flex; background: linear-gradient(to bottom, #FFA000, #FFCA28); }
+    #sidebar { width: 25%; background: #f9f9f9; padding: 15px; overflow-y: auto; box-sizing: border-box; border-right: 2px solid #ddd; }
     #sidebar h3 { margin-top: 0; }
-    #sidebar ul { list-style: none; padding: 0; margin: 10px 0; }
-    #sidebar li { padding: 8px; background: #fff; margin-bottom: 5px; cursor: pointer; border-radius: 4px; }
-    #sidebar li:hover { background: #ddd; }
-    #sidebar button { margin: 2px; }
-    #main { width: 80%; padding: 10px; overflow-y: auto; box-sizing: border-box; }
+    #sidebar ul { list-style: none; padding: 0; margin: 15px 0; }
+    #sidebar li { padding: 10px; background: #fff; margin-bottom: 8px; cursor: pointer; border-radius: 6px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    #sidebar li:hover { background: #eee; }
+    #sidebar button { margin: 5px 0; padding: 10px; width: 100%; border-radius: 6px; border: none; cursor: pointer; font-size: 16px; }
+
+    #main { width: 75%; padding: 15px; overflow-y: auto; box-sizing: border-box; }
+
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; font-size: 16px; }
     th { background: #eee; }
 
-    /* Formulario inline interactivo */
+    /* Formulario estilo card */
     #formNuevoDato {
         display: none;
-        margin-bottom: 15px;
-        padding: 15px;
-        background: linear-gradient(145deg, #eef2ff, #d9e4ff);
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        animation: slideFadeIn 0.3s ease forwards;
+        margin: 15px 0;
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
     }
-    @keyframes slideFadeIn {
-        0% { opacity: 0; transform: translateY(-20px);}
-        100% { opacity: 1; transform: translateY(0);}
-    }
-    #formNuevoDato input, 
+
+    #formNuevoDato input,
     #formNuevoDato textarea {
         width: 100%;
-        margin-bottom: 12px;
-        padding: 14px 12px;
-        font-size: 16px;
+        margin-bottom: 15px;
+        padding: 18px 15px;
+        font-size: 18px;
         border: 2px solid #ccc;
-        border-radius: 8px;
+        border-radius: 10px;
         box-sizing: border-box;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
     }
+
     #formNuevoDato input:focus,
     #formNuevoDato textarea:focus {
         border-color: #4a90e2;
-        box-shadow: 0 0 8px rgba(74,144,226,0.6);
+        box-shadow: 0 0 10px rgba(74,144,226,0.5);
         outline: none;
         background-color: #f0f8ff;
     }
-    #formNuevoDato textarea { resize: vertical; min-height: 60px; }
-    #formNuevoDato button {
-        width: 48%;
-        padding: 12px;
-        font-size: 16px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-        margin-right: 2%;
-    }
-    #guardarDato { background-color: #4CAF50; color: white; }
-    #guardarDato:hover { background-color: #45a049; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    #cancelarDato { background-color: #f44336; color: white; }
-    #cancelarDato:hover { background-color: #e53935; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-    /* Más opciones */
-    #opcionesExtra { display:none; margin-bottom:10px; }
-    #opcionesExtra label { display:flex; align-items:center; gap:5px; }
+    #formNuevoDato textarea { min-height: 80px; resize: vertical; }
+
+    #btnMasOpciones {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border: none;
+        background-color: #FFC107;
+        color: #333;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    #btnMasOpciones:hover { background-color: #FFB300; }
+
+    #opcionesExtra { display: none; margin-bottom: 15px; }
+
+    #opcionesExtra label { display: flex; align-items: center; gap: 8px; font-size: 16px; margin-bottom: 10px; }
+    #opcionesExtra input[type="checkbox"] { transform: scale(1.3); cursor: pointer; }
+
+    /* Botones grandes */
+    #formNuevoDato .botones {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    #formNuevoDato button.guardar,
+    #formNuevoDato button.cancelar {
+        flex: 1;
+        padding: 15px;
+        font-size: 18px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    #formNuevoDato button.guardar { background-color: #4CAF50; color: #fff; }
+    #formNuevoDato button.guardar:hover { background-color: #45a049; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    #formNuevoDato button.cancelar { background-color: #f44336; color: #fff; }
+    #formNuevoDato button.cancelar:hover { background-color: #e53935; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 </style>
 </head>
 <body>
 
 <div id="sidebar">
     <h3 id="sidebarTitulo">📂 Bases de Datos</h3>
-    <div id="sidebarBotones">
-        <button id="btnVolver" style="display:none;">⬅️ Volver</button>
-        <button id="btnAgregarDato" style="display:none;">➕ Nuevo Dato</button>
-    </div>
+    <button id="btnVolver" style="display:none;">⬅️ Volver</button>
+    <button id="btnAgregarDato" style="display:none;">➕ Nuevo Dato</button>
 
-    <!-- Formulario inline para nuevo dato -->
     <div id="formNuevoDato">
         <input type="text" id="inputNombre" placeholder="📝 Nombre del ítem">
         <input type="number" id="inputValor" placeholder="💰 Valor">
-        <button type="button" id="btnMasOpciones" style="margin-bottom:10px;">⚙️ Más opciones</button>
+        <button type="button" id="btnMasOpciones">⚙️ Más opciones</button>
         <div id="opcionesExtra">
             <label><input type="checkbox" id="inputNegativo"> Negativo</label>
             <textarea id="inputNota" placeholder="🗒️ Nota o descripción"></textarea>
         </div>
-        <div style="display:flex; justify-content:space-between;">
-            <button id="btnGuardarDato">Guardar</button>
-            <button id="btnCancelarDato">Cancelar</button>
+        <div class="botones">
+            <button id="btnGuardarDato" class="guardar">Guardar</button>
+            <button id="btnCancelarDato" class="cancelar">Cancelar</button>
         </div>
     </div>
 
@@ -101,7 +121,7 @@
 
 <div id="main">
     <h3>📝 Pedidos</h3>
-    <button id="btnCerrarSesion" style="margin-bottom:10px;">🚪 Cerrar Sesión</button>
+    <button id="btnCerrarSesion" style="margin-bottom:10px; padding:12px 15px; font-size:16px;">🚪 Cerrar Sesión</button>
     <table id="tablaPedidos">
         <thead>
             <tr>
@@ -118,7 +138,6 @@
 </div>
 
 <script>
-    // --- CONFIGURAR FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyBTphfyjQbU1AKt6sYFepJ8Q8mGp3sbtOA",
         authDomain: "zippy-727d5.firebaseapp.com",
@@ -151,13 +170,11 @@
         opcionesExtra.style.display = opcionesExtra.style.display === "none" ? "block" : "none";
     };
 
-    // --- CERRAR SESIÓN ---
     btnCerrarSesion.onclick = () => {
         auth.signOut().then(() => window.location.reload())
         .catch(err => alert("Error cerrando sesión: " + err.message));
     };
 
-    // --- AUTH ---
     auth.onAuthStateChanged(user => {
         if(user){
             idEmpresa = user.uid;
@@ -169,7 +186,6 @@
         }
     });
 
-    // --- CARGAR LISTA DE BASES ---
     function cargarBases() {
         sidebarTitulo.textContent = "📂 Bases de Datos";
         btnVolver.style.display = "none";
@@ -179,9 +195,8 @@
 
         const ref = db.ref(`${idEmpresa}/basededatos`);
         sidebarList.innerHTML = '';
-
         ref.on('child_added', baseSnap => {
-            if(!baseSnap.key) return; // evita items vacíos
+            if(!baseSnap.key) return;
             const li = document.createElement('li');
             li.textContent = baseSnap.key;
             li.onclick = () => mostrarDatos(baseSnap.key);
@@ -189,7 +204,6 @@
         });
     }
 
-    // --- MOSTRAR DATOS DE LA BASE SELECCIONADA ---
     function mostrarDatos(base) {
         baseSeleccionada = base;
         sidebarTitulo.textContent = `📄 Datos de: ${base}`;
@@ -201,7 +215,6 @@
         const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
         ref.off();
         sidebarList.innerHTML = '';
-
         ref.once('value', snapshot => {
             const itemsArray = [];
             snapshot.forEach(itemSnap => {
@@ -215,7 +228,6 @@
                 sidebarList.appendChild(li);
             });
         });
-
         ref.on('child_added', itemSnap => {
             const item = itemSnap.val();
             if(!item || !item.nombre) return;
@@ -228,15 +240,9 @@
         });
     }
 
-    // --- VOLVER ---
     btnVolver.onclick = () => cargarBases();
 
-    // --- Mostrar formulario inline ---
-    btnAgregarDato.onclick = () => {
-        if(!baseSeleccionada) return;
-        formNuevoDato.style.display = "block";
-    };
-
+    btnAgregarDato.onclick = () => { if(baseSeleccionada) formNuevoDato.style.display = "block"; };
     btnCancelarDato.onclick = () => {
         formNuevoDato.style.display = "none";
         opcionesExtra.style.display = "none";
@@ -252,11 +258,7 @@
         const negativo = inputNegativo.checked;
         const nota = inputNota.value.trim();
 
-        if(!nombre || isNaN(valor)){
-            alert("Nombre y valor son requeridos");
-            return;
-        }
-
+        if(!nombre || isNaN(valor)){ alert("Nombre y valor son requeridos"); return; }
         if(negativo) valor = -Math.abs(valor);
 
         const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
@@ -265,13 +267,7 @@
         const ahora = new Date();
         const fechaHora = `${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')} ${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
 
-        ref.child(newKey).set({
-            id: newKey,
-            fechaHora: fechaHora,
-            nombre: nombre,
-            valor: valor,
-            nota: nota || ""
-        });
+        ref.child(newKey).set({ id:newKey, fechaHora, nombre, valor, nota: nota || "" });
 
         inputNombre.value = "";
         inputValor.value = "";
@@ -281,11 +277,9 @@
         opcionesExtra.style.display = "none";
     };
 
-    // --- CARGAR PEDIDOS ---
     function cargarPedidos() {
         const ref = db.ref(`${idEmpresa}/Pedidos`);
         const tbody = document.querySelector("#tablaPedidos tbody");
-
         ref.on('value', snapshot => {
             tbody.innerHTML = '';
             snapshot.forEach(domicSnap => {
@@ -307,5 +301,6 @@
         });
     }
 </script>
+
 </body>
 </html>
