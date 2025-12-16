@@ -136,17 +136,41 @@ function mostrarDatos(base) {
     btnAgregarDato.style.display = "inline-block";
 
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
+
+    // Limpiar listeners previos para evitar duplicados
+    ref.off();
+
+    // Limpiar lista antes de mostrar
     sidebarList.innerHTML = '';
 
-    // Escuchar cada dato agregado
+    // Mostrar todos los datos actuales ordenados por fechaHora descendente
+    ref.once('value', snapshot => {
+        const itemsArray = [];
+        snapshot.forEach(itemSnap => {
+            itemsArray.push({...itemSnap.val(), key: itemSnap.key});
+        });
+        itemsArray.sort((a,b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+        itemsArray.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.nombre || ''} - ${item.valor || ''}`;
+            sidebarList.appendChild(li);
+        });
+    });
+
+    // Escuchar nuevos datos en tiempo real
     ref.on('child_added', itemSnap => {
         const item = itemSnap.val();
-        const li = document.createElement('li');
-        li.textContent = `${item.nombre || ''} - ${item.valor || ''}`;
-        // Insertar al inicio para que el más reciente quede primero
-        sidebarList.insertBefore(li, sidebarList.firstChild);
+        // Evitar duplicar los existentes ya cargados
+        const existe = Array.from(sidebarList.children).some(li => li.textContent.includes(item.nombre));
+        if(!existe) {
+            const li = document.createElement('li');
+            li.textContent = `${item.nombre || ''} - ${item.valor || ''}`;
+            // Insertar al inicio para el más reciente primero
+            sidebarList.insertBefore(li, sidebarList.firstChild);
+        }
     });
 }
+
 
 
     // --- VOLVER AL LISTADO DE BASES ---
