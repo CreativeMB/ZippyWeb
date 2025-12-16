@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Base de Datos - Zippy Contabilidad</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { color: #333; }
+        button { margin: 5px; padding: 8px 12px; }
+        ul { list-style: none; padding: 0; }
+        li { background: #f4f4f4; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .oculto { color: gray; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+<h2>📂 Bases de Datos</h2>
+<button id="btnCrearBase">➕ Crear Base</button>
+<button id="btnExportar">📤 Exportar Datos</button>
+<ul id="listaBases"></ul>
+
+<h2>📝 Pedidos</h2>
+<table id="tablaPedidos">
+    <thead>
+        <tr>
+            <th>Domiciliario</th>
+            <th>ID Pedido</th>
+            <th>Nombre</th>
+            <th>Nota</th>
+            <th>Valor</th>
+            <th>Fecha Entrega</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    // --- CONFIGURAR FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyBTphfyjQbU1AKt6sYFepJ8Q8mGp3sbtOA",
+        authDomain: "zippy-727d5.firebaseapp.com",
+        databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
+        projectId: "zippy-727d5"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    let idEmpresa = null;
+
+    // Verificar usuario autenticado
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            idEmpresa = user.uid;
+            cargarBases();
+            cargarPedidos();
+        } else {
+            alert("Debe iniciar sesión primero");
+            window.location.href = "login.html";
+        }
+    });
+
+    // --- FUNCIONES BASES DE DATOS ---
+    function cargarBases() {
+        const ref = db.ref(`${idEmpresa}/basededatos`);
+        const listaBases = document.getElementById("listaBases");
+        listaBases.innerHTML = '';
+
+        ref.on('value', snapshot => {
+            listaBases.innerHTML = '';
+            snapshot.forEach(baseSnap => {
+                const nombreBase = baseSnap.key;
+                const oculto = baseSnap.child('oculto').val() || false;
+                const li = document.createElement('li');
+                li.textContent = nombreBase;
+                if(oculto) li.classList.add('oculto');
+
+                const btnRenombrar = document.createElement('button');
+                btnRenombrar.textContent = "✏️";
+                btnRenombrar.onclick = () => renombrarBase(nombreBase);
+
+                const btnEliminar = document.createElement('button');
+                btnEliminar.textContent = "🗑️";
+                btnEliminar.onclick = () => eliminarBase(nombreBase);
+
+                li.appendChild(btnRenombrar);
+                li.appendChild(btnEliminar);
+
+                listaBases.appendChild(li);
+            });
+        });
+    }
+
+    function crearBase() {
+        const nombre = prompt("Ingrese nombre de la nueva base (sin espacios ni emojis)");
+        if(!nombre || nombre.includes(' ') || /[\uD800-\uDFFF]/.test(nombre)) {
+            alert("Nombre inválido");
+            return;
+        }
+
+        const ref = db.ref(`${idEmpresa}/basededatos/${nombre}`);
+        ref.once('value', snap => {
+            if(snap.exists()) {
+                alert("Ya existe una base con ese nombre");
+            } else {
+                const timestamp = new Date().toISOString();
+                ref.set({ timestamp, fechaCreacion: timestamp, oculto: false });
+            }
+        });
+    }
+
+    function renombrarBase(oldName) {
+        const newName = prompt("Ingrese nuevo nombre para la base:", oldName);
+        if(!newName || newName.includes(' ') || /[\uD800-\uDFFF]/.test(newName)) {
+            alert("Nombre inválido");
+            return;
+        }
+
+        const oldRef = db.ref(`${idEmpresa}/basededatos/${oldName}`);
+        const newRef = db.ref(`${idEmpresa}/basededatos/${newName}`);
+
+        newRef.once('value', snap => {
+            if(snap.exists()) {
+                alert("Ya existe una base con ese nombre");
+            } else {
+                oldRef.once('value', snapOld => {
+                    newRef.set(snapOld.val()).then(() => oldRef.remove());
+                });
+            }
+        });
+    }
+
+    function eliminarBase(nombre) {
+        if(confirm(`Eliminar base ${nombre}?`)) {
+            db.ref(`${idEmpresa}/basededatos/${nombre}`).remove();
+        }
+    }
+
+    document.getElementById("btnCrearBase").onclick = crearBase;
+
+    // --- FUNCIONES PEDIDOS ---
+    function cargarPedidos() {
+        const ref = db.ref(`${idEmpresa}/Pedidos`);
+        const tbody = document.querySelector("#tablaPedidos tbody");
+        tbody.innerHTML = '';
+
+        ref.on('value', snapshot => {
+            tbody.innerHTML = '';
+            snapshot.forEach(domicSnap => {
+                const idDomic = domicSnap.key;
+                domicSnap.forEach(pedidoSnap => {
+                    const p = pedidoSnap.val();
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${idDomic}</td>
+                        <td>${pedidoSnap.key}</td>
+                        <td>${p.nombre || ''}</td>
+                        <td>${p.nota || ''}</td>
+                        <td>${p.valor || ''}</td>
+                        <td>${p.diaEntrega || ''}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        });
+    }
+
+    // --- EXPORTAR A CSV ---
+    document.getElementById("btnExportar").onclick = () => {
+        db.ref(`${idEmpresa}/basededatos`).once('value').then(snapshot => {
+            let csvContent = "data:text/csv;charset=utf-8,Base,ID,Nombre,Nota,Valor,FechaHora\n";
+
+            snapshot.forEach(baseSnap => {
+                const baseName = baseSnap.key;
+                baseSnap.forEach(itemSnap => {
+                    const item = itemSnap.val();
+                    csvContent += [
+                        baseName,
+                        item.id || '',
+                        item.nombre || '',
+                        item.nota || '',
+                        item.valor || '',
+                        item.fechaHora || ''
+                    ].join(",") + "\n";
+                });
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            const ts = new Date().toISOString().replace(/[:.]/g,'-');
+            link.setAttribute("download", `Zippy_Datos_${ts}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    };
+</script>
+
+</body>
+</html>
