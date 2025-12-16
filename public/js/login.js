@@ -1,11 +1,32 @@
 // public/js/login.js
 
-// Función para iniciar sesión con Google
 document.addEventListener("DOMContentLoaded", () => {
   const btnGoogle = document.getElementById("btnGoogle");
   const errorMessage = document.getElementById("error-message");
 
-  btnGoogle.addEventListener("click", () => {
+  // Función para mostrar los días restantes
+  function mostrarDiasRestantes(fechaExpStr) {
+    const fechaParts = fechaExpStr.split(" ");
+    const fecha = new Date(fechaParts[0].split("/").reverse().join("-") + "T" + fechaParts[1]);
+    const ahora = new Date();
+
+    let mensaje = "";
+    if (ahora < fecha) {
+      const diff = fecha - ahora;
+      const diasRestantes = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      mensaje = `⏳ Suscripción activa. Vence en ${diasRestantes} día(s).`;
+    } else if (ahora.toDateString() === fecha.toDateString()) {
+      mensaje = "⚠️ Tu suscripción vence hoy";
+    } else {
+      const diff = ahora - fecha;
+      const diasVencidos = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      mensaje = `❌ Suscripción vencida hace ${diasVencidos} día(s)`;
+    }
+    return mensaje;
+  }
+
+  // Función para iniciar sesión con Google
+  function iniciarSesionGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
@@ -19,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log("UID Google:", user.uid);
 
-        // Referencia al perfil de empresa en Realtime Database
+        // Referencia al perfil de empresa
         const empresaRef = firebase.database().ref(user.uid + "/perfilempresa");
 
         empresaRef.get().then((snapshot) => {
@@ -29,18 +50,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Validar fechaExpiracion
             const fechaExpStr = empresaData.fechaExpiracion;
-            if (fechaExpStr) {
-              const fechaExp = new Date(fechaExpStr.split(" ")[0].split("/").reverse().join("-") + "T" + fechaExpStr.split(" ")[1]);
-              const now = new Date();
-
-              if (now <= fechaExp) {
-                // Suscripción activa, redirigir al dashboard
-                window.location.href = "basededatos.html"; // Ajusta según tu web
-              } else {
-                alert(`❌ Suscripción vencida el ${fechaExpStr}. Contacta al administrador.`);
-              }
-            } else {
+            if (!fechaExpStr) {
               alert("❌ No se encontró la fecha de expiración de la empresa.");
+              return;
+            }
+
+            const mensajeDias = mostrarDiasRestantes(fechaExpStr);
+            alert(mensajeDias);
+
+            const fechaParts = fechaExpStr.split(" ");
+            const fechaExp = new Date(fechaParts[0].split("/").reverse().join("-") + "T" + fechaParts[1]);
+            const ahora = new Date();
+
+            if (ahora <= fechaExp) {
+              // Suscripción activa, redirigir
+              window.location.href = "basededatos.html"; // Ajusta según tu web
             }
 
           } else {
@@ -56,5 +80,41 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error(error);
         errorMessage.textContent = "Error al autenticar con Google: " + error.message;
       });
+  }
+
+  btnGoogle.addEventListener("click", () => {
+    // Si ya hay usuario logueado, cerrar sesión primero
+    if (firebase.auth().currentUser) {
+      firebase.auth().signOut().then(() => {
+        iniciarSesionGoogle();
+      }).catch((err) => {
+        console.error("Error cerrando sesión:", err);
+        iniciarSesionGoogle(); // Intentar iniciar sesión de todas formas
+      });
+    } else {
+      iniciarSesionGoogle();
+    }
+  });
+
+  // Detectar si ya hay sesión activa al cargar la página
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      console.log("Usuario ya autenticado:", user.uid);
+      // Verificar empresa automáticamente
+      const empresaRef = firebase.database().ref(user.uid + "/perfilempresa");
+      empresaRef.get().then((snapshot) => {
+        if (snapshot.exists()) {
+          const empresaData = snapshot.val();
+          const mensajeDias = mostrarDiasRestantes(empresaData.fechaExpiracion);
+          alert("Ya logueado: " + mensajeDias);
+          const fechaParts = empresaData.fechaExpiracion.split(" ");
+          const fechaExp = new Date(fechaParts[0].split("/").reverse().join("-") + "T" + fechaParts[1]);
+          const ahora = new Date();
+          if (ahora <= fechaExp) {
+            window.location.href = "basededatos.html";
+          }
+        }
+      });
+    }
   });
 });
