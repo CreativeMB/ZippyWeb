@@ -21,7 +21,6 @@
     th, td { border: 1px solid #ccc; padding: 10px; text-align: left; font-size: 16px; }
     th { background: #eee; }
 
-    /* Formulario estilo card */
     #formNuevoDato {
         display: none;
         margin: 15px 0;
@@ -30,6 +29,7 @@
         border-radius: 12px;
         box-shadow: 0 6px 15px rgba(0,0,0,0.2);
         transition: all 0.3s ease;
+        position: relative;
     }
 
     #formNuevoDato input,
@@ -73,7 +73,6 @@
     #opcionesExtra label { display: flex; align-items: center; gap: 8px; font-size: 16px; margin-bottom: 10px; }
     #opcionesExtra input[type="checkbox"] { transform: scale(1.3); cursor: pointer; }
 
-    /* Botones grandes */
     #formNuevoDato .botones {
         display: flex;
         justify-content: space-between;
@@ -93,6 +92,19 @@
     #formNuevoDato button.guardar:hover { background-color: #45a049; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     #formNuevoDato button.cancelar { background-color: #f44336; color: #fff; }
     #formNuevoDato button.cancelar:hover { background-color: #e53935; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+    /* Sugerencias */
+    #suggestions {
+        position: absolute;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        max-height: 120px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+    }
+    #suggestions div:hover { background: #eee; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -112,7 +124,7 @@
         <div class="botones">
             <button id="btnGuardarDato" class="guardar">Guardar</button>
             <button id="btnCancelarDato" class="cancelar">Cancelar</button>
-             <button type="button" id="btnMasOpciones">⚙️ Más opciones</button>
+            <button type="button" id="btnMasOpciones">⚙️ Más opciones</button>
         </div>
     </div>
 
@@ -138,55 +150,50 @@
 </div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyBTphfyjQbU1AKt6sYFepJ8Q8mGp3sbtOA",
-        authDomain: "zippy-727d5.firebaseapp.com",
-        databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
-        projectId: "zippy-727d5"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
+const firebaseConfig = {
+    apiKey: "AIzaSyBTphfyjQbU1AKt6sYFepJ8Q8mGp3sbtOA",
+    authDomain: "zippy-727d5.firebaseapp.com",
+    databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
+    projectId: "zippy-727d5"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
 
-    let idEmpresa = null;
-    let baseSeleccionada = null;
+let idEmpresa = null;
+let baseSeleccionada = null;
 
-    const sidebarList = document.getElementById("sidebarList");
-    const sidebarTitulo = document.getElementById("sidebarTitulo");
-    const btnVolver = document.getElementById("btnVolver");
-    const btnAgregarDato = document.getElementById("btnAgregarDato");
-    const formNuevoDato = document.getElementById("formNuevoDato");
-    const inputNombre = document.getElementById("inputNombre");
-    const inputValor = document.getElementById("inputValor");
-    const inputNegativo = document.getElementById("inputNegativo");
-    const inputNota = document.getElementById("inputNota");
-    const btnGuardarDato = document.getElementById("btnGuardarDato");
-    const btnCancelarDato = document.getElementById("btnCancelarDato");
-    const btnCerrarSesion = document.getElementById("btnCerrarSesion");
-    const btnMasOpciones = document.getElementById("btnMasOpciones");
-    const opcionesExtra = document.getElementById("opcionesExtra");
+const sidebarList = document.getElementById("sidebarList");
+const sidebarTitulo = document.getElementById("sidebarTitulo");
+const btnVolver = document.getElementById("btnVolver");
+const btnAgregarDato = document.getElementById("btnAgregarDato");
+const formNuevoDato = document.getElementById("formNuevoDato");
+const inputNombre = document.getElementById("inputNombre");
+const inputValor = document.getElementById("inputValor");
+const inputNegativo = document.getElementById("inputNegativo");
+const inputNota = document.getElementById("inputNota");
+const btnGuardarDato = document.getElementById("btnGuardarDato");
+const btnCancelarDato = document.getElementById("btnCancelarDato");
+const btnCerrarSesion = document.getElementById("btnCerrarSesion");
+const btnMasOpciones = document.getElementById("btnMasOpciones");
+const opcionesExtra = document.getElementById("opcionesExtra");
 
-    btnMasOpciones.onclick = () => {
-        opcionesExtra.style.display = opcionesExtra.style.display === "none" ? "block" : "none";
-    };
+// --- Más opciones ---
+btnMasOpciones.onclick = () => {
+    opcionesExtra.style.display = opcionesExtra.style.display === "none" ? "block" : "none";
+};
 
-  // --- CERRAR SESIÓN ---
+// --- CERRAR SESIÓN ---
 btnCerrarSesion.onclick = () => {
-    const seguro = confirm("¿Está seguro que desea cerrar sesión?");
-    if(!seguro) return;
-
-    auth.signOut()
-        .then(() => {
-            // Opcional: redirigir al login
-            window.location.href = "login.html";
-        })
+    if(confirm("¿Está seguro que desea cerrar sesión?")){
+        auth.signOut().then(()=> window.location.href="login.html")
         .catch(err => alert("Error cerrando sesión: " + err.message));
+    }
 };
 
 // --- AUTH ---
 auth.onAuthStateChanged(user => {
     if(!user){
-        // Solo redirigir si no hay usuario
         window.location.href = "login.html";
     } else {
         idEmpresa = user.uid;
@@ -195,6 +202,7 @@ auth.onAuthStateChanged(user => {
     }
 });
 
+// --- CARGAR BASES ---
 function cargarBases() {
     sidebarTitulo.textContent = "📂 Bases de Datos";
     btnVolver.style.display = "none";
@@ -210,13 +218,12 @@ function cargarBases() {
         const li = document.createElement('li');
         li.textContent = baseSnap.key;
         li.onclick = () => mostrarDatos(baseSnap.key);
-        // Insertar al inicio para mostrar la más reciente primero
         sidebarList.insertBefore(li, sidebarList.firstChild);
     });
 }
 
-
-    function mostrarDatos(base) {
+// --- MOSTRAR DATOS DE BASE ---
+function mostrarDatos(base) {
     baseSeleccionada = base;
     sidebarTitulo.textContent = `📄 Datos de: ${base}`;
     btnVolver.style.display = "inline-block";
@@ -228,7 +235,7 @@ function cargarBases() {
     ref.off();
     sidebarList.innerHTML = '';
 
-    // Mostrar datos actuales
+    // Datos actuales
     ref.once('value', snapshot => {
         const itemsArray = [];
         snapshot.forEach(itemSnap => {
@@ -243,7 +250,7 @@ function cargarBases() {
         });
     });
 
-    // Escuchar nuevos datos en tiempo real
+    // Nuevos datos en tiempo real
     ref.on('child_added', itemSnap => {
         const item = itemSnap.val();
         if(!item || !item.nombre) return;
@@ -256,47 +263,41 @@ function cargarBases() {
     });
 }
 
+// --- BOTONES ---
+btnVolver.onclick = () => cargarBases();
+btnAgregarDato.onclick = () => { if(baseSeleccionada){ formNuevoDato.style.display = "block"; inputValor.focus(); } };
+btnCancelarDato.onclick = () => {
+    formNuevoDato.style.display = "none";
+    opcionesExtra.style.display = "none";
+    inputNombre.value = "";
+    inputValor.value = "";
+    inputNegativo.checked = false;
+    inputNota.value = "";
+};
 
-    btnVolver.onclick = () => cargarBases();
-
-    btnAgregarDato.onclick = () => { if(baseSeleccionada) formNuevoDato.style.display = "block"; };
-    btnCancelarDato.onclick = () => {
-        formNuevoDato.style.display = "none";
-        opcionesExtra.style.display = "none";
-        inputNombre.value = "";
-        inputValor.value = "";
-        inputNegativo.checked = false;
-        inputNota.value = "";
-    };
-
-    // Asignar tecla para abrir formulario (ej: F2)
-document.addEventListener('keydown', (e) => {
-    if(e.key === "F2") { // cambia "f2" por la tecla que quieras
+// --- TECLAS ---
+document.addEventListener('keydown', e => {
+    if(e.key === "F2"){ 
         if(!baseSeleccionada) return;
         formNuevoDato.style.display = "block";
-        inputNombre.focus();
+        inputValor.focus();
         e.preventDefault();
     }
 });
 
-// Mover entre campos con Enter y guardar
-[inputNombre, inputValor, inputNota].forEach((input, index, arr) => {
-    input.addEventListener('keydown', (e) => {
-        if(e.key === "Enter") {
+// Enter entre campos
+[inputValor, inputNombre, inputNota].forEach((input,index,arr)=>{
+    input.addEventListener('keydown', e=>{
+        if(e.key==="Enter"){
             e.preventDefault();
-            // Si hay más campos, ir al siguiente
-            if(index < arr.length - 1) {
-                arr[index + 1].focus();
-            } else {
-                // Último campo, guardar dato
-                guardarDato();
-            }
+            if(index < arr.length-1) arr[index+1].focus();
+            else guardarDato();
         }
     });
 });
 
-// Función que guarda el dato
-function guardarDato() {
+// --- GUARDAR DATO ---
+function guardarDato(){
     const nombre = inputNombre.value.trim();
     let valor = parseFloat(inputValor.value);
     const negativo = inputNegativo.checked;
@@ -306,7 +307,6 @@ function guardarDato() {
         alert("Nombre y valor son requeridos");
         return;
     }
-
     if(negativo) valor = -Math.abs(valor);
 
     const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
@@ -323,102 +323,89 @@ function guardarDato() {
         nota: nota || ""
     });
 
-    // Limpiar formulario y dejar foco en nombre para nuevo dato rápido
     inputNombre.value = "";
     inputValor.value = "";
     inputNegativo.checked = false;
     inputNota.value = "";
-    inputNombre.focus();
+    inputValor.focus();
 }
 
-
-    function cargarPedidos() {
-        const ref = db.ref(`${idEmpresa}/Pedidos`);
-        const tbody = document.querySelector("#tablaPedidos tbody");
-        ref.on('value', snapshot => {
-            tbody.innerHTML = '';
-            snapshot.forEach(domicSnap => {
-                const idDomic = domicSnap.key;
-                domicSnap.forEach(pedidoSnap => {
-                    const p = pedidoSnap.val();
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${idDomic}</td>
-                        <td>${pedidoSnap.key}</td>
-                        <td>${p.nombre || ''}</td>
-                        <td>${p.nota || ''}</td>
-                        <td>${p.valor || ''}</td>
-                        <td>${p.diaEntrega || ''}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+// --- CARGAR PEDIDOS ---
+function cargarPedidos(){
+    const ref = db.ref(`${idEmpresa}/Pedidos`);
+    const tbody = document.querySelector("#tablaPedidos tbody");
+    ref.on('value', snapshot=>{
+        tbody.innerHTML='';
+        snapshot.forEach(domicSnap=>{
+            const idDomic = domicSnap.key;
+            domicSnap.forEach(pedidoSnap=>{
+                const p = pedidoSnap.val();
+                const tr = document.createElement('tr');
+                tr.innerHTML=`
+                    <td>${idDomic}</td>
+                    <td>${pedidoSnap.key}</td>
+                    <td>${p.nombre||''}</td>
+                    <td>${p.nota||''}</td>
+                    <td>${p.valor||''}</td>
+                    <td>${p.diaEntrega||''}</td>
+                `;
+                tbody.appendChild(tr);
             });
         });
-    }
-    // --- AUTOCOMPLETADO DE NOMBRES ---
-const suggestionsContainer = document.createElement('div');
-suggestionsContainer.id = 'suggestions';
-suggestionsContainer.style.position = 'absolute';
-suggestionsContainer.style.background = '#fff';
-suggestionsContainer.style.border = '1px solid #ccc';
-suggestionsContainer.style.borderRadius = '6px';
-suggestionsContainer.style.maxHeight = '120px';
-suggestionsContainer.style.overflowY = 'auto';
-suggestionsContainer.style.zIndex = '1000';
-formNuevoDato.appendChild(suggestionsContainer);
+    });
+}
 
-// Posicionar sugerencias debajo del inputNombre
-inputNombre.addEventListener('input', () => {
+// --- AUTOCOMPLETADO ---
+const suggestionsContainer = document.createElement('div');
+suggestionsContainer.id='suggestions';
+document.body.appendChild(suggestionsContainer);
+
+function posicionarSugerencias(){
+    const rect = inputNombre.getBoundingClientRect();
+    suggestionsContainer.style.top = rect.bottom + window.scrollY + 'px';
+    suggestionsContainer.style.left = rect.left + window.scrollX + 'px';
+    suggestionsContainer.style.width = rect.width + 'px';
+}
+
+inputNombre.addEventListener('input', ()=>{
     const query = inputNombre.value.trim().toLowerCase();
-    if(query.length < 2){
-        suggestionsContainer.innerHTML = '';
-        suggestionsContainer.style.display = 'none';
-        return;
-    }
+    if(query.length<1){ suggestionsContainer.style.display='none'; return; }
 
     const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
-    ref.once('value', snapshot => {
+    ref.once('value', snapshot=>{
         const nombresExistentes = [];
-        snapshot.forEach(itemSnap => {
+        snapshot.forEach(itemSnap=>{
             const item = itemSnap.val();
             if(item && item.nombre && item.nombre.toLowerCase().startsWith(query)){
                 nombresExistentes.push(item.nombre);
             }
         });
 
-        // Mostrar sugerencias
-        suggestionsContainer.innerHTML = '';
-        if(nombresExistentes.length > 0){
-            nombresExistentes.forEach(nombre => {
+        suggestionsContainer.innerHTML='';
+        if(nombresExistentes.length>0){
+            posicionarSugerencias();
+            nombresExistentes.forEach(nombre=>{
                 const div = document.createElement('div');
                 div.textContent = nombre;
-                div.style.padding = '8px';
-                div.style.cursor = 'pointer';
-                div.onmouseover = () => div.style.background = '#eee';
-                div.onmouseout = () => div.style.background = '#fff';
-                div.onclick = () => {
+                div.style.padding='8px';
+                div.onclick = ()=>{
                     inputNombre.value = nombre;
-                    suggestionsContainer.innerHTML = '';
-                    suggestionsContainer.style.display = 'none';
-                    inputValor.focus(); // pasar al siguiente campo
+                    suggestionsContainer.style.display='none';
+                    inputNota.focus();
                 };
                 suggestionsContainer.appendChild(div);
             });
-            suggestionsContainer.style.display = 'block';
-        } else {
-            suggestionsContainer.style.display = 'none';
-        }
+            suggestionsContainer.style.display='block';
+        } else suggestionsContainer.style.display='none';
     });
 });
 
 // Cerrar sugerencias al hacer clic fuera
-document.addEventListener('click', (e) => {
+document.addEventListener('click', (e)=>{
     if(!formNuevoDato.contains(e.target)){
-        suggestionsContainer.innerHTML = '';
-        suggestionsContainer.style.display = 'none';
+        suggestionsContainer.style.display='none';
     }
 });
-
 </script>
 
 </body>
