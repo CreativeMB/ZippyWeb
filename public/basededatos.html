@@ -195,24 +195,26 @@ auth.onAuthStateChanged(user => {
     }
 });
 
+function cargarBases() {
+    sidebarTitulo.textContent = "📂 Bases de Datos";
+    btnVolver.style.display = "none";
+    btnAgregarDato.style.display = "none";
+    formNuevoDato.style.display = "none";
+    opcionesExtra.style.display = "none";
 
-    function cargarBases() {
-        sidebarTitulo.textContent = "📂 Bases de Datos";
-        btnVolver.style.display = "none";
-        btnAgregarDato.style.display = "none";
-        formNuevoDato.style.display = "none";
-        opcionesExtra.style.display = "none";
+    const ref = db.ref(`${idEmpresa}/basededatos`);
+    sidebarList.innerHTML = '';
 
-        const ref = db.ref(`${idEmpresa}/basededatos`);
-        sidebarList.innerHTML = '';
-        ref.on('child_added', baseSnap => {
-            if(!baseSnap.key) return;
-            const li = document.createElement('li');
-            li.textContent = baseSnap.key;
-            li.onclick = () => mostrarDatos(baseSnap.key);
-            sidebarList.appendChild(li);
-        });
-    }
+    ref.on('child_added', baseSnap => {
+        if(!baseSnap.key) return;
+        const li = document.createElement('li');
+        li.textContent = baseSnap.key;
+        li.onclick = () => mostrarDatos(baseSnap.key);
+        // Insertar al inicio para mostrar la más reciente primero
+        sidebarList.insertBefore(li, sidebarList.firstChild);
+    });
+}
+
 
     function mostrarDatos(base) {
     baseSeleccionada = base;
