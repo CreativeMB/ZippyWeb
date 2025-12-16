@@ -1,19 +1,25 @@
-// Firebase Auth
 const auth = firebase.auth();
-
-// Elementos del DOM
 const btnGoogle = document.getElementById("btnGoogle");
 const errorMessage = document.getElementById("error-message");
 
 // Proveedor de Google
 const provider = new firebase.auth.GoogleAuthProvider();
 
-// Login con popup
+// Login con Google
 btnGoogle.addEventListener("click", () => {
   auth.signInWithPopup(provider)
-    .then((result) => {
-      console.log("Usuario logueado:", result.user.email);
-      window.location.href = "dashboard.html";
+    .then(async (result) => {
+      const user = result.user;
+
+      // Verificar si el usuario existe en Firebase
+      if (user.metadata.creationTime === user.metadata.lastSignInTime) {
+        // El usuario es nuevo → no permitir login desde la web
+        auth.signOut();
+        errorMessage.textContent = "Debes registrarte primero en la aplicación móvil.";
+      } else {
+        // Usuario existente → permitir login
+        window.location.href = "dashboard.html";
+      }
     })
     .catch((error) => {
       console.error(error);
@@ -21,9 +27,11 @@ btnGoogle.addEventListener("click", () => {
     });
 });
 
-// Redirigir si ya está logueado
+// Redirigir si ya está logueado y existe
 auth.onAuthStateChanged(user => {
   if (user) {
-    window.location.href = "dashboard.html";
+    if (user.metadata.creationTime !== user.metadata.lastSignInTime) {
+      window.location.href = "dashboard.html";
+    }
   }
 });
