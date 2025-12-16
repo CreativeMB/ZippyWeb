@@ -1,101 +1,143 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Base de Datos - Zippy Contabilidad</title>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; }
-        header { display: flex; justify-content: flex-end; padding: 10px; background-color: #f2f2f2; }
-        #btnCerrarSesion { padding: 6px 12px; }
+<meta charset="UTF-8">
+<title>Base de Datos - Sidebar Interactivo</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; }
+header { display: flex; justify-content: flex-end; padding: 10px; background-color: #f2f2f2; }
+#btnCerrarSesion { padding: 6px 12px; }
 
-        #container { display: flex; flex: 1; height: calc(100% - 50px); }
-        #sidebar { width: 20%; background-color: #f9f9f9; border-right: 1px solid #ccc; padding: 10px; overflow-y: auto; }
-        #sidebar h2 { font-size: 16px; margin-top: 0; }
-        #sidebar ul { list-style: none; padding: 0; }
-        #sidebar li { padding: 8px; margin-bottom: 5px; background-color: #eee; border-radius: 4px; cursor: pointer; }
-        #sidebar li:hover { background-color: #ddd; }
+#container { display: flex; flex: 1; height: calc(100% - 50px); }
+#sidebar { width: 20%; background-color: #f9f9f9; border-right: 1px solid #ccc; padding: 10px; overflow-y: auto; }
+#sidebar h2 { font-size: 16px; margin-top: 0; }
+#sidebar ul { list-style: none; padding: 0; }
+#sidebar li { padding: 8px; margin-bottom: 5px; background-color: #eee; border-radius: 4px; cursor: pointer; }
+#sidebar li:hover { background-color: #ddd; }
+button.sidebar-btn { margin: 5px 0; padding: 6px 10px; width: 100%; }
 
-        #main { width: 80%; padding: 10px; overflow-y: auto; }
-    </style>
+#main { width: 80%; padding: 10px; overflow-y: auto; }
+#main h2 { margin-top: 0; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f2f2f2; }
+</style>
 </head>
 <body>
 
 <header>
-    <button id="btnCerrarSesion">🚪 Cerrar Sesión</button>
+<button id="btnCerrarSesion">🚪 Cerrar Sesión</button>
 </header>
 
 <div id="container">
     <div id="sidebar">
-        <h2>📂 Bases de Datos</h2>
-        <ul id="listaBases"></ul>
+        <h2 id="sidebarTitulo">📂 Bases de Datos</h2>
+        <ul id="sidebarList"></ul>
+        <button id="btnVolver" class="sidebar-btn" style="display:none;">🔙 Volver a Bases</button>
+        <button id="btnAgregarDato" class="sidebar-btn" style="display:none;">➕ Agregar Nuevo Dato</button>
     </div>
 
     <div id="main">
-        <h2>📝 Pedidos</h2>
-        <p>Aquí se cargarán los pedidos cuando se seleccione una base de datos.</p>
+        <h2>Área Principal</h2>
+        <p>Aquí puedes mostrar información general o dejarlo vacío.</p>
     </div>
 </div>
 
 <script>
-    // --- CONFIGURAR FIREBASE ---
-    const firebaseConfig = {
-        apiKey: "AIzaSyBTphfyjQbU1AKt6sYFepJ8Q8mGp3sbtOA",
-        authDomain: "zippy-727d5.firebaseapp.com",
-        databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
-        projectId: "zippy-727d5"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
-    let idEmpresa = null;
+// --- Configurar Firebase ---
+const firebaseConfig = {
+    apiKey: "AIzaSyBTphfyjQbU1AKt6sYFepJ8Q8mGp3sbtOA",
+    authDomain: "zippy-727d5.firebaseapp.com",
+    databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
+    projectId: "zippy-727d5"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
 
-    // --- CERRAR SESIÓN ---
-    document.getElementById("btnCerrarSesion").onclick = () => {
-        auth.signOut().then(() => {
-            alert("Sesión cerrada correctamente");
-            window.location.href = "login.html";
-        }).catch(error => {
-            alert("Error al cerrar sesión: " + error.message);
-        });
-    };
+let idEmpresa = null;
+let baseSeleccionada = null;
 
-    // --- Verificar usuario autenticado ---
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            idEmpresa = user.uid;
-            cargarBases();
-        } else {
-            alert("Debe iniciar sesión primero");
-            window.location.href = "login.html";
-        }
-    });
+// --- Cerrar sesión ---
+document.getElementById("btnCerrarSesion").onclick = () => {
+    auth.signOut().then(() => {
+        alert("Sesión cerrada correctamente");
+        window.location.href = "login.html";
+    }).catch(error => alert("Error al cerrar sesión: " + error.message));
+};
 
-    // --- Cargar bases de datos ---
-    function cargarBases() {
-        const ref = db.ref(`${idEmpresa}/basededatos`);
-        const listaBases = document.getElementById("listaBases");
-        listaBases.innerHTML = '';
-
-        ref.on('value', snapshot => {
-            listaBases.innerHTML = '';
-            snapshot.forEach(baseSnap => {
-                const nombreBase = baseSnap.key;
-                const li = document.createElement('li');
-                li.textContent = nombreBase;
-
-                // Cuando hagan click, podemos capturar la base seleccionada
-                li.onclick = () => {
-                    alert(`Seleccionaste la base: ${nombreBase}`);
-                    // Aquí más adelante cargaremos los pedidos correspondientes
-                };
-
-                listaBases.appendChild(li);
-            });
-        });
+// --- Verificar usuario autenticado ---
+auth.onAuthStateChanged(user => {
+    if (user) {
+        idEmpresa = user.uid;
+        mostrarBases();
+    } else {
+        alert("Debe iniciar sesión primero");
+        window.location.href = "login.html";
     }
+});
+
+const sidebarList = document.getElementById("sidebarList");
+const sidebarTitulo = document.getElementById("sidebarTitulo");
+const btnVolver = document.getElementById("btnVolver");
+const btnAgregarDato = document.getElementById("btnAgregarDato");
+
+// --- Mostrar listado de bases ---
+function mostrarBases() {
+    sidebarTitulo.textContent = "📂 Bases de Datos";
+    sidebarList.innerHTML = '';
+    btnVolver.style.display = "none";
+    btnAgregarDato.style.display = "none";
+    baseSeleccionada = null;
+
+    db.ref(`${idEmpresa}/basededatos`).once('value').then(snapshot => {
+        snapshot.forEach(baseSnap => {
+            const li = document.createElement('li');
+            li.textContent = baseSnap.key;
+            li.onclick = () => mostrarDatos(baseSnap.key);
+            sidebarList.appendChild(li);
+        });
+    });
+}
+
+// --- Mostrar datos de la base en el sidebar ---
+function mostrarDatos(base) {
+    baseSeleccionada = base;
+    sidebarTitulo.textContent = `📄 Datos de: ${base}`;
+    sidebarList.innerHTML = '';
+    btnVolver.style.display = "inline-block";
+    btnAgregarDato.style.display = "inline-block";
+
+    const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
+    ref.on('value', snapshot => {
+        sidebarList.innerHTML = '';
+        snapshot.forEach(itemSnap => {
+            const li = document.createElement('li');
+            const item = itemSnap.val();
+            li.textContent = `${item.nombre || itemSnap.key} - ${item.valor || ''}`;
+            sidebarList.appendChild(li);
+        });
+    });
+}
+
+// --- Botón volver al listado de bases ---
+btnVolver.onclick = () => mostrarBases();
+
+// --- Botón agregar nuevo dato ---
+btnAgregarDato.onclick = () => {
+    if (!baseSeleccionada) return alert("Seleccione primero una base.");
+
+    const nombre = prompt("Nombre del dato:");
+    if (!nombre) return;
+    const valor = prompt("Valor:");
+    const id = Date.now().toString();
+
+    const nuevoDato = { id, nombre, valor, fechaHora: new Date().toISOString() };
+    db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}/${id}`).set(nuevoDato);
+};
 </script>
 
 </body>
