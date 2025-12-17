@@ -355,16 +355,17 @@ th {
     background: #f5f5f5;
     border-radius: 8px;
 }
+
 .whatsapp-link {
-    color: inherit;          /* mismo color del texto */
+    color: #1a73e8;       /* azul */
     text-decoration: none;
-    font-weight: bold;
-    cursor: pointer;
+    font-weight: 600;
 }
 
 .whatsapp-link:hover {
     text-decoration: underline;
 }
+
 
 
 
@@ -821,17 +822,19 @@ function crearPedidoCard(p, domi) {
                     ${p.referencia || 'Pedido'}
                 </div>
 
- <div class="linea">
+<div class="linea">
     👤 ${p.nombreCliente || ''}
     <div class="sub-linea">
         N°:
         <a class="whatsapp-link"
            href="https://wa.me/${(p.cliente || '').replace(/\D/g, '')}"
-           target="_blank">
-           ${p.cliente || ''}
+    
+           rel="noopener">
+            ${p.cliente || ''}
         </a>
     </div>
 </div>
+
 
 <div class="linea">
     🎁 ${p.nombreDestinatario || ''}
