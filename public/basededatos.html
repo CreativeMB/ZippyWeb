@@ -856,13 +856,16 @@ function formatearFechaBonita(fecha) {
     const [d, m, y] = fecha.split('-');
     const date = new Date(y, m - 1, d);
 
-    return date.toLocaleDateString('es-CO', {
+    const fechaTexto = date.toLocaleDateString('es-CO', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
         year: 'numeric'
     });
+
+    return `Pedidos para Entrega:  ${fechaTexto}`;
 }
+
 
 
 
