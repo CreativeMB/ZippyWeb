@@ -213,48 +213,57 @@ th {
     #suggestions div:hover { background: #eee; cursor: pointer; }
      /* pedidos */
     #pedidosGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
 }
 
 .pedido-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(0,0,0,.2);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .pedido-img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background: #eee;
 }
 
 .pedido-body {
-  padding: 12px;
-  font-size: 14px;
+    padding: 12px;
+    font-size: 14px;
+}
+
+.pedido-body h4 {
+    margin: 0 0 6px;
+    font-size: 18px;
+}
+
+.pedido-body p {
+    margin: 3px 0;
 }
 
 .pedido-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background: #f3f3f3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f3f3f3;
+    font-size: 13px;
+    font-weight: bold;
 }
 
 .color-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
 }
 
-.rojo { background: #e53935; }
-.verde { background: #43a047; }
-.amarillo { background: #fbc02d; }
 
 </style>
 </head>
@@ -284,20 +293,18 @@ th {
 
 <div id="main">
     <button id="btnCerrarSesion" style="margin-bottom:10px; padding:12px 15px; font-size:16px;">🚪 Cerrar Sesión</button>
-    <h3>📝 Pedidos</h3>
-    <table id="tablaPedidos">
-        <thead>
-            <tr>
-                <th>Domiciliario</th>
-                <th>ID Pedido</th>
-                <th>Nombre</th>
-                <th>Nota</th>
-                <th>Valor</th>
-                <th>Fecha Entrega</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <!-- ================= PEDIDOS ================= -->
+<div id="pedidos-container">
+
+    <div id="pedidos-toolbar">
+        <h2>📝 Pedidos</h2>
+    </div>
+
+    <!-- Grid responsive -->
+    <div id="pedidosGrid"></div>
+
+</div>
+
 </div>
 
 <script>
@@ -349,7 +356,7 @@ auth.onAuthStateChanged(user => {
     } else {
         idEmpresa = user.uid;
         cargarBases();
-        cargarPedidos();
+         cargarPedidosRealtime();
     }
 });
 
@@ -629,30 +636,49 @@ document.addEventListener('click', (e)=>{
     }
 });
 // --- CARGAR PEDIDOS ---
-function crearTarjetaPedido(pedido, domiciliario) {
-  const card = document.createElement("div");
-  card.className = "pedido-card";
+function cargarPedidosRealtime() {
+    const ref = db.ref(`${idEmpresa}/Pedidos`);
+    const grid = document.getElementById("pedidosGrid");
 
-  card.innerHTML = `
-    <img class="pedido-img" src="${pedido.imagenUrl || 'placeholder.jpg'}">
+    ref.on('value', snapshot => {
+        grid.innerHTML = '';
 
-    <div class="pedido-body">
-      <h4>${pedido.referencia || 'Pedido'}</h4>
-      <p>👤 ${pedido.nombreCliente}</p>
-      <p>📍 ${pedido.direccion}</p>
-      <p>📝 ${pedido.mensaje}</p>
-      <p>🚴 ${domiciliario}</p>
-    </div>
+        snapshot.forEach(domicSnap => {
+            const idDomiciliario = domicSnap.key;
 
-    <div class="pedido-footer">
-      <span>📅 ${pedido.diaEntrega}</span>
-      <span>⏰ ${pedido.horaEntrega}</span>
-      <span class="color-dot ${pedido.color}"></span>
-    </div>
-  `;
+            domicSnap.forEach(pedidoSnap => {
+                const p = pedidoSnap.val();
+                if (!p) return;
 
-  return card;
+                const card = document.createElement('div');
+                card.className = 'pedido-card';
+
+                card.innerHTML = `
+                    <img class="pedido-img"
+                         src="${p.imagenUrl || 'https://via.placeholder.com/400x300?text=Pedido'}">
+
+                    <div class="pedido-body">
+                        <h4>${p.referencia || 'Pedido'}</h4>
+                        <p>👤 Cliente: ${p.nombreCliente || ''}</p>
+                        <p>📍 ${p.direccion || ''}</p>
+                        <p>📝 ${p.mensaje || ''}</p>
+                        <p>🚴 Domiciliario: ${idDomiciliario}</p>
+                    </div>
+
+                    <div class="pedido-footer">
+                        <span>📅 ${p.diaEntrega || ''}</span>
+                        <span>⏰ ${p.horaEntrega || ''}</span>
+                        <span class="color-dot"
+                              style="background:${p.color || '#ccc'}"></span>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        });
+    });
 }
+
 
 
 </script>
