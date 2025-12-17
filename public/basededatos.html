@@ -286,34 +286,16 @@ th {
     font-weight: 600;
 }
 
-/* CONTENEDOR */
+/* CONTENEDOR PRINCIPAL */
 .pedido-info {
     font-size: 14px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;              /* espacio entre líneas */
     font-weight: bold;
-    line-height: 1.25;
-    align-items: flex-start; /* Alinea todo a la izquierda */
-}
-
-/* LINEAS PRINCIPALES */
-.pedido-info .linea {
-    font-size: inherit;
-    font-weight: bold;
-    display: flex;
-    flex-direction: column; /* Para que el contenido de cada linea se apile verticalmente si hay sublinea */
-    align-items: flex-start; /* Alinea el contenido interno a la izquierda */
-}
-
-/* SUBLINEAS */
-.pedido-info .sub-linea {
-    font-size: 14px;
-    font-weight: normal;
-    margin-left: 18px;
-    line-height: 1.2;
-    display: flex; /* opcional si quieres que el número y el enlace queden en la misma linea */
-    gap: 4px;      /* espacio entre elementos en sublinea */
+    line-height: 1.4;
+    align-items: flex-start; /* todo alineado a la izquierda */
+    padding: 8px 12px;       /* opcional: espacio interno */
 }
 
 /* REFERENCIA */
@@ -322,8 +304,43 @@ th {
     font-weight: bold;
     margin-bottom: 6px;
     letter-spacing: 0.3px;
-    text-align: left; /* asegura alineación a la izquierda */
+    text-align: left;        /* asegura alineación a la izquierda */
 }
+
+/* LINEAS PRINCIPALES */
+.pedido-info .linea {
+    display: flex;
+    flex-direction: row;     /* icono y texto en la misma línea */
+    align-items: flex-start; /* alineación vertical del contenido */
+    gap: 6px;                /* espacio entre icono y texto */
+    font-weight: bold;
+    word-wrap: break-word;   /* para que textos largos no se salgan */
+}
+
+/* SUBLINEAS */
+.pedido-info .sub-linea {
+    font-size: 14px;
+    font-weight: normal;
+    margin-left: 26px;      /* indentación respecto a la línea principal */
+    line-height: 1.3;
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    word-wrap: break-word;
+}
+
+/* ENLACES */
+.pedido-info a.whatsapp-link,
+.pedido-info a.maps-link {
+    color: #0077cc;        /* azul tipo link */
+    text-decoration: none;
+}
+
+.pedido-info a.whatsapp-link:hover,
+.pedido-info a.maps-link:hover {
+    text-decoration: underline;
+}
+
 
 
 /* MENSAJE LARGO */
