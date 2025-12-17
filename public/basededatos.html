@@ -358,6 +358,7 @@ th {
  
     <!-- ================= PEDIDOS ================= -->
 <div id="pedidos-container">
+
     <!-- Grid responsive -->
     <div id="pedidosGrid"></div>
 
@@ -780,12 +781,15 @@ function crearPedidoCard(p, domi) {
                 </div>
 
                 <div class="linea">
-                    👤 ${p.nombreCliente || ''} · 📞 ${p.cliente || ''}
-                </div>
+    👤 ${p.nombreCliente || ''}
+    <div class="sub-linea">📞 ${p.cliente || ''}</div>
+</div>
 
-                <div class="linea">
-                    🎁 ${p.nombreDestinatario || ''} · 📞 ${p.destinatario || ''}
-                </div>
+<div class="linea">
+    🎁 ${p.nombreDestinatario || ''}
+    <div class="sub-linea">📞 ${p.destinatario || ''}</div>
+</div>
+
 
                 <div class="linea">
                     📍 ${p.direccion || ''}
