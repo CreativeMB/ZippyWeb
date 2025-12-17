@@ -842,7 +842,14 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
                 <div class="linea">
                     👤 ${p.nombreCliente || ''}
-                    <div class="sub-linea">N°: ${p.cliente || ''}</div>
+                    <div class="sub-linea">
+                        N°:
+                        <a class="whatsapp-link"
+                           href="https://wa.me/${(p.cliente || '').replace(/\D/g, '')}"
+                           target="_blank">
+                           ${p.cliente || ''}
+                        </a>
+                    </div>
                 </div>
 
                 <div class="linea">
@@ -889,8 +896,9 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         </div>
     `;
 
-    /* ================== SPINNER DOMICILIARIOS ================== */
+    /* ====== SPINNER DOMICILIARIOS ====== */
     const select = card.querySelector('.domi-select');
+    const telSpan = card.querySelector('.domi-telefono');
 
     Object.entries(domiciliarios).forEach(([id, d]) => {
         const option = document.createElement('option');
@@ -900,7 +908,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         select.appendChild(option);
     });
 
-    /* ================== CAMBIO DOMICILIARIO ================== */
+    /* ====== CAMBIO DOMICILIARIO ====== */
     select.addEventListener('change', async () => {
 
         const idDomiNuevo = select.value;
@@ -913,9 +921,15 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                 idDomiNuevo,
                 p
             );
+
+            // actualizar teléfono visual
+            telSpan.textContent = `📞 ${domiciliarios[idDomiNuevo]?.telefono || ''}`;
+
+            idDomiActual = idDomiNuevo;
+
         } catch (e) {
             alert('Error al cambiar domiciliario');
-            select.value = idDomiActual; // revertir
+            select.value = idDomiActual;
         }
     });
 
@@ -931,7 +945,6 @@ async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedid
     const refViejo = baseRef.child(idDomiViejo).child(idPedido);
     const refNuevo = baseRef.child(idDomiNuevo);
 
-    // 🔢 Calcular última posición
     const snap = await refNuevo.once('value');
     let ultimaPos = 0;
 
@@ -940,12 +953,10 @@ async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedid
         if (pos > ultimaPos) ultimaPos = pos;
     });
 
-    // 🔄 Actualizar pedido
     pedido.idDomiciliario = idDomiNuevo;
     pedido.posicion = ultimaPos + 1;
     pedido.notificado = false;
 
-    // 💾 Guardar y eliminar
     await refNuevo.child(idPedido).set(pedido);
     await refViejo.remove();
 }
