@@ -314,7 +314,16 @@ th {
         height: 220px;
     }
 }
-
+/* separador de fechas */
+.fecha-header {
+    grid-column: 1 / -1;
+    font-weight: 600;
+    font-size: 15px;
+    margin: 14px 0 6px;
+    padding: 6px 10px;
+    background: #f5f5f5;
+    border-radius: 8px;
+}
 
 
 
@@ -707,88 +716,114 @@ function cargarPedidosRealtime() {
         });
 
         pedidosRef.on('value', snapshot => {
+
             grid.innerHTML = '';
 
+            const pedidosPorFecha = {};
+
             snapshot.forEach(domicSnap => {
+
                 const idDomi = domicSnap.key;
                 const domi = domiciliarios[idDomi] || {};
 
                 domicSnap.forEach(pedidoSnap => {
+
                     const p = pedidoSnap.val();
-                    if (!p) return;
+                    if (!p || !p.diaEntrega) return;
 
-                    const card = document.createElement('div');
-                    card.className = 'pedido-card';
+                    if (!pedidosPorFecha[p.diaEntrega]) {
+                        pedidosPorFecha[p.diaEntrega] = [];
+                    }
 
-                    const colorPedido = obtenerColorPedido(p.color);
+                    pedidosPorFecha[p.diaEntrega].push({
+                        pedido: p,
+                        domi
+                    });
 
-                    // 🎨 COLOR REAL DEL PEDIDO (SIN TRANSPARENCIA)
-                    card.style.backgroundColor = colorPedido;
-
-                    card.innerHTML = `
-
-    <div class="pedido-top">
-
-        <img class="pedido-img"
-             src="${normalizarImagen(p.imagenUrl)}"
-             loading="lazy">
-
-        <div class="pedido-info">
-
-            <div class="linea ref">
-                ${p.referencia || 'Pedido'}
-            </div>
-
-            <div class="linea">
-                👤 ${p.nombreCliente || ''} · 📞 ${p.cliente || ''}
-            </div>
-
-            <div class="linea">
-                🎁 ${p.nombreDestinatario || ''} · 📞 ${p.destinatario || ''}
-            </div>
-
-            <div class="linea">
-                📍 ${p.direccion || ''}
-            </div>
-
-            <div class="linea">
-                📅 ${p.diaEntrega || ''} · ⏰ ${p.horaEntrega || ''}
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="pedido-bottom">
-
-        <div class="linea"><strong>Mensaje</strong></div>
-        <div class="linea mensaje">${p.mensaje || ''}</div>
-
-        <div class="linea">De: ${p.de || ''}</div>
-        <div class="linea">Para: ${p.nombreDestinatario || ''}</div>
-
-        <div class="linea">
-            🚴 ${domi.nombre || ''}
-        </div>
-
-        <div class="linea">
-            📞 ${domi.telefono || ''}
-        </div>
-
-        <div class="linea">
-            🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
-        </div>
-
-    </div>
-`;
-
-
-                    grid.appendChild(card);
                 });
             });
+
+            Object.keys(pedidosPorFecha)
+                .sort((a, b) => convertirFecha(a) - convertirFecha(b))
+                .forEach(fecha => {
+
+                    // 🗓 HEADER DE FECHA
+                    const header = document.createElement('div');
+                    header.className = 'fecha-header';
+                    header.textContent = formatearFechaBonita(fecha);
+                    grid.appendChild(header);
+
+                    // 🧾 PEDIDOS DE ESA FECHA
+                    pedidosPorFecha[fecha].forEach(item => {
+                        const card = crearPedidoCard(item.pedido, item.domi);
+                        grid.appendChild(card);
+                    });
+                });
         });
     });
 }
+function crearPedidoCard(p, domi) {
+
+    const card = document.createElement('div');
+    card.className = 'pedido-card';
+
+    // 🎨 COLOR REAL DEL PEDIDO
+    card.style.backgroundColor = obtenerColorPedido(p.color);
+
+    card.innerHTML = `
+
+        <div class="pedido-top">
+
+            <img class="pedido-img"
+                 src="${normalizarImagen(p.imagenUrl)}"
+                 loading="lazy">
+
+            <div class="pedido-info">
+
+                <div class="linea ref">
+                    ${p.referencia || 'Pedido'}
+                </div>
+
+                <div class="linea">
+                    👤 ${p.nombreCliente || ''} · 📞 ${p.cliente || ''}
+                </div>
+
+                <div class="linea">
+                    🎁 ${p.nombreDestinatario || ''} · 📞 ${p.destinatario || ''}
+                </div>
+
+                <div class="linea">
+                    📍 ${p.direccion || ''}
+                </div>
+
+                <div class="linea">
+                    📅 ${p.diaEntrega || ''} · ⏰ ${p.horaEntrega || ''}
+                </div>
+
+            </div>
+        </div>
+
+        <div class="pedido-bottom">
+
+            <div class="linea"><strong>Mensaje</strong></div>
+            <div class="linea mensaje">${p.mensaje || ''}</div>
+
+            <div class="linea">De: ${p.de || ''}</div>
+            <div class="linea">Para: ${p.nombreDestinatario || ''}</div>
+
+            <div class="linea">🚴 ${domi.nombre || ''}</div>
+            <div class="linea">📞 ${domi.telefono || ''}</div>
+
+            <div class="linea">
+                🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
+            </div>
+
+        </div>
+    `;
+
+    return card;
+}
+
 
 
 function normalizarImagen(url){
@@ -811,6 +846,22 @@ function obtenerColorPedido(color) {
     }
 
     return '#ffffff';
+}
+function convertirFecha(fecha) {
+    const [d, m, y] = fecha.split('-');
+    return new Date(y, m - 1, d);
+}
+
+function formatearFechaBonita(fecha) {
+    const [d, m, y] = fecha.split('-');
+    const date = new Date(y, m - 1, d);
+
+    return date.toLocaleDateString('es-CO', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
 }
 
 
