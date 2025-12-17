@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login Empresa - ZippyWeb</title>
+  <title>ZippyWeb</title>
   <link rel="stylesheet" href="css/styles.css">
 
   <!-- Firebase compat -->
@@ -26,6 +26,41 @@
       <div id="error-message" style="color: red; margin-top: 10px;"></div>
     </div>
   </div>
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Función para detectar si es un dispositivo móvil
+  function esDispositivoMovil() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  if (esDispositivoMovil()) {
+    // Crear un div de aviso
+    const aviso = document.createElement('div');
+    aviso.style.position = 'fixed';
+    aviso.style.top = '0';
+    aviso.style.left = '0';
+    aviso.style.width = '100%';
+    aviso.style.backgroundColor = '#ffcc00';
+    aviso.style.color = '#000';
+    aviso.style.textAlign = 'center';
+    aviso.style.padding = '10px';
+    aviso.style.zIndex = '1000';
+    aviso.style.fontWeight = 'bold';
+    aviso.innerHTML = `
+      Estás en un dispositivo móvil. 
+      <a href="https://zipy.carrd.co/" target="_blank" style="color: blue; text-decoration: underline;">Descarga la app aquí</a>
+      <span id="cerrarAviso" style="margin-left: 10px; cursor: pointer;">✖</span>
+    `;
+    document.body.appendChild(aviso);
+
+    // Botón para cerrar aviso
+    document.getElementById('cerrarAviso').addEventListener('click', () => {
+      aviso.style.display = 'none';
+    });
+  }
+});
+</script>
+
 </body>
 </html>
 
