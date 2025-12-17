@@ -818,25 +818,14 @@ function cargarPedidosRealtime() {
     });
 }
 
-function crearPedidoCard(p, idPedido, idDomiActual, domiciliarios) {
+function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     const card = document.createElement('div');
     card.className = 'pedido-card';
     card.style.backgroundColor = obtenerColorPedido(p.color);
 
-    // Construir opciones del select
-    let opciones = '';
-    Object.entries(domiciliarios).forEach(([id, d]) => {
-        opciones += `
-            <option value="${id}" ${id === idDomiActual ? 'selected' : ''}>
-                ${d.nombre}
-            </option>
-        `;
-    });
-
     card.innerHTML = `
         <div class="pedido-top">
-
             <img class="pedido-img"
                  src="${normalizarImagen(p.imagenUrl)}"
                  loading="lazy">
@@ -883,15 +872,8 @@ function crearPedidoCard(p, idPedido, idDomiActual, domiciliarios) {
 
             <div class="linea domiciliario-linea">
                 🚴 
-                <select class="domi-select"
-                        data-idpedido="${idPedido}"
-                        data-iddomiactual="${idDomiActual}">
-                    ${opciones}
-                </select>
-
-                <span class="domi-telefono">
-                    📞 ${domiciliarios[idDomiActual]?.telefono || ''}
-                </span>
+                <select class="domi-select"></select>
+                <span class="domi-telefono">📞 ${domiActual.telefono || ''}</span>
             </div>
 
             <div class="linea">
@@ -901,34 +883,67 @@ function crearPedidoCard(p, idPedido, idDomiActual, domiciliarios) {
         </div>
     `;
 
-    // 🎯 EVENTO CAMBIO DOMICILIARIO
+    /* ================== SPINNER DOMICILIARIOS ================== */
     const select = card.querySelector('.domi-select');
-    select.addEventListener('change', e => {
-        cambiarDomiciliarioPedido(
-            idPedido,
-            idDomiActual,
-            e.target.value,
-            p
-        );
+
+    Object.entries(domiciliarios).forEach(([id, d]) => {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = d.nombre;
+        if (id === idDomiActual) option.selected = true;
+        select.appendChild(option);
+    });
+
+    /* ================== CAMBIO DOMICILIARIO ================== */
+    select.addEventListener('change', async () => {
+
+        const idDomiNuevo = select.value;
+        if (idDomiNuevo === idDomiActual) return;
+
+        try {
+            await moverPedidoDomiciliario(
+                idPedido,
+                idDomiActual,
+                idDomiNuevo,
+                p
+            );
+        } catch (e) {
+            alert('Error al cambiar domiciliario');
+            select.value = idDomiActual; // revertir
+        }
     });
 
     return card;
 }
 
-function cambiarDomiciliarioPedido(idPedido, idDomiViejo, idDomiNuevo, pedido) {
+
+async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedido) {
 
     if (idDomiViejo === idDomiNuevo) return;
 
-    const refViejo = db.ref(`${idEmpresa}/Pedidos/${idDomiViejo}/${idPedido}`);
-    const refNuevo = db.ref(`${idEmpresa}/Pedidos/${idDomiNuevo}/${idPedido}`);
+    const baseRef = db.ref(`${idEmpresa}/Pedidos`);
+    const refViejo = baseRef.child(idDomiViejo).child(idPedido);
+    const refNuevo = baseRef.child(idDomiNuevo);
 
-    refNuevo.set(pedido)
-        .then(() => refViejo.remove())
-        .catch(err => {
-            console.error('Error cambiando domiciliario', err);
-            alert('Error al cambiar domiciliario');
-        });
+    // 🔢 Calcular última posición
+    const snap = await refNuevo.once('value');
+    let ultimaPos = 0;
+
+    snap.forEach(s => {
+        const pos = s.child('posicion').val() || 0;
+        if (pos > ultimaPos) ultimaPos = pos;
+    });
+
+    // 🔄 Actualizar pedido
+    pedido.idDomiciliario = idDomiNuevo;
+    pedido.posicion = ultimaPos + 1;
+    pedido.notificado = false;
+
+    // 💾 Guardar y eliminar
+    await refNuevo.child(idPedido).set(pedido);
+    await refViejo.remove();
 }
+
 
 
 
