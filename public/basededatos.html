@@ -384,7 +384,14 @@ function mostrarDatos(base) {
 
 // --- BOTONES ---
 btnVolver.onclick = () => cargarBases();
-btnAgregarDato.onclick = () => { if(baseSeleccionada){ formNuevoDato.style.display = "block"; inputValor.focus(); } };
+
+btnAgregarDato.onclick = () => {
+    if(baseSeleccionada){
+        formNuevoDato.style.display = "block";
+        inputValor.focus();
+    }
+};
+
 btnCancelarDato.onclick = () => {
     formNuevoDato.style.display = "none";
     opcionesExtra.style.display = "none";
@@ -393,6 +400,12 @@ btnCancelarDato.onclick = () => {
     inputNegativo.checked = false;
     inputNota.value = "";
 };
+
+// Guardar llama a la función única que escribe en Firebase
+btnGuardarDato.onclick = () => {
+    guardarDato();
+};
+
 
 // --- TECLAS ---
 document.addEventListener('keydown', e => {
@@ -415,18 +428,14 @@ document.addEventListener('keydown', e => {
     });
 });
 
-// --- FUNCION PARA GUARDAR DATO Y AGREGARLO A LA LISTA ---
+// --- FUNCION GUARDAR DATO ---
 function guardarDato() {
     const nombre = inputNombre.value.trim();
     let valor = parseFloat(inputValor.value);
     const negativo = inputNegativo.checked;
     const nota = inputNota.value.trim();
 
-    if(!nombre || isNaN(valor)){
-        alert("Nombre y valor son requeridos");
-        return;
-    }
-
+    if(!nombre || isNaN(valor)){ alert("Nombre y valor son requeridos"); return; }
     if(negativo) valor = -Math.abs(valor);
 
     const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
@@ -437,37 +446,39 @@ function guardarDato() {
 
     ref.child(newKey).set({
         id: newKey,
-        fechaHora: fechaHora,
-        nombre: nombre,
-        valor: valor,
+        fechaHora,
+        nombre,
+        valor,
         nota: nota || ""
     }).then(() => {
-         // 🔹 Agregar inmediatamente a la lista visual
-    const li = document.createElement('li');
-    li.textContent = `${nombre} - ${valor} (${fechaHora})`;
-    if (valor < 0) {
-        li.style.color = '#D32F2F';
-        li.style.backgroundColor = '#FFCDD2';
-    } else {
-        li.style.color = '#388E3C';
-        li.style.backgroundColor = '#C8E6C9';
-    }
-    li.style.padding = '10px';
-    li.style.marginBottom = '5px';
-    li.style.borderRadius = '6px';
+        // Agregar a la lista visual evitando duplicados
+        if(!sidebarList.querySelector(`li[data-key="${newKey}"]`)){
+            const li = document.createElement('li');
+            li.dataset.key = newKey;
+            li.textContent = `${nombre} - ${valor} (${fechaHora})`;
+            if(valor < 0){
+                li.style.color = '#D32F2F';
+                li.style.backgroundColor = '#FFCDD2';
+            } else {
+                li.style.color = '#388E3C';
+                li.style.backgroundColor = '#C8E6C9';
+            }
+            li.style.padding = '10px';
+            li.style.marginBottom = '5px';
+            li.style.borderRadius = '6px';
+            sidebarList.insertBefore(li, sidebarList.firstChild);
+        }
 
-    sidebarList.insertBefore(li, sidebarList.firstChild);
-        // Limpiar y ocultar formulario
+        // Limpiar formulario
         inputNombre.value = "";
         inputValor.value = "";
         inputNegativo.checked = false;
         inputNota.value = "";
         formNuevoDato.style.display = "none";
         opcionesExtra.style.display = "none";
-
-        // Ahora, el usuario presiona F2 para agregar otro dato
     }).catch(err => alert("Error guardando dato: " + err.message));
 }
+
 
 function mostrarItemsConColores(items) {
     sidebarList.innerHTML = ''; // limpiar lista
