@@ -805,18 +805,24 @@ function cargarPedidosRealtime() {
                     grid.appendChild(header);
 
                     pedidosPorFecha[fecha].forEach(item => {
+
+                        const domiActual = domiciliarios[item.idDomiActual] || {};
+
                         const card = crearPedidoCard(
-                            item.pedido,
                             item.idPedido,
                             item.idDomiActual,
+                            item.pedido,
+                            domiActual,
                             domiciliarios
                         );
+
                         grid.appendChild(card);
                     });
                 });
         });
     });
 }
+
 
 function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
