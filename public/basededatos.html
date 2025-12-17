@@ -356,16 +356,15 @@ th {
     border-radius: 8px;
 }
 
-.whatsapp-link {
-    color: #1a73e8;       /* azul */
+.maps-link {
+    color: #f00f0f;      /* azul Google */
     text-decoration: none;
-    font-weight: 600;
+    font-weight: normal;
 }
 
-.whatsapp-link:hover {
+.maps-link:hover {
     text-decoration: underline;
 }
-
 
 
 
@@ -822,19 +821,10 @@ function crearPedidoCard(p, domi) {
                     ${p.referencia || 'Pedido'}
                 </div>
 
-<div class="linea">
+                <div class="linea">
     👤 ${p.nombreCliente || ''}
-    <div class="sub-linea">
-        N°:
-        <a class="whatsapp-link"
-           href="https://wa.me/${(p.cliente || '').replace(/\D/g, '')}"
-    
-           rel="noopener">
-            ${p.cliente || ''}
-        </a>
-    </div>
+    <div class="sub-linea">N°: ${p.cliente || ''}</div>
 </div>
-
 
 <div class="linea">
     🎁 ${p.nombreDestinatario || ''}
@@ -842,9 +832,15 @@ function crearPedidoCard(p, domi) {
 </div>
 
 
-                <div class="linea">
-                    📍 ${p.direccion || ''}
-                </div>
+               <div class="linea">
+    📍 
+    <a class="maps-link"
+       href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion || '')}"
+       target="_blank">
+        ${p.direccion || ''}
+    </a>
+</div>
+
 
                <div class="linea">
     📅 ${p.diaEntrega || ''}
