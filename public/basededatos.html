@@ -212,51 +212,48 @@ th {
     }
     #suggestions div:hover { background: #eee; cursor: pointer; }
      /* pedidos */
-    #pedidosGrid {
+ #pedidosGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
 }
 
+
 .pedido-card {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,.2);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    background: #fff;
 }
+
 
 .pedido-img {
     width: 100%;
-    height: 180px;
-    object-fit: cover;
-    background: #eee;
+    height: 300px;              /* más alto que ancho */
+    object-fit: contain;        /* muestra la imagen completa */
+    background: #f4f4f4;        /* relleno si sobra espacio */
 }
 
 .pedido-body {
-    padding: 12px;
-    font-size: 14px;
+    padding: 8px;
+    font-size: 12px;
 }
 
 .pedido-body h4 {
-    margin: 0 0 6px;
-    font-size: 18px;
+    font-size: 14px;
+    margin-bottom: 4px;
 }
 
 .pedido-body p {
-    margin: 3px 0;
+    margin: 2px 0;
 }
 
+
 .pedido-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background: #f3f3f3;
-    font-size: 13px;
-    font-weight: bold;
+    padding: 6px 8px;
+    font-size: 11px;
 }
+
 
 .color-dot {
     width: 14px;
