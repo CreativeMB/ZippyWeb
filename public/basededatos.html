@@ -327,6 +327,53 @@ function cargarBases() {
     });
 }
 
+
+// --- BOTONES ---
+btnVolver.onclick = () => cargarBases();
+
+btnAgregarDato.onclick = () => {
+    if(baseSeleccionada){
+        formNuevoDato.style.display = "block";
+        inputValor.focus();
+    }
+};
+
+btnCancelarDato.onclick = () => {
+    formNuevoDato.style.display = "none";
+    opcionesExtra.style.display = "none";
+    inputNombre.value = "";
+    inputValor.value = "";
+    inputNegativo.checked = false;
+    inputNota.value = "";
+};
+
+// Guardar llama a la función única que escribe en Firebase
+btnGuardarDato.onclick = () => {
+    guardarDato();
+};
+
+
+// --- TECLAS ---
+document.addEventListener('keydown', e => {
+    if(e.key === "F2"){ 
+        if(!baseSeleccionada) return;
+        formNuevoDato.style.display = "block";
+        inputValor.focus();
+        e.preventDefault();
+    }
+});
+
+// Enter entre campos
+[inputValor, inputNombre, inputNota].forEach((input,index,arr)=>{
+    input.addEventListener('keydown', e=>{
+        if(e.key==="Enter"){
+            e.preventDefault();
+            if(index < arr.length-1) arr[index+1].focus();
+            else guardarDato();
+        }
+    });
+});
+
 // --- FUNCION MOSTRAR DATOS DE BASE ---
 function mostrarDatos(base) {
     baseSeleccionada = base;
@@ -405,82 +452,6 @@ function mostrarDatos(base) {
     });
 }
 
-    // --- ESCUCHAR NUEVOS DATOS EN TIEMPO REAL ---
-    ref.on('child_added', itemSnap => {
-        const item = itemSnap.val();
-        if(!item || !item.nombre) return;
-
-        // Solo agregar si aún no se mostró
-        if(itemsMostrados.has(itemSnap.key)) return;
-        itemsMostrados.add(itemSnap.key);
-
-        const li = document.createElement('li');
-        li.textContent = `${item.nombre} - ${item.valor} (${item.fechaHora})`;
-
-        if(item.valor < 0){
-            li.style.color = '#D32F2F';
-            li.style.backgroundColor = '#FFCDD2';
-        } else {
-            li.style.color = '#388E3C';
-            li.style.backgroundColor = '#C8E6C9';
-        }
-
-        li.style.padding = '10px';
-        li.style.marginBottom = '5px';
-        li.style.borderRadius = '6px';
-
-        // Insertar al inicio
-        sidebarList.insertBefore(li, sidebarList.firstChild);
-    });
-
-
-
-// --- BOTONES ---
-btnVolver.onclick = () => cargarBases();
-
-btnAgregarDato.onclick = () => {
-    if(baseSeleccionada){
-        formNuevoDato.style.display = "block";
-        inputValor.focus();
-    }
-};
-
-btnCancelarDato.onclick = () => {
-    formNuevoDato.style.display = "none";
-    opcionesExtra.style.display = "none";
-    inputNombre.value = "";
-    inputValor.value = "";
-    inputNegativo.checked = false;
-    inputNota.value = "";
-};
-
-// Guardar llama a la función única que escribe en Firebase
-btnGuardarDato.onclick = () => {
-    guardarDato();
-};
-
-
-// --- TECLAS ---
-document.addEventListener('keydown', e => {
-    if(e.key === "F2"){ 
-        if(!baseSeleccionada) return;
-        formNuevoDato.style.display = "block";
-        inputValor.focus();
-        e.preventDefault();
-    }
-});
-
-// Enter entre campos
-[inputValor, inputNombre, inputNota].forEach((input,index,arr)=>{
-    input.addEventListener('keydown', e=>{
-        if(e.key==="Enter"){
-            e.preventDefault();
-            if(index < arr.length-1) arr[index+1].focus();
-            else guardarDato();
-        }
-    });
-});
-
 // --- FUNCION GUARDAR DATO ---
 function guardarDato() {
     const nombre = inputNombre.value.trim();
@@ -515,6 +486,7 @@ function guardarDato() {
         // El listener de Firebase se encargará de agregar el item automáticamente al DOM
     }).catch(err => alert("Error guardando dato: " + err.message));
 }
+
 
 
 function mostrarItemsConColores(items) {
