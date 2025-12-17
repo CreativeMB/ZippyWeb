@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Zippy Contabilidad - Bases de Datos</title>
+<title>Zippy Contabilidad</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -110,13 +110,13 @@
 <body>
 
 <div id="sidebar">
-    <h3 id="sidebarTitulo">📂 Bases de Datos</h3>
+    <h3 id="sidebarTitulo">📂 Contabilidad</h3>
     <button id="btnVolver" style="display:none;">⬅️ Volver</button>
-    <button id="btnAgregarDato" style="display:none;">➕ Nuevo Dato</button>
+    <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
 
     <div id="formNuevoDato">
-        <input type="number" id="inputValor" placeholder="💰 Valor">
-        <input type="text" id="inputNombre" placeholder="📝 Nombre del ítem">
+        <input type="number" id="inputValor" placeholder="💰 Precio">
+        <input type="text" id="inputNombre" placeholder="📝 Nombre">
         <div id="opcionesExtra">
             <label><input type="checkbox" id="inputNegativo"> Negativo</label>
             <textarea id="inputNota" placeholder="🗒️ Nota o descripción"></textarea>
@@ -132,8 +132,8 @@
 </div>
 
 <div id="main">
-    <h3>📝 Pedidos</h3>
     <button id="btnCerrarSesion" style="margin-bottom:10px; padding:12px 15px; font-size:16px;">🚪 Cerrar Sesión</button>
+    <h3>📝 Pedidos</h3>
     <table id="tablaPedidos">
         <thead>
             <tr>
