@@ -826,12 +826,12 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
             <div class="pedido-info">
 
-                <div class="linea ref">${p.referencia || 'Pedido'}</div>
+                <div class="linea ref">🏷️ ${p.referencia || 'Pedido'}</div>
 
                 <div class="linea">
                     👤 ${p.nombreCliente || ''}
                     <div class="sub-linea">
-                        ✅N°:
+                        #️⃣N°:
                         <a class="whatsapp-link"
                            href="https://wa.me/${(p.cliente || '').replace(/\D/g, '')}"
                            target="_blank">
