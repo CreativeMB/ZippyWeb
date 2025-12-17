@@ -357,7 +357,7 @@ th {
 }
 
 .maps-link {
-    color: #f00f0f;      /* azul Google */
+    color: #000000;      /* azul Google */
     text-decoration: none;
     font-weight: normal;
 }
@@ -366,6 +366,25 @@ th {
     text-decoration: underline;
 }
 
+.domiciliario-linea {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.domi-select {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+}
+
+.domi-telefono {
+    font-size: 13px;
+}
 
 
 </style>
@@ -755,16 +774,12 @@ function cargarPedidosRealtime() {
         pedidosRef.on('value', snapshot => {
 
             grid.innerHTML = '';
-
             const pedidosPorFecha = {};
 
             snapshot.forEach(domicSnap => {
-
                 const idDomi = domicSnap.key;
-                const domi = domiciliarios[idDomi] || {};
 
                 domicSnap.forEach(pedidoSnap => {
-
                     const p = pedidoSnap.val();
                     if (!p || !p.diaEntrega) return;
 
@@ -774,9 +789,9 @@ function cargarPedidosRealtime() {
 
                     pedidosPorFecha[p.diaEntrega].push({
                         pedido: p,
-                        domi
+                        idPedido: pedidoSnap.key,
+                        idDomiActual: idDomi
                     });
-
                 });
             });
 
@@ -784,31 +799,42 @@ function cargarPedidosRealtime() {
                 .sort((a, b) => convertirFecha(a) - convertirFecha(b))
                 .forEach(fecha => {
 
-                    // 🗓 HEADER DE FECHA
                     const header = document.createElement('div');
                     header.className = 'fecha-header';
                     header.textContent = formatearFechaBonita(fecha);
                     grid.appendChild(header);
 
-                    // 🧾 PEDIDOS DE ESA FECHA
                     pedidosPorFecha[fecha].forEach(item => {
-                        const card = crearPedidoCard(item.pedido, item.domi);
+                        const card = crearPedidoCard(
+                            item.pedido,
+                            item.idPedido,
+                            item.idDomiActual,
+                            domiciliarios
+                        );
                         grid.appendChild(card);
                     });
                 });
         });
     });
 }
-function crearPedidoCard(p, domi) {
+
+function crearPedidoCard(p, idPedido, idDomiActual, domiciliarios) {
 
     const card = document.createElement('div');
     card.className = 'pedido-card';
-
-    // 🎨 COLOR REAL DEL PEDIDO
     card.style.backgroundColor = obtenerColorPedido(p.color);
 
-    card.innerHTML = `
+    // Construir opciones del select
+    let opciones = '';
+    Object.entries(domiciliarios).forEach(([id, d]) => {
+        opciones += `
+            <option value="${id}" ${id === idDomiActual ? 'selected' : ''}>
+                ${d.nombre}
+            </option>
+        `;
+    });
 
+    card.innerHTML = `
         <div class="pedido-top">
 
             <img class="pedido-img"
@@ -817,36 +843,31 @@ function crearPedidoCard(p, domi) {
 
             <div class="pedido-info">
 
-                <div class="linea ref">
-                    ${p.referencia || 'Pedido'}
+                <div class="linea ref">${p.referencia || 'Pedido'}</div>
+
+                <div class="linea">
+                    👤 ${p.nombreCliente || ''}
+                    <div class="sub-linea">N°: ${p.cliente || ''}</div>
                 </div>
 
                 <div class="linea">
-    👤 ${p.nombreCliente || ''}
-    <div class="sub-linea">N°: ${p.cliente || ''}</div>
-</div>
+                    🎁 ${p.nombreDestinatario || ''}
+                    <div class="sub-linea">📞 ${p.destinatario || ''}</div>
+                </div>
 
-<div class="linea">
-    🎁 ${p.nombreDestinatario || ''}
-    <div class="sub-linea">📞 ${p.destinatario || ''}</div>
-</div>
+                <div class="linea">
+                    📍 
+                    <a class="maps-link"
+                       href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion || '')}"
+                       target="_blank">
+                        ${p.direccion || ''}
+                    </a>
+                </div>
 
-
-               <div class="linea">
-    📍 
-    <a class="maps-link"
-       href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion || '')}"
-       target="_blank">
-        ${p.direccion || ''}
-    </a>
-</div>
-
-
-               <div class="linea">
-    📅 ${p.diaEntrega || ''}
-    <div class="sub-linea">⏰ ${p.horaEntrega || ''}</div>
-</div>
-
+                <div class="linea">
+                    📅 ${p.diaEntrega || ''}
+                    <div class="sub-linea">⏰ ${p.horaEntrega || ''}</div>
+                </div>
 
             </div>
         </div>
@@ -857,14 +878,21 @@ function crearPedidoCard(p, domi) {
             <div class="linea mensaje">${p.mensaje || ''}</div>
 
             <div class="linea">
-    De: ${p.de || ''} · Para: ${p.nombreDestinatario || ''}
-</div>
+                De: ${p.de || ''} · Para: ${p.nombreDestinatario || ''}
+            </div>
 
+            <div class="linea domiciliario-linea">
+                🚴 
+                <select class="domi-select"
+                        data-idpedido="${idPedido}"
+                        data-iddomiactual="${idDomiActual}">
+                    ${opciones}
+                </select>
 
-            <div class="linea">
-    🚴 ${domi.nombre || ''} · 📞 ${domi.telefono || ''}
-</div>
-
+                <span class="domi-telefono">
+                    📞 ${domiciliarios[idDomiActual]?.telefono || ''}
+                </span>
+            </div>
 
             <div class="linea">
                 🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
@@ -873,7 +901,33 @@ function crearPedidoCard(p, domi) {
         </div>
     `;
 
+    // 🎯 EVENTO CAMBIO DOMICILIARIO
+    const select = card.querySelector('.domi-select');
+    select.addEventListener('change', e => {
+        cambiarDomiciliarioPedido(
+            idPedido,
+            idDomiActual,
+            e.target.value,
+            p
+        );
+    });
+
     return card;
+}
+
+function cambiarDomiciliarioPedido(idPedido, idDomiViejo, idDomiNuevo, pedido) {
+
+    if (idDomiViejo === idDomiNuevo) return;
+
+    const refViejo = db.ref(`${idEmpresa}/Pedidos/${idDomiViejo}/${idPedido}`);
+    const refNuevo = db.ref(`${idEmpresa}/Pedidos/${idDomiNuevo}/${idPedido}`);
+
+    refNuevo.set(pedido)
+        .then(() => refViejo.remove())
+        .catch(err => {
+            console.error('Error cambiando domiciliario', err);
+            alert('Error al cambiar domiciliario');
+        });
 }
 
 
