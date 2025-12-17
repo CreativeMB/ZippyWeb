@@ -276,7 +276,7 @@ th {
 
 /* CONTENEDOR */
 .pedido-info {
-    font-size: 14px;        /* tamaño base GRANDE */
+    font-size: 14px;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -286,13 +286,13 @@ th {
 
 /* LINEAS PRINCIPALES */
 .pedido-info .linea {
-    font-size: inherit;    /* hereda los 20px */
+    font-size: inherit;
     font-weight: bold;
 }
 
-/* SUBLINEAS (teléfono, hora) */
+/* SUBLINEAS */
 .pedido-info .sub-linea {
-    font-size: 14px;       /* más pequeño */
+    font-size: 14px;
     font-weight: normal;
     margin-left: 18px;
     line-height: 1.2;
@@ -300,12 +300,11 @@ th {
 
 /* REFERENCIA */
 .linea.ref {
-    font-size: 20px;        /* más grande */
-    font-weight: 700;
-    text-align: center;    /* centrado */
+    font-size: 20px;
+    font-weight: bold;
     margin-bottom: 6px;
     letter-spacing: 0.3px;
-    font-weight: bold;
+    /* ❌ text-align: center;  ← eliminado */
 }
 
 
