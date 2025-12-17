@@ -820,11 +820,15 @@ function crearPedidoCard(p, domi) {
             <div class="linea"><strong>Mensaje</strong></div>
             <div class="linea mensaje">${p.mensaje || ''}</div>
 
-            <div class="linea">De: ${p.de || ''}</div>
-            <div class="linea">Para: ${p.nombreDestinatario || ''}</div>
+            <div class="linea">
+    De: ${p.de || ''} · Para: ${p.nombreDestinatario || ''}
+</div>
 
-            <div class="linea">🚴 ${domi.nombre || ''}</div>
-            <div class="linea">📞 ${domi.telefono || ''}</div>
+
+            <div class="linea">
+    🚴 ${domi.nombre || ''} · 📞 ${domi.telefono || ''}
+</div>
+
 
             <div class="linea">
                 🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
