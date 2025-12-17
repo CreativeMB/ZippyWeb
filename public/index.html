@@ -27,52 +27,21 @@
     </div>
   </div>
 
-  <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ZippyWeb</title>
-  <link rel="stylesheet" href="css/styles.css">
-
-  <!-- Firebase SDK compat (solo CDN) -->
-  <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-auth-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-database-compat.js"></script>
-
-  <!-- Inicialización y login -->
-  <script defer src="js/init.js"></script>
-  <script defer src="js/login.js"></script>
-</head>
-<body>
-  <div class="container" id="container">
-    <div class="card" id="cardLogin">
-      <img src="img/icono.png" alt="Logo Zippy" class="logo">
-      <h1 class="nombreEmpresa">Todo en un solo lugar</h1>
-      <h2 class="signInText">Zippy Administra tus finanzas</h2>
-      <p class="subTitle">Toca la tarjeta para continuar</p>
-      <button id="btnGoogle">Iniciar sesión con Google</button>
-      <div id="error-message" style="color: red; margin-top: 10px;"></div>
-    </div>
-  </div>
-
   <script>
   document.addEventListener('DOMContentLoaded', function() {
 
-    // Función para detectar si es un dispositivo móvil
     function esDispositivoMovil() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
-    // Aquí pondrás tu lógica real para saber si el usuario tiene empresa
-    // Por ejemplo, desde Firebase Database o Auth
-    const usuarioTieneEmpresa = false; // Cambiar según tu lógica real
-
     const container = document.getElementById('container');
     const card = document.getElementById('cardLogin');
 
+    // Aquí pondrás tu lógica real para saber si el usuario tiene empresa
+    const usuarioTieneEmpresa = false; // Cambiar según tu lógica real
+
     if (esDispositivoMovil()) {
-      // Si es móvil, ocultar la tarjeta y mostrar solo aviso de descarga
+      // Ocultar tarjeta y mostrar aviso de descarga en móvil
       card.style.display = 'none';
 
       const avisoMovil = document.createElement('div');
@@ -94,7 +63,7 @@
       container.appendChild(avisoMovil);
 
     } else if (!usuarioTieneEmpresa) {
-      // Si es desktop y no tiene empresa, mostrar aviso y enlace debajo de la tarjeta
+      // En desktop, mostrar mensaje debajo de la tarjeta solo si no tiene empresa
       const avisoDesktop = document.createElement('div');
       avisoDesktop.style.marginTop = '20px';
       avisoDesktop.style.padding = '15px';
@@ -114,8 +83,5 @@
 
   });
   </script>
-</body>
-</html>
-
 </body>
 </html>
