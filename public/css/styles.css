@@ -1,5 +1,9 @@
 body {
-  background: linear-gradient(to bottom, #FFA000, #FFCA28);
+ background: linear-gradient(
+        to bottom,
+        rgba(86, 74, 173, 0.3),
+        rgba(229, 0, 150, 0.53)
+    );
   font-family: Roboto, sans-serif;
   display: flex;
   justify-content: center;
