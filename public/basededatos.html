@@ -8,14 +8,60 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
     body { font-family: 'Roboto', sans-serif; margin: 0; height: 100vh; display: flex; background: linear-gradient(to bottom, #FFA000, #FFCA28); }
-    #sidebar { width: 25%; background: #f9f9f9; padding: 15px; overflow-y: auto; box-sizing: border-box; border-right: 2px solid #ddd; }
-    #sidebar h3 { margin-top: 0; }
-    #sidebar ul { list-style: none; padding: 0; margin: 15px 0; }
-    #sidebar li { padding: 10px; background: #fff; margin-bottom: 8px; cursor: pointer; border-radius: 6px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    #sidebar li:hover { background: #eee; }
-    #sidebar button { margin: 5px 0; padding: 10px; width: 100%; border-radius: 6px; border: none; cursor: pointer; font-size: 16px; }
+    /* Barra lateral a la derecha con fondo negro */
+#sidebar {
+    width: 25%;
+    background: #000; /* fondo negro */
+    color: #fff; /* texto blanco */
+    padding: 15px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    border-left: 2px solid #444; /* en lugar de border-right */
+    border-right: none;
+    position: fixed; /* fijar al lado derecho */
+    top: 0;
+    right: 0; /* mover al lado derecho */
+    height: 100vh;
+}
 
-    #main { width: 75%; padding: 15px; overflow-y: auto; box-sizing: border-box; }
+/* Cambiar estilos de lista dentro de la sidebar */
+#sidebar li {
+    padding: 10px;
+    background: #111; /* ligeramente más claro que el negro */
+    margin-bottom: 8px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+#sidebar li:hover {
+    background: #222;
+}
+
+/* Botones dentro de la barra */
+#sidebar button {
+    margin: 5px 0;
+    padding: 10px;
+    width: 100%;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    background: #333;
+    color: #fff;
+    transition: 0.2s;
+}
+
+#sidebar button:hover {
+    background: #555;
+}
+
+/* Ajustar el main para que no quede tapado */
+#main {
+    margin-right: 25%; /* dejar espacio para la sidebar */
+    padding: 15px;
+}
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { border: 1px solid #ccc; padding: 10px; text-align: left; font-size: 16px; }
