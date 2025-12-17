@@ -221,32 +221,50 @@ th {
 
 /* CARD */
 .pedido-card {
+    border-radius: 14px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* PARTE SUPERIOR */
+.pedido-top {
     display: flex;
     gap: 10px;
-    padding: 10px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,.15);
+    align-items: flex-start;
 }
 
 /* IMAGE */
 .pedido-img {
     width: 110px;
-    height: 170px;
+    height: 160px;
     object-fit: contain;
-    background: #f2f2f2;
-    border-radius: 8px;
+    background: #fff;
+    border-radius: 10px;
     flex-shrink: 0;
 }
 
-/* BODY */
-.pedido-body {
-    flex: 1;
+/* PARTE INFERIOR */
+.pedido-bottom {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    font-size: 12px;
-    color: #333;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+/* TEXTO COMPACTO */
+.linea {
+    font-size: 13px;
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+}
+
+/* BODY */
+.pedido-body p,
+.pedido-body h4 {
+    margin: 2px 0;
 }
 
 /* TITULO */
@@ -257,18 +275,16 @@ th {
 }
 
 /* INFO */
-.pedido-info p,
-.pedido-depara p,
-.pedido-domiciliario p {
-    margin: 2px 0;
+.pedido-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 /* MENSAJE LARGO */
-.pedido-mensaje p {
-    margin: 4px 0;
-    white-space: normal;      /* CLAVE */
-    word-break: break-word;  /* CLAVE */
-    line-height: 1.4;
+.mensaje {
+    font-size: 12.5px;
+    white-space: pre-wrap;
 }
 
 /* FOOTER */
@@ -705,42 +721,42 @@ function cargarPedidosRealtime() {
                     card.className = 'pedido-card';
 
                     const colorPedido = obtenerColorPedido(p.color);
-                    card.style.backgroundColor = colorPedido + '33';
+
+                    // 🎨 COLOR REAL DEL PEDIDO (SIN TRANSPARENCIA)
+                    card.style.backgroundColor = colorPedido;
 
                     card.innerHTML = `
-                        <img class="pedido-img"
-                             src="${normalizarImagen(p.imagenUrl)}"
-                             loading="lazy">
 
-                        <div class="pedido-body">
+    <div class="pedido-top">
 
-                            <h4>${p.referencia || 'Pedido'}</h4>
+        <img class="pedido-img"
+             src="${normalizarImagen(p.imagenUrl)}"
+             loading="lazy">
 
-                            <p><strong>Cliente:</strong> ${p.nombreCliente || ''}</p>
-                            <p><strong>Dirección:</strong> ${p.direccion || ''}</p>
-                            <p><strong>Entrega:</strong> ${p.diaEntrega || ''} · ${p.horaEntrega || ''}</p>
-                            <p><strong>Correo:</strong> ${p.correo || ''}</p>
-                            <p><strong>Banco:</strong> ${p.banco || ''}</p>
+        <div class="pedido-info">
 
-                            <div class="pedido-mensaje">
-                                <strong>Mensaje:</strong>
-                                <p>${p.mensaje || ''}</p>
-                            </div>
+            <div class="linea"><strong>${p.referencia || 'Pedido'}</strong></div>
+            <div class="linea">👤 ${p.nombreCliente || ''}</div>
+            <div class="linea">📍 ${p.direccion || ''}</div>
+            <div class="linea">📅 ${p.diaEntrega || ''} · ${p.horaEntrega || ''}</div>
 
-                            <p><strong>De:</strong> ${p.de || ''}</p>
-                            <p><strong>Para:</strong> ${p.nombreDestinatario || ''}</p>
+        </div>
 
-                            <p><strong>Domiciliario:</strong> ${domi.nombre || ''}</p>
-                            <p><strong>Tel:</strong> ${domi.telefono || ''}</p>
+    </div>
 
-                            <div class="pedido-footer">
-                                <span>${p.fechaRegistro || ''} ${p.horaRegistro || ''}</span>
-                                <span class="color-dot"
-                                      title="Color del pedido"
-                                      style="background:${colorPedido}"></span>
-                            </div>
-                        </div>
-                    `;
+    <div class="pedido-bottom">
+
+        <div class="linea"><strong>Mensaje:</strong></div>
+        <div class="linea mensaje">${p.mensaje || ''}</div>
+
+        <div class="linea">De: ${p.de || ''}</div>
+        <div class="linea">Para: ${p.nombreDestinatario || ''}</div>
+        <div class="linea">📞 ${p.cliente || ''}</div>
+        <div class="linea">🚴 ${domi.nombre || ''}</div>
+
+    </div>
+`;
+
 
                     grid.appendChild(card);
                 });
@@ -748,6 +764,7 @@ function cargarPedidosRealtime() {
         });
     });
 }
+
 
 function normalizarImagen(url){
     if(!url) return '';
