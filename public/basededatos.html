@@ -887,16 +887,16 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         </div>
 
         <div class="pedido-bottom">
-             <div class="linea"><strong>Notas:</strong> ${p.notas || ''}</div>
+             <div class="linea"><strong>📝:</strong> ${p.notas || ''}</div>
 
-            <div class="linea"><strong>Mensaje:</strong>${p.mensaje || ''}</div>
+            <div class="linea"><strong>📝:</strong> ${p.mensaje || ''}</div>
 
             <div class="linea">
                 De: ${p.de || ''} · Para: ${p.nombreDestinatario || ''}
             </div>
 
             <div class="linea domiciliario-linea">
-                🚴 
+                🚗 
                 <select class="domi-select"></select>
                 <span class="domi-telefono">📞 ${domiActual.telefono || ''}</span>
             </div>
