@@ -675,47 +675,86 @@ document.addEventListener('click', (e)=>{
 });
 // --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
-    const ref = db.ref(`${idEmpresa}/Pedidos`);
+
+    const pedidosRef = db.ref(`${idEmpresa}/Pedidos`);
+    const domiRef = db.ref(`${idEmpresa}/Domiciliarios`);
     const grid = document.getElementById("pedidosGrid");
 
-    ref.on('value', snapshot => {
-        grid.innerHTML = '';
+    // 1️⃣ Cargar domiciliarios primero
+    domiRef.once('value').then(domiSnap => {
 
-        snapshot.forEach(domicSnap => {
-            const nombre = domicSnap.key;
+        const domiciliarios = {};
 
-            domicSnap.forEach(pedidoSnap => {
-                const p = pedidoSnap.val();
-                if (!p) return;
+        domiSnap.forEach(d => {
+            domiciliarios[d.key] = {
+                nombre: d.child('nombre').val() || 'Sin nombre',
+                telefono: d.child('telefono').val() || ''
+            };
+        });
 
-                const card = document.createElement('div');
-                card.className = 'pedido-card';
+        // 2️⃣ Escuchar pedidos en tiempo real
+        pedidosRef.on('value', snapshot => {
+            grid.innerHTML = '';
 
-                card.innerHTML = `
-                    <img class="pedido-img"
-                        src="${normalizarImagen(p.imagenUrl)}">
+            snapshot.forEach(domicSnap => {
+                const idDomi = domicSnap.key;
+                const domi = domiciliarios[idDomi] || {};
 
-                    <div class="pedido-body">
-                        <h4>${p.referencia || 'Pedido'}</h4>
-                        <p>👤 Cliente: ${p.nombreCliente || ''}</p>
-                        <p>📍 ${p.direccion || ''}</p>
-                        <p>📝 ${p.mensaje || ''}</p>
-                        <p>🚴 Domiciliario: ${nombre}</p>
-                    </div>
+                domicSnap.forEach(pedidoSnap => {
+                    const p = pedidoSnap.val();
+                    if (!p) return;
 
-                    <div class="pedido-footer">
-                        <span>📅 ${p.diaEntrega || ''}</span>
-                        <span>⏰ ${p.horaEntrega || ''}</span>
-                        <span class="color-dot"
-                              style="background:${p.color || '#ccc'}"></span>
-                    </div>
-                `;
+                    const card = document.createElement('div');
+                    card.className = 'pedido-card';
 
-                grid.appendChild(card);
+                    card.innerHTML = `
+                        <img class="pedido-img"
+                             src="${normalizarImagen(p.imagenUrl)}"
+                             loading="lazy">
+
+                        <div class="pedido-body">
+
+                            <h4>${p.nombreCliente || 'Cliente'}</h4>
+
+                            <div class="pedido-info">
+                                <p><strong>Dirección:</strong> ${p.direccion || ''}</p>
+                                <p><strong>Entrega:</strong> ${p.diaEntrega || ''} · ${p.horaEntrega || ''}</p>
+                                <p><strong>Correo:</strong> ${p.correo || ''}</p>
+                                <p><strong>Banco:</strong> ${p.banco || ''}</p>
+                            </div>
+
+                            <div class="pedido-mensaje">
+                                <strong>Mensaje:</strong>
+                                <p>${p.mensaje || ''}</p>
+                            </div>
+
+                            <div class="pedido-depara">
+                                <p><strong>De:</strong> ${p.de || ''}</p>
+                                <p><strong>Para:</strong> ${p.para || ''}</p>
+                            </div>
+
+                            <div class="pedido-domiciliario">
+                                <p><strong>Domiciliario:</strong> ${domi.nombre || ''}</p>
+                                <p><strong>Tel:</strong> ${domi.telefono || ''}</p>
+                            </div>
+
+                            <div class="pedido-footer">
+                                <span>${p.fechaRegistro || ''} ${p.horaRegistro || ''}</span>
+                                <span class="color-dot"
+                                      style="background:${p.color || '#ccc'}"></span>
+                            </div>
+
+                        </div>
+                    `;
+
+                    grid.appendChild(card);
+                });
             });
         });
+
     });
 }
+
 function normalizarImagen(url){
     if(!url) return '';
 
