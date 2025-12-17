@@ -735,10 +735,25 @@ function cargarPedidosRealtime() {
 
         <div class="pedido-info">
 
-            <div class="linea"><strong>${p.referencia || 'Pedido'}</strong></div>
-            <div class="linea">👤 ${p.nombreCliente || ''}</div>
-            <div class="linea">📍 ${p.direccion || ''}</div>
-            <div class="linea">📅 ${p.diaEntrega || ''} · ${p.horaEntrega || ''}</div>
+            <div class="linea ref">
+                ${p.referencia || 'Pedido'}
+            </div>
+
+            <div class="linea">
+                👤 ${p.nombreCliente || ''} · 📞 ${p.cliente || ''}
+            </div>
+
+            <div class="linea">
+                🎁 ${p.nombreDestinatario || ''} · 📞 ${p.destinatario || ''}
+            </div>
+
+            <div class="linea">
+                📍 ${p.direccion || ''}
+            </div>
+
+            <div class="linea">
+                📅 ${p.diaEntrega || ''} · ⏰ ${p.horaEntrega || ''}
+            </div>
 
         </div>
 
@@ -746,13 +761,23 @@ function cargarPedidosRealtime() {
 
     <div class="pedido-bottom">
 
-        <div class="linea"><strong>Mensaje:</strong></div>
+        <div class="linea"><strong>Mensaje</strong></div>
         <div class="linea mensaje">${p.mensaje || ''}</div>
 
         <div class="linea">De: ${p.de || ''}</div>
         <div class="linea">Para: ${p.nombreDestinatario || ''}</div>
-        <div class="linea">📞 ${p.cliente || ''}</div>
-        <div class="linea">🚴 ${domi.nombre || ''}</div>
+
+        <div class="linea">
+            🚴 ${domi.nombre || ''}
+        </div>
+
+        <div class="linea">
+            📞 ${domi.telefono || ''}
+        </div>
+
+        <div class="linea">
+            🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
+        </div>
 
     </div>
 `;
