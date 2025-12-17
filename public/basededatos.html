@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Zippy Contabilidad</title>
+<title>ZippyWeb</title>
  <link rel="icon" href="favicon.ico" type="image/x-icon">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -513,30 +513,7 @@ function mostrarItemsConColores(items) {
     });
 }
 
-// --- CARGAR PEDIDOS ---
-function cargarPedidos(){
-    const ref = db.ref(`${idEmpresa}/Pedidos`);
-    const tbody = document.querySelector("#tablaPedidos tbody");
-    ref.on('value', snapshot=>{
-        tbody.innerHTML='';
-        snapshot.forEach(domicSnap=>{
-            const idDomic = domicSnap.key;
-            domicSnap.forEach(pedidoSnap=>{
-                const p = pedidoSnap.val();
-                const tr = document.createElement('tr');
-                tr.innerHTML=`
-                    <td>${idDomic}</td>
-                    <td>${pedidoSnap.key}</td>
-                    <td>${p.nombre||''}</td>
-                    <td>${p.nota||''}</td>
-                    <td>${p.valor||''}</td>
-                    <td>${p.diaEntrega||''}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        });
-    });
-}
+
 
 // --- AUTOCOMPLETADO Y ENTER PARA GUARDAR ---
 const suggestionsContainer = document.createElement('div');
@@ -606,7 +583,30 @@ document.addEventListener('click', (e)=>{
         suggestionsContainer.style.display='none';
     }
 });
-
+// --- CARGAR PEDIDOS ---
+function cargarPedidos(){
+    const ref = db.ref(`${idEmpresa}/Pedidos`);
+    const tbody = document.querySelector("#tablaPedidos tbody");
+    ref.on('value', snapshot=>{
+        tbody.innerHTML='';
+        snapshot.forEach(domicSnap=>{
+            const idDomic = domicSnap.key;
+            domicSnap.forEach(pedidoSnap=>{
+                const p = pedidoSnap.val();
+                const tr = document.createElement('tr');
+                tr.innerHTML=`
+                    <td>${idDomic}</td>
+                    <td>${pedidoSnap.key}</td>
+                    <td>${p.nombre||''}</td>
+                    <td>${p.nota||''}</td>
+                    <td>${p.valor||''}</td>
+                    <td>${p.diaEntrega||''}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+    });
+}
 
 </script>
 
