@@ -274,15 +274,40 @@ th {
     font-weight: 600;
 }
 
-/* INFO */
+/* CONTENEDOR */
 .pedido-info {
-    font-size: 20px;     /* aumenta aquí */
+    font-size: 20px;        /* tamaño base GRANDE */
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
     font-weight: bold;
-    line-height: 1.2;    /* evita espacios raros */
+    line-height: 1.25;
 }
+
+/* LINEAS PRINCIPALES */
+.pedido-info .linea {
+    font-size: inherit;    /* hereda los 20px */
+    font-weight: bold;
+}
+
+/* SUBLINEAS (teléfono, hora) */
+.pedido-info .sub-linea {
+    font-size: 16px;       /* más pequeño */
+    font-weight: normal;
+    margin-left: 18px;
+    line-height: 1.2;
+}
+
+/* REFERENCIA */
+.linea.ref {
+    font-size: 20px;        /* más grande */
+    font-weight: 700;
+    text-align: center;    /* centrado */
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+    font-weight: bold;
+}
+
 
 
 /* MENSAJE LARGO */
@@ -319,14 +344,7 @@ th {
     }
 }
 
-.linea.ref {
-    font-size: 20px;        /* más grande */
-    font-weight: 700;
-    text-align: center;    /* centrado */
-    margin-bottom: 6px;
-    letter-spacing: 0.3px;
-    font-weight: bold;
-}
+
 
 /* separador de fechas */
 .fecha-header {
