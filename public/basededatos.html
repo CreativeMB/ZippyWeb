@@ -680,19 +680,16 @@ function cargarPedidosRealtime() {
     const domiRef = db.ref(`${idEmpresa}/Domiciliarios`);
     const grid = document.getElementById("pedidosGrid");
 
-    // 1️⃣ Cargar domiciliarios primero
     domiRef.once('value').then(domiSnap => {
 
         const domiciliarios = {};
-
         domiSnap.forEach(d => {
             domiciliarios[d.key] = {
-                nombre: d.child('nombre').val() || 'Sin nombre',
+                nombre: d.child('nombre').val() || '',
                 telefono: d.child('telefono').val() || ''
             };
         });
 
-        // 2️⃣ Escuchar pedidos en tiempo real
         pedidosRef.on('value', snapshot => {
             grid.innerHTML = '';
 
@@ -707,6 +704,9 @@ function cargarPedidosRealtime() {
                     const card = document.createElement('div');
                     card.className = 'pedido-card';
 
+                    const colorPedido = obtenerColorPedido(p.color);
+                    card.style.backgroundColor = colorPedido + '33';
+
                     card.innerHTML = `
                         <img class="pedido-img"
                              src="${normalizarImagen(p.imagenUrl)}"
@@ -714,36 +714,31 @@ function cargarPedidosRealtime() {
 
                         <div class="pedido-body">
 
-                            <h4>${p.nombreCliente || 'Cliente'}</h4>
+                            <h4>${p.referencia || 'Pedido'}</h4>
 
-                            <div class="pedido-info">
-                                <p><strong>Dirección:</strong> ${p.direccion || ''}</p>
-                                <p><strong>Entrega:</strong> ${p.diaEntrega || ''} · ${p.horaEntrega || ''}</p>
-                                <p><strong>Correo:</strong> ${p.correo || ''}</p>
-                                <p><strong>Banco:</strong> ${p.banco || ''}</p>
-                            </div>
+                            <p><strong>Cliente:</strong> ${p.nombreCliente || ''}</p>
+                            <p><strong>Dirección:</strong> ${p.direccion || ''}</p>
+                            <p><strong>Entrega:</strong> ${p.diaEntrega || ''} · ${p.horaEntrega || ''}</p>
+                            <p><strong>Correo:</strong> ${p.correo || ''}</p>
+                            <p><strong>Banco:</strong> ${p.banco || ''}</p>
 
                             <div class="pedido-mensaje">
                                 <strong>Mensaje:</strong>
                                 <p>${p.mensaje || ''}</p>
                             </div>
 
-                            <div class="pedido-depara">
-                                <p><strong>De:</strong> ${p.de || ''}</p>
-                                <p><strong>Para:</strong> ${p.para || ''}</p>
-                            </div>
+                            <p><strong>De:</strong> ${p.de || ''}</p>
+                            <p><strong>Para:</strong> ${p.nombreDestinatario || ''}</p>
 
-                            <div class="pedido-domiciliario">
-                                <p><strong>Domiciliario:</strong> ${domi.nombre || ''}</p>
-                                <p><strong>Tel:</strong> ${domi.telefono || ''}</p>
-                            </div>
+                            <p><strong>Domiciliario:</strong> ${domi.nombre || ''}</p>
+                            <p><strong>Tel:</strong> ${domi.telefono || ''}</p>
 
                             <div class="pedido-footer">
                                 <span>${p.fechaRegistro || ''} ${p.horaRegistro || ''}</span>
                                 <span class="color-dot"
-                                      style="background:${p.color || '#ccc'}"></span>
+                                      title="Color del pedido"
+                                      style="background:${colorPedido}"></span>
                             </div>
-
                         </div>
                     `;
 
@@ -751,7 +746,6 @@ function cargarPedidosRealtime() {
                 });
             });
         });
-
     });
 }
 
@@ -766,6 +760,17 @@ function normalizarImagen(url){
     }
     return url;
 }
+function obtenerColorPedido(color) {
+    if (!color) return '#ffffff';
+
+    // Asegura que sea un color HEX válido
+    if (color.startsWith('#') && (color.length === 7 || color.length === 4)) {
+        return color;
+    }
+
+    return '#ffffff';
+}
+
 
 
 
