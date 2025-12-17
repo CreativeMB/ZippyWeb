@@ -641,7 +641,7 @@ function cargarPedidosRealtime() {
         grid.innerHTML = '';
 
         snapshot.forEach(domicSnap => {
-            const idDomiciliario = domicSnap.key;
+            const nombre = domicSnap.key;
 
             domicSnap.forEach(pedidoSnap => {
                 const p = pedidoSnap.val();
@@ -659,7 +659,7 @@ function cargarPedidosRealtime() {
                         <p>👤 Cliente: ${p.nombreCliente || ''}</p>
                         <p>📍 ${p.direccion || ''}</p>
                         <p>📝 ${p.mensaje || ''}</p>
-                        <p>🚴 Domiciliario: ${idDomiciliario}</p>
+                        <p>🚴 Domiciliario: ${nombre}</p>
                     </div>
 
                     <div class="pedido-footer">
