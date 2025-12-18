@@ -426,7 +426,7 @@ th {
 <body>
 
 <div id="sidebar">
-       <button id="btnCerrarSesion" style="margin-bottom:10px; padding:12px 15px; font-size:16px;">🚪 Cerrar Sesión</button>
+       <button id="btnCerrarSesion" style="margin-bottom:5px; padding:8px 10px; font-size:16px;">🚪 Cerrar Sesión</button>
     <h3 id="sidebarTitulo">📂 Contabilidad</h3>
    <div id="resumenTotales" class="resumen-oculto">
     <div class="total positivo">
@@ -538,9 +538,8 @@ auth.onAuthStateChanged(user => {
 
 // --- CARGAR BASES ---
 function cargarBases() {
-    // 🔴 OCULTAR RESUMEN SIEMPRE QUE ESTAMOS EN BASES
     document.getElementById('resumenTotales').style.display = 'none';
-    sidebarTitulo.textContent = "📂 Bases de Datos";
+    sidebarTitulo.textContent = "📂 Contabilidad";
     btnVolver.style.display = "none";
     btnAgregarDato.style.display = "none";
     formNuevoDato.style.display = "none";
