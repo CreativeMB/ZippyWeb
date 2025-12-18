@@ -456,11 +456,11 @@ th {
 }
 
 /* =========================
-   TARJETA IMPRESIÓN 4x6
+   TARJETA IMPRESIÓN BASE
 ========================= */
 .tarjeta-impresion {
-    width: 101.6mm;
-    height: 152.4mm;
+    width: 101.6mm;   /* 4 pulgadas */
+    height: 152.4mm;  /* 6 pulgadas */
     padding: 10mm;
     box-sizing: border-box;
 
@@ -515,10 +515,11 @@ th {
     font-size: 20px;
     margin-top: 6mm;
 }
+
 /* =========================
-   VISTA PREVIA HORIZONTAL
+   VISTA PREVIA (SOLO PANTALLA)
 ========================= */
-.print-contenido.horizontal {
+.print-contenido {
     width: 90vw;
     max-width: 900px;
 }
@@ -531,22 +532,16 @@ th {
     padding: 10px;
 }
 
-/* La tarjeta se muestra horizontal SOLO EN PANTALLA */
-.print-area-horizontal .tarjeta-impresion {
-    width: 152.4mm;
-    height: 101.6mm;
-}
-
-/* En impresión sigue siendo 4x6 vertical (no cambia) */
-@media print {
-    .tarjeta-impresion {
-        width: 101.6mm;
-        height: 152.4mm;
+/* Tarjeta horizontal SOLO en pantalla */
+@media screen {
+    .print-area-horizontal .tarjeta-impresion {
+        width: 152.4mm;  /* horizontal */
+        height: 101.6mm;
     }
 }
 
 /* =========================
-   IMPRESIÓN
+   IMPRESIÓN REAL
 ========================= */
 @media print {
 
@@ -564,12 +559,16 @@ th {
         inset: 0;
     }
 
+    .tarjeta-impresion {
+        width: 101.6mm;   /* vertical real */
+        height: 152.4mm;
+    }
+
     @page {
         size: 101.6mm 152.4mm;
         margin: 0;
     }
 }
-
 
 
 </style>
@@ -1425,19 +1424,49 @@ function actualizarTotales(pos, neg) {
 
     totalDif.parentElement.style.color = dif < 0 ? '#C62828' : '#2E7D32';
 }
+/* ===== ABRIR VISTA PREVIA ===== */
+function abrirImpresion(pedido) {
 
-function imprimirTarjeta() {
-    const iframe = document.getElementById('printFrame');
+    const printArea = document.getElementById('printArea');
+    const modal = document.getElementById('printModal');
 
-    if (!iframe) {
-        alert('Falta el iframe de impresión');
+    if (!printArea || !modal) {
+        alert('Falta printArea o printModal');
         return;
     }
 
+    printArea.innerHTML = `
+        <div class="tarjeta-impresion">
+
+            <div class="publicidad-top">
+                🌸 Floristería Los Lirios · WhatsApp 300 000 0000
+            </div>
+
+            <div class="mensaje-principal">
+                ${pedido.mensaje || ''}
+            </div>
+
+            <div class="de-para">
+                <div><strong>Para:</strong> ${pedido.para || ''}</div>
+                <div><strong>De:</strong> ${pedido.de || ''}</div>
+            </div>
+
+            <div class="decoracion">💐 💝 🌿</div>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+}
+
+
+/* ===== IMPRIMIR ===== */
+function imprimirTarjeta() {
+
+    const iframe = document.getElementById('printFrame');
     const printArea = document.getElementById('printArea');
 
-    if (!printArea || !printArea.innerHTML.trim()) {
-        alert('La tarjeta está vacía');
+    if (!iframe || !printArea || !printArea.innerHTML.trim()) {
+        alert('No hay tarjeta para imprimir');
         return;
     }
 
@@ -1447,8 +1476,9 @@ function imprimirTarjeta() {
     doc.write(`
         <html>
         <head>
+            <meta charset="utf-8">
             <style>
-                ${document.querySelector('style').innerHTML}
+                ${document.querySelector('#printStyles').innerHTML}
 
                 @page {
                     size: 101.6mm 152.4mm;
@@ -1473,6 +1503,8 @@ function imprimirTarjeta() {
     setTimeout(cerrarPrint, 500);
 }
 
+
+/* ===== CERRAR ===== */
 function cerrarPrint() {
     document.getElementById('printModal').style.display = 'none';
 }
