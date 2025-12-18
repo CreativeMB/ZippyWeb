@@ -980,7 +980,12 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         <div class="pedido-bottom">
              <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
 
-            <div class="linea"><strong>📝:</strong> ${p.mensaje || ''}</div>
+          <div class="linea mensaje-linea">
+    <strong>📝:</strong>
+    <span class="mensaje-texto">${p.mensaje || ''}</span>
+    <button class="btn-editar-mensaje">✏️</button>
+</div>
+
 
             <div class="linea">
                 👉 De: ${p.de || ''} 👉 Para: ${p.para || ''}
@@ -1035,6 +1040,44 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             select.value = idDomiActual;
         }
     });
+/* ====== EDITAR MENSAJE ====== */
+const btnEditar = card.querySelector('.btn-editar-mensaje');
+const mensajeSpan = card.querySelector('.mensaje-texto');
+
+btnEditar.addEventListener('click', () => {
+
+    const textarea = document.createElement('textarea');
+    textarea.value = mensajeSpan.textContent;
+    textarea.style.width = '100%';
+    textarea.rows = 3;
+
+    const btnGuardar = document.createElement('button');
+    btnGuardar.textContent = '💾 Guardar';
+    btnGuardar.style.marginTop = '5px';
+
+    mensajeSpan.replaceWith(textarea);
+    btnEditar.replaceWith(btnGuardar);
+
+    btnGuardar.addEventListener('click', async () => {
+        const nuevoMensaje = textarea.value.trim();
+
+        try {
+            await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
+                .update({ mensaje: nuevoMensaje });
+
+            // volver a texto
+            const nuevoSpan = document.createElement('span');
+            nuevoSpan.className = 'mensaje-texto';
+            nuevoSpan.textContent = nuevoMensaje;
+
+            textarea.replaceWith(nuevoSpan);
+            btnGuardar.replaceWith(btnEditar);
+
+        } catch (e) {
+            alert('Error guardando mensaje');
+        }
+    });
+});
 
     return card;
 }
