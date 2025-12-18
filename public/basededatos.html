@@ -538,6 +538,8 @@ auth.onAuthStateChanged(user => {
 
 // --- CARGAR BASES ---
 function cargarBases() {
+    // 🔴 OCULTAR RESUMEN SIEMPRE QUE ESTAMOS EN BASES
+    document.getElementById('resumenTotales').style.display = 'none';
     sidebarTitulo.textContent = "📂 Bases de Datos";
     btnVolver.style.display = "none";
     btnAgregarDato.style.display = "none";
