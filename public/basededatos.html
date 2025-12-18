@@ -1546,7 +1546,18 @@ function abrirImpresion(pedido) {
     // Construimos la tarjeta de impresión
    printArea.innerHTML = `
 <div class="tarjeta-impresion">
-  <div class="mensaje-principal">${(pedido.mensaje || '').trim()}</div>
+
+    <!-- Logo de la empresa en la esquina superior izquierda -->
+    <div style="position:absolute; top:10mm; left:10mm;">
+        <img id="logoEmpresa" src="" alt="Logo Empresa" style="max-height:15mm; cursor:pointer;">
+    </div>
+
+    <!-- Mensaje principal centrado -->
+    <div class="mensaje-principal" style="margin-top:25mm;">
+        ${(pedido.mensaje || '').trim()}
+    </div>
+
+    <!-- De / Para -->
     <div class="de-para">
         <div><strong>Para:</strong> ${(pedido.para || '').trim()}</div>
         <div><strong>De:</strong> ${(pedido.de || '').trim()}</div>
@@ -1561,31 +1572,24 @@ function abrirImpresion(pedido) {
         Visítanos en: ${(perfil.urlPagina || '').trim()}
     </div>
 
-    <!-- Logo e iconos de redes sociales (editable) -->
-    <div class="decoracion-url">
-
-        <div>
-            <img id="logoEmpresa" src="" alt="Logo Empresa" style="max-height:20mm; cursor:pointer;">
+    <!-- Redes sociales en la parte inferior, una línea -->
+    <div class="decoracion-url" style="display:flex; justify-content:center; align-items:center; gap:4mm; margin-top:2mm; position:absolute; bottom:10mm; left:10mm; right:10mm; font-size:8px;">
+        <div style="display:flex; align-items:center; gap:2mm;">
+            <img class="icono-redes" id="facebook" src="icono-facebook.png" alt="Facebook" style="height:6mm; cursor:pointer;">
+            <span contenteditable="true" id="usuarioFacebook">@usuarioFB</span>
         </div>
-
-        <div class="redes-sociales">
-            <div>
-                <img class="icono-redes" id="facebook" src="icono-facebook.png" alt="Facebook" style="cursor:pointer;">
-                <span contenteditable="true" id="usuarioFacebook">@usuarioFB</span>
-            </div>
-            <div>
-                <img class="icono-redes" id="instagram" src="icono-instagram.png" alt="Instagram" style="cursor:pointer;">
-                <span contenteditable="true" id="usuarioInstagram">@usuarioIG</span>
-            </div>
-            <div>
-                <img class="icono-redes" id="whatsapp" src="icono-whatsapp.png" alt="WhatsApp" style="cursor:pointer;">
-                <span contenteditable="true" id="usuarioWhatsApp">+57 300 000 0000</span>
-            </div>
+        <div style="display:flex; align-items:center; gap:2mm;">
+            <img class="icono-redes" id="instagram" src="icono-instagram.png" alt="Instagram" style="height:6mm; cursor:pointer;">
+            <span contenteditable="true" id="usuarioInstagram">@usuarioIG</span>
         </div>
-
+        <div style="display:flex; align-items:center; gap:2mm;">
+            <img class="icono-redes" id="whatsapp" src="icono-whatsapp.png" alt="WhatsApp" style="height:6mm; cursor:pointer;">
+            <span contenteditable="true" id="usuarioWhatsApp">+57 300 000 0000</span>
+        </div>
     </div>
 
 </div>`;
+
 
   // Asociar eventos a imágenes
     ['logoEmpresa','facebook','instagram','whatsapp'].forEach(id => {
