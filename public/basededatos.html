@@ -460,18 +460,18 @@ th {
    TARJETA IMPRESIÓN BASE
 ========================= */
 .tarjeta-impresion {
-    width: 101.6mm;          /* 4 pulgadas */
-    height: 152.4mm;         /* 6 pulgadas */
+    width: 101.6mm;          
+    height: 152.4mm;         
     padding: 10mm;
     box-sizing: border-box;
-    background: #fdfcf8;      /* fondo crema elegante */
-    font-family: 'Georgia', serif;
+    background: #fdfcf8;      
+    font-family: 'Georgia', serif;  /* base elegante */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     border: none;
     position: relative;
-    color: #2c2c2c;           /* texto oscuro elegante */
+    color: #2c2c2c;           
 }
 
 /* =========================
@@ -482,19 +482,21 @@ th {
     font-weight: bold;
     text-align: center;
     margin-bottom: 6mm;
-    color: #004d40;           /* verde elegante */
+    color: #004d40;           
 }
 
 /* =========================
-   MENSAJE PRINCIPAL
+   MENSAJE PRINCIPAL (CURSIVA)
 ========================= */
 .mensaje-principal {
-    flex: 1;                               /* ocupa espacio restante */
-    font-size: clamp(12px, 1.5vw, 18px);  /* se ajusta al contenido */
+    flex: 1;                              
+    font-family: 'Great Vibes', cursive;  /* elegante manuscrita */
+    font-size: clamp(14px, 2vw, 22px);    /* se ajusta automáticamente */
     text-align: center;
-    line-height: 1.55;
-    white-space: pre-wrap;                 /* mantiene saltos de línea */
-    overflow-wrap: break-word;             /* evita que se salga */
+    line-height: 1.5;
+    white-space: pre-wrap;                 
+    overflow-wrap: break-word;             
+    color: #2c2c2c;                       /* color elegante */
 }
 
 /* =========================
@@ -504,6 +506,8 @@ th {
     margin-top: 6mm;
     font-size: 13px;
     text-align: center;
+    font-family: 'Georgia', serif;
+    color: #2c2c2c;
 }
 
 .de-para div {
@@ -511,24 +515,38 @@ th {
 }
 
 /* =========================
-   DECORACIÓN INFERIOR
+   FIRMA OPCIONAL
+========================= */
+.firma {
+    font-family: 'Dancing Script', cursive; 
+    font-size: clamp(14px, 2.5vw, 24px);
+    color: #8b0000;
+    margin-top: 6mm;
+    text-align: center;
+}
+
+/* =========================
+   DECORACIÓN INFERIOR (TEXTO)
 ========================= */
 .decoracion {
     text-align: center;
     font-size: 20px;
     margin-top: 6mm;
-    color: #8b0000;           /* rojo elegante */
+    color: #8b0000;           
 }
 
 /* =========================
-   FIRMA OPCIONAL
+   DECORACIÓN INFERIOR (IMAGEN)
 ========================= */
-.firma {
-    font-family: 'Dancing Script', cursive; /* elegante manuscrita */
-    font-size: clamp(14px, 2.5vw, 24px);
-    color: #8b0000;
-    margin-top: 6mm;
+.decoracion-url {
     text-align: center;
+    margin-top: 6mm;
+}
+
+.decoracion-url img {
+    max-width: 100%;   
+    max-height: 25mm;  
+    object-fit: contain;
 }
 
 /* =========================
@@ -1499,7 +1517,7 @@ function abrirImpresion(pedido) {
             </div>
 
             <!-- URL de la empresa debajo de la decoración -->
-            <div class="decoracion-url" style="font-size:10px; text-align:center; margin-top:1mm;">
+            <div class="decoracion" style="font-size:10px; text-align:center; margin-top:1mm;">
                 Visítanos en: ${perfil.urlPagina}
             </div>
 
