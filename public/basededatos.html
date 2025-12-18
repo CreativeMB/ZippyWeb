@@ -542,41 +542,104 @@ th {
 /* =========================
    IMPRESIÓN REAL
 ========================= */
+/* ===== ESTILOS GENERALES DE LA TARJETA ===== */
+.tarjeta-impresion {
+    width: 152.4mm;   /* 6 pulgadas ancho horizontal */
+    height: 101.6mm;  /* 4 pulgadas alto horizontal */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centrar verticalmente */
+    align-items: center;     /* Centrar horizontalmente */
+    text-align: center;
+    box-sizing: border-box;
+    padding: 2mm; /* Espacio interno si quieres */
+    font-family: sans-serif;
+}
+
+/* Texto decorativo, mensaje y de-para */
+.decoracion, .decoracion-url, .mensaje-principal, .de-para {
+    margin: 0;
+    padding: 0;
+    font-size: 10px; /* Ajusta según necesites */
+}
+
+/* ===== MODAL DE IMPRESIÓN ===== */
+#printModal {
+    display: none; /* Se muestra solo cuando abres la vista previa */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.6); /* Fondo semitransparente */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.print-contenido {
+    background: white;
+    padding: 10px;
+    border-radius: 6px;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: auto;
+}
+
+/* Botones dentro del modal */
+.print-botones button {
+    margin: 2px;
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+/* ===== ESTILOS ESPECÍFICOS PARA IMPRESIÓN ===== */
 @media print {
     body * {
-        visibility: hidden; /* Oculta todo */
+        visibility: hidden; /* Oculta todo lo demás */
     }
 
     #printModal, #printModal * {
-        visibility: visible; /* Solo mostramos el modal y su contenido */
+        visibility: visible; /* Solo muestra el modal y su contenido */
     }
 
     #printModal {
         position: absolute;
         left: 0;
         top: 0;
-        width: 152.4mm;  /* 6 pulgadas ancho horizontal */
-        height: 101.6mm; /* 4 pulgadas alto horizontal */
+        width: 152.4mm;   /* 6 pulgadas */
+        height: 101.6mm;  /* 4 pulgadas */
         margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .print-botones {
-        display: none; /* Oculta botones al imprimir */
+        display: none; /* Oculta los botones al imprimir */
     }
 
     .tarjeta-impresion {
-        width: 100%;
-        height: 100%;
+        width: 152.4mm;
+        height: 101.6mm;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
         box-sizing: border-box;
+        padding: 0;
     }
 
-    /* Si quieres texto más ajustado para impresión */
-    .decoracion, .mensaje-principal, .de-para {
-        font-size: 10px;
+    .mensaje-principal, .de-para, .decoracion, .decoracion-url {
+        margin: 0;
+        padding: 0;
+    }
+
+    @page {
+        size: 152.4mm 101.6mm landscape; /* 6x4 horizontal */
+        margin: 0;
     }
 }
-
-
 
 
 </style>
