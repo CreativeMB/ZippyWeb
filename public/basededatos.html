@@ -491,30 +491,27 @@ th {
     font-size: 20px;
 }
 
-/* ===== IMPRESIÓN REAL ===== */
 @media print {
-
     body * {
-        visibility: hidden;
+        display: none;
     }
 
     #printArea, #printArea * {
-        visibility: visible;
+        display: block;
     }
 
     #printArea {
-        position: fixed;
+        position: absolute;
         inset: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
 
+    /* 🟢 4x6 HORIZONTAL */
     @page {
-        size: 101.6mm 152.4mm;
+        size: 152.4mm 101.6mm; /* ancho x alto */
         margin: 0;
     }
 }
+
 
 
 
