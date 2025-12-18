@@ -561,6 +561,7 @@ function mostrarDatos(base) {
     let totalPositivo = 0;
     let totalNegativo = 0;
 
+    // 🔴 Tiempo real
     ref.on('child_added', itemSnap => {
         const item = itemSnap.val();
         if (!item || !item.nombre) return;
@@ -575,7 +576,7 @@ function mostrarDatos(base) {
         const li = document.createElement('li');
         li.dataset.key = itemSnap.key;
 
-        const fechaFormateada = formatearFechaCorta(item.fechaHora);
+        const fechaFormateada = formatearFecha(item.fechaHora);
         const valorTexto = `$${valor.toLocaleString('es-CO')}`;
 
         li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
@@ -595,6 +596,7 @@ function mostrarDatos(base) {
         sidebarList.insertBefore(li, sidebarList.firstChild);
     });
 
+    // 🔵 Carga inicial
     ref.once('value', snapshot => {
         const itemsArray = [];
 
@@ -605,7 +607,11 @@ function mostrarDatos(base) {
             }
         });
 
-        itemsArray.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+        itemsArray.sort((a, b) => {
+            const da = new Date(a.fechaHora);
+            const db = new Date(b.fechaHora);
+            return db - da;
+        });
 
         itemsArray.forEach(item => {
             if (itemsMostrados.has(item.key)) return;
@@ -618,7 +624,7 @@ function mostrarDatos(base) {
             const li = document.createElement('li');
             li.dataset.key = item.key;
 
-            const fechaFormateada = formatearFechaCorta(item.fechaHora);
+            const fechaFormateada = formatearFecha(item.fechaHora);
             const valorTexto = `$${valor.toLocaleString('es-CO')}`;
 
             li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
@@ -818,7 +824,10 @@ function cargarPedidosRealtime() {
 
                     const header = document.createElement('div');
                     header.className = 'fecha-header';
-                    header.textContent = formatearFechaBonita(fecha);
+
+                    // ✅ USAR FUNCIÓN UNIFICADA
+                    header.textContent = formatearFecha(fecha);
+
                     grid.appendChild(header);
 
                     pedidosPorFecha[fecha].forEach(item => {
@@ -841,11 +850,17 @@ function cargarPedidosRealtime() {
 }
 
 
+
 function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     const card = document.createElement('div');
     card.className = 'pedido-card';
     card.style.backgroundColor = obtenerColorPedido(p.color);
+
+    const fechaEntregaFormateada = formatearFecha(p.diaEntrega);
+    const fechaRegistroFormateada = formatearFecha(
+        `${p.fechaRegistro || ''} ${p.horaRegistro || ''}`
+    );
 
     card.innerHTML = `
         <div class="pedido-top">
@@ -884,7 +899,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                 </div>
 
                 <div class="linea">
-                    📅 ${p.diaEntrega || ''}
+                    📅 ${fechaEntregaFormateada}
                     <div class="sub-linea">⏰ ${p.horaEntrega || ''}</div>
                 </div>
 
@@ -892,7 +907,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         </div>
 
         <div class="pedido-bottom">
-             <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
+            <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
 
             <div class="linea"><strong>📝:</strong> ${p.mensaje || ''}</div>
 
@@ -907,9 +922,8 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             </div>
 
             <div class="linea">
-                🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
+                🕒 ${fechaRegistroFormateada}
             </div>
-
         </div>
     `;
 
@@ -939,9 +953,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                 p
             );
 
-            // actualizar teléfono visual
             telSpan.textContent = `📞 ${domiciliarios[idDomiNuevo]?.telefono || ''}`;
-
             idDomiActual = idDomiNuevo;
 
         } catch (e) {
@@ -952,6 +964,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     return card;
 }
+
 
 
 async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedido) {
