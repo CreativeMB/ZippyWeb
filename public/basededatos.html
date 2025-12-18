@@ -633,7 +633,6 @@ th {
 </div>
 
 </div>
-<iframe id="printFrame" style="display:none;"></iframe>
 
 <div id="printModal" class="print-modal">
     <div class="print-contenido horizontal">
@@ -1431,7 +1430,14 @@ function imprimirTarjeta() {
     const iframe = document.getElementById('printFrame');
 
     if (!iframe) {
-        alert('No se encontró el iframe de impresión');
+        alert('Falta el iframe de impresión');
+        return;
+    }
+
+    const printArea = document.getElementById('printArea');
+
+    if (!printArea || !printArea.innerHTML.trim()) {
+        alert('La tarjeta está vacía');
         return;
     }
 
@@ -1441,7 +1447,6 @@ function imprimirTarjeta() {
     doc.write(`
         <html>
         <head>
-            <title>Imprimir tarjeta</title>
             <style>
                 ${document.querySelector('style').innerHTML}
 
@@ -1456,7 +1461,7 @@ function imprimirTarjeta() {
             </style>
         </head>
         <body>
-            ${document.getElementById('printArea').innerHTML}
+            ${printArea.innerHTML}
         </body>
         </html>
     `);
@@ -1465,7 +1470,6 @@ function imprimirTarjeta() {
     iframe.contentWindow.focus();
     iframe.contentWindow.print();
 
-    // ⏱ cerrar modal luego de abrir impresión
     setTimeout(cerrarPrint, 500);
 }
 
@@ -1473,7 +1477,9 @@ function cerrarPrint() {
     document.getElementById('printModal').style.display = 'none';
 }
 
+
 </script>
+<iframe id="printFrame" style="display:none;"></iframe>
 
 </body>
 </html>
