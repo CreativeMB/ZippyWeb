@@ -633,6 +633,8 @@ th {
 </div>
 
 </div>
+<iframe id="printFrame" style="display:none;"></iframe>
+
 <div id="printModal" class="print-modal">
     <div class="print-contenido horizontal">
 
@@ -1425,43 +1427,51 @@ function actualizarTotales(pos, neg) {
     totalDif.parentElement.style.color = dif < 0 ? '#C62828' : '#2E7D32';
 }
 
-function abrirImpresion(pedido) {
-
-    document.getElementById('printArea').innerHTML = `
-        <div class="tarjeta-impresion">
-            <div class="logo">🌸 Floristería Los Lirios</div>
-
-            <div class="mensaje-principal">
-                ${pedido.mensaje || ''}
-            </div>
-
-            <hr>
-
-            <div class="para">
-                <strong>Para:</strong> ${pedido.para || ''}
-            </div>
-
-            <div class="de">
-                <strong>De:</strong> ${pedido.de || ''}
-            </div>
-
-            <div class="decoracion">💐 💝 🌿</div>
-        </div>
-    `;
-
-    document.getElementById('printModal').style.display = 'flex';
-}
-
 function imprimirTarjeta() {
-    window.print();
-    setTimeout(cerrarPrint, 300);
-}
+    const iframe = document.getElementById('printFrame');
 
+    if (!iframe) {
+        alert('No se encontró el iframe de impresión');
+        return;
+    }
+
+    const doc = iframe.contentWindow.document;
+
+    doc.open();
+    doc.write(`
+        <html>
+        <head>
+            <title>Imprimir tarjeta</title>
+            <style>
+                ${document.querySelector('style').innerHTML}
+
+                @page {
+                    size: 101.6mm 152.4mm;
+                    margin: 0;
+                }
+
+                body {
+                    margin: 0;
+                }
+            </style>
+        </head>
+        <body>
+            ${document.getElementById('printArea').innerHTML}
+        </body>
+        </html>
+    `);
+    doc.close();
+
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+
+    // ⏱ cerrar modal luego de abrir impresión
+    setTimeout(cerrarPrint, 500);
+}
 
 function cerrarPrint() {
     document.getElementById('printModal').style.display = 'none';
 }
-
 
 </script>
 
