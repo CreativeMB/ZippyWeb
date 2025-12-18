@@ -1046,18 +1046,28 @@ const mensajeSpan = card.querySelector('.mensaje-texto');
 
 btnEditar.addEventListener('click', () => {
 
+    const textoOriginal = mensajeSpan.textContent;
+
     const textarea = document.createElement('textarea');
-    textarea.value = mensajeSpan.textContent;
+    textarea.value = textoOriginal;
     textarea.style.width = '100%';
     textarea.rows = 3;
 
     const btnGuardar = document.createElement('button');
     btnGuardar.textContent = '💾 Guardar';
-    btnGuardar.style.marginTop = '5px';
+    btnGuardar.style.marginRight = '6px';
+
+    const btnCancelar = document.createElement('button');
+    btnCancelar.textContent = '❌ Cancelar';
+
+    const contenedorBtns = document.createElement('div');
+    contenedorBtns.style.marginTop = '5px';
+    contenedorBtns.append(btnGuardar, btnCancelar);
 
     mensajeSpan.replaceWith(textarea);
-    btnEditar.replaceWith(btnGuardar);
+    btnEditar.replaceWith(contenedorBtns);
 
+    /* ====== GUARDAR ====== */
     btnGuardar.addEventListener('click', async () => {
         const nuevoMensaje = textarea.value.trim();
 
@@ -1065,19 +1075,29 @@ btnEditar.addEventListener('click', () => {
             await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
                 .update({ mensaje: nuevoMensaje });
 
-            // volver a texto
             const nuevoSpan = document.createElement('span');
             nuevoSpan.className = 'mensaje-texto';
             nuevoSpan.textContent = nuevoMensaje;
 
             textarea.replaceWith(nuevoSpan);
-            btnGuardar.replaceWith(btnEditar);
+            contenedorBtns.replaceWith(btnEditar);
 
         } catch (e) {
             alert('Error guardando mensaje');
         }
     });
+
+    /* ====== CANCELAR ====== */
+    btnCancelar.addEventListener('click', () => {
+        const spanOriginal = document.createElement('span');
+        spanOriginal.className = 'mensaje-texto';
+        spanOriginal.textContent = textoOriginal;
+
+        textarea.replaceWith(spanOriginal);
+        contenedorBtns.replaceWith(btnEditar);
+    });
 });
+
 
     return card;
 }
