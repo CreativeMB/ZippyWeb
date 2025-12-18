@@ -474,14 +474,21 @@ function cargarBases() {
     formNuevoDato.style.display = "none";
     opcionesExtra.style.display = "none";
 
-    const ref = db.ref(`${idEmpresa}/basededatos`);
     sidebarList.innerHTML = '';
 
-    ref.on('child_added', baseSnap => {
-        if(!baseSnap.key) return;
+    const ref = db
+        .ref(`${idEmpresa}/basededatos`)
+        .orderByChild('timestamp')
+        .limitToLast(100);
+
+    ref.on('child_added', snap => {
+        if (!snap.exists()) return;
+
         const li = document.createElement('li');
-        li.textContent = baseSnap.key;
-        li.onclick = () => mostrarDatos(baseSnap.key);
+        li.textContent = snap.key;
+        li.onclick = () => mostrarDatos(snap.key);
+
+        // 🔥 MÁS RECIENTE ARRIBA
         sidebarList.insertBefore(li, sidebarList.firstChild);
     });
 }
