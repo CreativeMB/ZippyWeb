@@ -1472,31 +1472,31 @@ function abrirImpresion(pedido) {
     }
 
     // Construimos la tarjeta de impresión
-    printArea.innerHTML = `
-        <div class="tarjeta-impresion">
+    printArea.innerHTML = `<div class="tarjeta-impresion">
 
-            <!-- Mensaje principal -->
-            <div class="mensaje-principal">
-                ${pedido.mensaje || ''}
-            </div>
+    <!-- Mensaje principal -->
+    <div class="mensaje-principal">
+        ${ (pedido.mensaje || '').trim() }
+    </div>
 
-            <!-- De - Para -->
-            <div class="de-para">
-                <div><strong>Para:</strong> ${pedido.para || ''}</div>
-                <div><strong>De:</strong> ${pedido.de || ''}</div>
-            </div>
+    <!-- De - Para -->
+    <div class="de-para">
+        <div><strong>Para:</strong> ${(pedido.para || '').trim()}</div>
+        <div><strong>De:</strong> ${(pedido.de || '').trim()}</div>
+    </div>
 
-            <!-- Decoración inferior: todos los datos de la empresa en una línea -->
-            <div class="decoracion" style="font-size:10px; text-align:center; margin-top:2mm;">
-                ${perfil.nombreEmpresa} · WhatsApp: ${perfil.WhatsApp} · ${perfil.direccion} · ${perfil.ciudad}
-            </div>
+    <!-- Decoración inferior: todos los datos de la empresa en una línea -->
+    <div class="decoracion" style="font-size:10px; text-align:center; margin-top:2mm;">
+        ${ (perfil.nombreEmpresa || '').trim() } · WhatsApp: ${ (perfil.WhatsApp || '').trim() } · ${ (perfil.direccion || '').trim() } · ${ (perfil.ciudad || '').trim() }
+    </div>
 
-            <!-- URL de la empresa debajo de la decoración -->
-            <div class="decoracion" style="font-size:10px; text-align:center; margin-top:1mm;">
-                Visítanos en: ${perfil.urlPagina}
-            </div>
+    <!-- URL de la empresa debajo de la decoración -->
+    <div class="decoracion" style="font-size:10px; text-align:center; margin-top:1mm;">
+        Visítanos en: ${ (perfil.urlPagina || '').trim() }
+    </div>
 
-        </div>
+</div>`;
+
     `;
 
     modal.style.display = 'flex';
