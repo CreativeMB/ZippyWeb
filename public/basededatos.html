@@ -515,6 +515,35 @@ th {
     font-size: 20px;
     margin-top: 6mm;
 }
+/* =========================
+   VISTA PREVIA HORIZONTAL
+========================= */
+.print-contenido.horizontal {
+    width: 90vw;
+    max-width: 900px;
+}
+
+.print-area-horizontal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+    padding: 10px;
+}
+
+/* La tarjeta se muestra horizontal SOLO EN PANTALLA */
+.print-area-horizontal .tarjeta-impresion {
+    width: 152.4mm;
+    height: 101.6mm;
+}
+
+/* En impresión sigue siendo 4x6 vertical (no cambia) */
+@media print {
+    .tarjeta-impresion {
+        width: 101.6mm;
+        height: 152.4mm;
+    }
+}
 
 /* =========================
    IMPRESIÓN
