@@ -399,7 +399,6 @@ th {
     </div>
 
     <ul id="sidebarList"></ul>
-    
 </div>
 
 <div id="main">
@@ -556,22 +555,20 @@ function mostrarDatos(base) {
 
     const itemsMostrados = new Set(); // evitar duplicados
 
-    // 🔴 Listener en tiempo real (nuevos registros)
+    // Listener en tiempo real
     ref.on('child_added', itemSnap => {
         const item = itemSnap.val();
         if (!item || !item.nombre) return;
 
-        if (itemsMostrados.has(itemSnap.key)) return;
+        // Si ya se mostró, no lo agregamos otra vez
+        if(itemsMostrados.has(itemSnap.key)) return;
         itemsMostrados.add(itemSnap.key);
 
         const li = document.createElement('li');
         li.dataset.key = itemSnap.key;
+        li.textContent = `${item.nombre} - ${item.valor} (${item.fechaHora})`;
 
-        const fechaFormateada = formatearFechaBonita(item.fechaHora);
-
-        li.textContent = `${item.nombre} - ${item.valor} (${fechaFormateada})`;
-
-        if (item.valor < 0) {
+        if(item.valor < 0){
             li.style.color = '#D32F2F';
             li.style.backgroundColor = '#FFCDD2';
         } else {
@@ -582,53 +579,44 @@ function mostrarDatos(base) {
         li.style.padding = '10px';
         li.style.marginBottom = '5px';
         li.style.borderRadius = '6px';
-
-        // Los nuevos aparecen arriba
         sidebarList.insertBefore(li, sidebarList.firstChild);
     });
 
-    // 🔵 Cargar datos existentes una sola vez (ordenados)
+    // Cargar datos existentes una sola vez
     ref.once('value', snapshot => {
         const itemsArray = [];
-
         snapshot.forEach(itemSnap => {
             const item = itemSnap.val();
-            if (item && item.nombre) {
-                itemsArray.push({ ...item, key: itemSnap.key });
-            }
+            if(item && item.nombre) itemsArray.push({...item, key: itemSnap.key});
         });
 
         // Ordenar por fecha descendente
-        itemsArray.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+        itemsArray.sort((a,b) => new Date(b.fechaHora) - new Date(a.fechaHora));
 
         itemsArray.forEach(item => {
-            if (itemsMostrados.has(item.key)) return;
-            itemsMostrados.add(item.key);
+            if(!itemsMostrados.has(item.key)){
+                itemsMostrados.add(item.key);
 
-            const li = document.createElement('li');
-            li.dataset.key = item.key;
+                const li = document.createElement('li');
+                li.dataset.key = item.key;
+                li.textContent = `${item.nombre} - ${item.valor} (${item.fechaHora})`;
 
-            const fechaFormateada = formatearFechaBonita(item.fechaHora);
+                if(item.valor < 0){
+                    li.style.color = '#D32F2F';
+                    li.style.backgroundColor = '#FFCDD2';
+                } else {
+                    li.style.color = '#388E3C';
+                    li.style.backgroundColor = '#C8E6C9';
+                }
 
-            li.textContent = `${item.nombre} - ${item.valor} (${fechaFormateada})`;
-
-            if (item.valor < 0) {
-                li.style.color = '#D32F2F';
-                li.style.backgroundColor = '#FFCDD2';
-            } else {
-                li.style.color = '#388E3C';
-                li.style.backgroundColor = '#C8E6C9';
+                li.style.padding = '10px';
+                li.style.marginBottom = '5px';
+                li.style.borderRadius = '6px';
+                sidebarList.appendChild(li);
             }
-
-            li.style.padding = '10px';
-            li.style.marginBottom = '5px';
-            li.style.borderRadius = '6px';
-
-            sidebarList.appendChild(li);
         });
     });
 }
-
 
 // --- FUNCION GUARDAR DATO ---
 function guardarDato() {
@@ -996,9 +984,9 @@ function convertirFecha(fecha) {
     return new Date(y, m - 1, d);
 }
 
-function formatearFechaBonita(fechaHora) {
-    // Soporta "YYYY-MM-DD HH:mm" o ISO
-    const date = new Date(fechaHora);
+function formatearFechaBonita(fecha) {
+    const [d, m, y] = fecha.split('-');
+    const date = new Date(y, m - 1, d);
 
     const fechaTexto = date.toLocaleDateString('es-CO', {
         weekday: 'long',
@@ -1007,18 +995,8 @@ function formatearFechaBonita(fechaHora) {
         year: 'numeric'
     });
 
-    const horaTexto = date.toLocaleTimeString('es-CO', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-    });
-
-    return `${fechaTexto} • ${horaTexto}`;
+    return `Pedidos para Entrega:  ${fechaTexto}`;
 }
-
-
-
-
 
 
 </script>
