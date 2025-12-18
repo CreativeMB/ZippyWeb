@@ -585,7 +585,7 @@ th {
 
     /* MENSAJE PRINCIPAL: tamaño adaptable */
     .print-area-horizontal .tarjeta-impresion .mensaje-principal {
-        font-size: clamp(12px, 2vw, 18px);  /* crece o disminuye según cantidad de texto */
+        font-size: clamp(5px, 2vw, 25px);  /* crece o disminuye según cantidad de texto */
         line-height: 1.5;
         text-align: center;
         overflow-wrap: break-word;
@@ -606,13 +606,12 @@ th {
     }
 
     #printArea {
-        position: fixed; /* evita repetición */
+        position: absolute; /* evita repetición */
         top: 0;
         left: 0;
         width: 152.4mm;
         height: 101.6mm;
         margin: 0;
-        box-sizing: border-box;
         border: none;      /* quita cualquier borde */
         box-shadow: none;  /* quita sombras si había */
     }
