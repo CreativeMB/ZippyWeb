@@ -582,43 +582,44 @@ th {
 /* =========================
    edicion personalisada de la tarjeta 
 ========================= */
-.decoracion-url {
-    margin-top: 6mm;
-    text-align: center;
+.logo-empresa {
+    position: absolute;
+    top: 10mm;
+    left: 10mm;
 }
-
-.decoracion-url img {
-    max-height: 20mm;
-    max-width: 100%;
-    object-fit: contain;
-    margin-bottom: 3mm;
+.logo-empresa img {
+    max-height: 15mm;
     cursor: pointer;
 }
 
-.redes-sociales {
+.redes-sociales-abajo {
+    position: absolute;
+    bottom: 10mm;
+    left: 10mm;
+    right: 10mm;
     display: flex;
-    justify-content: center;
-    gap: 6mm;
-    margin-top: 2mm;
-}
-
-.redes-sociales div {
-    display: flex;
-    flex-direction: column;
+    justify-content: space-around;
     align-items: center;
+    font-size: 8px;
+    gap: 2mm;
 }
 
-.icono-redes {
-    width: 8mm;
+.redes-sociales-abajo div {
+    display: flex;
+    align-items: center;
+    gap: 1mm;
+}
+
+.redes-sociales-abajo img {
+    height: 6mm;
     cursor: pointer;
 }
 
-.redes-sociales span {
-    font-size: 12px;
-    margin-top: 1mm;
-    text-align: center;
-    min-width: 20mm;
+.redes-sociales-abajo span {
+    vertical-align: middle;
+    white-space: nowrap;
 }
+
 
 
 </style>
@@ -1548,12 +1549,12 @@ function abrirImpresion(pedido) {
 <div class="tarjeta-impresion">
 
     <!-- Logo de la empresa en la esquina superior izquierda -->
-    <div style="position:absolute; top:10mm; left:10mm;">
-        <img id="logoEmpresa" src="" alt="Logo Empresa" style="max-height:15mm; cursor:pointer;">
+    <div class="logo-empresa">
+        <img id="logoEmpresa" src="" alt="Logo Empresa">
     </div>
 
     <!-- Mensaje principal centrado -->
-    <div class="mensaje-principal" style="margin-top:25mm;">
+    <div class="mensaje-principal" contenteditable="true">
         ${(pedido.mensaje || '').trim()}
     </div>
 
@@ -1564,26 +1565,26 @@ function abrirImpresion(pedido) {
     </div>
 
     <!-- Decoración inferior: datos de la empresa -->
-    <div class="decoracion" style="font-size:10px; text-align:center; margin-top:2mm;">
+    <div class="decoracion">
         ${(perfil.nombreEmpresa || '').trim()} · WhatsApp: ${(perfil.WhatsApp || '').trim()} · ${(perfil.direccion || '').trim()} · ${(perfil.ciudad || '').trim()}
     </div>
 
-    <div class="decoracion" style="font-size:10px; text-align:center; margin-top:1mm;">
+    <div class="decoracion">
         Visítanos en: ${(perfil.urlPagina || '').trim()}
     </div>
 
-    <!-- Redes sociales en la parte inferior, una línea -->
-    <div class="decoracion-url" style="display:flex; justify-content:center; align-items:center; gap:4mm; margin-top:2mm; position:absolute; bottom:10mm; left:10mm; right:10mm; font-size:8px;">
-        <div style="display:flex; align-items:center; gap:2mm;">
-            <img class="icono-redes" id="facebook" src="icono-facebook.png" alt="Facebook" style="height:6mm; cursor:pointer;">
+    <!-- Redes sociales en la parte inferior -->
+    <div class="redes-sociales-abajo">
+        <div>
+            <img class="icono-redes" id="facebook" src="icono-facebook.png" alt="Facebook">
             <span contenteditable="true" id="usuarioFacebook">@usuarioFB</span>
         </div>
-        <div style="display:flex; align-items:center; gap:2mm;">
-            <img class="icono-redes" id="instagram" src="icono-instagram.png" alt="Instagram" style="height:6mm; cursor:pointer;">
+        <div>
+            <img class="icono-redes" id="instagram" src="icono-instagram.png" alt="Instagram">
             <span contenteditable="true" id="usuarioInstagram">@usuarioIG</span>
         </div>
-        <div style="display:flex; align-items:center; gap:2mm;">
-            <img class="icono-redes" id="whatsapp" src="icono-whatsapp.png" alt="WhatsApp" style="height:6mm; cursor:pointer;">
+        <div>
+            <img class="icono-redes" id="whatsapp" src="icono-whatsapp.png" alt="WhatsApp">
             <span contenteditable="true" id="usuarioWhatsApp">+57 300 000 0000</span>
         </div>
     </div>
