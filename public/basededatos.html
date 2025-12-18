@@ -373,6 +373,11 @@ th {
     font-size: 13px;
 }
 
+.resumen-oculto {
+    display: none;
+}
+
+/* === RESUMEN === */
 #resumenTotales {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -380,6 +385,7 @@ th {
     margin: 12px 0;
 }
 
+/* tarjetas */
 #resumenTotales .total {
     padding: 10px;
     border-radius: 12px;
@@ -395,23 +401,12 @@ th {
     margin-bottom: 4px;
 }
 
-/* Colores */
-.total.positivo {
-    background: #E8F5E9;
-    color: #2E7D32;
-}
+/* colores */
+.total.positivo { background:#E8F5E9; color:#2E7D32; }
+.total.negativo { background:#FFEBEE; color:#C62828; }
+.total.diferencia { background:#E3F2FD; color:#1565C0; }
 
-.total.negativo {
-    background: #FFEBEE;
-    color: #C62828;
-}
-
-.total.diferencia {
-    background: #E3F2FD;
-    color: #1565C0;
-}
-
-/* Botones */
+/* botones */
 .acciones {
     display: flex;
     gap: 8px;
@@ -422,9 +417,7 @@ th {
     padding: 10px;
     border-radius: 10px;
     border: none;
-    font-size: 14px;
     cursor: pointer;
-    background: #f5f5f5;
 }
 
 
@@ -435,7 +428,7 @@ th {
 <div id="sidebar">
        <button id="btnCerrarSesion" style="margin-bottom:10px; padding:12px 15px; font-size:16px;">🚪 Cerrar Sesión</button>
     <h3 id="sidebarTitulo">📂 Contabilidad</h3>
-    <div id="resumenTotales">
+   <div id="resumenTotales" class="resumen-oculto">
     <div class="total positivo">
         <span class="label">Ingresos</span>
         <span id="totalPositivo">$0</span>
@@ -456,6 +449,7 @@ th {
     <button id="btnVolver" style="display:none;">⬅️ Volver</button>
     <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
 </div>
+
 
     <button id="btnVolver" style="display:none;">⬅️ Volver</button>
     <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
@@ -619,11 +613,16 @@ document.addEventListener('keydown', e => {
 // --- FUNCION MOSTRAR DATOS DE BASE ---
 function mostrarDatos(base) {
     baseSeleccionada = base;
+
     sidebarTitulo.textContent = `📄 Datos de: ${base}`;
     btnVolver.style.display = "inline-block";
     btnAgregarDato.style.display = "inline-block";
     formNuevoDato.style.display = "none";
     opcionesExtra.style.display = "none";
+
+    // 👉 MOSTRAR resumen SOLO al entrar a la base
+    const resumen = document.getElementById('resumenTotales');
+    resumen.style.display = 'grid';
 
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
     ref.off();
@@ -635,43 +634,7 @@ function mostrarDatos(base) {
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    // 🔴 Tiempo real
-    ref.on('child_added', itemSnap => {
-        const item = itemSnap.val();
-        if (!item || !item.nombre) return;
-        if (itemsMostrados.has(itemSnap.key)) return;
-
-        itemsMostrados.add(itemSnap.key);
-
-        const valor = Number(item.valor) || 0;
-        if (valor > 0) totalPositivo += valor;
-        if (valor < 0) totalNegativo += valor;
-
-        const li = document.createElement('li');
-        li.dataset.key = itemSnap.key;
-
-        // ✅ USAMOS LA NUEVA FUNCIÓN
-        const fechaFormateada = formatearFechaBD(item.fechaHora);
-        const valorTexto = `$${valor.toLocaleString('es-CO')}`;
-
-        li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
-
-        if (valor < 0) {
-            li.style.color = '#D32F2F';
-            li.style.backgroundColor = '#FFCDD2';
-        } else {
-            li.style.color = '#388E3C';
-            li.style.backgroundColor = '#C8E6C9';
-        }
-
-        li.style.padding = '10px';
-        li.style.marginBottom = '5px';
-        li.style.borderRadius = '6px';
-
-        sidebarList.insertBefore(li, sidebarList.firstChild);
-    });
-
-    // 🔵 Carga inicial ordenada por fecha
+    /* ===================== 🔵 CARGA INICIAL ===================== */
     ref.once('value', snapshot => {
         const itemsArray = [];
 
@@ -682,15 +645,10 @@ function mostrarDatos(base) {
             }
         });
 
-        // 🔽 Ordenar por fecha (más reciente primero)
-        itemsArray.sort((a, b) => {
-            const da = new Date(a.fechaHora);
-            const db = new Date(b.fechaHora);
-            return db - da;
-        });
+        // Ordenar por fecha (más reciente primero)
+        itemsArray.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
 
         itemsArray.forEach(item => {
-            if (itemsMostrados.has(item.key)) return;
             itemsMostrados.add(item.key);
 
             const valor = Number(item.valor) || 0;
@@ -700,7 +658,6 @@ function mostrarDatos(base) {
             const li = document.createElement('li');
             li.dataset.key = item.key;
 
-            // ✅ USAMOS LA NUEVA FUNCIÓN
             const fechaFormateada = formatearFechaBD(item.fechaHora);
             const valorTexto = `$${valor.toLocaleString('es-CO')}`;
 
@@ -720,8 +677,51 @@ function mostrarDatos(base) {
 
             sidebarList.appendChild(li);
         });
+
+        // 👉 actualizar resumen inicial
+        actualizarTotales(totalPositivo, totalNegativo);
+    });
+
+    /* ===================== 🔴 TIEMPO REAL ===================== */
+    ref.on('child_added', itemSnap => {
+        if (itemsMostrados.has(itemSnap.key)) return;
+
+        const item = itemSnap.val();
+        if (!item || !item.nombre) return;
+
+        itemsMostrados.add(itemSnap.key);
+
+        const valor = Number(item.valor) || 0;
+        if (valor > 0) totalPositivo += valor;
+        if (valor < 0) totalNegativo += valor;
+
+        const li = document.createElement('li');
+        li.dataset.key = itemSnap.key;
+
+        const fechaFormateada = formatearFechaBD(item.fechaHora);
+        const valorTexto = `$${valor.toLocaleString('es-CO')}`;
+
+        li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
+
+        if (valor < 0) {
+            li.style.color = '#D32F2F';
+            li.style.backgroundColor = '#FFCDD2';
+        } else {
+            li.style.color = '#388E3C';
+            li.style.backgroundColor = '#C8E6C9';
+        }
+
+        li.style.padding = '10px';
+        li.style.marginBottom = '5px';
+        li.style.borderRadius = '6px';
+
+        sidebarList.insertBefore(li, sidebarList.firstChild);
+
+        // 👉 actualizar resumen en tiempo real
+        actualizarTotales(totalPositivo, totalNegativo);
     });
 }
+
 
 
 // --- FUNCION GUARDAR DATO ---
@@ -1142,6 +1142,19 @@ function formatearFechaBD(fechaHora) {
     });
 
     return `${dia} ${fecha}  ${hora}`;
+}
+function actualizarTotales(pos, neg) {
+    const totalPos = document.getElementById('totalPositivo');
+    const totalNeg = document.getElementById('totalNegativo');
+    const totalDif = document.getElementById('totalDiferencia');
+
+    totalPos.textContent = `$${pos.toLocaleString('es-CO')}`;
+    totalNeg.textContent = `$${Math.abs(neg).toLocaleString('es-CO')}`;
+
+    const dif = pos + neg;
+    totalDif.textContent = `$${dif.toLocaleString('es-CO')}`;
+
+    totalDif.parentElement.style.color = dif < 0 ? '#C62828' : '#2E7D32';
 }
 
 
