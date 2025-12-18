@@ -543,31 +543,28 @@ th {
    IMPRESIÓN REAL
 ========================= */
 @media print {
-
     body * {
-        display: none !important;
+        visibility: hidden; /* Oculta todo */
     }
 
-    #printArea,
-    #printArea * {
-        display: block !important;
+    #printModal, #printModal * {
+        visibility: visible; /* Solo muestra el modal */
     }
 
-    #printArea {
+    #printModal {
         position: absolute;
-        inset: 0;
-    }
-
-    .tarjeta-impresion {
-        width: 101.6mm;   /* vertical real */
-        height: 152.4mm;
-    }
-
-    @page {
-        size: 101.6mm 152.4mm;
+        left: 0;
+        top: 0;
+        width: 101.6mm;   /* 4 pulgadas */
+        height: 152.4mm;  /* 6 pulgadas */
         margin: 0;
     }
+
+    .print-botones {
+        display: none; /* Oculta botones al imprimir */
+    }
 }
+
 
 
 </style>
@@ -1493,64 +1490,17 @@ function abrirImpresion(pedido) {
 
 /* ===== IMPRIMIR ===== */
 function imprimirTarjeta() {
+    const printModal = document.getElementById('printModal');
     const printArea = document.getElementById('printArea');
-    if (!printArea || !printArea.innerHTML.trim()) {
+
+    if (!printModal || !printArea || !printArea.innerHTML.trim()) {
         alert('No hay tarjeta para imprimir');
         return;
     }
 
-    // Creamos un iframe dinámicamente si no existe
-    let iframe = document.getElementById('printFrame');
-    if (!iframe) {
-        iframe = document.createElement('iframe');
-        iframe.id = 'printFrame';
-        iframe.style.position = 'absolute';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = '0';
-        document.body.appendChild(iframe);
-    }
-
-    const doc = iframe.contentWindow.document;
-    const estilos = document.getElementById('printStyles') ? document.getElementById('printStyles').innerHTML : '';
-
-    doc.open();
-    doc.write(`
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <style>
-                ${estilos}
-
-                @page {
-                    size: 101.6mm 152.4mm; /* Tamaño 4x6 pulgadas */
-                    margin: 0;
-                }
-
-                body {
-                    margin: 0;
-                    font-family: sans-serif;
-                }
-
-                .tarjeta-impresion {
-                    width: 100%;
-                }
-            </style>
-        </head>
-        <body>
-            ${printArea.innerHTML}
-        </body>
-        </html>
-    `);
-    doc.close();
-
-    // Abrimos el diálogo de impresión
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-
-    // Cerramos el modal después de medio segundo
-    setTimeout(cerrarPrint, 500);
+    window.print(); // Se imprimirá solo el contenido visible del modal
 }
+
 
 /* ===== CERRAR ===== */
 function cerrarPrint() {
