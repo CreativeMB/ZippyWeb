@@ -1491,19 +1491,28 @@ function abrirImpresion(pedido) {
 
 
 
-
 /* ===== IMPRIMIR ===== */
 function imprimirTarjeta() {
-
-    const iframe = document.getElementById('printFrame');
     const printArea = document.getElementById('printArea');
-
-    if (!iframe || !printArea || !printArea.innerHTML.trim()) {
+    if (!printArea || !printArea.innerHTML.trim()) {
         alert('No hay tarjeta para imprimir');
         return;
     }
 
+    // Creamos un iframe dinámicamente si no existe
+    let iframe = document.getElementById('printFrame');
+    if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'printFrame';
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        document.body.appendChild(iframe);
+    }
+
     const doc = iframe.contentWindow.document;
+    const estilos = document.getElementById('printStyles') ? document.getElementById('printStyles').innerHTML : '';
 
     doc.open();
     doc.write(`
@@ -1511,15 +1520,20 @@ function imprimirTarjeta() {
         <head>
             <meta charset="utf-8">
             <style>
-                ${document.querySelector('#printStyles').innerHTML}
+                ${estilos}
 
                 @page {
-                    size: 101.6mm 152.4mm;
+                    size: 101.6mm 152.4mm; /* Tamaño 4x6 pulgadas */
                     margin: 0;
                 }
 
                 body {
                     margin: 0;
+                    font-family: sans-serif;
+                }
+
+                .tarjeta-impresion {
+                    width: 100%;
                 }
             </style>
         </head>
@@ -1530,17 +1544,20 @@ function imprimirTarjeta() {
     `);
     doc.close();
 
+    // Abrimos el diálogo de impresión
     iframe.contentWindow.focus();
     iframe.contentWindow.print();
 
+    // Cerramos el modal después de medio segundo
     setTimeout(cerrarPrint, 500);
 }
 
-
 /* ===== CERRAR ===== */
 function cerrarPrint() {
-    document.getElementById('printModal').style.display = 'none';
+    const modal = document.getElementById('printModal');
+    if (modal) modal.style.display = 'none';
 }
+
 
 
 </script>
