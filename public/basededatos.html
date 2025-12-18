@@ -437,6 +437,25 @@ th {
     width: 360px;
 }
 
+/* ===== MODAL ===== */
+.print-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.print-contenido {
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 420px;
+}
+
+/* ===== TARJETA 4x6 ===== */
 .tarjeta-impresion {
     width: 101.6mm;
     height: 152.4mm;
@@ -444,14 +463,17 @@ th {
     box-sizing: border-box;
     font-family: 'Georgia', serif;
     border: 2px solid #ccc;
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
+/* CONTENIDO */
 .logo {
     text-align: center;
     font-size: 18px;
+    font-weight: bold;
 }
 
 .mensaje-principal {
@@ -460,22 +482,32 @@ th {
     white-space: pre-wrap;
 }
 
+.para, .de {
+    font-size: 14px;
+}
+
 .decoracion {
     text-align: center;
     font-size: 20px;
 }
+
+/* ===== IMPRESIÓN REAL ===== */
 @media print {
+
     body * {
-        display: none;
+        visibility: hidden;
     }
 
     #printArea, #printArea * {
-        display: block;
+        visibility: visible;
     }
 
     #printArea {
-        position: absolute;
+        position: fixed;
         inset: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     @page {
@@ -483,6 +515,7 @@ th {
         margin: 0;
     }
 }
+
 
 
 </style>
@@ -1351,9 +1384,12 @@ function abrirImpresion(pedido) {
 
     document.getElementById('printModal').style.display = 'flex';
 }
+
 function imprimirTarjeta() {
     window.print();
+    setTimeout(cerrarPrint, 300);
 }
+
 
 function cerrarPrint() {
     document.getElementById('printModal').style.display = 'none';
