@@ -675,21 +675,54 @@ th {
  
     <!-- ================= PEDIDOS ================= -->
 <div id="pedidos-container">
+ <!-- Grid de pedidos -->
+<div id="pedidosGrid"></div>
 
-    <!-- Grid responsive -->
-    <div id="pedidosGrid"></div>
-
-</div>
-
-</div>
-
+<!-- Modal de impresión / edición -->
 <div id="printModal" class="print-modal">
     <div class="print-contenido horizontal">
 
         <h3>🖨 Vista previa de impresión</h3>
 
         <div id="printArea" class="print-area-horizontal">
-            <!-- Tarjeta se carga aquí -->
+            <!-- Aquí se cargará dinámicamente la tarjeta completa -->
+            <!-- Ejemplo dinámico: -->
+            <div class="tarjeta-impresion">
+
+                <div class="mensaje-principal" contenteditable="true">
+                    ¡Feliz día!
+                </div>
+
+                <div class="de-para">
+                    <div><strong>Para:</strong> Juan</div>
+                    <div><strong>De:</strong> María</div>
+                </div>
+
+                <!-- Logo e iconos de redes -->
+                <div class="decoracion-url">
+
+                    <div>
+                        <img id="logoEmpresa" src="" alt="Logo Empresa" style="max-height:20mm; cursor:pointer;">
+                    </div>
+
+                    <div class="redes-sociales">
+                        <div>
+                            <img class="icono-redes" id="facebook" src="icono-facebook.png" alt="Facebook" style="cursor:pointer;">
+                            <span contenteditable="true" id="usuarioFacebook">@usuarioFB</span>
+                        </div>
+                        <div>
+                            <img class="icono-redes" id="instagram" src="icono-instagram.png" alt="Instagram" style="cursor:pointer;">
+                            <span contenteditable="true" id="usuarioInstagram">@usuarioIG</span>
+                        </div>
+                        <div>
+                            <img class="icono-redes" id="whatsapp" src="icono-whatsapp.png" alt="WhatsApp" style="cursor:pointer;">
+                            <span contenteditable="true" id="usuarioWhatsApp">+57 300 000 0000</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
         </div>
 
         <div class="print-botones">
@@ -698,30 +731,6 @@ th {
         </div>
 
     </div>
-</div>
-<div class="decoracion-url">
-
-    <!-- Logo de la empresa -->
-    <div>
-        <img id="logoEmpresa" src="" alt="Logo Empresa" style="max-height:20mm; cursor:pointer;">
-    </div>
-
-    <!-- Redes sociales con texto editable -->
-    <div class="redes-sociales">
-        <div>
-            <img class="icono-redes" id="facebook" src="icono-facebook.png" alt="Facebook" style="cursor:pointer;">
-            <span contenteditable="true" id="usuarioFacebook">@usuarioFB</span>
-        </div>
-        <div>
-            <img class="icono-redes" id="instagram" src="icono-instagram.png" alt="Instagram" style="cursor:pointer;">
-            <span contenteditable="true" id="usuarioInstagram">@usuarioIG</span>
-        </div>
-        <div>
-            <img class="icono-redes" id="whatsapp" src="icono-whatsapp.png" alt="WhatsApp" style="cursor:pointer;">
-            <span contenteditable="true" id="usuarioWhatsApp">+57 300 000 0000</span>
-        </div>
-    </div>
-
 </div>
 
 
