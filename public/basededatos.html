@@ -537,7 +537,7 @@ th {
         height: 101.6mm; /* 4 pulgadas */
         margin: auto;    /* Centrar en pantalla */
         box-sizing: border-box;
-        border: 1px solid #f00d0d; /* Opcional: borde para ver tarjeta */
+        border: 1px solid #008558; /* Opcional: borde para ver tarjeta */
     }
 }
 
@@ -545,27 +545,36 @@ th {
    IMPRESIÓN REAL 4x6
 ========================= */
 @media print {
+
+    /* Oculta todo menos el área de impresión */
     body * {
-        visibility: hidden; /* oculta todo */
+        visibility: hidden;
     }
 
     #printArea, #printArea * {
-        visibility: visible; /* solo mostrar el área de impresión */
+        visibility: visible;
     }
 
+    /* Contenedor de la tarjeta */
     #printArea {
-        position: fixed; /* evita repetición */
+        position: fixed;           /* evita repetición */
         top: 0;
         left: 0;
-        width: 152.4mm;
-        height: 101.6mm;
-        margin: 0;
+        width: 100vw;              /* ancho de la página */
+        height: 100vh;             /* alto de la página */
+        display: flex;
+        justify-content: center;   /* centra horizontal */
+        align-items: center;       /* centra vertical */
         box-sizing: border-box;
+        page-break-inside: avoid;  /* evita que se divida */
+        page-break-after: always;  /* asegura que no se repita */
     }
 
+    /* Tarjeta en sí */
     .tarjeta-impresion {
-        width: 152.4mm;
-        height: 101.6mm;
+        width: 152.4mm;   /* 6 pulgadas */
+        height: 101.6mm;  /* 4 pulgadas */
+        box-sizing: border-box;
     }
 }
 
@@ -1492,15 +1501,54 @@ function abrirImpresion(pedido) {
 
 /* ===== IMPRIMIR TARJETA ===== */
 function imprimirTarjeta() {
-    const printArea = document.getElementById('printArea');
+    // Obtiene el contenido de la tarjeta
+    const contenido = document.getElementById('printArea').outerHTML;
 
-    if (!printArea || !printArea.innerHTML.trim()) {
-        alert('No hay tarjeta para imprimir');
-        return;
-    }
+    // Abre una ventana nueva para impresión
+    const ventana = window.open('', '', 'width=400,height=600');
 
-    window.print(); // Se imprimirá solo el contenido visible del modal
+    // Escribe el contenido y aplica el CSS
+    ventana.document.write(`
+        <html>
+        <head>
+            <title>Imprimir Tarjeta</title>
+            <style>
+                @media print {
+                    body * { visibility: hidden; }
+                    #printArea, #printArea * { visibility: visible; }
+                    #printArea {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100vw;
+                        height: 100vh;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        box-sizing: border-box;
+                        page-break-inside: avoid;
+                        page-break-after: always;
+                    }
+                    .tarjeta-impresion {
+                        width: 152.4mm;
+                        height: 101.6mm;
+                        box-sizing: border-box;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            ${contenido}
+        </body>
+        </html>
+    `);
+
+    ventana.document.close();
+    ventana.focus();
+    ventana.print();
+    ventana.close();
 }
+
 
 /* ===== CERRAR MODAL ===== */
 function cerrarPrint() {
