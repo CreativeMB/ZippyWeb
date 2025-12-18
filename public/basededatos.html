@@ -1546,13 +1546,7 @@ function abrirImpresion(pedido) {
     // Construimos la tarjeta de impresión
    printArea.innerHTML = `
 <div class="tarjeta-impresion">
-
-    <!-- Mensaje principal -->
-    <div class="mensaje-principal" contenteditable="true">
-        ${(pedido.mensaje || '').trim()}
-    </div>
-
-    <!-- De / Para -->
+  <div class="mensaje-principal">${(pedido.mensaje || '').trim()}</div>
     <div class="de-para">
         <div><strong>Para:</strong> ${(pedido.para || '').trim()}</div>
         <div><strong>De:</strong> ${(pedido.de || '').trim()}</div>
@@ -1593,7 +1587,16 @@ function abrirImpresion(pedido) {
 
 </div>`;
 
+  // Asociar eventos a imágenes
+    ['logoEmpresa','facebook','instagram','whatsapp'].forEach(id => {
+        document.getElementById(id).addEventListener('click', () => subirImagen(id));
+    });
 
+    // Ajustar tamaño del texto según contenido
+    ajustarTextoMensaje();
+
+    // Cargar los valores guardados si existen
+    cargarRedes();
 
 
     modal.style.display = 'flex';
