@@ -1455,7 +1455,7 @@ function actualizarTotales(pos, neg) {
 
 /* ===== ABRIR VISTA PREVIA ===== */
 function abrirImpresion(pedido) {
-    ajustarTextoMensaje();
+   
     const printArea = document.getElementById('printArea');
     const modal = document.getElementById('printModal');
 
@@ -1470,7 +1470,7 @@ function abrirImpresion(pedido) {
         alert("Perfil de empresa no cargado aún.");
         return;
     }
-
+ ajustarTextoMensaje();
     // Construimos la tarjeta de impresión
     printArea.innerHTML = `
         <div class="tarjeta-impresion">
