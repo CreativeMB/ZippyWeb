@@ -545,24 +545,30 @@ th {
    IMPRESIÓN REAL 4x6
 ========================= */
 @media print {
-   
-    /* Posición y tamaño exacto de la tarjeta */
+    body * {
+        visibility: hidden; /* oculta todo */
+    }
+
+    #printArea, #printArea * {
+        visibility: visible; /* solo mostrar el área de impresión */
+    }
+
     #printArea {
-        position: absolute;
+        position: fixed; /* evita repetición */
         top: 0;
         left: 0;
-        width: 152.4mm;  /* 6 pulgadas */
-        height: 101.6mm; /* 4 pulgadas */
+        width: 152.4mm;
+        height: 101.6mm;
         margin: 0;
         box-sizing: border-box;
     }
 
     .tarjeta-impresion {
-       width: 152.4mm;  /* 6 pulgadas */
-        height: 101.6mm; /* 4 pulgadas */
+        width: 152.4mm;
+        height: 101.6mm;
     }
-
 }
+
 
 
 </style>
