@@ -474,19 +474,6 @@ th {
     flex-direction: column;
 }
 
-
-/* =========================
-   PUBLICIDAD SUPERIOR
-========================= */
-.publicidad-top {
-    text-align: center;
-    font-size: 12px;
-    font-weight: bold;
-    color: #000;          /* NEGRO PURO */
-    margin-bottom: 6mm;
-}
-
-
 /* =========================
    MENSAJE PRINCIPAL
 ========================= */
@@ -519,6 +506,13 @@ th {
     font-size: 20px;
     margin-top: 6mm;
 }
+
+.decoracion-top {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 6mm;
+}
+
 
 /* =========================
    VISTA PREVIA (SOLO PANTALLA)
@@ -1443,7 +1437,7 @@ function abrirImpresion(pedido) {
     printArea.innerHTML = `
         <div class="tarjeta-impresion">
 
-            <div class="publicidad-top">
+            <div class="decoracion decoracion-top">
                 🌸 Floristería Los Lirios · WhatsApp 300 000 0000
             </div>
 
