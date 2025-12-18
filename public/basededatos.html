@@ -565,7 +565,11 @@ function cargarBases() {
 
 
 // --- BOTONES ---
-btnVolver.onclick = () => cargarBases();
+btnVolver.onclick = () => {
+    document.getElementById('resumenTotales').style.display = 'none';
+    cargarBases();
+};
+
 
 btnAgregarDato.onclick = () => {
     if(baseSeleccionada){
@@ -721,8 +725,6 @@ function mostrarDatos(base) {
         actualizarTotales(totalPositivo, totalNegativo);
     });
 }
-
-
 
 // --- FUNCION GUARDAR DATO ---
 function guardarDato() {
