@@ -1457,12 +1457,13 @@ function abrirImpresion(pedido) {
         return;
     }
 
+    // Usamos el mismo tamaño que la decoracion inferior (10px)
     printArea.innerHTML = `
         <div class="tarjeta-impresion">
 
-            <!-- Decoración superior: URL de la empresa -->
-            <div class="decoracion decoracion-top" style="font-size:12px; text-align:center; margin-bottom:2mm;">
-                Visítanos en: <a href="${perfil.urlPagina}" target="_blank">${perfil.urlPagina}</a>
+            <!-- Decoración superior: URL de la empresa como texto plano -->
+            <div class="decoracion decoracion-top" style="font-size:10px; text-align:center; margin-bottom:2mm;">
+                Visítanos en: ${perfil.urlPagina}
             </div>
 
             <!-- Mensaje principal -->
