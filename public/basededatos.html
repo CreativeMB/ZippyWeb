@@ -380,6 +380,11 @@ th {
 
 <div id="sidebar">
        <button id="btnCerrarSesion" style="margin-bottom:10px; padding:12px 15px; font-size:16px;">🚪 Cerrar Sesión</button>
+       <div id="resumenTotales" style="margin:10px 0;">
+    <div id="totalPositivo"></div>
+    <div id="totalNegativo"></div>
+    <div id="totalDiferencia"></div>
+</div>
     <h3 id="sidebarTitulo">📂 Contabilidad</h3>
     <button id="btnVolver" style="display:none;">⬅️ Volver</button>
     <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
@@ -399,12 +404,6 @@ th {
     </div>
 
     <ul id="sidebarList"></ul>
-
-    <div id="resumenTotales" style="margin:10px 0;">
-    <div id="totalPositivo"></div>
-    <div id="totalNegativo"></div>
-    <div id="totalDiferencia"></div>
-</div>
 
 </div>
 
@@ -562,29 +561,10 @@ function mostrarDatos(base) {
 
     const itemsMostrados = new Set();
 
-    // 🔢 Totales
+    // Totales
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    const totalPositivoEl = document.getElementById('totalPositivo');
-    const totalNegativoEl = document.getElementById('totalNegativo');
-    const totalDiferenciaEl = document.getElementById('totalDiferencia');
-
-    function actualizarTotales() {
-        const diferencia = totalPositivo + totalNegativo;
-
-        totalPositivoEl.textContent = `🟢 Total positivo: $${totalPositivo.toLocaleString('es-CO')}`;
-        totalNegativoEl.textContent = `🔴 Total negativo: $${Math.abs(totalNegativo).toLocaleString('es-CO')}`;
-        totalDiferenciaEl.textContent = `⚖️ Diferencia: $${diferencia.toLocaleString('es-CO')}`;
-
-        totalPositivoEl.style.color = '#388E3C';
-        totalNegativoEl.style.color = '#D32F2F';
-
-        totalDiferenciaEl.style.color = diferencia < 0 ? '#D32F2F' : '#388E3C';
-        totalDiferenciaEl.style.fontWeight = 'bold';
-    }
-
-    // 🔴 Tiempo real
     ref.on('child_added', itemSnap => {
         const item = itemSnap.val();
         if (!item || !item.nombre) return;
@@ -593,17 +573,16 @@ function mostrarDatos(base) {
         itemsMostrados.add(itemSnap.key);
 
         const valor = Number(item.valor) || 0;
-
         if (valor > 0) totalPositivo += valor;
         if (valor < 0) totalNegativo += valor;
-
-        actualizarTotales();
 
         const li = document.createElement('li');
         li.dataset.key = itemSnap.key;
 
-        const fechaFormateada = formatearFechaBonita(item.fechaHora);
-        li.textContent = `${item.nombre} - ${valor} (${fechaFormateada})`;
+        const fechaFormateada = formatearFechaCorta(item.fechaHora);
+        const valorTexto = `$${valor.toLocaleString('es-CO')}`;
+
+        li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
 
         if (valor < 0) {
             li.style.color = '#D32F2F';
@@ -620,7 +599,6 @@ function mostrarDatos(base) {
         sidebarList.insertBefore(li, sidebarList.firstChild);
     });
 
-    // 🔵 Carga inicial
     ref.once('value', snapshot => {
         const itemsArray = [];
 
@@ -638,15 +616,16 @@ function mostrarDatos(base) {
             itemsMostrados.add(item.key);
 
             const valor = Number(item.valor) || 0;
-
             if (valor > 0) totalPositivo += valor;
             if (valor < 0) totalNegativo += valor;
 
             const li = document.createElement('li');
             li.dataset.key = item.key;
 
-            const fechaFormateada = formatearFechaBonita(item.fechaHora);
-            li.textContent = `${item.nombre} - ${valor} (${fechaFormateada})`;
+            const fechaFormateada = formatearFechaCorta(item.fechaHora);
+            const valorTexto = `$${valor.toLocaleString('es-CO')}`;
+
+            li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
 
             if (valor < 0) {
                 li.style.color = '#D32F2F';
@@ -662,8 +641,6 @@ function mostrarDatos(base) {
 
             sidebarList.appendChild(li);
         });
-
-        actualizarTotales();
     });
 }
 
@@ -1034,25 +1011,26 @@ function convertirFecha(fecha) {
     return new Date(y, m - 1, d);
 }
 
-function formatearFechaBonita(fechaHora) {
-    // Soporta "YYYY-MM-DD HH:mm" o ISO
+function formatearFechaCorta(fechaHora) {
     const date = new Date(fechaHora);
 
-    const fechaTexto = date.toLocaleDateString('es-CO', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
+    const dia = date.toLocaleDateString('es-CO', { weekday: 'long' });
+
+    const fecha = date.toLocaleDateString('es-CO', {
+        day: '2-digit',
+        month: '2-digit',
         year: 'numeric'
     });
 
-    const horaTexto = date.toLocaleTimeString('es-CO', {
+    const hora = date.toLocaleTimeString('es-CO', {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true
     });
 
-    return `${fechaTexto} • ${horaTexto}`;
+    return `${dia} ${fecha}  ${hora}`;
 }
+
 
 
 
