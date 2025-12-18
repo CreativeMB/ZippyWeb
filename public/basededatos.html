@@ -373,6 +373,60 @@ th {
     font-size: 13px;
 }
 
+#resumenTotales {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 12px 0;
+}
+
+#resumenTotales .total {
+    padding: 10px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+#resumenTotales .label {
+    display: block;
+    font-size: 12px;
+    opacity: 0.85;
+    margin-bottom: 4px;
+}
+
+/* Colores */
+.total.positivo {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.total.negativo {
+    background: #FFEBEE;
+    color: #C62828;
+}
+
+.total.diferencia {
+    background: #E3F2FD;
+    color: #1565C0;
+}
+
+/* Botones */
+.acciones {
+    display: flex;
+    gap: 8px;
+}
+
+.acciones button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    background: #f5f5f5;
+}
+
 
 </style>
 </head>
@@ -381,6 +435,28 @@ th {
 <div id="sidebar">
        <button id="btnCerrarSesion" style="margin-bottom:10px; padding:12px 15px; font-size:16px;">🚪 Cerrar Sesión</button>
     <h3 id="sidebarTitulo">📂 Contabilidad</h3>
+    <div id="resumenTotales">
+    <div class="total positivo">
+        <span class="label">Ingresos</span>
+        <span id="totalPositivo">$0</span>
+    </div>
+
+    <div class="total negativo">
+        <span class="label">Gastos</span>
+        <span id="totalNegativo">$0</span>
+    </div>
+
+    <div class="total diferencia">
+        <span class="label">Balance</span>
+        <span id="totalDiferencia">$0</span>
+    </div>
+</div>
+
+<div class="acciones">
+    <button id="btnVolver" style="display:none;">⬅️ Volver</button>
+    <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
+</div>
+
     <button id="btnVolver" style="display:none;">⬅️ Volver</button>
     <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
 
@@ -550,25 +626,37 @@ function mostrarDatos(base) {
     opcionesExtra.style.display = "none";
 
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-    ref.off(); // eliminar listeners anteriores
+    ref.off();
     sidebarList.innerHTML = '';
 
-    const itemsMostrados = new Set(); // evitar duplicados
+    const itemsMostrados = new Set();
 
-    // Listener en tiempo real
+    // Totales
+    let totalPositivo = 0;
+    let totalNegativo = 0;
+
+    // 🔴 Tiempo real
     ref.on('child_added', itemSnap => {
         const item = itemSnap.val();
         if (!item || !item.nombre) return;
+        if (itemsMostrados.has(itemSnap.key)) return;
 
-        // Si ya se mostró, no lo agregamos otra vez
-        if(itemsMostrados.has(itemSnap.key)) return;
         itemsMostrados.add(itemSnap.key);
+
+        const valor = Number(item.valor) || 0;
+        if (valor > 0) totalPositivo += valor;
+        if (valor < 0) totalNegativo += valor;
 
         const li = document.createElement('li');
         li.dataset.key = itemSnap.key;
-        li.textContent = `${item.nombre} - ${item.valor} (${item.fechaHora})`;
 
-        if(item.valor < 0){
+        // ✅ USAMOS LA NUEVA FUNCIÓN
+        const fechaFormateada = formatearFechaBD(item.fechaHora);
+        const valorTexto = `$${valor.toLocaleString('es-CO')}`;
+
+        li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
+
+        if (valor < 0) {
             li.style.color = '#D32F2F';
             li.style.backgroundColor = '#FFCDD2';
         } else {
@@ -579,44 +667,62 @@ function mostrarDatos(base) {
         li.style.padding = '10px';
         li.style.marginBottom = '5px';
         li.style.borderRadius = '6px';
+
         sidebarList.insertBefore(li, sidebarList.firstChild);
     });
 
-    // Cargar datos existentes una sola vez
+    // 🔵 Carga inicial ordenada por fecha
     ref.once('value', snapshot => {
         const itemsArray = [];
+
         snapshot.forEach(itemSnap => {
             const item = itemSnap.val();
-            if(item && item.nombre) itemsArray.push({...item, key: itemSnap.key});
+            if (item && item.nombre) {
+                itemsArray.push({ ...item, key: itemSnap.key });
+            }
         });
 
-        // Ordenar por fecha descendente
-        itemsArray.sort((a,b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+        // 🔽 Ordenar por fecha (más reciente primero)
+        itemsArray.sort((a, b) => {
+            const da = new Date(a.fechaHora);
+            const db = new Date(b.fechaHora);
+            return db - da;
+        });
 
         itemsArray.forEach(item => {
-            if(!itemsMostrados.has(item.key)){
-                itemsMostrados.add(item.key);
+            if (itemsMostrados.has(item.key)) return;
+            itemsMostrados.add(item.key);
 
-                const li = document.createElement('li');
-                li.dataset.key = item.key;
-                li.textContent = `${item.nombre} - ${item.valor} (${item.fechaHora})`;
+            const valor = Number(item.valor) || 0;
+            if (valor > 0) totalPositivo += valor;
+            if (valor < 0) totalNegativo += valor;
 
-                if(item.valor < 0){
-                    li.style.color = '#D32F2F';
-                    li.style.backgroundColor = '#FFCDD2';
-                } else {
-                    li.style.color = '#388E3C';
-                    li.style.backgroundColor = '#C8E6C9';
-                }
+            const li = document.createElement('li');
+            li.dataset.key = item.key;
 
-                li.style.padding = '10px';
-                li.style.marginBottom = '5px';
-                li.style.borderRadius = '6px';
-                sidebarList.appendChild(li);
+            // ✅ USAMOS LA NUEVA FUNCIÓN
+            const fechaFormateada = formatearFechaBD(item.fechaHora);
+            const valorTexto = `$${valor.toLocaleString('es-CO')}`;
+
+            li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
+
+            if (valor < 0) {
+                li.style.color = '#D32F2F';
+                li.style.backgroundColor = '#FFCDD2';
+            } else {
+                li.style.color = '#388E3C';
+                li.style.backgroundColor = '#C8E6C9';
             }
+
+            li.style.padding = '10px';
+            li.style.marginBottom = '5px';
+            li.style.borderRadius = '6px';
+
+            sidebarList.appendChild(li);
         });
     });
 }
+
 
 // --- FUNCION GUARDAR DATO ---
 function guardarDato() {
@@ -996,6 +1102,46 @@ function formatearFechaBonita(fecha) {
     });
 
     return `Pedidos para Entrega:  ${fechaTexto}`;
+}
+function formatearFechaBD(fechaHora) {
+    if (!fechaHora) return '';
+
+    let date;
+
+    // YYYY-MM-DD HH:mm
+    if (typeof fechaHora === 'string' && fechaHora.includes(' ')) {
+        const [f, h] = fechaHora.split(' ');
+        const [y, m, d] = f.split('-');
+        const [hh = '00', mm = '00'] = h.split(':');
+        date = new Date(y, m - 1, d, hh, mm);
+    }
+    // YYYY-MM-DD
+    else if (typeof fechaHora === 'string' && fechaHora.includes('-')) {
+        const [y, m, d] = fechaHora.split('-');
+        date = new Date(y, m - 1, d);
+    }
+    // ISO / timestamp
+    else {
+        date = new Date(fechaHora);
+    }
+
+    if (isNaN(date)) return '';
+
+    const dia = date.toLocaleDateString('es-CO', { weekday: 'long' });
+
+    const fecha = date.toLocaleDateString('es-CO', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+
+    const hora = date.toLocaleTimeString('es-CO', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+
+    return `${dia} ${fecha}  ${hora}`;
 }
 
 
