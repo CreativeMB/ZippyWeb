@@ -1007,30 +1007,46 @@ function convertirFecha(fecha) {
     return new Date(y, m - 1, d);
 }
 
-function formatearFechaBonita(fechaHora) {
-    // Soporta "YYYY-MM-DD HH:mm" o ISO
-    const date = new Date(fechaHora);
+function formatearFecha(fechaHora) {
+    if (!fechaHora) return '';
 
-    const fechaTexto = date.toLocaleDateString('es-CO', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
+    let date;
+
+    // Si viene como "YYYY-MM-DD HH:mm"
+    if (typeof fechaHora === 'string' && fechaHora.includes(' ')) {
+        const [fecha, hora] = fechaHora.split(' ');
+        const [y, m, d] = fecha.split('-');
+        const [hh = '00', mm = '00'] = hora.split(':');
+        date = new Date(y, m - 1, d, hh, mm);
+    }
+    // Si viene como "YYYY-MM-DD"
+    else if (typeof fechaHora === 'string' && fechaHora.includes('-')) {
+        const [y, m, d] = fechaHora.split('-');
+        date = new Date(y, m - 1, d);
+    }
+    // ISO o timestamp
+    else {
+        date = new Date(fechaHora);
+    }
+
+    if (isNaN(date)) return '';
+
+    const dia = date.toLocaleDateString('es-CO', { weekday: 'long' });
+
+    const fecha = date.toLocaleDateString('es-CO', {
+        day: '2-digit',
+        month: '2-digit',
         year: 'numeric'
     });
 
-    const horaTexto = date.toLocaleTimeString('es-CO', {
+    const hora = date.toLocaleTimeString('es-CO', {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true
     });
 
-    return `${fechaTexto} • ${horaTexto}`;
+    return `${dia} ${fecha}  ${hora}`;
 }
-
-
-
-
-
 
 
 
