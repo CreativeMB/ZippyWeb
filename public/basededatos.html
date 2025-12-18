@@ -380,7 +380,6 @@ th {
 
 <div id="sidebar">
        <button id="btnCerrarSesion" style="margin-bottom:10px; padding:12px 15px; font-size:16px;">🚪 Cerrar Sesión</button>
-  
     <h3 id="sidebarTitulo">📂 Contabilidad</h3>
     <button id="btnVolver" style="display:none;">⬅️ Volver</button>
     <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
@@ -400,7 +399,7 @@ th {
     </div>
 
     <ul id="sidebarList"></ul>
-
+    
 </div>
 
 <div id="main">
@@ -552,36 +551,27 @@ function mostrarDatos(base) {
     opcionesExtra.style.display = "none";
 
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-    ref.off();
+    ref.off(); // eliminar listeners anteriores
     sidebarList.innerHTML = '';
 
-    const itemsMostrados = new Set();
+    const itemsMostrados = new Set(); // evitar duplicados
 
-    // Totales
-    let totalPositivo = 0;
-    let totalNegativo = 0;
-
-    // 🔴 Tiempo real
+    // 🔴 Listener en tiempo real (nuevos registros)
     ref.on('child_added', itemSnap => {
         const item = itemSnap.val();
         if (!item || !item.nombre) return;
+
         if (itemsMostrados.has(itemSnap.key)) return;
-
         itemsMostrados.add(itemSnap.key);
-
-        const valor = Number(item.valor) || 0;
-        if (valor > 0) totalPositivo += valor;
-        if (valor < 0) totalNegativo += valor;
 
         const li = document.createElement('li');
         li.dataset.key = itemSnap.key;
 
-        const fechaFormateada = formatearFecha(item.fechaHora);
-        const valorTexto = `$${valor.toLocaleString('es-CO')}`;
+        const fechaFormateada = formatearFechaBonita(item.fechaHora);
 
-        li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
+        li.textContent = `${item.nombre} - ${item.valor} (${fechaFormateada})`;
 
-        if (valor < 0) {
+        if (item.valor < 0) {
             li.style.color = '#D32F2F';
             li.style.backgroundColor = '#FFCDD2';
         } else {
@@ -593,10 +583,11 @@ function mostrarDatos(base) {
         li.style.marginBottom = '5px';
         li.style.borderRadius = '6px';
 
+        // Los nuevos aparecen arriba
         sidebarList.insertBefore(li, sidebarList.firstChild);
     });
 
-    // 🔵 Carga inicial
+    // 🔵 Cargar datos existentes una sola vez (ordenados)
     ref.once('value', snapshot => {
         const itemsArray = [];
 
@@ -607,29 +598,21 @@ function mostrarDatos(base) {
             }
         });
 
-        itemsArray.sort((a, b) => {
-            const da = new Date(a.fechaHora);
-            const db = new Date(b.fechaHora);
-            return db - da;
-        });
+        // Ordenar por fecha descendente
+        itemsArray.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
 
         itemsArray.forEach(item => {
             if (itemsMostrados.has(item.key)) return;
             itemsMostrados.add(item.key);
 
-            const valor = Number(item.valor) || 0;
-            if (valor > 0) totalPositivo += valor;
-            if (valor < 0) totalNegativo += valor;
-
             const li = document.createElement('li');
             li.dataset.key = item.key;
 
-            const fechaFormateada = formatearFecha(item.fechaHora);
-            const valorTexto = `$${valor.toLocaleString('es-CO')}`;
+            const fechaFormateada = formatearFechaBonita(item.fechaHora);
 
-            li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
+            li.textContent = `${item.nombre} - ${item.valor} (${fechaFormateada})`;
 
-            if (valor < 0) {
+            if (item.valor < 0) {
                 li.style.color = '#D32F2F';
                 li.style.backgroundColor = '#FFCDD2';
             } else {
@@ -824,10 +807,7 @@ function cargarPedidosRealtime() {
 
                     const header = document.createElement('div');
                     header.className = 'fecha-header';
-
-                    // ✅ USAR FUNCIÓN UNIFICADA
-                    header.textContent = formatearFecha(fecha);
-
+                    header.textContent = formatearFechaBonita(fecha);
                     grid.appendChild(header);
 
                     pedidosPorFecha[fecha].forEach(item => {
@@ -850,17 +830,11 @@ function cargarPedidosRealtime() {
 }
 
 
-
 function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     const card = document.createElement('div');
     card.className = 'pedido-card';
     card.style.backgroundColor = obtenerColorPedido(p.color);
-
-    const fechaEntregaFormateada = formatearFecha(p.diaEntrega);
-    const fechaRegistroFormateada = formatearFecha(
-        `${p.fechaRegistro || ''} ${p.horaRegistro || ''}`
-    );
 
     card.innerHTML = `
         <div class="pedido-top">
@@ -899,7 +873,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                 </div>
 
                 <div class="linea">
-                    📅 ${fechaEntregaFormateada}
+                    📅 ${p.diaEntrega || ''}
                     <div class="sub-linea">⏰ ${p.horaEntrega || ''}</div>
                 </div>
 
@@ -907,7 +881,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         </div>
 
         <div class="pedido-bottom">
-            <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
+             <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
 
             <div class="linea"><strong>📝:</strong> ${p.mensaje || ''}</div>
 
@@ -922,8 +896,9 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             </div>
 
             <div class="linea">
-                🕒 ${fechaRegistroFormateada}
+                🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
             </div>
+
         </div>
     `;
 
@@ -953,7 +928,9 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                 p
             );
 
+            // actualizar teléfono visual
             telSpan.textContent = `📞 ${domiciliarios[idDomiNuevo]?.telefono || ''}`;
+
             idDomiActual = idDomiNuevo;
 
         } catch (e) {
@@ -964,7 +941,6 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     return card;
 }
-
 
 
 async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedido) {
@@ -1020,46 +996,28 @@ function convertirFecha(fecha) {
     return new Date(y, m - 1, d);
 }
 
-function formatearFecha(fechaHora) {
-    if (!fechaHora) return '';
+function formatearFechaBonita(fechaHora) {
+    // Soporta "YYYY-MM-DD HH:mm" o ISO
+    const date = new Date(fechaHora);
 
-    let date;
-
-    // Si viene como "YYYY-MM-DD HH:mm"
-    if (typeof fechaHora === 'string' && fechaHora.includes(' ')) {
-        const [fecha, hora] = fechaHora.split(' ');
-        const [y, m, d] = fecha.split('-');
-        const [hh = '00', mm = '00'] = hora.split(':');
-        date = new Date(y, m - 1, d, hh, mm);
-    }
-    // Si viene como "YYYY-MM-DD"
-    else if (typeof fechaHora === 'string' && fechaHora.includes('-')) {
-        const [y, m, d] = fechaHora.split('-');
-        date = new Date(y, m - 1, d);
-    }
-    // ISO o timestamp
-    else {
-        date = new Date(fechaHora);
-    }
-
-    if (isNaN(date)) return '';
-
-    const dia = date.toLocaleDateString('es-CO', { weekday: 'long' });
-
-    const fecha = date.toLocaleDateString('es-CO', {
-        day: '2-digit',
-        month: '2-digit',
+    const fechaTexto = date.toLocaleDateString('es-CO', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
         year: 'numeric'
     });
 
-    const hora = date.toLocaleTimeString('es-CO', {
+    const horaTexto = date.toLocaleTimeString('es-CO', {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true
     });
 
-    return `${dia} ${fecha}  ${hora}`;
+    return `${fechaTexto} • ${horaTexto}`;
 }
+
+
+
 
 
 
