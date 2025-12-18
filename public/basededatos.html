@@ -579,7 +579,46 @@ th {
         height: 101.6mm;
     }
 }
+/* =========================
+   edicion personalisada de la tarjeta 
+========================= */
+.decoracion-url {
+    margin-top: 6mm;
+    text-align: center;
+}
 
+.decoracion-url img {
+    max-height: 20mm;
+    max-width: 100%;
+    object-fit: contain;
+    margin-bottom: 3mm;
+    cursor: pointer;
+}
+
+.redes-sociales {
+    display: flex;
+    justify-content: center;
+    gap: 6mm;
+    margin-top: 2mm;
+}
+
+.redes-sociales div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.icono-redes {
+    width: 8mm;
+    cursor: pointer;
+}
+
+.redes-sociales span {
+    font-size: 12px;
+    margin-top: 1mm;
+    text-align: center;
+    min-width: 20mm;
+}
 
 
 </style>
@@ -659,6 +698,30 @@ th {
         </div>
 
     </div>
+</div>
+<div class="decoracion-url">
+
+    <!-- Logo de la empresa -->
+    <div>
+        <img id="logoEmpresa" src="" alt="Logo Empresa" style="max-height:20mm; cursor:pointer;">
+    </div>
+
+    <!-- Redes sociales con texto editable -->
+    <div class="redes-sociales">
+        <div>
+            <img class="icono-redes" id="facebook" src="icono-facebook.png" alt="Facebook" style="cursor:pointer;">
+            <span contenteditable="true" id="usuarioFacebook">@usuarioFB</span>
+        </div>
+        <div>
+            <img class="icono-redes" id="instagram" src="icono-instagram.png" alt="Instagram" style="cursor:pointer;">
+            <span contenteditable="true" id="usuarioInstagram">@usuarioIG</span>
+        </div>
+        <div>
+            <img class="icono-redes" id="whatsapp" src="icono-whatsapp.png" alt="WhatsApp" style="cursor:pointer;">
+            <span contenteditable="true" id="usuarioWhatsApp">+57 300 000 0000</span>
+        </div>
+    </div>
+
 </div>
 
 
@@ -1601,6 +1664,64 @@ function ajustarTextoMensaje() {
 // Ejecutar al cargar la página o abrir modal
 window.addEventListener('load', ajustarTextoMensaje);
 
+// Subir imagen (logo o iconos)
+function subirImagen(idImagen) {
+    const img = document.getElementById(idImagen);
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            img.src = reader.result;
+            guardarRedes(); // guardar cambios
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+
+// Asociar eventos a imágenes
+['logoEmpresa','facebook','instagram','whatsapp'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () => subirImagen(id));
+});
+
+// Guardar los textos e imágenes en localStorage
+function guardarRedes() {
+    const data = {
+        logoSrc: document.getElementById('logoEmpresa').src,
+        facebookSrc: document.getElementById('facebook').src,
+        instagramSrc: document.getElementById('instagram').src,
+        whatsappSrc: document.getElementById('whatsapp').src,
+        usuarioFacebook: document.getElementById('usuarioFacebook').innerText.trim(),
+        usuarioInstagram: document.getElementById('usuarioInstagram').innerText.trim(),
+        usuarioWhatsApp: document.getElementById('usuarioWhatsApp').innerText.trim()
+    };
+    localStorage.setItem('tarjetaRedes', JSON.stringify(data));
+}
+
+// Cargar datos guardados
+function cargarRedes() {
+    const data = JSON.parse(localStorage.getItem('tarjetaRedes'));
+    if (!data) return;
+    document.getElementById('logoEmpresa').src = data.logoSrc;
+    document.getElementById('facebook').src = data.facebookSrc;
+    document.getElementById('instagram').src = data.instagramSrc;
+    document.getElementById('whatsapp').src = data.whatsappSrc;
+    document.getElementById('usuarioFacebook').innerText = data.usuarioFacebook;
+    document.getElementById('usuarioInstagram').innerText = data.usuarioInstagram;
+    document.getElementById('usuarioWhatsApp').innerText = data.usuarioWhatsApp;
+}
+
+// Escuchar cambios en los textos editables
+['usuarioFacebook','usuarioInstagram','usuarioWhatsApp'].forEach(id => {
+    document.getElementById(id).addEventListener('input', guardarRedes);
+});
+
+// Inicializar al cargar la página
+window.addEventListener('load', cargarRedes);
 
 
 </script>
