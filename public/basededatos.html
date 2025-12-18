@@ -1441,6 +1441,7 @@ function actualizarTotales(pos, neg) {
     totalDif.parentElement.style.color = dif < 0 ? '#C62828' : '#2E7D32';
 }
 /* ===== ABRIR VISTA PREVIA ===== */
+/* ===== ABRIR VISTA PREVIA ===== */
 function abrirImpresion(pedido) {
     const printArea = document.getElementById('printArea');
     const modal = document.getElementById('printModal');
@@ -1457,14 +1458,9 @@ function abrirImpresion(pedido) {
         return;
     }
 
-    // Usamos el mismo tamaño que la decoracion inferior (10px)
+    // Construimos la tarjeta de impresión
     printArea.innerHTML = `
         <div class="tarjeta-impresion">
-
-            <!-- Decoración superior: URL de la empresa como texto plano -->
-            <div class="decoracion-top" style="font-size:10px; text-align:center; margin-bottom:2mm;">
-                Visítanos en: ${perfil.urlPagina}
-            </div>
 
             <!-- Mensaje principal -->
             <div class="mensaje-principal">
@@ -1481,11 +1477,18 @@ function abrirImpresion(pedido) {
             <div class="decoracion" style="font-size:10px; text-align:center; margin-top:2mm;">
                 ${perfil.nombreEmpresa} · WhatsApp: ${perfil.WhatsApp} · ${perfil.direccion} · ${perfil.ciudad}
             </div>
+
+            <!-- URL de la empresa debajo de la decoración -->
+            <div class="decoracion-url" style="font-size:10px; text-align:center; margin-top:1mm;">
+                Visítanos en: ${perfil.urlPagina}
+            </div>
+
         </div>
     `;
 
     modal.style.display = 'flex';
 }
+
 
 
 
