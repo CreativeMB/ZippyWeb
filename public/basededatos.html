@@ -1470,7 +1470,7 @@ function abrirImpresion(pedido) {
         alert("Perfil de empresa no cargado aún.");
         return;
     }
- ajustarTextoMensaje();
+
     // Construimos la tarjeta de impresión
     printArea.innerHTML = `
         <div class="tarjeta-impresion">
@@ -1500,6 +1500,7 @@ function abrirImpresion(pedido) {
     `;
 
     modal.style.display = 'flex';
+     ajustarTextoMensaje();
 }
 
 /* ===== IMPRIMIR TARJETA ===== */
