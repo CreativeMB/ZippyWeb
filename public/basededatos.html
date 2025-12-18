@@ -1007,25 +1007,26 @@ function convertirFecha(fecha) {
     return new Date(y, m - 1, d);
 }
 
-function formatearFechaCorta(fechaHora) {
+function formatearFechaBonita(fechaHora) {
+    // Soporta "YYYY-MM-DD HH:mm" o ISO
     const date = new Date(fechaHora);
 
-    const dia = date.toLocaleDateString('es-CO', { weekday: 'long' });
-
-    const fecha = date.toLocaleDateString('es-CO', {
-        day: '2-digit',
-        month: '2-digit',
+    const fechaTexto = date.toLocaleDateString('es-CO', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
         year: 'numeric'
     });
 
-    const hora = date.toLocaleTimeString('es-CO', {
+    const horaTexto = date.toLocaleTimeString('es-CO', {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true
     });
 
-    return `${dia} ${fecha}  ${hora}`;
+    return `${fechaTexto} • ${horaTexto}`;
 }
+
 
 
 
