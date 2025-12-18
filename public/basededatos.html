@@ -460,8 +460,8 @@ th {
    TARJETA IMPRESIÓN BASE
 ========================= */
 .tarjeta-impresion {
-    width: 101.6mm;   /* 4 pulgadas */
-    height: 152.4mm;  /* 6 pulgadas */
+    width: 101.6mm;
+    height: 152.4mm;
     padding: 10mm;
     box-sizing: border-box;
 
@@ -472,8 +472,8 @@ th {
 
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
 }
+
 
 /* =========================
    PUBLICIDAD SUPERIOR
@@ -491,12 +491,13 @@ th {
    MENSAJE PRINCIPAL
 ========================= */
 .mensaje-principal {
-    flex-grow: 1;
+    flex: 1;              /* ✔ correcto */
     font-size: 15px;
     text-align: center;
     line-height: 1.55;
     white-space: pre-wrap;
 }
+
 
 /* =========================
    DE / PARA
