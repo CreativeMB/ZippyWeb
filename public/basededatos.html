@@ -584,8 +584,9 @@ th {
 ========================= */
 .logo-empresa {
     position: absolute;
-    top: 10mm;
-    left: 10mm;
+    top: 5mm;
+    left: 5mm;
+    z-index: 10; /* encima del contenido de la tarjeta */
 }
 .logo-empresa img {
     max-height: 15mm;
@@ -594,14 +595,15 @@ th {
 
 .redes-sociales-abajo {
     position: absolute;
-    bottom: 10mm;
-    left: 10mm;
-    right: 10mm;
+    bottom: 5mm;
+    left: 5mm;
+    right: 5mm;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     font-size: 8px;
     gap: 2mm;
+    z-index: 10; /* encima del contenido de la tarjeta */
 }
 
 .redes-sociales-abajo div {
@@ -619,7 +621,6 @@ th {
     vertical-align: middle;
     white-space: nowrap;
 }
-
 
 
 </style>
