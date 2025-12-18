@@ -460,28 +460,42 @@ th {
    TARJETA IMPRESIÓN BASE
 ========================= */
 .tarjeta-impresion {
-    width: 101.6mm;
-    height: 152.4mm;
+    width: 101.6mm;          /* 4 pulgadas */
+    height: 152.4mm;         /* 6 pulgadas */
     padding: 10mm;
     box-sizing: border-box;
-    background: #ffffff;
+    background: #fdfcf8;      /* fondo crema elegante */
     font-family: 'Georgia', serif;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     border: none;
+    position: relative;
+    color: #2c2c2c;           /* texto oscuro elegante */
+}
+
+/* =========================
+   DECORACIÓN SUPERIOR
+========================= */
+.decoracion-top {
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 6mm;
+    color: #004d40;           /* verde elegante */
 }
 
 /* =========================
    MENSAJE PRINCIPAL
 ========================= */
 .mensaje-principal {
-    flex: 1;              /* ✔ correcto */
-    font-size: 15px;
+    flex: 1;                               /* ocupa espacio restante */
+    font-size: clamp(12px, 1.5vw, 18px);  /* se ajusta al contenido */
     text-align: center;
     line-height: 1.55;
-    white-space: pre-wrap;
+    white-space: pre-wrap;                 /* mantiene saltos de línea */
+    overflow-wrap: break-word;             /* evita que se salga */
 }
-
 
 /* =========================
    DE / PARA
@@ -489,6 +503,7 @@ th {
 .de-para {
     margin-top: 6mm;
     font-size: 13px;
+    text-align: center;
 }
 
 .de-para div {
@@ -502,14 +517,19 @@ th {
     text-align: center;
     font-size: 20px;
     margin-top: 6mm;
+    color: #8b0000;           /* rojo elegante */
 }
 
-.decoracion-top {
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 6mm;
+/* =========================
+   FIRMA OPCIONAL
+========================= */
+.firma {
+    font-family: 'Dancing Script', cursive; /* elegante manuscrita */
+    font-size: clamp(14px, 2.5vw, 24px);
+    color: #8b0000;
+    margin-top: 6mm;
+    text-align: center;
 }
-
 
 /* =========================
    VISTA PREVIA (SOLO PANTALLA)
