@@ -1450,7 +1450,6 @@ function abrirImpresion(pedido) {
         return;
     }
 
-    // Obtenemos el perfil de la empresa previamente cargado
     const perfil = window.perfilEmpresa;
     if (!perfil) {
         alert("Perfil de empresa no cargado aún.");
@@ -1458,28 +1457,29 @@ function abrirImpresion(pedido) {
     }
 
     printArea.innerHTML = `
-        <div class="tarjeta-impresion">
+        <div class="tarjeta-impresion" style="width: 58mm; height: 100mm; position: relative; padding:0; box-sizing:border-box;">
 
-            <!-- Decoración superior: URL de la empresa -->
-            <div class="decoracion decoracion-top" style="font-size:12px; text-align:center; margin-bottom:2mm;">
-                Visítanos en: <a href="${perfil.urlPagina}" target="_blank">${perfil.urlPagina}</a>
+            <!-- Decoración superior: URL como texto, pegada al borde superior -->
+            <div class="decoracion decoracion-top" style="font-size:10px; text-align:center; position:absolute; top:0; left:0; right:0; padding:2px 0;">
+                Visítanos en: ${perfil.urlPagina}
             </div>
 
-            <!-- Mensaje principal -->
-            <div class="mensaje-principal">
+            <!-- Mensaje principal centrado -->
+            <div class="mensaje-principal" style="margin-top:20mm; margin-bottom:20mm; text-align:center; font-size:12px;">
                 ${pedido.mensaje || ''}
             </div>
 
             <!-- De - Para -->
-            <div class="de-para">
+            <div class="de-para" style="text-align:center; font-size:11px; margin-bottom:2mm;">
                 <div><strong>Para:</strong> ${pedido.para || ''}</div>
                 <div><strong>De:</strong> ${pedido.de || ''}</div>
             </div>
 
-            <!-- Decoración inferior: todos los datos de la empresa en una línea -->
-            <div class="decoracion decoracion-bottom" style="font-size:10px; text-align:center; margin-top:2mm;">
+            <!-- Decoración inferior: todos los datos de la empresa, pegada al borde inferior -->
+            <div class="decoracion decoracion-bottom" style="font-size:10px; text-align:center; position:absolute; bottom:0; left:0; right:0; padding:2px 0;">
                 ${perfil.nombreEmpresa} · WhatsApp: ${perfil.WhatsApp} · ${perfil.direccion} · ${perfil.ciudad}
             </div>
+
         </div>
     `;
 
