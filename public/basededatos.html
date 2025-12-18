@@ -523,32 +523,7 @@ th {
     text-align: center;
 }
 
-/* =========================
-   VISTA PREVIA (SOLO PANTALLA)
-========================= */
-.print-contenido {
-    width: 90vw;
-    max-width: 900px;
-}
 
-.print-area-horizontal {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 10px;
-}
-/* =========================
-   TARJETA HORIZONTAL SOLO EN PANTALLA
-========================= */
-@media screen {
-    .print-area-horizontal .tarjeta-impresion {
-        width: 152.4mm;  /* 6 pulgadas */
-        height: 101.6mm; /* 4 pulgadas */
-        margin: auto;    /* Centrar en pantalla */
-        box-sizing: border-box;
-        border: 1px solid #008558;
-    }
-}
 
 /* =========================
    IMPRESIÓN REAL 4x6
@@ -1491,7 +1466,7 @@ function abrirImpresion(pedido) {
             </div>
 
             <!-- URL de la empresa debajo de la decoración -->
-            <div class="ddecoracion" style="font-size:10px; text-align:center; margin-top:1mm;">
+            <div class="decoracion" style="font-size:10px; text-align:center; margin-top:1mm;">
                 Visítanos en: ${perfil.urlPagina}
             </div>
 
