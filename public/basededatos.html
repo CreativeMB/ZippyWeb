@@ -574,8 +574,6 @@ th {
 }
 
 
-
-
 </style>
 </head>
 <body>
@@ -1497,54 +1495,15 @@ function abrirImpresion(pedido) {
 
 /* ===== IMPRIMIR TARJETA ===== */
 function imprimirTarjeta() {
-    // Obtiene el contenido de la tarjeta
-    const contenido = document.getElementById('printArea').outerHTML;
+    const printArea = document.getElementById('printArea');
 
-    // Abre una ventana nueva para impresión
-    const ventana = window.open('', '', 'width=400,height=600');
+    if (!printArea || !printArea.innerHTML.trim()) {
+        alert('No hay tarjeta para imprimir');
+        return;
+    }
 
-    // Escribe el contenido y aplica el CSS
-    ventana.document.write(`
-        <html>
-        <head>
-            <title>Imprimir Tarjeta</title>
-            <style>
-                @media print {
-                    body * { visibility: hidden; }
-                    #printArea, #printArea * { visibility: visible; }
-                    #printArea {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100vw;
-                        height: 100vh;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        box-sizing: border-box;
-                        page-break-inside: avoid;
-                        page-break-after: always;
-                    }
-                    .tarjeta-impresion {
-                        width: 152.4mm;
-                        height: 101.6mm;
-                        box-sizing: border-box;
-                    }
-                }
-            </style>
-        </head>
-        <body>
-            ${contenido}
-        </body>
-        </html>
-    `);
-
-    ventana.document.close();
-    ventana.focus();
-    ventana.print();
-    ventana.close();
+    window.print(); // Se imprimirá solo el contenido visible del modal
 }
-
 
 /* ===== CERRAR MODAL ===== */
 function cerrarPrint() {
