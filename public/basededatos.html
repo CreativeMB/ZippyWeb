@@ -1116,6 +1116,18 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
         </div>
     `;
+/* ====== IMPRIMIR TARJETA ====== */
+const btnImprimir = card.querySelector('.btn-imprimir');
+
+if (btnImprimir) {
+    btnImprimir.onclick = () => {
+        abrirImpresion({
+            mensaje: p.mensaje || '',
+            para: p.para || '',
+            de: p.de || ''
+        });
+    };
+}
 
     /* ====== SPINNER DOMICILIARIOS ====== */
     const select = card.querySelector('.domi-select');
