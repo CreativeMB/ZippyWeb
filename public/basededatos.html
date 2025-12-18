@@ -530,10 +530,9 @@ th {
 .print-area-horizontal {
     display: flex;
     justify-content: center;
-    align-items: center;
-    overflow-x: auto;
-    padding: 10px;
+    align-items: flex-start;   /* 🔥 CLAVE */
 }
+
 
 /* Tarjeta horizontal SOLO en pantalla */
 @media screen {
@@ -1454,7 +1453,7 @@ function abrirImpresion(pedido) {
                 <div><strong>De:</strong> ${pedido.de || ''}</div>
             </div>
 
-            <div class="decoracion">💐 💝 🌿</div>
+            <div class="decoracion">🌸 Floristería Los Lirios · WhatsApp 300 000 0000 💐 💝 🌿</div>
         </div>
     `;
 
