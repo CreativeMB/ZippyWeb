@@ -420,10 +420,13 @@ th {
     cursor: pointer;
 }
 
+/* =========================
+   MODAL DE IMPRESIÓN
+========================= */
 .print-modal {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.6);
+    background: rgba(0,0,0,0.6);
     display: none;
     justify-content: center;
     align-items: center;
@@ -432,72 +435,99 @@ th {
 
 .print-contenido {
     background: #fff;
-    padding: 12px;
+    padding: 16px;
     border-radius: 12px;
-    width: 360px;
+    width: 420px;
+    max-height: 90vh;
+    overflow: auto;
 }
 
-/* ===== MODAL ===== */
-.print-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.5);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+.print-botones {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
 }
 
-.print-contenido {
-    background: #fff;
-    padding: 10px;
-    border-radius: 10px;
-    max-width: 420px;
+.print-botones button {
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
-/* ===== TARJETA 4x6 ===== */
+/* =========================
+   TARJETA IMPRESIÓN 4x6
+========================= */
 .tarjeta-impresion {
     width: 101.6mm;
     height: 152.4mm;
     padding: 10mm;
     box-sizing: border-box;
+
+    background: #ffffff;
+    border: 1.5px solid #ccc;
+
     font-family: 'Georgia', serif;
-    border: 2px solid #ccc;
 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
-/* CONTENIDO */
-.logo {
+/* =========================
+   PUBLICIDAD SUPERIOR
+========================= */
+.publicidad-top {
     text-align: center;
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 10px;
+    color: #555;
+    margin-bottom: 6mm;
 }
 
+/* =========================
+   MENSAJE PRINCIPAL
+========================= */
 .mensaje-principal {
-    font-size: 16px;
+    flex-grow: 1;
+    font-size: 15px;
     text-align: center;
+    line-height: 1.55;
     white-space: pre-wrap;
 }
 
-.para, .de {
-    font-size: 14px;
+/* =========================
+   DE / PARA
+========================= */
+.de-para {
+    margin-top: 6mm;
+    font-size: 13px;
 }
 
+.de-para div {
+    margin-top: 2mm;
+}
+
+/* =========================
+   DECORACIÓN INFERIOR
+========================= */
 .decoracion {
     text-align: center;
     font-size: 20px;
+    margin-top: 6mm;
 }
 
+/* =========================
+   IMPRESIÓN
+========================= */
 @media print {
+
     body * {
-        display: none;
+        display: none !important;
     }
 
-    #printArea, #printArea * {
-        display: block;
+    #printArea,
+    #printArea * {
+        display: block !important;
     }
 
     #printArea {
@@ -505,13 +535,11 @@ th {
         inset: 0;
     }
 
-    /* 🟢 4x6 HORIZONTAL */
     @page {
-        size: 152.4mm 101.6mm; /* ancho x alto */
+        size: 101.6mm 152.4mm;
         margin: 0;
     }
 }
-
 
 
 
