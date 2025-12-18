@@ -543,31 +543,39 @@ th {
    IMPRESIÓN REAL
 ========================= */
 @media print {
-    @page {
-        size: 152.4mm 101.6mm landscape; /* 4x6 horizontal */
-        margin: 0;
-    }
-
     body * {
-        visibility: hidden;
+        visibility: hidden; /* Oculta todo */
     }
 
     #printModal, #printModal * {
-        visibility: visible;
+        visibility: visible; /* Solo mostramos el modal y su contenido */
     }
 
     #printModal {
         position: absolute;
         left: 0;
         top: 0;
-        width: 152.4mm; /* ancho horizontal */
-        height: 101.6mm; /* alto horizontal */
+        width: 152.4mm;  /* 6 pulgadas ancho horizontal */
+        height: 101.6mm; /* 4 pulgadas alto horizontal */
+        margin: 0;
     }
 
     .print-botones {
-        display: none;
+        display: none; /* Oculta botones al imprimir */
+    }
+
+    .tarjeta-impresion {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Si quieres texto más ajustado para impresión */
+    .decoracion, .mensaje-principal, .de-para {
+        font-size: 10px;
     }
 }
+
 
 
 
