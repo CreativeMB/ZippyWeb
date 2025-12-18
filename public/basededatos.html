@@ -698,10 +698,27 @@ auth.onAuthStateChanged(user => {
         window.location.href = "login.html";
     } else {
         idEmpresa = user.uid;
+        cargarPerfilEmpresa();
         cargarBases();
          cargarPedidosRealtime();
     }
 });
+// Función para cargar el perfil de la empresa
+function cargarPerfilEmpresa() {
+    const ref = db.ref(`${idEmpresa}/perfilempresa`);
+    ref.once('value').then(snapshot => {
+        const perfil = snapshot.val();
+        if (!perfil) return;
+
+        window.perfilEmpresa = perfil;
+        const resumenEmpresa = document.getElementById('resumenEmpresa');
+        if (resumenEmpresa) {
+            resumenEmpresa.textContent = `${perfil.nombreEmpresa} · WhatsApp: ${perfil.WhatsApp}`;
+        }
+    }).catch(err => {
+        console.error("Error cargando perfil de empresa:", err);
+    });
+}
 
 // --- CARGAR BASES ---
 function cargarBases() {
@@ -1425,7 +1442,6 @@ function actualizarTotales(pos, neg) {
 }
 /* ===== ABRIR VISTA PREVIA ===== */
 function abrirImpresion(pedido) {
-
     const printArea = document.getElementById('printArea');
     const modal = document.getElementById('printModal');
 
@@ -1434,28 +1450,42 @@ function abrirImpresion(pedido) {
         return;
     }
 
+    // Obtenemos el perfil de la empresa previamente cargado
+    const perfil = window.perfilEmpresa;
+    if (!perfil) {
+        alert("Perfil de empresa no cargado aún.");
+        return;
+    }
+
     printArea.innerHTML = `
         <div class="tarjeta-impresion">
 
-            <div class="decoracion decoracion-top">
-                🌸 Floristería Los Lirios · WhatsApp 300 000 0000
+            <!-- Decoración superior: URL de la empresa -->
+            <div class="decoracion decoracion-top" style="font-size:12px; text-align:center; margin-bottom:2mm;">
+                Visítanos en: <a href="${perfil.urlPagina}" target="_blank">${perfil.urlPagina}</a>
             </div>
 
+            <!-- Mensaje principal -->
             <div class="mensaje-principal">
                 ${pedido.mensaje || ''}
             </div>
 
+            <!-- De - Para -->
             <div class="de-para">
                 <div><strong>Para:</strong> ${pedido.para || ''}</div>
                 <div><strong>De:</strong> ${pedido.de || ''}</div>
             </div>
 
-            <div class="decoracion">🌸 Floristería Los Lirios · WhatsApp 300 000 0000 💐 💝 🌿</div>
+            <!-- Decoración inferior: todos los datos de la empresa en una línea -->
+            <div class="decoracion decoracion-bottom" style="font-size:10px; text-align:center; margin-top:2mm;">
+                ${perfil.nombreEmpresa} · WhatsApp: ${perfil.WhatsApp} · ${perfil.direccion} · ${perfil.ciudad}
+            </div>
         </div>
     `;
 
     modal.style.display = 'flex';
 }
+
 
 
 /* ===== IMPRIMIR ===== */
