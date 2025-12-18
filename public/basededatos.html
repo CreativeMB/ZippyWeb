@@ -550,7 +550,7 @@ th {
         visibility: hidden;
     }
 
-    /* Solo el área de la tarjeta */
+    /* Solo la tarjeta se imprime */
     #printArea, #printArea * {
         visibility: visible;
     }
@@ -560,20 +560,18 @@ th {
         position: absolute;
         top: 0;
         left: 0;
-        width: 152.4mm;
-        height: 101.6mm;
+        width: 152.4mm;  /* 6 pulgadas */
+        height: 101.6mm; /* 4 pulgadas */
         margin: 0;
         box-sizing: border-box;
     }
 
-    /* Tarjeta se ajusta al 100% del área */
     .tarjeta-impresion {
         width: 100%;
         height: 100%;
-        box-sizing: border-box;
     }
 
-    /* Oculta botones y títulos */
+    /* Ocultar botones y títulos */
     .print-botones, .print-contenido h3 {
         display: none;
     }
@@ -583,7 +581,6 @@ th {
         font-size: 10px;
     }
 }
-
 
 
 </style>
