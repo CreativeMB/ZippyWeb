@@ -1040,63 +1040,85 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             select.value = idDomiActual;
         }
     });
-/* ====== EDITAR MENSAJE ====== */
-const btnEditar = card.querySelector('.btn-editar-mensaje');
-const mensajeSpan = card.querySelector('.mensaje-texto');
+/* ====== EDITAR MENSAJE (CORREGIDO) ====== */
 
-btnEditar.addEventListener('click', () => {
+function activarEdicionMensaje() {
 
-    const textoOriginal = mensajeSpan.textContent;
+    const btnEditar = card.querySelector('.btn-editar-mensaje');
+    const mensajeSpan = card.querySelector('.mensaje-texto');
 
-    const textarea = document.createElement('textarea');
-    textarea.value = textoOriginal;
-    textarea.style.width = '100%';
-    textarea.rows = 3;
+    if (!btnEditar || !mensajeSpan) return;
 
-    const btnGuardar = document.createElement('button');
-    btnGuardar.textContent = '💾 Guardar';
-    btnGuardar.style.marginRight = '6px';
+    btnEditar.onclick = () => {
 
-    const btnCancelar = document.createElement('button');
-    btnCancelar.textContent = '❌ Cancelar';
+        const textoOriginal = mensajeSpan.textContent;
 
-    const contenedorBtns = document.createElement('div');
-    contenedorBtns.style.marginTop = '5px';
-    contenedorBtns.append(btnGuardar, btnCancelar);
+        const textarea = document.createElement('textarea');
+        textarea.value = textoOriginal;
+        textarea.style.width = '100%';
+        textarea.rows = 3;
 
-    mensajeSpan.replaceWith(textarea);
-    btnEditar.replaceWith(contenedorBtns);
+        const btnGuardar = document.createElement('button');
+        btnGuardar.textContent = '💾 Guardar';
+        btnGuardar.style.marginRight = '6px';
 
-    /* ====== GUARDAR ====== */
-    btnGuardar.addEventListener('click', async () => {
-        const nuevoMensaje = textarea.value.trim();
+        const btnCancelar = document.createElement('button');
+        btnCancelar.textContent = '❌ Cancelar';
 
-        try {
-            await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
-                .update({ mensaje: nuevoMensaje });
+        const contenedorBtns = document.createElement('div');
+        contenedorBtns.style.marginTop = '5px';
+        contenedorBtns.append(btnGuardar, btnCancelar);
 
-            const nuevoSpan = document.createElement('span');
-            nuevoSpan.className = 'mensaje-texto';
-            nuevoSpan.textContent = nuevoMensaje;
+        mensajeSpan.replaceWith(textarea);
+        btnEditar.replaceWith(contenedorBtns);
 
-            textarea.replaceWith(nuevoSpan);
-            contenedorBtns.replaceWith(btnEditar);
+        /* ====== GUARDAR ====== */
+        btnGuardar.onclick = async () => {
+            const nuevoMensaje = textarea.value.trim();
 
-        } catch (e) {
-            alert('Error guardando mensaje');
-        }
-    });
+            try {
+                await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
+                    .update({ mensaje: nuevoMensaje });
 
-    /* ====== CANCELAR ====== */
-    btnCancelar.addEventListener('click', () => {
-        const spanOriginal = document.createElement('span');
-        spanOriginal.className = 'mensaje-texto';
-        spanOriginal.textContent = textoOriginal;
+                const nuevoSpan = document.createElement('span');
+                nuevoSpan.className = 'mensaje-texto';
+                nuevoSpan.textContent = nuevoMensaje;
 
-        textarea.replaceWith(spanOriginal);
-        contenedorBtns.replaceWith(btnEditar);
-    });
-});
+                const nuevoBtnEditar = document.createElement('button');
+                nuevoBtnEditar.className = 'btn-editar-mensaje';
+                nuevoBtnEditar.textContent = '✏️';
+
+                textarea.replaceWith(nuevoSpan);
+                contenedorBtns.replaceWith(nuevoBtnEditar);
+
+                activarEdicionMensaje(); // 🔁 REACTIVAR
+
+            } catch (e) {
+                alert('Error guardando mensaje');
+            }
+        };
+
+        /* ====== CANCELAR ====== */
+        btnCancelar.onclick = () => {
+
+            const spanOriginal = document.createElement('span');
+            spanOriginal.className = 'mensaje-texto';
+            spanOriginal.textContent = textoOriginal;
+
+            const nuevoBtnEditar = document.createElement('button');
+            nuevoBtnEditar.className = 'btn-editar-mensaje';
+            nuevoBtnEditar.textContent = '✏️';
+
+            textarea.replaceWith(spanOriginal);
+            contenedorBtns.replaceWith(nuevoBtnEditar);
+
+            activarEdicionMensaje(); // 🔁 REACTIVAR
+        };
+    };
+}
+
+// 🚀 activar edición al crear la tarjeta
+activarEdicionMensaje();
 
 
     return card;
