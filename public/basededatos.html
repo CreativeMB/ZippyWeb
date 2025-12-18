@@ -460,12 +460,12 @@ th {
    TARJETA IMPRESIÓN BASE
 ========================= */
 .tarjeta-impresion {
-    width: 101.6mm;          
-    height: 152.4mm;         
+    width: 101.6mm;          /* 4x6 pulgadas */
+    height: 152.4mm;
     padding: 10mm;
     box-sizing: border-box;
     background: #fdfcf8;      
-    font-family: 'Georgia', serif;  /* base elegante */
+    font-family: 'Georgia', serif;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -486,17 +486,19 @@ th {
 }
 
 /* =========================
-   MENSAJE PRINCIPAL (CURSIVA)
+   MENSAJE PRINCIPAL (CURSIVA Y ADAPTABLE)
 ========================= */
 .mensaje-principal {
     flex: 1;                              
-    font-family: 'Great Vibes', cursive;  /* elegante manuscrita */
-    font-size: clamp(14px, 2vw, 22px);    /* se ajusta automáticamente */
+    font-family: 'Great Vibes', cursive;  
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    line-height: 1.5;
+    line-height: 1.2;
     white-space: pre-wrap;                 
     overflow-wrap: break-word;             
-    color: #2c2c2c;                       /* color elegante */
+    color: #2c2c2c;                       
 }
 
 /* =========================
@@ -519,7 +521,7 @@ th {
 ========================= */
 .firma {
     font-family: 'Dancing Script', cursive; 
-    font-size: clamp(14px, 2.5vw, 24px);  /* se ajusta al tamaño de pantalla */
+    font-size: clamp(14px, 2.5vw, 24px);
     color: #8b0000;
     margin-top: 6mm;
     text-align: center;
@@ -547,49 +549,6 @@ th {
     max-width: 100%;   
     max-height: 25mm;  
     object-fit: contain;
-}
-
-/* =========================
-   VISTA PREVIA (SOLO PANTALLA)
-========================= */
-.print-contenido {
-    width: 90vw;
-    max-width: 900px;
-    margin: auto;
-}
-
-.print-area-horizontal {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 10px;
-}
-
-/* =========================
-   TARJETA HORIZONTAL SOLO EN PANTALLA
-========================= */
-@media screen {
-    .print-area-horizontal .tarjeta-impresion {
-        width: 90%;                 /* no se sale del contenedor */
-        max-width: 152.4mm;         /* 6 pulgadas máximo */
-        height: auto;               /* altura ajustable según contenido */
-        aspect-ratio: 152.4 / 101.6; /* mantiene proporción horizontal */
-        margin: auto;               
-        box-sizing: border-box;
-        border: 1px solid #008558;  /* opcional para vista previa */
-        padding: 10mm;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-    }
-
-    /* MENSAJE PRINCIPAL: tamaño adaptable */
-    .print-area-horizontal .tarjeta-impresion .mensaje-principal {
-        font-size: clamp(5px, 2vw, 25px);  /* crece o disminuye según cantidad de texto */
-        line-height: 1.5;
-        text-align: center;
-        overflow-wrap: break-word;
-    }
 }
 
 
@@ -1614,6 +1573,41 @@ function cerrarPrint() {
     if (modal) modal.style.display = 'none';
 }
 
+function ajustarTextoMensaje() {
+    const tarjetas = document.querySelectorAll('.tarjeta-impresion');
+
+    tarjetas.forEach(tarjeta => {
+        const mensaje = tarjeta.querySelector('.mensaje-principal');
+        if (!mensaje) return;
+
+        let fontSize = 40; // tamaño inicial grande en px
+        const minFont = 10; // tamaño mínimo
+        const maxFont = 40; // tamaño máximo
+        const contenedorHeight = mensaje.clientHeight;
+
+        mensaje.style.fontSize = fontSize + 'px';
+
+        // Reducir hasta que el texto quepa
+        while (mensaje.scrollHeight > contenedorHeight && fontSize > minFont) {
+            fontSize -= 1;
+            mensaje.style.fontSize = fontSize + 'px';
+        }
+
+        // Ajustar hacia arriba si sobra espacio
+        while (mensaje.scrollHeight < contenedorHeight && fontSize < maxFont) {
+            fontSize += 1;
+            mensaje.style.fontSize = fontSize + 'px';
+            if (mensaje.scrollHeight > contenedorHeight) {
+                fontSize -= 1;
+                mensaje.style.fontSize = fontSize + 'px';
+                break;
+            }
+        }
+    });
+}
+
+// Llamar al cargar la página o al abrir el modal
+window.addEventListener('load', ajustarTextoMensaje);
 
 
 
