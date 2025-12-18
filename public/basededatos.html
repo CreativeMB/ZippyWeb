@@ -420,6 +420,70 @@ th {
     cursor: pointer;
 }
 
+.print-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.print-contenido {
+    background: #fff;
+    padding: 12px;
+    border-radius: 12px;
+    width: 360px;
+}
+
+.tarjeta-impresion {
+    width: 101.6mm;
+    height: 152.4mm;
+    padding: 10mm;
+    box-sizing: border-box;
+    font-family: 'Georgia', serif;
+    border: 2px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo {
+    text-align: center;
+    font-size: 18px;
+}
+
+.mensaje-principal {
+    font-size: 16px;
+    text-align: center;
+    white-space: pre-wrap;
+}
+
+.decoracion {
+    text-align: center;
+    font-size: 20px;
+}
+@media print {
+    body * {
+        display: none;
+    }
+
+    #printArea, #printArea * {
+        display: block;
+    }
+
+    #printArea {
+        position: absolute;
+        inset: 0;
+    }
+
+    @page {
+        size: 101.6mm 152.4mm;
+        margin: 0;
+    }
+}
+
 
 </style>
 </head>
@@ -481,6 +545,22 @@ th {
 
 </div>
 
+</div>
+<div id="printModal" class="print-modal">
+    <div class="print-contenido">
+
+        <h3>🖨 Vista previa de impresión</h3>
+
+        <div id="printArea">
+            <!-- Tarjeta se carga aquí -->
+        </div>
+
+        <div class="print-botones">
+            <button onclick="imprimirTarjeta()">🖨 Imprimir</button>
+            <button onclick="cerrarPrint()">❌ Cancelar</button>
+        </div>
+
+    </div>
 </div>
 
 <script>
@@ -985,7 +1065,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     <span class="mensaje-texto">${p.mensaje || ''}</span>
     <button class="btn-editar-mensaje">✏️</button>
 </div>
-
+<button class="btn-imprimir">🖨 Imprimir</button>
 
             <div class="linea">
                 👉 De: ${p.de || ''} 👉 Para: ${p.para || ''}
@@ -1243,6 +1323,40 @@ function actualizarTotales(pos, neg) {
     totalDif.textContent = `$${dif.toLocaleString('es-CO')}`;
 
     totalDif.parentElement.style.color = dif < 0 ? '#C62828' : '#2E7D32';
+}
+
+function abrirImpresion(pedido) {
+
+    document.getElementById('printArea').innerHTML = `
+        <div class="tarjeta-impresion">
+            <div class="logo">🌸 Floristería Los Lirios</div>
+
+            <div class="mensaje-principal">
+                ${pedido.mensaje || ''}
+            </div>
+
+            <hr>
+
+            <div class="para">
+                <strong>Para:</strong> ${pedido.para || ''}
+            </div>
+
+            <div class="de">
+                <strong>De:</strong> ${pedido.de || ''}
+            </div>
+
+            <div class="decoracion">💐 💝 🌿</div>
+        </div>
+    `;
+
+    document.getElementById('printModal').style.display = 'flex';
+}
+function imprimirTarjeta() {
+    window.print();
+}
+
+function cerrarPrint() {
+    document.getElementById('printModal').style.display = 'none';
 }
 
 
