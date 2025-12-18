@@ -399,6 +399,13 @@ th {
     </div>
 
     <ul id="sidebarList"></ul>
+
+    <div id="resumenTotales" style="margin:10px 0;">
+    <div id="totalPositivo"></div>
+    <div id="totalNegativo"></div>
+    <div id="totalDiferencia"></div>
+</div>
+
 </div>
 
 <div id="main">
@@ -550,27 +557,55 @@ function mostrarDatos(base) {
     opcionesExtra.style.display = "none";
 
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-    ref.off(); // eliminar listeners anteriores
+    ref.off();
     sidebarList.innerHTML = '';
 
-    const itemsMostrados = new Set(); // evitar duplicados
+    const itemsMostrados = new Set();
 
-    // 🔴 Listener en tiempo real (nuevos registros)
+    // 🔢 Totales
+    let totalPositivo = 0;
+    let totalNegativo = 0;
+
+    const totalPositivoEl = document.getElementById('totalPositivo');
+    const totalNegativoEl = document.getElementById('totalNegativo');
+    const totalDiferenciaEl = document.getElementById('totalDiferencia');
+
+    function actualizarTotales() {
+        const diferencia = totalPositivo + totalNegativo;
+
+        totalPositivoEl.textContent = `🟢 Total positivo: $${totalPositivo.toLocaleString('es-CO')}`;
+        totalNegativoEl.textContent = `🔴 Total negativo: $${Math.abs(totalNegativo).toLocaleString('es-CO')}`;
+        totalDiferenciaEl.textContent = `⚖️ Diferencia: $${diferencia.toLocaleString('es-CO')}`;
+
+        totalPositivoEl.style.color = '#388E3C';
+        totalNegativoEl.style.color = '#D32F2F';
+
+        totalDiferenciaEl.style.color = diferencia < 0 ? '#D32F2F' : '#388E3C';
+        totalDiferenciaEl.style.fontWeight = 'bold';
+    }
+
+    // 🔴 Tiempo real
     ref.on('child_added', itemSnap => {
         const item = itemSnap.val();
         if (!item || !item.nombre) return;
-
         if (itemsMostrados.has(itemSnap.key)) return;
+
         itemsMostrados.add(itemSnap.key);
+
+        const valor = Number(item.valor) || 0;
+
+        if (valor > 0) totalPositivo += valor;
+        if (valor < 0) totalNegativo += valor;
+
+        actualizarTotales();
 
         const li = document.createElement('li');
         li.dataset.key = itemSnap.key;
 
         const fechaFormateada = formatearFechaBonita(item.fechaHora);
+        li.textContent = `${item.nombre} - ${valor} (${fechaFormateada})`;
 
-        li.textContent = `${item.nombre} - ${item.valor} (${fechaFormateada})`;
-
-        if (item.valor < 0) {
+        if (valor < 0) {
             li.style.color = '#D32F2F';
             li.style.backgroundColor = '#FFCDD2';
         } else {
@@ -582,11 +617,10 @@ function mostrarDatos(base) {
         li.style.marginBottom = '5px';
         li.style.borderRadius = '6px';
 
-        // Los nuevos aparecen arriba
         sidebarList.insertBefore(li, sidebarList.firstChild);
     });
 
-    // 🔵 Cargar datos existentes una sola vez (ordenados)
+    // 🔵 Carga inicial
     ref.once('value', snapshot => {
         const itemsArray = [];
 
@@ -597,21 +631,24 @@ function mostrarDatos(base) {
             }
         });
 
-        // Ordenar por fecha descendente
         itemsArray.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
 
         itemsArray.forEach(item => {
             if (itemsMostrados.has(item.key)) return;
             itemsMostrados.add(item.key);
 
+            const valor = Number(item.valor) || 0;
+
+            if (valor > 0) totalPositivo += valor;
+            if (valor < 0) totalNegativo += valor;
+
             const li = document.createElement('li');
             li.dataset.key = item.key;
 
             const fechaFormateada = formatearFechaBonita(item.fechaHora);
+            li.textContent = `${item.nombre} - ${valor} (${fechaFormateada})`;
 
-            li.textContent = `${item.nombre} - ${item.valor} (${fechaFormateada})`;
-
-            if (item.valor < 0) {
+            if (valor < 0) {
                 li.style.color = '#D32F2F';
                 li.style.backgroundColor = '#FFCDD2';
             } else {
@@ -625,6 +662,8 @@ function mostrarDatos(base) {
 
             sidebarList.appendChild(li);
         });
+
+        actualizarTotales();
     });
 }
 
