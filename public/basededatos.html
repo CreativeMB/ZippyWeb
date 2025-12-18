@@ -543,25 +543,29 @@ th {
    IMPRESIÓN REAL
 ========================= */
 @media print {
+    @page {
+        size: 152.4mm 101.6mm landscape; /* 4x6 horizontal */
+        margin: 0;
+    }
+
     body * {
-        visibility: hidden; /* Oculta todo */
+        visibility: hidden;
     }
 
     #printModal, #printModal * {
-        visibility: visible; /* Solo muestra el modal */
+        visibility: visible;
     }
 
     #printModal {
         position: absolute;
         left: 0;
         top: 0;
-        width: 101.6mm;   /* 4 pulgadas */
-        height: 152.4mm;  /* 6 pulgadas */
-        margin: 0;
+        width: 152.4mm; /* ancho horizontal */
+        height: 101.6mm; /* alto horizontal */
     }
 
     .print-botones {
-        display: none; /* Oculta botones al imprimir */
+        display: none;
     }
 }
 
@@ -1437,7 +1441,7 @@ function actualizarTotales(pos, neg) {
 
     totalDif.parentElement.style.color = dif < 0 ? '#C62828' : '#2E7D32';
 }
-/* ===== ABRIR VISTA PREVIA ===== */
+
 /* ===== ABRIR VISTA PREVIA ===== */
 function abrirImpresion(pedido) {
     const printArea = document.getElementById('printArea');
@@ -1485,8 +1489,6 @@ function abrirImpresion(pedido) {
 
     modal.style.display = 'flex';
 }
-
-
 
 /* ===== IMPRIMIR ===== */
 function imprimirTarjeta() {
