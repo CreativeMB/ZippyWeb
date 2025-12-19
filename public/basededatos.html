@@ -1726,11 +1726,6 @@ function subirImagen(idImagen) {
     input.click();
 }
 
-// Asociar eventos a imágenes
-['logoEmpresa','facebook','instagram','whatsapp'].forEach(id => {
-    document.getElementById(id).addEventListener('click', () => subirImagen(id));
-});
-
 // Guardar los textos e imágenes en localStorage
 function guardarRedes() {
     const data = {
