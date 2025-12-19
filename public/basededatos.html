@@ -1577,15 +1577,16 @@ function abrirImpresion(pedido) {
     </div>
 </div>`;
 
-  // Asociar eventos a imágenes
-    ['logoEmpresa','facebook','instagram','whatsapp'].forEach(id => {
-        document.getElementById(id).addEventListener('click', () => subirImagen(id));
-    });
-// Guardar cuando se pierde foco (blur) del contenteditable
+ ['logoEmpresa','facebook','instagram','whatsapp'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', () => subirImagen(id));
+});
+
 ['usuarioFacebook', 'usuarioInstagram', 'usuarioWhatsApp'].forEach(id => {
     const el = document.getElementById(id);
-    el.addEventListener('blur', guardarRedes);
+    if (el) el.addEventListener('blur', guardarRedes);
 });
+
 
     // Cargar los valores guardados si existen
     cargarRedes();
