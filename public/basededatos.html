@@ -544,6 +544,22 @@ th {
     }
 }
 
+/* Imagen de publicidad */
+.tarjeta-impresion .publicidad {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30mm;       /* ancho de la publicidad */
+    height: 100%;      /* ocupa toda la altura de la tarjeta */
+    object-fit: cover; /* ajusta la imagen sin deformarla */
+    z-index: 0;        /* detrás del contenido */
+}
+
+/* Mensaje principal y DE/PARA */
+.tarjeta-impresion > *:not(.publicidad) {
+    position: relative;
+    z-index: 1;        /* contenido por encima de la publicidad */
+}
 /* =========================
    IMPRESIÓN REAL 4x6
 ========================= */
@@ -1480,6 +1496,9 @@ function abrirImpresion(pedido) {
     <div class="decoracion" style="font-size:10px; text-align:center; margin-top:1mm;">
         Visítanos en: ${(perfil.urlPagina || '').trim()}
     </div>
+    <label for="pubInput">Subir publicidad lateral:</label>
+<input type="file" id="pubInput" accept="image/*" onchange="subirPublicidad(this)">
+
 </div>`;
 
 
@@ -1582,11 +1601,53 @@ function ajustarTextoMensaje() {
     });
 }
 
-
-
 // Ejecutar al cargar la página o abrir modal
 window.addEventListener('load', ajustarTextoMensaje);
 
+// Guardar cookie
+function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days*24*60*60*1000));
+    document.cookie = `${name}=${encodeURIComponent(value)};path=/;expires=${d.toUTCString()}`;
+}
+
+// Leer cookie
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+    return null;
+}
+
+// Colocar publicidad
+function cargarPublicidad() {
+    const url = getCookie('publicidad');
+    if (!url) return; // si no hay, no hace nada
+
+    document.querySelectorAll('.tarjeta-impresion').forEach(tarjeta => {
+        let img = tarjeta.querySelector('.publicidad');
+        if (!img) {
+            img = document.createElement('img');
+            img.classList.add('publicidad');
+            tarjeta.prepend(img); // agrega al inicio
+        }
+        img.src = url;
+    });
+}
+
+// Función para que el usuario suba la publicidad por primera vez
+function subirPublicidad(fileInput) {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const url = e.target.result;
+        setCookie('publicidad', url, 365); // guardar 1 año
+        cargarPublicidad(); // aplica a todas las tarjetas
+    };
+    reader.readAsDataURL(file);
+}
 
 
 </script>
