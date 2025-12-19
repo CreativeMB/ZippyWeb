@@ -550,15 +550,16 @@ th {
     top: 0;
     left: 0;
     width: 30mm;       /* ancho de la publicidad */
-    height: 100%;      /* ocupa toda la altura de la tarjeta */
-    object-fit: cover; /* ajusta la imagen sin deformarla */
-    z-index: 0;        /* detrás del contenido */
+    height: 100%;      /* ocupa toda la altura */
+    object-fit: cover; /* ajusta la imagen sin deformar */
+    z-index: 0;        
+    cursor: pointer;   /* indica que se puede hacer click */
 }
 
 /* Mensaje principal y DE/PARA */
 .tarjeta-impresion > *:not(.publicidad) {
     position: relative;
-    z-index: 1;        /* contenido por encima de la publicidad */
+    z-index: 1;       
 }
 /* =========================
    IMPRESIÓN REAL 4x6
@@ -1485,6 +1486,9 @@ function abrirImpresion(pedido) {
 
     // Construimos la tarjeta de impresión
     printArea.innerHTML = `<div class="tarjeta-impresion">
+        <!-- Input para cargar imagen -->
+    <input type="file" id="pubInput" accept="image/*" style="display:none" onchange="subirPublicidad(this)">
+
     <div class="mensaje-principal">${(pedido.mensaje || '').trim()}</div>
     <div class="de-para">
         <div><strong>Para:</strong> ${(pedido.para || '').trim()}</div>
@@ -1495,10 +1499,7 @@ function abrirImpresion(pedido) {
     </div>
     <div class="decoracion" style="font-size:10px; text-align:center; margin-top:1mm;">
         Visítanos en: ${(perfil.urlPagina || '').trim()}
-    </div>
-    <label for="pubInput">Subir publicidad lateral:</label>
-<input type="file" id="pubInput" accept="image/*" onchange="subirPublicidad(this)">
-
+    
 </div>`;
 
 
@@ -1619,23 +1620,23 @@ function getCookie(name) {
     return null;
 }
 
-// Colocar publicidad
+// Cargar publicidad desde cookie a todas las tarjetas
 function cargarPublicidad() {
     const url = getCookie('publicidad');
-    if (!url) return; // si no hay, no hace nada
+    if (!url) return;
 
     document.querySelectorAll('.tarjeta-impresion').forEach(tarjeta => {
         let img = tarjeta.querySelector('.publicidad');
         if (!img) {
             img = document.createElement('img');
             img.classList.add('publicidad');
-            tarjeta.prepend(img); // agrega al inicio
+            tarjeta.prepend(img);
         }
         img.src = url;
     });
 }
 
-// Función para que el usuario suba la publicidad por primera vez
+// Función para que el usuario suba la publicidad
 function subirPublicidad(fileInput) {
     const file = fileInput.files[0];
     if (!file) return;
@@ -1648,6 +1649,12 @@ function subirPublicidad(fileInput) {
     };
     reader.readAsDataURL(file);
 }
+
+// Ejecutar al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    cargarPublicidad();
+});
+
 
 
 </script>
