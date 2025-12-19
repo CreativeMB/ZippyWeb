@@ -646,13 +646,14 @@ th {
 ========================= */
 .pedido-card {
     position: relative;
-    overflow: visible;
+    overflow: hidden;
 }
 
 .etiqueta-ruta {
+margin-left: auto;
     position: absolute;
     top: 12px;
-    right: -28px;
+    right: -42px;
     transform: rotate(45deg);
 
     background: linear-gradient(135deg, #27ae60, #2ecc71);
@@ -660,28 +661,26 @@ th {
 
     font-size: 14px;
     font-weight: 800;
-    letter-spacing: 1px;
+    letter-spacing: 3px;
     text-transform: uppercase;
 
-    padding: 8px 44px;
+    padding: 8px 50px;
+
+    display: flex;
+    align-items: center;      /* centra vertical */
+    justify-content: center;  /* centra horizontal */
+    text-align: center;
+
+    line-height: 1;           /* evita desalineación */
+    box-shadow: 0 3px 8px rgba(0,0,0,.35);
 
     display: none;
-    align-items: center;
-    justify-content: center;
-
-    white-space: nowrap;
-    line-height: 1.1;
-
-    box-shadow: 0 3px 8px rgba(0,0,0,.35);
     z-index: 10;
 }
-
-
 
 .pedido-card.en-ruta .etiqueta-ruta {
     display: flex;
 }
-
 .switch-ruta {
     display: inline-flex;
     align-items: center;
