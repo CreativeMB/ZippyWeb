@@ -590,12 +590,6 @@ th {
    IMPRESIÓN REAL 4x6
 ========================= */
 @media print {
-    .opciones-impresion,
-    .print-botones,
-    h3 {
-        display: none !important;
-    }
-}
     body * {
         visibility: hidden; /* oculta todo */
     }
@@ -622,76 +616,50 @@ th {
         width: 152.4mm;
         height: 101.6mm;
     }
-/* =========================
-   IMPRESIÓN opciones 4x6
-========================= */
-.opciones-impresion {
-    margin-bottom: 10px;
-    padding: 10px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    font-size: 14px;
 }
 
-.opciones-impresion label {
-    margin-right: 15px;
-    cursor: pointer;
-}
-
-.nota-impresion {
-    margin-top: 8px;
-    font-size: 13px;
-    color: #444;
-    line-height: 1.4;
-}
 
 
 </style>
 </head>
 <body>
 
-<!-- ================= SIDEBAR ================= -->
 <div id="sidebar">
-
-    <button id="btnCerrarSesion" style="margin-bottom:5px; padding:8px 10px; font-size:16px;">
-        🚪 Cerrar Sesión
-    </button>
-
+       <button id="btnCerrarSesion" style="margin-bottom:5px; padding:8px 10px; font-size:16px;">🚪 Cerrar Sesión</button>
     <h3 id="sidebarTitulo">📂 Contabilidad</h3>
-
-    <div id="resumenTotales" class="resumen-oculto">
-        <div class="total positivo">
-            <span class="label">Ingresos</span>
-            <span id="totalPositivo">$0</span>
-        </div>
-
-        <div class="total negativo">
-            <span class="label">Gastos</span>
-            <span id="totalNegativo">$0</span>
-        </div>
-
-        <div class="total diferencia">
-            <span class="label">Balance</span>
-            <span id="totalDiferencia">$0</span>
-        </div>
+   <div id="resumenTotales" class="resumen-oculto">
+    <div class="total positivo">
+        <span class="label">Ingresos</span>
+        <span id="totalPositivo">$0</span>
     </div>
 
-    <div class="acciones">
-        <button id="btnVolver" style="display:none;">⬅️ Volver</button>
-        <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
+    <div class="total negativo">
+        <span class="label">Gastos</span>
+        <span id="totalNegativo">$0</span>
     </div>
+
+    <div class="total diferencia">
+        <span class="label">Balance</span>
+        <span id="totalDiferencia">$0</span>
+    </div>
+</div>
+
+<div class="acciones">
+    <button id="btnVolver" style="display:none;">⬅️ Volver</button>
+    <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
+</div>
+
+
+    <button id="btnVolver" style="display:none;">⬅️ Volver</button>
+    <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
 
     <div id="formNuevoDato">
         <input type="number" id="inputValor" placeholder="💰 Precio">
         <input type="text" id="inputNombre" placeholder="📝 Nombre">
-
         <div id="opcionesExtra">
-            <label>
-                <input type="checkbox" id="inputNegativo"> Negativo
-            </label>
+            <label><input type="checkbox" id="inputNegativo"> Negativo</label>
             <textarea id="inputNota" placeholder="🗒️ Nota o descripción"></textarea>
         </div>
-
         <div class="botones">
             <button id="btnGuardarDato" class="guardar">Guardar</button>
             <button id="btnCancelarDato" class="cancelar">Cancelar</button>
@@ -700,47 +668,28 @@ th {
     </div>
 
     <ul id="sidebarList"></ul>
-
 </div>
 
-
-<!-- ================= MAIN ================= -->
 <div id="main">
+ 
+     <!-- ================= PEDIDOS ================= -->
+<div id="pedidos-container">
 
-    <!-- ================= PEDIDOS ================= -->
-    <div id="pedidos-container">
-        <div id="pedidosGrid"></div>
-    </div>
+    <!-- Grid responsive -->
+    <div id="pedidosGrid"></div>
 
 </div>
 
+</div>
 
-<!-- ================= MODAL DE IMPRESIÓN ================= -->
 <div id="printModal" class="print-modal">
     <div class="print-contenido horizontal">
 
         <h3>🖨 Vista previa de impresión</h3>
 
-        <div class="opciones-impresion">
-            <label>
-                <input type="checkbox" id="chkPara" checked>
-                Mostrar Para
-            </label>
-
-            <label>
-                <input type="checkbox" id="chkDe" checked>
-                Mostrar De
-            </label>
-
-            <p class="nota-impresion">
-                ⚠️ <strong>Importante:</strong><br>
-                Configura tu impresora en tamaño  
-                <strong>4 × 6 pulgadas (10.16 × 15.24 cm)</strong><br>
-                y desactiva cualquier opción de ajuste automático o escalado.
-            </p>
+        <div id="printArea" class="print-area-horizontal">
+            <!-- Tarjeta se carga aquí -->
         </div>
-
-        <div id="printArea" class="print-area-horizontal"></div>
 
         <div class="print-botones">
             <button onclick="imprimirTarjeta()">🖨 Imprimir</button>
@@ -1574,14 +1523,6 @@ function abrirImpresion(pedido) {
         <div><strong>Para:</strong> ${(pedido.para || '').trim()}</div>
         <div><strong>De:</strong> ${(pedido.de || '').trim()}</div>
     </div>
-    <div id="lineaPara">
-    <strong>Para:</strong> <span id="txtPara"></span>
-</div>
-
-<div id="lineaDe">
-    <strong>De:</strong> <span id="txtDe"></span>
-</div>
-
     <div class="decoracion" style="font-size:10px; text-align:center; margin-top:2mm;">
         ${(perfil.nombreEmpresa || '').trim()} · WhatsApp: ${(perfil.WhatsApp || '').trim()} · ${(perfil.direccion || '').trim()} · ${(perfil.ciudad || '').trim()}
     </div>
@@ -1589,8 +1530,6 @@ function abrirImpresion(pedido) {
         Visítanos en: ${(perfil.urlPagina || '').trim()}
     
 </div>`;
-document.getElementById('chkPara').addEventListener('change', () => cargarTarjeta(pedidoActual));
-document.getElementById('chkDe').addEventListener('change', () => cargarTarjeta(pedidoActual));
 
 // Asociar evento al logo
     const logo = document.getElementById('logoEmpresa');
@@ -1607,26 +1546,6 @@ document.getElementById('chkDe').addEventListener('change', () => cargarTarjeta(
     
      ajustarTextoMensaje();
 }
-/* ===== opcines de para ===== */
-function cargarTarjeta(pedido) {
-    const para = (pedido.para || '').trim();
-    const de   = (pedido.de || '').trim();
-
-    document.getElementById('txtPara').textContent = para;
-    document.getElementById('txtDe').textContent   = de;
-
-    // Referencias
-    const lineaPara = document.getElementById('lineaPara');
-    const lineaDe   = document.getElementById('lineaDe');
-
-    const chkPara = document.getElementById('chkPara');
-    const chkDe   = document.getElementById('chkDe');
-
-    // Mostrar u ocultar según check y si hay texto
-    lineaPara.style.display = (chkPara.checked && para) ? 'block' : 'none';
-    lineaDe.style.display   = (chkDe.checked && de) ? 'block' : 'none';
-}
-
 
 /* ===== IMPRIMIR TARJETA ===== */
 function imprimirTarjeta() {
