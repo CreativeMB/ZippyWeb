@@ -1753,11 +1753,6 @@ function cargarRedes() {
     document.getElementById('usuarioWhatsApp').innerText = data.usuarioWhatsApp;
 }
 
-// Escuchar cambios en los textos editables
-['usuarioFacebook','usuarioInstagram','usuarioWhatsApp'].forEach(id => {
-    document.getElementById(id).addEventListener('input', guardarRedes);
-});
-
 // Inicializar al cargar la página
 window.addEventListener('load', cargarRedes);
 
