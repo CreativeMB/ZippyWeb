@@ -579,48 +579,7 @@ th {
         height: 101.6mm;
     }
 }
-/* =========================
-   edicion personalisada de la tarjeta 
-========================= */
-.logo-empresa {
-    position: absolute;
-    top: 5mm;
-    left: 5mm;
-    z-index: 10; /* encima del contenido de la tarjeta */
-}
-.logo-empresa img {
-    max-height: 15mm;
-    cursor: pointer;
-}
 
-.redes-sociales-abajo {
-    position: absolute;
-    bottom: 5mm;
-    left: 5mm;
-    right: 5mm;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 8px;
-    gap: 2mm;
-    z-index: 10; /* encima del contenido de la tarjeta */
-}
-
-.redes-sociales-abajo div {
-    display: flex;
-    align-items: center;
-    gap: 1mm;
-}
-
-.redes-sociales-abajo img {
-    height: 6mm;
-    cursor: pointer;
-}
-
-.redes-sociales-abajo span {
-    vertical-align: middle;
-    white-space: nowrap;
-}
 
 
 </style>
@@ -677,54 +636,21 @@ th {
  
     <!-- ================= PEDIDOS ================= -->
 <div id="pedidos-container">
- <!-- Grid de pedidos -->
-<div id="pedidosGrid"></div>
 
-<!-- Modal de impresión / edición -->
+    <!-- Grid responsive -->
+    <div id="pedidosGrid"></div>
+
+</div>
+
+</div>
+
 <div id="printModal" class="print-modal">
     <div class="print-contenido horizontal">
 
         <h3>🖨 Vista previa de impresión</h3>
 
         <div id="printArea" class="print-area-horizontal">
-            <!-- Aquí se cargará dinámicamente la tarjeta completa -->
-            <!-- Ejemplo dinámico: -->
-            <div class="tarjeta-impresion">
-
-                <div class="mensaje-principal" contenteditable="true">
-                    ¡Feliz día!
-                </div>
-
-                <div class="de-para">
-                    <div><strong>Para:</strong> Juan</div>
-                    <div><strong>De:</strong> María</div>
-                </div>
-
-                <!-- Logo e iconos de redes -->
-                <div class="decoracion-url">
-
-                    <div>
-                        <img id="logoEmpresa" src="" alt="Logo Empresa" style="max-height:20mm; cursor:pointer;">
-                    </div>
-
-                    <div class="redes-sociales">
-                        <div>
-                            <img class="icono-redes" id="facebook" src="icono-facebook.png" alt="Facebook" style="cursor:pointer;">
-                            <span contenteditable="true" id="usuarioFacebook">@usuarioFB</span>
-                        </div>
-                        <div>
-                            <img class="icono-redes" id="instagram" src="icono-instagram.png" alt="Instagram" style="cursor:pointer;">
-                            <span contenteditable="true" id="usuarioInstagram">@usuarioIG</span>
-                        </div>
-                        <div>
-                            <img class="icono-redes" id="whatsapp" src="icono-whatsapp.png" alt="WhatsApp" style="cursor:pointer;">
-                            <span contenteditable="true" id="usuarioWhatsApp">+57 300 000 0000</span>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
+            <!-- Tarjeta se carga aquí -->
         </div>
 
         <div class="print-botones">
@@ -1528,8 +1454,6 @@ function actualizarTotales(pos, neg) {
 }
 
 /* ===== ABRIR VISTA PREVIA ===== */
-
-
 function abrirImpresion(pedido) {
    
     const printArea = document.getElementById('printArea');
@@ -1548,7 +1472,7 @@ function abrirImpresion(pedido) {
     }
 
     // Construimos la tarjeta de impresión
-   printArea.innerHTML = `<div class="tarjeta-impresion">
+    printArea.innerHTML = `<div class="tarjeta-impresion">
     <div class="mensaje-principal">${(pedido.mensaje || '').trim()}</div>
     <div class="de-para">
         <div><strong>Para:</strong> ${(pedido.para || '').trim()}</div>
@@ -1560,25 +1484,8 @@ function abrirImpresion(pedido) {
     <div class="decoracion" style="font-size:10px; text-align:center; margin-top:1mm;">
         Visítanos en: ${(perfil.urlPagina || '').trim()}
     </div>
-    <!-- Redes sociales en la parte inferior -->
-    <div class="redes-sociales-abajo">
-        <div>
-            <img class="icono-redes" id="facebook" src="icono-facebook.png" alt="Facebook">
-            <span contenteditable="true" id="usuarioFacebook">@usuarioFB</span>
-        </div>
-        <div>
-            <img class="icono-redes" id="instagram" src="icono-instagram.png" alt="Instagram">
-            <span contenteditable="true" id="usuarioInstagram">@usuarioIG</span>
-        </div>
-        <div>
-            <img class="icono-redes" id="whatsapp" src="icono-whatsapp.png" alt="WhatsApp">
-            <span contenteditable="true" id="usuarioWhatsApp">+57 300 000 0000</span>
-        </div>
-    </div>
 </div>`;
 
-    // Cargar los valores guardados si existen
-    cargarRedes();
 
 
     modal.style.display = 'flex';
@@ -1665,9 +1572,9 @@ function ajustarTextoMensaje() {
         const mensaje = tarjeta.querySelector('.mensaje-principal');
         if (!mensaje) return;
 
-        let fontSize = 40; // tamaño inicial grande
+        let fontSize = 30; // tamaño inicial grande
         const minFont = 5; // mínimo
-        const maxFont = 40; // máximo
+        const maxFont = 45; // máximo
         const contenedorHeight = mensaje.clientHeight;
 
         mensaje.style.fontSize = fontSize + 'px';
@@ -1692,53 +1599,9 @@ function ajustarTextoMensaje() {
 }
 
 // Ejecutar al cargar la página o abrir modal
-window.addEventListener('load', ajustarTextoMensaje, cargarRedes);
+window.addEventListener('load', ajustarTextoMensaje);
 
-// Subir imagen (logo o iconos)
-function subirImagen(idImagen) {
-    const img = document.getElementById(idImagen);
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-            img.src = reader.result;
-            guardarRedes(); // guardar cambios
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
 
-// Guardar los textos e imágenes en localStorage
-function guardarRedes() {
-    const data = {
-        logoSrc: document.getElementById('logoEmpresa').src,
-        facebookSrc: document.getElementById('facebook').src,
-        instagramSrc: document.getElementById('instagram').src,
-        whatsappSrc: document.getElementById('whatsapp').src,
-        usuarioFacebook: document.getElementById('usuarioFacebook').innerText.trim(),
-        usuarioInstagram: document.getElementById('usuarioInstagram').innerText.trim(),
-        usuarioWhatsApp: document.getElementById('usuarioWhatsApp').innerText.trim()
-    };
-    localStorage.setItem('tarjetaRedes', JSON.stringify(data));
-}
-
-// Cargar datos guardados
-function cargarRedes() {
-    const data = JSON.parse(localStorage.getItem('tarjetaRedes'));
-    if (!data) return;
-    document.getElementById('logoEmpresa').src = data.logoSrc;
-    document.getElementById('facebook').src = data.facebookSrc;
-    document.getElementById('instagram').src = data.instagramSrc;
-    document.getElementById('whatsapp').src = data.whatsappSrc;
-    document.getElementById('usuarioFacebook').innerText = data.usuarioFacebook;
-    document.getElementById('usuarioInstagram').innerText = data.usuarioInstagram;
-    document.getElementById('usuarioWhatsApp').innerText = data.usuarioWhatsApp;
-}
 
 </script>
 <iframe id="printFrame" style="display:none;"></iframe>
