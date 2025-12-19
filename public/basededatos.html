@@ -646,32 +646,35 @@ th {
 ========================= */
 .pedido-card {
     position: relative;
+    overflow: hidden; /* clave para la cinta */
 }
 
+/* CINTA PROMO */
 .etiqueta-ruta {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    background: #27ae60;
-    color: white;
-    font-size: 11px;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-weight: bold;
+    top: 12px;
+    right: -42px;
+    transform: rotate(45deg);
+
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: #fff;
+
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+
+    padding: 6px 50px;
+    box-shadow: 0 3px 8px rgba(0,0,0,.35);
+
     display: none;
-    z-index: 5;
+    z-index: 10;
 }
 
+/* Mostrar solo cuando está en ruta */
 .pedido-card.en-ruta .etiqueta-ruta {
     display: block;
 }
-
-.switch-ruta {
-    margin-top: 6px;
-    font-size: 13px;
-    cursor: pointer;
-}
-
 
 
 </style>
