@@ -1578,6 +1578,11 @@ function ajustarTextoMensaje() {
         const contenedorHeight = mensaje.clientHeight;
 
         mensaje.style.fontSize = fontSize + 'px';
+        mensaje.style.overflow = 'hidden'; // ocultar lo que sobra
+        mensaje.style.display = '-webkit-box';
+        mensaje.style.webkitBoxOrient = 'vertical';
+        mensaje.style.webkitLineClamp = '100'; // se puede ajustar
+        mensaje.style.wordBreak = 'break-word';
 
         // Reducir hasta que el texto quepa
         while (mensaje.scrollHeight > contenedorHeight && fontSize > minFont) {
@@ -1597,6 +1602,7 @@ function ajustarTextoMensaje() {
         }
     });
 }
+
 
 // Ejecutar al cargar la página o abrir modal
 window.addEventListener('load', ajustarTextoMensaje);
