@@ -651,42 +651,48 @@ th {
 </head>
 <body>
 
+<!-- ================= SIDEBAR ================= -->
 <div id="sidebar">
-       <button id="btnCerrarSesion" style="margin-bottom:5px; padding:8px 10px; font-size:16px;">🚪 Cerrar Sesión</button>
+
+    <button id="btnCerrarSesion" style="margin-bottom:5px; padding:8px 10px; font-size:16px;">
+        🚪 Cerrar Sesión
+    </button>
+
     <h3 id="sidebarTitulo">📂 Contabilidad</h3>
-   <div id="resumenTotales" class="resumen-oculto">
-    <div class="total positivo">
-        <span class="label">Ingresos</span>
-        <span id="totalPositivo">$0</span>
+
+    <div id="resumenTotales" class="resumen-oculto">
+        <div class="total positivo">
+            <span class="label">Ingresos</span>
+            <span id="totalPositivo">$0</span>
+        </div>
+
+        <div class="total negativo">
+            <span class="label">Gastos</span>
+            <span id="totalNegativo">$0</span>
+        </div>
+
+        <div class="total diferencia">
+            <span class="label">Balance</span>
+            <span id="totalDiferencia">$0</span>
+        </div>
     </div>
 
-    <div class="total negativo">
-        <span class="label">Gastos</span>
-        <span id="totalNegativo">$0</span>
+    <div class="acciones">
+        <button id="btnVolver" style="display:none;">⬅️ Volver</button>
+        <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
     </div>
-
-    <div class="total diferencia">
-        <span class="label">Balance</span>
-        <span id="totalDiferencia">$0</span>
-    </div>
-</div>
-
-<div class="acciones">
-    <button id="btnVolver" style="display:none;">⬅️ Volver</button>
-    <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
-</div>
-
-
-    <button id="btnVolver" style="display:none;">⬅️ Volver</button>
-    <button id="btnAgregarDato" style="display:none;">➕ Nuevo Producto</button>
 
     <div id="formNuevoDato">
         <input type="number" id="inputValor" placeholder="💰 Precio">
         <input type="text" id="inputNombre" placeholder="📝 Nombre">
+
         <div id="opcionesExtra">
-            <label><input type="checkbox" id="inputNegativo"> Negativo</label>
+            <label>
+                <input type="checkbox" id="inputNegativo"> Negativo
+            </label>
             <textarea id="inputNota" placeholder="🗒️ Nota o descripción"></textarea>
         </div>
+
         <div class="botones">
             <button id="btnGuardarDato" class="guardar">Guardar</button>
             <button id="btnCancelarDato" class="cancelar">Cancelar</button>
@@ -695,15 +701,17 @@ th {
     </div>
 
     <ul id="sidebarList"></ul>
+
 </div>
 
-<div id="main">
- 
-   <!-- ================= PEDIDOS ================= -->
-<div id="pedidos-container">
 
-    <!-- Grid responsive -->
-    <div id="pedidosGrid"></div>
+<!-- ================= MAIN ================= -->
+<div id="main">
+
+    <!-- ================= PEDIDOS ================= -->
+    <div id="pedidos-container">
+        <div id="pedidosGrid"></div>
+    </div>
 
 </div>
 
@@ -714,7 +722,6 @@ th {
 
         <h3>🖨 Vista previa de impresión</h3>
 
-        <!-- OPCIONES DE IMPRESIÓN -->
         <div class="opciones-impresion">
             <label>
                 <input type="checkbox" id="chkPara" checked>
@@ -729,17 +736,13 @@ th {
             <p class="nota-impresion">
                 ⚠️ <strong>Importante:</strong><br>
                 Configura tu impresora en tamaño  
-                <strong>4 × 6 pulgadas (10.16 × 15.24 cm)</strong>  
+                <strong>4 × 6 pulgadas (10.16 × 15.24 cm)</strong><br>
                 y desactiva cualquier opción de ajuste automático o escalado.
             </p>
         </div>
 
-        <!-- ÁREA DE IMPRESIÓN -->
-        <div id="printArea" class="print-area-horizontal">
-            <!-- Tarjeta se carga aquí -->
-        </div>
+        <div id="printArea" class="print-area-horizontal"></div>
 
-        <!-- BOTONES -->
         <div class="print-botones">
             <button onclick="imprimirTarjeta()">🖨 Imprimir</button>
             <button onclick="cerrarPrint()">❌ Cancelar</button>
@@ -747,7 +750,7 @@ th {
 
     </div>
 </div>
-</div>
+
 
 <script>
 const firebaseConfig = {
