@@ -646,11 +646,10 @@ th {
 ========================= */
 .pedido-card {
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .etiqueta-ruta {
-margin-left: auto;
     position: absolute;
     top: 12px;
     right: -42px;
@@ -666,21 +665,20 @@ margin-left: auto;
 
     padding: 8px 50px;
 
-    display: flex;
-    align-items: center;      /* centra vertical */
-    justify-content: center;  /* centra horizontal */
+    display: none;
+    align-items: center;
+    justify-content: center;
     text-align: center;
 
-    line-height: 1;           /* evita desalineación */
+    white-space: nowrap;
     box-shadow: 0 3px 8px rgba(0,0,0,.35);
-
-    display: none;
     z-index: 10;
 }
 
 .pedido-card.en-ruta .etiqueta-ruta {
     display: flex;
 }
+
 .switch-ruta {
     display: inline-flex;
     align-items: center;
@@ -1308,7 +1306,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     <button class="btn-editar-mensaje">✏️</button><button class="btn-imprimir">🖨 Imprimir</button>
 <label class="switch-ruta">
     <input type="checkbox" class="chkRuta">
-    🛵En Ruta
+    🚘En Ruta
 </label>
    <div class="etiqueta-ruta">EN RUTA</div>
 </div>
