@@ -1587,9 +1587,6 @@ function abrirImpresion(pedido) {
     el.addEventListener('blur', guardarRedes);
 });
 
-    // Ajustar tamaño del texto según contenido
-    ajustarTextoMensaje();
-
     // Cargar los valores guardados si existen
     cargarRedes();
 
@@ -1705,7 +1702,7 @@ function ajustarTextoMensaje() {
 }
 
 // Ejecutar al cargar la página o abrir modal
-window.addEventListener('load', ajustarTextoMensaje);
+window.addEventListener('load', ajustarTextoMensaje, cargarRedes);
 
 // Subir imagen (logo o iconos)
 function subirImagen(idImagen) {
@@ -1752,10 +1749,6 @@ function cargarRedes() {
     document.getElementById('usuarioInstagram').innerText = data.usuarioInstagram;
     document.getElementById('usuarioWhatsApp').innerText = data.usuarioWhatsApp;
 }
-
-// Inicializar al cargar la página
-window.addEventListener('load', cargarRedes);
-
 
 </script>
 <iframe id="printFrame" style="display:none;"></iframe>
