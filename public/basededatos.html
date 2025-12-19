@@ -646,10 +646,9 @@ th {
 ========================= */
 .pedido-card {
     position: relative;
-    overflow: hidden; /* clave para la cinta */
+    overflow: hidden;
 }
 
-/* CINTA PROMO */
 .etiqueta-ruta {
     position: absolute;
     top: 12px;
@@ -664,18 +663,49 @@ th {
     letter-spacing: 1px;
     text-transform: uppercase;
 
-    padding: 6px 50px;
+    padding: 8px 50px;
+
+    display: flex;
+    align-items: center;      /* centra vertical */
+    justify-content: center;  /* centra horizontal */
+    text-align: center;
+
+    line-height: 1;           /* evita desalineación */
     box-shadow: 0 3px 8px rgba(0,0,0,.35);
 
     display: none;
     z-index: 10;
 }
 
-/* Mostrar solo cuando está en ruta */
 .pedido-card.en-ruta .etiqueta-ruta {
-    display: block;
+    display: flex;
+}
+.acciones-linea {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
+.mensaje-texto {
+    flex: 1;
+    min-width: 0;
+}
+
+.acciones-derecha {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.switch-ruta {
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.switch-ruta input {
+    margin-right: 3px;
+}
 
 </style>
 </head>
@@ -1290,11 +1320,25 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         <div class="pedido-bottom">
              <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
 
-          <div class="linea mensaje-linea">
+        <div class="linea mensaje-linea acciones-linea">
+
     <strong>📝:</strong>
     <span class="mensaje-texto">${p.mensaje || ''}</span>
-    <button class="btn-editar-mensaje">✏️</button><button class="btn-imprimir">🖨 Imprimir</button>
+
+    <div class="acciones-derecha">
+        <button class="btn-editar-mensaje">✏️</button>
+        <button class="btn-imprimir">🖨 Imprimir</button>
+
+        <label class="switch-ruta">
+            <input type="checkbox" class="chkRuta">
+            <span>🛵 En ruta</span>
+        </label>
+    </div>
+
 </div>
+
+<!-- La etiqueta sigue aparte, pegada a la esquina -->
+<div class="etiqueta-ruta">EN RUTA</div>
 
 
             <div class="linea">
@@ -1310,13 +1354,6 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             <div class="linea">
                 🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
             </div>
-            <div class="etiqueta-ruta">EN RUTA</div>
-
-<label class="switch-ruta">
-    <input type="checkbox" class="chkRuta">
-    🛵 En ruta
-</label>
-
 
         </div>
         
