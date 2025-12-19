@@ -1658,9 +1658,10 @@ function cargarLogo() {
     document.querySelector('.logo-empresa .placeholder').style.display = 'none';
 }
 
-// Función para subir logo
-function subirLogo() {
-    const img = document.getElementById('logoEmpresa');
+// Función para subir imágenes (logo)
+function subirImagen(idImagen) {
+    const img = document.getElementById(idImagen);
+    if (!img) return;
 
     const input = document.createElement('input');
     input.type = 'file';
@@ -1673,8 +1674,7 @@ function subirLogo() {
         const reader = new FileReader();
         reader.onload = () => {
             img.src = reader.result;
-            document.querySelector('.logo-empresa .placeholder').style.display = 'none';
-            guardarLogo();
+            guardarLogo(); // ✅ AHORA SÍ GUARDA
         };
         reader.readAsDataURL(file);
     };
