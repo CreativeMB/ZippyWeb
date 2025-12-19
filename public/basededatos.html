@@ -236,11 +236,28 @@ th {
 /* TARJETAS */
 .pedido-card {
     border-radius: 14px;
-    padding: 10px;  /* espacio interno reducido a 2px */
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 2px;      /* espacio entre elementos internos */
+    gap: 2px;
+    
+    width: 100%;         /* ocupar todo el ancho de la columna del grid */
+    min-height: 220px;   /* altura mínima uniforme para todas */
+    box-sizing: border-box; /* incluir padding en el tamaño total */
 }
+/* IMAGE */
+.pedido-img {
+    width: 100%;        /* ocupa el ancho de la tarjeta */
+    max-width: 110px;   /* límite máximo para mantener proporción */
+    height: auto;       /* mantiene proporción real */
+    flex-shrink: 1;     /* permite que la imagen se reduzca si hace falta */
+}
+
+.mensaje, .linea, .sub-linea {
+    word-break: break-word;     /* evita que textos largos rompan el layout */
+    overflow-wrap: break-word;  /* soporta quiebre de palabras */
+}
+
 
 /* PARTE SUPERIOR */
 .pedido-top {
@@ -249,15 +266,6 @@ th {
     align-items: flex-start;
 }
 
-/* IMAGE */
-.pedido-img {
-    width: 110px;
-    height: 160px;
-    object-fit: contain;
-    background: #fff;
-    border-radius: 10px;
-    flex-shrink: 0;
-}
 
 /* PARTE INFERIOR */
 .pedido-bottom {
