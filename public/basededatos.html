@@ -543,23 +543,24 @@ th {
         border: 1px solid #008558;
     }
 }
-
-/* Contenedor de logo a la izquierda */
+/* =========================
+   Contenedor de logo a la izquierda
+========================= */
 .logo-empresa {
-    width: 30mm;               /* ancho del logo */
+    width: 30mm;
     height: 100%;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f0f0f0; /* color de placeholder */
+    background-color: #f0f0f0;
     cursor: pointer;
 }
 
-.logo-empresa .publicidad {
+.logo-empresa img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     position: absolute;
     top: 0;
     left: 0;
@@ -572,6 +573,7 @@ th {
     color: #888;
     text-align: center;
     padding: 2px;
+    pointer-events: none; /* deja pasar el click */
 }
 
 
@@ -1511,9 +1513,11 @@ function abrirImpresion(pedido) {
     // Construimos la tarjeta de impresión
     printArea.innerHTML = `<div class="tarjeta-impresion">
         
-   <div>
-            <img id="logoEmpresa" src="" alt="Logo Empresa" style="max-height:20mm; cursor:pointer;">
-        </div>
+   <div class="logo-empresa" id="logoEmpresaContainer">
+    <img id="logoEmpresa" src="" alt="Logo Empresa" style="max-height:20mm;">
+    <div class="placeholder">Click para subir logo</div>
+</div>
+
 
     <div class="mensaje-principal">${(pedido.mensaje || '').trim()}</div>
     <div class="de-para">
@@ -1529,7 +1533,10 @@ function abrirImpresion(pedido) {
 </div>`;
 
 // Asociar evento al logo
-document.getElementById('logoEmpresa').addEventListener('click', () => subirImagen('logoEmpresa'));
+document.getElementById('logoEmpresa').addEventListener('click', () => {
+    subirImagen('logoEmpresa');
+});
+
 
 
     modal.style.display = 'flex';
@@ -1636,39 +1643,52 @@ window.addEventListener('load', ajustarTextoMensaje);
 
 // Guardar logo en localStorage
 function guardarLogo() {
-    const logoSrc = document.getElementById('logoEmpresa').src;
-    localStorage.setItem('logoGuardado', logoSrc);
+    const logo = document.getElementById('logoEmpresa');
+    if (logo.src) {
+        localStorage.setItem('logoGuardado', logo.src);
+    }
 }
 
 // Cargar logo desde localStorage
 function cargarLogo() {
     const logoSrc = localStorage.getItem('logoGuardado');
     if (!logoSrc) return;
-    document.getElementById('logoEmpresa').src = logoSrc;
+
+    const logo = document.getElementById('logoEmpresa');
+    logo.src = logoSrc;
+    document.querySelector('.logo-empresa .placeholder').style.display = 'none';
 }
 
-// Inicializar al cargar página
-window.addEventListener('load', cargarLogo);
+// Función para subir logo
+function subirLogo() {
+    const img = document.getElementById('logoEmpresa');
 
-
-// Función para subir imágenes (logo o iconos)
-function subirImagen(idImagen) {
-    const img = document.getElementById(idImagen);
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
+
     input.onchange = e => {
         const file = e.target.files[0];
         if (!file) return;
+
         const reader = new FileReader();
         reader.onload = () => {
             img.src = reader.result;
-            guardarRedes(); // guardar cambios
+            document.querySelector('.logo-empresa .placeholder').style.display = 'none';
+            guardarLogo();
         };
         reader.readAsDataURL(file);
     };
+
     input.click();
 }
+
+// Click sobre el contenedor
+document.getElementById('logoEmpresaContainer')
+    .addEventListener('click', subirLogo);
+
+// Cargar al iniciar
+window.addEventListener('load', cargarLogo);
 
 </script>
 <iframe id="printFrame" style="display:none;"></iframe>
