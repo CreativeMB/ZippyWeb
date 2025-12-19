@@ -166,7 +166,8 @@ th {
     gap: 10px;
     font-size: 16px;
     margin-bottom: 10px;
-    color: #fff; 
+    color: #fff; /* Asegura visibilidad del texto */
+}
 
 #opcionesExtra input[type="checkbox"] {
     transform: scale(1.3);
@@ -227,8 +228,8 @@ th {
 /* CONTENEDOR GRID */
 #pedidosGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-    gap: 10px;          
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* más flexible para pantallas medianas */
+    gap: 10px;          /* separación visible entre tarjetas */
     padding: 1px 0;
     width: 100%;
     max-width: 100%;
@@ -237,10 +238,10 @@ th {
 /* TARJETAS */
 .pedido-card {
     border-radius: 14px;
-    padding: 10px;  
+    padding: 10px;  /* espacio interno reducido a 2px */
     display: flex;
     flex-direction: column;
-    gap: 2px;     
+    gap: 2px;      /* espacio entre elementos internos */
 }
 
 /* PARTE SUPERIOR */
@@ -265,7 +266,7 @@ th {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    margin-top: 2px; 
+    margin-top: 2px; /* margen entre top y bottom */
 }
 
 /* TEXTO COMPACTO */
