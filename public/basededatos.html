@@ -225,12 +225,15 @@ th {
     }
     #suggestions div:hover { background: #eee; cursor: pointer; }
     /* ================= CONTENEDOR GRID ================= */
-/* CONTENEDOR GRID */
+/* GRID */
 #pedidosGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1px;
-    padding: 1px 0; /* margen arriba y abajo del grid */
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* más flexible para pantallas medianas */
+    gap: 10px;          /* separación visible entre tarjetas */
+    padding: 1px 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* TARJETAS */
@@ -241,31 +244,32 @@ th {
     flex-direction: column;
     gap: 2px;
     
-    width: 100%;         /* ocupar todo el ancho de la columna del grid */
-    min-height: 220px;   /* altura mínima uniforme para todas */
-    box-sizing: border-box; /* incluir padding en el tamaño total */
+    width: 100%;         /* ocupar todo el ancho de la columna */
+    min-height: 220px;   /* altura mínima uniforme */
+    box-sizing: border-box;
+    flex: 1 1 auto;      /* permite crecer igual en altura si es necesario */
 }
-/* IMAGE */
+
+/* IMAGEN */
 .pedido-img {
-    width: 100%;        /* ocupa el ancho de la tarjeta */
-    max-width: 110px;   /* límite máximo para mantener proporción */
+    width: 100%;        /* ocupar todo el ancho de la tarjeta */
+    max-width: 100%;    /* elimina límite de 110px */
     height: auto;       /* mantiene proporción real */
-    flex-shrink: 1;     /* permite que la imagen se reduzca si hace falta */
+    flex-shrink: 1;     /* permite reducir si hay poco espacio */
 }
 
+/* TEXTOS */
 .mensaje, .linea, .sub-linea {
-    word-break: break-word;     /* evita que textos largos rompan el layout */
-    overflow-wrap: break-word;  /* soporta quiebre de palabras */
+    word-break: break-word;     
+    overflow-wrap: break-word;  
 }
 
-
-/* PARTE SUPERIOR */
-.pedido-top {
+/* PARTE SUPERIOR E INFERIOR */
+.pedido-top, .pedido-bottom {
     display: flex;
     gap: 2px;
-    align-items: flex-start;
+    flex-wrap: wrap;       /* evitar que el contenido estreche la tarjeta */
 }
-
 
 /* PARTE INFERIOR */
 .pedido-bottom {
