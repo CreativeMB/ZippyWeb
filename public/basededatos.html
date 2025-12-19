@@ -227,9 +227,11 @@ th {
 /* CONTENEDOR GRID */
 #pedidosGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* reducir min-width */
     gap: 1px;
-    padding: 1px 0; /* margen arriba y abajo del grid */
+    padding: 1px 0; 
+    width: 100%;      /* asegurar que el grid use todo el ancho disponible */
+    max-width: 100%;  /* evitar restricción por contenedor padre */
 }
 
 /* TARJETAS */
