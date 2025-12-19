@@ -650,37 +650,35 @@ th {
 }
 
 .etiqueta-ruta {
-margin-left: auto;
     position: absolute;
-    top: 12px;
-    right: -42px;
+    top: -6px;
+    right: -52px;
     transform: rotate(45deg);
+
+    width: 140px;              /* 👈 cubre hasta la esquina */
+    height: 48px;              /* alto suficiente para 2 líneas */
 
     background: linear-gradient(135deg, #27ae60, #2ecc71);
     color: #fff;
 
     font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 0px;
+    font-weight: 900;
     text-transform: uppercase;
 
-    padding: 8px 50px;
-
-    display: flex;
-    align-items: center;      /* centra vertical */
-    justify-content: center;  /* centra horizontal */
-    text-align: center;
-
-    line-height: 1;           /* evita desalineación */
-    box-shadow: 0 3px 8px rgba(0,0,0,.35);
-
     display: none;
+    flex-direction: column;    /* 👈 texto en 2 líneas */
+    align-items: center;
+    justify-content: center;
+
+    line-height: 1.1;
+    box-shadow: 0 3px 8px rgba(0,0,0,.35);
     z-index: 10;
 }
 
 .pedido-card.en-ruta .etiqueta-ruta {
     display: flex;
 }
+
 .switch-ruta {
     display: inline-flex;
     align-items: center;
@@ -1310,7 +1308,10 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     <input type="checkbox" class="chkRuta">
     🚘En Ruta
 </label>
-   <div class="etiqueta-ruta">EN RUTA</div>
+  <div class="etiqueta-ruta">
+    <span>EN</span>
+    <span>RUTA</span>
+</div>
 </div>
             <div class="linea">
                 👉 De: ${p.de || ''} 👉 Para: ${p.para || ''}
