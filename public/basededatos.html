@@ -650,6 +650,7 @@ th {
 }
 
 .etiqueta-ruta {
+margin-left: auto;
     position: absolute;
     top: 12px;
     right: -42px;
@@ -1307,9 +1308,9 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     <button class="btn-editar-mensaje">✏️</button><button class="btn-imprimir">🖨 Imprimir</button>
 <label class="switch-ruta">
     <input type="checkbox" class="chkRuta">
-    🛵
+    🛵En Ruta
 </label>
-   <div class="etiqueta-ruta"> EN RUTA</div>
+   <div class="etiqueta-ruta">EN RUTA</div>
 </div>
             <div class="linea">
                 👉 De: ${p.de || ''} 👉 Para: ${p.para || ''}
