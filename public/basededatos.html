@@ -680,31 +680,12 @@ th {
 .pedido-card.en-ruta .etiqueta-ruta {
     display: flex;
 }
-.acciones-linea {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.mensaje-texto {
-    flex: 1;
-    min-width: 0;
-}
-
-.acciones-derecha {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
 .switch-ruta {
-    font-size: 12px;
-    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
     cursor: pointer;
-}
-
-.switch-ruta input {
-    margin-right: 3px;
+    font-size: 14px;
 }
 
 </style>
@@ -1320,27 +1301,17 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         <div class="pedido-bottom">
              <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
 
-        <div class="linea mensaje-linea acciones-linea">
-
+          <div class="linea mensaje-linea">
     <strong>📝:</strong>
     <span class="mensaje-texto">${p.mensaje || ''}</span>
-
-    <div class="acciones-derecha">
-        <button class="btn-editar-mensaje">✏️</button>
-        <button class="btn-imprimir">🖨 Imprimir</button>
-
-        <label class="switch-ruta">
-            <input type="checkbox" class="chkRuta">
-            <span>🛵 En ruta</span>
-        </label>
-    </div>
-
+    <button class="btn-editar-mensaje">✏️</button><button class="btn-imprimir">🖨 Imprimir</button>
 </div>
 
-<!-- La etiqueta sigue aparte, pegada a la esquina -->
+<label class="switch-ruta">
+    <input type="checkbox" class="chkRuta">
+    🛵
+</label>
 <div class="etiqueta-ruta">EN RUTA</div>
-
-
             <div class="linea">
                 👉 De: ${p.de || ''} 👉 Para: ${p.para || ''}
             </div>
@@ -1354,6 +1325,8 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             <div class="linea">
                 🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
             </div>
+        
+
 
         </div>
         
