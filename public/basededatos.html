@@ -544,9 +544,9 @@ th {
     }
 }
 
-/* Contenedor de publicidad flotante a la izquierda */
-.publicidad-container {
-    width: 30mm;               /* ancho de publicidad */
+/* Contenedor de logo a la izquierda */
+.logo-empresa {
+    width: 30mm;               /* ancho del logo */
     height: 100%;
     position: relative;
     display: flex;
@@ -556,7 +556,7 @@ th {
     cursor: pointer;
 }
 
-.publicidad-container .publicidad {
+.logo-empresa .publicidad {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -565,7 +565,7 @@ th {
     left: 0;
 }
 
-.publicidad-container .placeholder {
+.logo-empresa .placeholder {
     position: relative;
     z-index: 1;
     font-size: 10px;
@@ -573,6 +573,7 @@ th {
     text-align: center;
     padding: 2px;
 }
+
 
 /* Contenido de la tarjeta */
 .contenido-tarjeta, .mensaje-principal, .de-para {
@@ -687,7 +688,12 @@ th {
         <div id="printArea" class="print-area-horizontal">
             <!-- Tarjeta se carga aquí -->
         </div>
-
+   <!-- Logo de la empresa -->
+    <div>
+        <img id="logoEmpresa" src="" alt="Logo Empresa" style="max-height:20mm; cursor:pointer;">
+    </div>
+    
+    </div>
         <div class="print-botones">
             <button onclick="imprimirTarjeta()">🖨 Imprimir</button>
             <button onclick="cerrarPrint()">❌ Cancelar</button>
@@ -1509,11 +1515,9 @@ function abrirImpresion(pedido) {
     // Construimos la tarjeta de impresión
     printArea.innerHTML = `<div class="tarjeta-impresion">
         
-    <!-- Contenedor de publicidad, clickeable para subir imagen -->
-    <div class="publicidad-container" onclick="document.getElementById('pubInput').click()">
-        <img class="publicidad" src="" alt="Publicidad">
-        <span class="placeholder">Haz clic para cargar publicidad</span>
-    </div>
+   <div>
+            <img id="logoEmpresa" src="" alt="Logo Empresa" style="max-height:20mm; cursor:pointer;">
+        </div>
 
     <div class="mensaje-principal">${(pedido.mensaje || '').trim()}</div>
     <div class="de-para">
@@ -1528,9 +1532,12 @@ function abrirImpresion(pedido) {
     
 </div>`;
 
+// Asociar evento al logo
+document.getElementById('logoEmpresa').addEventListener('click', () => subirImagen('logoEmpresa'));
 
 
     modal.style.display = 'flex';
+    cargarLogo()
      ajustarTextoMensaje();
 }
 
@@ -1631,51 +1638,41 @@ function ajustarTextoMensaje() {
 // Ejecutar al cargar la página o abrir modal
 window.addEventListener('load', ajustarTextoMensaje);
 
-// Guardar cookie
-function setCookie(name, value, days) {
-    const d = new Date();
-    d.setTime(d.getTime() + (days*24*60*60*1000));
-    document.cookie = `${name}=${encodeURIComponent(value)};path=/;expires=${d.toUTCString()}`;
+// Guardar logo en localStorage
+function guardarLogo() {
+    const logoSrc = document.getElementById('logoEmpresa').src;
+    localStorage.setItem('logoGuardado', logoSrc);
 }
 
-// Leer cookie
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
-    return null;
+// Cargar logo desde localStorage
+function cargarLogo() {
+    const logoSrc = localStorage.getItem('logoGuardado');
+    if (!logoSrc) return;
+    document.getElementById('logoEmpresa').src = logoSrc;
 }
 
-// Cargar publicidad en todas las tarjetas
-function cargarPublicidad() {
-    const url = getCookie('publicidad');
-    if (!url) return;
+// Inicializar al cargar página
+window.addEventListener('load', cargarLogo);
 
-    document.querySelectorAll('.tarjeta-impresion .publicidad').forEach(img => {
-        img.src = url;
-        const placeholder = img.parentElement.querySelector('.placeholder');
-        if (placeholder) placeholder.style.display = 'none';
-    });
-}
 
-// Subir publicidad desde la tarjeta
-function subirPublicidad(fileInput) {
-    const file = fileInput.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const url = e.target.result;
-        setCookie('publicidad', url, 365); // guardar 1 año
-        cargarPublicidad();
+// Función para subir imágenes (logo o iconos)
+function subirImagen(idImagen) {
+    const img = document.getElementById(idImagen);
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            img.src = reader.result;
+            guardarRedes(); // guardar cambios
+        };
+        reader.readAsDataURL(file);
     };
-    reader.readAsDataURL(file);
+    input.click();
 }
-
-// Ejecutar al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    cargarPublicidad();
-});
 
 </script>
 <iframe id="printFrame" style="display:none;"></iframe>
