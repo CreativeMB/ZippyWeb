@@ -544,22 +544,44 @@ th {
     }
 }
 
-/* Imagen de publicidad como fondo flotante */
-.tarjeta-impresion .publicidad {
+/* Contenedor de publicidad flotante a la izquierda */
+.publicidad-container {
+    width: 30mm;               /* ancho de publicidad */
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0; /* color de placeholder */
+    cursor: pointer;
+}
+
+.publicidad-container .publicidad {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     position: absolute;
     top: 0;
     left: 0;
-    width: 30mm;       /* ancho de la publicidad */
-    height: 100%;      /* ocupa toda la altura de la tarjeta */
-    object-fit: cover; /* ajusta la imagen sin deformarla */
-    z-index: 0;        /* queda detrás del contenido */
-    pointer-events: none; /* no interfiere con clicks en el contenido */
 }
 
-/* Todo el contenido de la tarjeta */
-.tarjeta-impresion > *:not(.publicidad) {
+.publicidad-container .placeholder {
     position: relative;
-    z-index: 1;       /* contenido encima de la publicidad */
+    z-index: 1;
+    font-size: 10px;
+    color: #888;
+    text-align: center;
+    padding: 2px;
+}
+
+/* Contenido de la tarjeta */
+.contenido-tarjeta, .mensaje-principal, .de-para {
+    flex: 1;
+    padding: 2mm;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
 }
 /* =========================
    IMPRESIÓN REAL 4x6
@@ -1487,8 +1509,11 @@ function abrirImpresion(pedido) {
     // Construimos la tarjeta de impresión
     printArea.innerHTML = `<div class="tarjeta-impresion">
         
-    <!-- Imagen de publicidad flotante -->
-    <img class="publicidad" id="publicidadPreview" src="" alt="Publicidad">
+    <!-- Contenedor de publicidad, clickeable para subir imagen -->
+    <div class="publicidad-container" onclick="document.getElementById('pubInput').click()">
+        <img class="publicidad" src="" alt="Publicidad">
+        <span class="placeholder">Haz clic para cargar publicidad</span>
+    </div>
 
     <div class="mensaje-principal">${(pedido.mensaje || '').trim()}</div>
     <div class="de-para">
@@ -1626,13 +1651,14 @@ function cargarPublicidad() {
     const url = getCookie('publicidad');
     if (!url) return;
 
-    document.querySelectorAll('.tarjeta-impresion').forEach(tarjeta => {
-        let img = tarjeta.querySelector('.publicidad');
-        if (img) img.src = url;
+    document.querySelectorAll('.tarjeta-impresion .publicidad').forEach(img => {
+        img.src = url;
+        const placeholder = img.parentElement.querySelector('.placeholder');
+        if (placeholder) placeholder.style.display = 'none';
     });
 }
 
-// Subir nueva publicidad
+// Subir publicidad desde la tarjeta
 function subirPublicidad(fileInput) {
     const file = fileInput.files[0];
     if (!file) return;
@@ -1650,9 +1676,6 @@ function subirPublicidad(fileInput) {
 document.addEventListener('DOMContentLoaded', () => {
     cargarPublicidad();
 });
-
-
-
 
 </script>
 <iframe id="printFrame" style="display:none;"></iframe>
