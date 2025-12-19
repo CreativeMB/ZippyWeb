@@ -1566,13 +1566,7 @@ function abrirImpresion(pedido) {
     </div>
 
     <!-- Decoración inferior: datos de la empresa -->
-    <div class="decoracion">
-        ${(perfil.nombreEmpresa || '').trim()} · WhatsApp: ${(perfil.WhatsApp || '').trim()} · ${(perfil.direccion || '').trim()} · ${(perfil.ciudad || '').trim()}
-    </div>
-
-    <div class="decoracion">
-        Visítanos en: ${(perfil.urlPagina || '').trim()}
-    </div>
+    <div class="decoracion" style="font-size:10px; text-align:center; margin-top:2mm;"> ${(perfil.nombreEmpresa || '').trim()} · WhatsApp: ${(perfil.WhatsApp || '').trim()} · ${(perfil.direccion || '').trim()} · ${(perfil.ciudad || '').trim()} </div> <div class="decoracion" style="font-size:10px; text-align:center; margin-top:1mm;"> Visítanos en: ${(perfil.urlPagina || '').trim()} </div>
 
     <!-- Redes sociales en la parte inferior -->
     <div class="redes-sociales-abajo">
@@ -1597,6 +1591,11 @@ function abrirImpresion(pedido) {
     ['logoEmpresa','facebook','instagram','whatsapp'].forEach(id => {
         document.getElementById(id).addEventListener('click', () => subirImagen(id));
     });
+// Guardar cuando se pierde foco (blur) del contenteditable
+['usuarioFacebook', 'usuarioInstagram', 'usuarioWhatsApp'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('blur', guardarRedes);
+});
 
     // Ajustar tamaño del texto según contenido
     ajustarTextoMensaje();
