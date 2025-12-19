@@ -590,6 +590,12 @@ th {
    IMPRESIÓN REAL 4x6
 ========================= */
 @media print {
+    .opciones-impresion,
+    .print-botones,
+    h3 {
+        display: none !important;
+    }
+}
     body * {
         visibility: hidden; /* oculta todo */
     }
@@ -617,7 +623,28 @@ th {
         height: 101.6mm;
     }
 }
+/* =========================
+   IMPRESIÓN opciones 4x6
+========================= */
+.opciones-impresion {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    font-size: 14px;
+}
 
+.opciones-impresion label {
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.nota-impresion {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #444;
+    line-height: 1.4;
+}
 
 
 </style>
@@ -687,16 +714,40 @@ th {
 
         <h3>🖨 Vista previa de impresión</h3>
 
+        <!-- OPCIONES DE IMPRESIÓN -->
+        <div class="opciones-impresion">
+            <label>
+                <input type="checkbox" id="chkPara" checked>
+                Mostrar Para
+            </label>
+
+            <label>
+                <input type="checkbox" id="chkDe" checked>
+                Mostrar De
+            </label>
+
+            <p class="nota-impresion">
+                ⚠️ <strong>Importante:</strong>  
+                Antes de imprimir, configura tu impresora en tamaño de papel  
+                <strong>4 × 6 pulgadas (10.16 × 15.24 cm)</strong>  
+                y desactiva cualquier opción de ajuste automático o escalado.
+            </p>
+        </div>
+
+        <!-- ÁREA DE IMPRESIÓN -->
         <div id="printArea" class="print-area-horizontal">
             <!-- Tarjeta se carga aquí -->
         </div>
 
+        <!-- BOTONES -->
         <div class="print-botones">
             <button onclick="imprimirTarjeta()">🖨 Imprimir</button>
             <button onclick="cerrarPrint()">❌ Cancelar</button>
         </div>
 
     </div>
+</div>
+
 </div>
 
 
@@ -1523,6 +1574,14 @@ function abrirImpresion(pedido) {
         <div><strong>Para:</strong> ${(pedido.para || '').trim()}</div>
         <div><strong>De:</strong> ${(pedido.de || '').trim()}</div>
     </div>
+    <div id="lineaPara">
+    <strong>Para:</strong> <span id="txtPara"></span>
+</div>
+
+<div id="lineaDe">
+    <strong>De:</strong> <span id="txtDe"></span>
+</div>
+
     <div class="decoracion" style="font-size:10px; text-align:center; margin-top:2mm;">
         ${(perfil.nombreEmpresa || '').trim()} · WhatsApp: ${(perfil.WhatsApp || '').trim()} · ${(perfil.direccion || '').trim()} · ${(perfil.ciudad || '').trim()}
     </div>
@@ -1530,6 +1589,8 @@ function abrirImpresion(pedido) {
         Visítanos en: ${(perfil.urlPagina || '').trim()}
     
 </div>`;
+document.getElementById('chkPara').addEventListener('change', () => cargarTarjeta(pedidoActual));
+document.getElementById('chkDe').addEventListener('change', () => cargarTarjeta(pedidoActual));
 
 // Asociar evento al logo
     const logo = document.getElementById('logoEmpresa');
@@ -1546,6 +1607,26 @@ function abrirImpresion(pedido) {
     
      ajustarTextoMensaje();
 }
+
+function cargarTarjeta(pedido) {
+    const para = (pedido.para || '').trim();
+    const de   = (pedido.de || '').trim();
+
+    document.getElementById('txtPara').textContent = para;
+    document.getElementById('txtDe').textContent   = de;
+
+    // Referencias
+    const lineaPara = document.getElementById('lineaPara');
+    const lineaDe   = document.getElementById('lineaDe');
+
+    const chkPara = document.getElementById('chkPara');
+    const chkDe   = document.getElementById('chkDe');
+
+    // Mostrar u ocultar según check y si hay texto
+    lineaPara.style.display = (chkPara.checked && para) ? 'block' : 'none';
+    lineaDe.style.display   = (chkDe.checked && de) ? 'block' : 'none';
+}
+
 
 /* ===== IMPRIMIR TARJETA ===== */
 function imprimirTarjeta() {
