@@ -1539,10 +1539,11 @@ if (logo) {
     });
 }
 
-
+cargarLogo();
+observarLogo();
 
     modal.style.display = 'flex';
-    guardarLogo()
+    
      ajustarTextoMensaje();
 }
 
@@ -1643,15 +1644,13 @@ function ajustarTextoMensaje() {
 // Ejecutar al cargar la página o abrir modal
 window.addEventListener('load', ajustarTextoMensaje);
 
-// Guardar logo en localStorage
 function guardarLogo() {
     const logo = document.getElementById('logoEmpresa');
-    if (logo.src) {
+    if (logo && logo.src) {
         localStorage.setItem('logoGuardado', logo.src);
     }
 }
 
-// Cargar logo desde localStorage
 function cargarLogo() {
     const logoSrc = localStorage.getItem('logoGuardado');
     if (!logoSrc) return;
@@ -1664,6 +1663,20 @@ function cargarLogo() {
     const placeholder = document.querySelector('.logo-empresa .placeholder');
     if (placeholder) placeholder.style.display = 'none';
 }
+function observarLogo() {
+    const logo = document.getElementById('logoEmpresa');
+    if (!logo) return;
+
+    const observer = new MutationObserver(() => {
+        guardarLogo();
+    });
+
+    observer.observe(logo, {
+        attributes: true,
+        attributeFilter: ['src']
+    });
+}
+
 
 
 // Función para subir imágenes (logo)
