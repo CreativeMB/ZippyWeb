@@ -1531,16 +1531,16 @@ function abrirImpresion(pedido) {
     
 </div>`;
 
-// Asociar evento al logo (DESPUÉS de crear el HTML)
-const logo = document.getElementById('logoEmpresa');
-if (logo) {
-    logo.addEventListener('click', () => {
-        subirImagen('logoEmpresa');
-    });
-}
+// Asociar evento al logo
+    const logo = document.getElementById('logoEmpresa');
+    if (logo) {
+        logo.addEventListener('click', () => {
+            subirImagen('logoEmpresa');
+        });
+    }
 
-cargarLogo();
-observarLogo();
+    cargarLogo();
+    observarLogo();
 
     modal.style.display = 'flex';
     
@@ -1644,6 +1644,7 @@ function ajustarTextoMensaje() {
 // Ejecutar al cargar la página o abrir modal
 window.addEventListener('load', ajustarTextoMensaje);
 
+// Guardar logo en localStorage
 function guardarLogo() {
     const logo = document.getElementById('logoEmpresa');
     if (logo && logo.src) {
@@ -1651,6 +1652,7 @@ function guardarLogo() {
     }
 }
 
+// Cargar logo desde localStorage
 function cargarLogo() {
     const logoSrc = localStorage.getItem('logoGuardado');
     if (!logoSrc) return;
@@ -1663,6 +1665,8 @@ function cargarLogo() {
     const placeholder = document.querySelector('.logo-empresa .placeholder');
     if (placeholder) placeholder.style.display = 'none';
 }
+
+// Observar cambios automáticos del logo (guardado automático)
 function observarLogo() {
     const logo = document.getElementById('logoEmpresa');
     if (!logo) return;
@@ -1677,9 +1681,7 @@ function observarLogo() {
     });
 }
 
-
-
-// Función para subir imágenes (logo)
+// Función para subir imagen del logo (NO guarda manualmente)
 function subirImagen(idImagen) {
     const img = document.getElementById(idImagen);
     if (!img) return;
@@ -1694,8 +1696,7 @@ function subirImagen(idImagen) {
 
         const reader = new FileReader();
         reader.onload = () => {
-            img.src = reader.result;
-            guardarLogo(); // ✅ AHORA SÍ GUARDA
+            img.src = reader.result; // ← el observer se encarga de guardar
         };
         reader.readAsDataURL(file);
     };
@@ -1703,8 +1704,9 @@ function subirImagen(idImagen) {
     input.click();
 }
 
-// Cargar al iniciar
+// Cargar logo al iniciar la página
 window.addEventListener('load', cargarLogo);
+
 
 </script>
 <iframe id="printFrame" style="display:none;"></iframe>
