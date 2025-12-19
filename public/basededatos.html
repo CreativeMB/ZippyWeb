@@ -480,14 +480,20 @@ th {
     flex: 1;                              
     font-family: 'Great Vibes', cursive;  
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; /* centra horizontalmente */
+    align-items: center;     /* centra verticalmente */
     text-align: center;
     line-height: 1.2;
     white-space: pre-wrap;                 
     overflow-wrap: break-word;             
     color: #2c2c2c;                       
+
+    height: 100%;            /* ocupar todo el alto de la tarjeta */
+    margin: 0;               /* eliminar márgenes extra */
+    overflow: hidden;        /* cortar si algo sobra */
+    padding: 2px;            /* opcional: un poco de espacio interno */
 }
+
 
 /* =========================
    DE / PARA
@@ -1572,36 +1578,20 @@ function ajustarTextoMensaje() {
         const mensaje = tarjeta.querySelector('.mensaje-principal');
         if (!mensaje) return;
 
-        let fontSize = 40; // tamaño inicial grande
+        let fontSize = 50; // tamaño inicial grande
         const minFont = 4; // mínimo
-        const maxFont = 50; // máximo
         const contenedorHeight = mensaje.clientHeight;
 
         mensaje.style.fontSize = fontSize + 'px';
-        mensaje.style.overflow = 'hidden'; // ocultar lo que sobra
-        mensaje.style.display = '-webkit-box';
-        mensaje.style.webkitBoxOrient = 'vertical';
-        mensaje.style.webkitLineClamp = '100'; // se puede ajustar
-        mensaje.style.wordBreak = 'break-word';
 
         // Reducir hasta que el texto quepa
         while (mensaje.scrollHeight > contenedorHeight && fontSize > minFont) {
             fontSize -= 1;
             mensaje.style.fontSize = fontSize + 'px';
         }
-
-        // Ajustar hacia arriba si sobra espacio
-        while (mensaje.scrollHeight < contenedorHeight && fontSize < maxFont) {
-            fontSize += 1;
-            mensaje.style.fontSize = fontSize + 'px';
-            if (mensaje.scrollHeight > contenedorHeight) {
-                fontSize -= 1;
-                mensaje.style.fontSize = fontSize + 'px';
-                break;
-            }
-        }
     });
 }
+
 
 
 // Ejecutar al cargar la página o abrir modal
