@@ -544,37 +544,40 @@ th {
     }
 }
 /* =========================
-   Contenedor de logo a la izquierda
+   Logo como imagen flotante de fondo
 ========================= */
 .logo-empresa {
-    width: 30mm;
-    height: 100%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f0f0f0;
-    cursor: pointer;
+    position: absolute;        /* fuera del flujo */
+    top: 0;
+    left: 0;
+    width: 30mm;               /* ancho del logo */
+    height: 100%;              /* toda la tarjeta */
+    z-index: 0;                /* detrás del contenido */
+    background-color: transparent;
+    pointer-events: auto;      /* sigue siendo clickeable */
 }
 
+/* Imagen del logo */
 .logo-empresa img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    position: absolute;
-    top: 0;
-    left: 0;
+    object-fit: cover;         /* estira sin deformar */
+    opacity: 0.15;             /* efecto fondo (ajustable) */
 }
 
+/* Placeholder encima del logo */
 .logo-empresa .placeholder {
-    position: relative;
+    position: absolute;
+    inset: 0;
     z-index: 1;
-    font-size: 10px;
-    color: #888;
-    text-align: center;
-    padding: 2px;
-    pointer-events: none; /* deja pasar el click */
+    font-size: 9px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
 }
+
 
 
 /* Contenido de la tarjeta */
