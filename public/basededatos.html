@@ -1536,7 +1536,7 @@ function actualizarTotales(pos, neg) {
 
 /* ===== ABRIR VISTA PREVIA ===== */
 function abrirImpresion(pedido) {
-   
+
     const printArea = document.getElementById('printArea');
     const modal = document.getElementById('printModal');
 
@@ -1545,50 +1545,84 @@ function abrirImpresion(pedido) {
         return;
     }
 
-    // Obtenemos el perfil de la empresa previamente cargado
     const perfil = window.perfilEmpresa;
     if (!perfil) {
         alert("Perfil de empresa no cargado aún.");
         return;
     }
 
-    // Construimos la tarjeta de impresión
-    printArea.innerHTML = `<div class="tarjeta-impresion">
-        
-   <div class="logo-empresa" id="logoEmpresaContainer">
-    <img id="logoEmpresa" src="" alt="Logo Empresa">
-    <div class="placeholder">Click para subir logo</div>
-</div>
+    const mensaje = (pedido.mensaje || '').trim();
+    const para = (pedido.para || '').trim();
+    const de   = (pedido.de || '').trim();
 
+    printArea.innerHTML = `
+        <div class="tarjeta-impresion">
 
-    <div class="mensaje-principal">${(pedido.mensaje || '').trim()}</div>
-    <div class="de-para">
-        <div><strong>Para:</strong> ${(pedido.para || '').trim()}</div>
-        <div><strong>De:</strong> ${(pedido.de || '').trim()}</div>
-    </div>
-    <div class="decoracion" style="font-size:10px; text-align:center; margin-top:2mm;">
-        ${(perfil.nombreEmpresa || '').trim()} · WhatsApp: ${(perfil.WhatsApp || '').trim()} · ${(perfil.direccion || '').trim()} · ${(perfil.ciudad || '').trim()}
-    </div>
-    <div class="decoracion" style="font-size:10px; text-align:center; margin-top:1mm;">
-        Visítanos en: ${(perfil.urlPagina || '').trim()}
-    
-</div>`;
+            <div class="logo-empresa" id="logoEmpresaContainer">
+                <img id="logoEmpresa" src="" alt="Logo Empresa">
+                <div class="placeholder">Click para subir logo</div>
+            </div>
 
-// Asociar evento al logo
+            <div class="mensaje-principal">${mensaje}</div>
+
+            <div class="de-para">
+                <div id="lineaPara">
+                    <strong>Para:</strong> <span id="txtPara"></span>
+                </div>
+
+                <div id="lineaDe">
+                    <strong>De:</strong> <span id="txtDe"></span>
+                </div>
+            </div>
+
+            <div class="decoracion" style="font-size:10px; text-align:center; margin-top:2mm;">
+                ${(perfil.nombreEmpresa || '').trim()} · WhatsApp: ${(perfil.WhatsApp || '').trim()} · ${(perfil.direccion || '').trim()} · ${(perfil.ciudad || '').trim()}
+            </div>
+
+            <div class="decoracion" style="font-size:10px; text-align:center; margin-top:1mm;">
+                Visítanos en: ${(perfil.urlPagina || '').trim()}
+            </div>
+
+        </div>
+    `;
+
+    // Insertar texto Para / De
+    document.getElementById('txtPara').textContent = para;
+    document.getElementById('txtDe').textContent   = de;
+
+    // Control de visibilidad según checkbox
+    const chkPara = document.getElementById('chkPara');
+    const chkDe   = document.getElementById('chkDe');
+
+    const lineaPara = document.getElementById('lineaPara');
+    const lineaDe   = document.getElementById('lineaDe');
+
+    lineaPara.style.display = (chkPara.checked && para) ? 'block' : 'none';
+    lineaDe.style.display   = (chkDe.checked && de) ? 'block' : 'none';
+
+    // Eventos para actualizar en vivo
+    chkPara.onchange = () => {
+        lineaPara.style.display = (chkPara.checked && para) ? 'block' : 'none';
+    };
+
+    chkDe.onchange = () => {
+        lineaDe.style.display = (chkDe.checked && de) ? 'block' : 'none';
+    };
+
+    // Logo
     const logo = document.getElementById('logoEmpresa');
     if (logo) {
-        logo.addEventListener('click', () => {
-            subirImagen('logoEmpresa');
-        });
+        logo.addEventListener('click', () => subirImagen('logoEmpresa'));
     }
 
     cargarLogo();
     observarLogo();
 
     modal.style.display = 'flex';
-    
-     ajustarTextoMensaje();
+
+    ajustarTextoMensaje();
 }
+
 
 /* ===== IMPRIMIR TARJETA ===== */
 function imprimirTarjeta() {
