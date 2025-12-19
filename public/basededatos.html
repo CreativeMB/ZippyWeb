@@ -1531,10 +1531,13 @@ function abrirImpresion(pedido) {
     
 </div>`;
 
-// Asociar evento al logo
-document.getElementById('logoEmpresa').addEventListener('click', () => {
-    subirImagen('logoEmpresa');
-});
+// Asociar evento al logo (DESPUÉS de crear el HTML)
+const logo = document.getElementById('logoEmpresa');
+if (logo) {
+    logo.addEventListener('click', () => {
+        subirImagen('logoEmpresa');
+    });
+}
 
 
 
@@ -1654,9 +1657,14 @@ function cargarLogo() {
     if (!logoSrc) return;
 
     const logo = document.getElementById('logoEmpresa');
+    if (!logo) return;
+
     logo.src = logoSrc;
-    document.querySelector('.logo-empresa .placeholder').style.display = 'none';
+
+    const placeholder = document.querySelector('.logo-empresa .placeholder');
+    if (placeholder) placeholder.style.display = 'none';
 }
+
 
 // Función para subir imágenes (logo)
 function subirImagen(idImagen) {
@@ -1681,10 +1689,6 @@ function subirImagen(idImagen) {
 
     input.click();
 }
-
-// Click sobre el contenedor
-document.getElementById('logoEmpresaContainer')
-    .addEventListener('click', subirLogo);
 
 // Cargar al iniciar
 window.addEventListener('load', cargarLogo);
