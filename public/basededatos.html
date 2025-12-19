@@ -1582,11 +1582,6 @@ function abrirImpresion(pedido) {
     if (el) el.addEventListener('click', () => subirImagen(id));
 });
 
-['usuarioFacebook', 'usuarioInstagram', 'usuarioWhatsApp'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('blur', guardarRedes);
-});
-
 
     // Cargar los valores guardados si existen
     cargarRedes();
