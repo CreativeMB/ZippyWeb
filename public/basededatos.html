@@ -641,6 +641,36 @@ th {
         height: 101.6mm;
     }
 }
+/* =========================
+   En Ruta
+========================= */
+.pedido-card {
+    position: relative;
+}
+
+.etiqueta-ruta {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #27ae60;
+    color: white;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+    display: none;
+    z-index: 5;
+}
+
+.pedido-card.en-ruta .etiqueta-ruta {
+    display: block;
+}
+
+.switch-ruta {
+    margin-top: 6px;
+    font-size: 13px;
+    cursor: pointer;
+}
 
 
 
@@ -1277,8 +1307,16 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             <div class="linea">
                 🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
             </div>
+            <div class="etiqueta-ruta">EN RUTA</div>
+
+<label class="switch-ruta">
+    <input type="checkbox" class="chkRuta">
+    🛵 En ruta
+</label>
+
 
         </div>
+        
     `;
 /* ====== IMPRIMIR TARJETA ====== */
 const btnImprimir = card.querySelector('.btn-imprimir');
@@ -1329,6 +1367,32 @@ if (btnImprimir) {
             select.value = idDomiActual;
         }
     });
+
+    /* ====== EN RUTA (EFECTO VISUAL PERSISTENTE) ====== */
+const chkRuta = card.querySelector('.chkRuta');
+
+const rutas = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
+
+// restaurar estado al cargar
+if (rutas[idPedido]) {
+    chkRuta.checked = true;
+    card.classList.add('en-ruta');
+}
+
+chkRuta.addEventListener('change', () => {
+    const rutasActuales = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
+
+    if (chkRuta.checked) {
+        rutasActuales[idPedido] = true;
+        card.classList.add('en-ruta');
+    } else {
+        delete rutasActuales[idPedido];
+        card.classList.remove('en-ruta');
+    }
+
+    localStorage.setItem('pedidosEnRuta', JSON.stringify(rutasActuales));
+});
+
 /* ====== EDITAR MENSAJE (CORREGIDO) ====== */
 
 function activarEdicionMensaje() {
