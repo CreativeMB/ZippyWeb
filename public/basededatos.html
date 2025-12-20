@@ -833,15 +833,21 @@ btnCerrarSesion.onclick = () => {
 
 // --- AUTH ---
 auth.onAuthStateChanged(user => {
-    if(!user){
+    if (!user) {
         window.location.href = "login.html";
     } else {
         idEmpresa = user.uid;
+
         cargarPerfilEmpresa();
         cargarBases();
-         cargarPedidosRealtime();
+
+        // ✅ ORDEN CORRECTO
+        cargarReferenciasDesdeFirebase().then(() => {
+            cargarPedidosRealtime();
+        });
     }
 });
+
 // Función para cargar el perfil de la empresa
 function cargarPerfilEmpresa() {
     const ref = db.ref(`${idEmpresa}/perfilempresa`);
@@ -1438,6 +1444,31 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     activarEdicionMensaje();
     return card;
+}
+
+let referenciasDrive = {}; // GLOBAL
+
+function cargarReferenciasDesdeFirebase() {
+
+    return db.ref(`${idEmpresa}/Referencias`).once('value')
+        .then(snapshot => {
+
+            referenciasDrive = {};
+
+            snapshot.forEach(refSnap => {
+                const ref = refSnap.key;
+                const url = refSnap.val()?.imagen || refSnap.val();
+
+                if (ref && url) {
+                    referenciasDrive[ref] = url;
+                }
+            });
+
+            console.log('✅ Referencias cargadas:', referenciasDrive);
+        })
+        .catch(err => {
+            console.error('❌ Error cargando referencias:', err);
+        });
 }
 
 
