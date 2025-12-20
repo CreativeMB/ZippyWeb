@@ -1658,7 +1658,6 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     return card;
 }
 
-
 async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedido) {
 
     if (idDomiViejo === idDomiNuevo) return;
@@ -1682,7 +1681,6 @@ async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedid
     await refNuevo.child(idPedido).set(pedido);
     await refViejo.remove();
 }
-
 
 function obtenerColorPedido(color) {
     if (!color) return '#ffffff';
