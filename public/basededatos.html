@@ -1606,20 +1606,27 @@ async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedid
     await refViejo.remove();
 }
 
+function normalizarImagen(url) {
+    if (!url) return '';
 
-
-
-function normalizarImagen(url){
-    if(!url) return '';
-
-    if(url.includes('drive.google.com')){
+    // ✅ GOOGLE DRIVE (LEGADO)
+    if (url.includes('drive.google.com')) {
         const match = url.match(/id=([^&]+)/);
-        if(match && match[1]){
+        if (match && match[1]) {
             return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
         }
     }
+
+    // ✅ FIREBASE STORAGE (NO TOCAR)
+    if (url.includes('firebasestorage.googleapis.com')) {
+        return url;
+    }
+
+    // ✅ CUALQUIER OTRA URL
     return url;
 }
+
+
 function obtenerColorPedido(color) {
     if (!color) return '#ffffff';
 
