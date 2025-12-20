@@ -833,21 +833,15 @@ btnCerrarSesion.onclick = () => {
 
 // --- AUTH ---
 auth.onAuthStateChanged(user => {
-    if (!user) {
+    if(!user){
         window.location.href = "login.html";
     } else {
         idEmpresa = user.uid;
-
         cargarPerfilEmpresa();
         cargarBases();
-
-        // ✅ ORDEN CORRECTO
-        cargarReferenciasDesdeFirebase().then(() => {
-            cargarPedidosRealtime();
-        });
+         cargarPedidosRealtime();
     }
 });
-
 // Función para cargar el perfil de la empresa
 function cargarPerfilEmpresa() {
     const ref = db.ref(`${idEmpresa}/perfilempresa`);
@@ -1186,15 +1180,12 @@ document.addEventListener('click', (e)=>{
         suggestionsContainer.style.display='none';
     }
 });
-
 // --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
 
-    const grid = document.getElementById("pedidosGrid");
-    if (!grid) return; // ✅ CORRECCIÓN CLAVE
-
     const pedidosRef = db.ref(`${idEmpresa}/Pedidos`);
     const domiRef = db.ref(`${idEmpresa}/Domiciliarios`);
+    const grid = document.getElementById("pedidosGrid");
 
     domiRef.once('value').then(domiSnap => {
 
@@ -1208,9 +1199,7 @@ function cargarPedidosRealtime() {
 
         pedidosRef.on('value', snapshot => {
 
-            if (!grid) return; // ✅ seguridad extra
             grid.innerHTML = '';
-
             const pedidosPorFecha = {};
 
             snapshot.forEach(domicSnap => {
@@ -1261,25 +1250,16 @@ function cargarPedidosRealtime() {
 }
 
 
-
 function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     const card = document.createElement('div');
     card.className = 'pedido-card';
     card.style.backgroundColor = obtenerColorPedido(p.color);
 
-    /* =========================
-       📸 IMAGEN INICIAL
-    ========================= */
-    const imagenInicial =
-        (p.referencia && referenciasDrive[p.referencia])
-            ? referenciasDrive[p.referencia]
-            : p.imagenUrl || '';
-
     card.innerHTML = `
         <div class="pedido-top">
             <img class="pedido-img"
-                 src="${normalizarImagen(imagenInicial)}"
+                 src="${normalizarImagen(p.imagenUrl)}"
                  loading="lazy">
 
             <div class="pedido-info">
@@ -1321,25 +1301,21 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         </div>
 
         <div class="pedido-bottom">
-            <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
+             <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
 
-            <div class="linea mensaje-linea">
-                <strong>📝:</strong>
-                <span class="mensaje-texto">${p.mensaje || ''}</span>
-                <button class="btn-editar-mensaje">✏️</button>
-                <button class="btn-imprimir">🖨 Imprimir</button>
-
-                <label class="switch-ruta">
-                    <input type="checkbox" class="chkRuta">
-                    🚘En Ruta
-                </label>
-
-                <div class="etiqueta-ruta">
-                    <span>EN</span>
-                    <span>RUTA</span>
-                </div>
-            </div>
-
+          <div class="linea mensaje-linea">
+    <strong>📝:</strong>
+    <span class="mensaje-texto">${p.mensaje || ''}</span>
+    <button class="btn-editar-mensaje">✏️</button><button class="btn-imprimir">🖨 Imprimir</button>
+<label class="switch-ruta">
+    <input type="checkbox" class="chkRuta">
+    🚘En Ruta
+</label>
+  <div class="etiqueta-ruta">
+    <span>EN</span>
+    <span>RUTA</span>
+</div>
+</div>
             <div class="linea">
                 👉 De: ${p.de || ''} 👉 Para: ${p.para || ''}
             </div>
@@ -1353,49 +1329,26 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             <div class="linea">
                 🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
             </div>
+        
+
+
         </div>
+        
     `;
+/* ====== IMPRIMIR TARJETA ====== */
+const btnImprimir = card.querySelector('.btn-imprimir');
 
-    /* =========================
-       🔁 ACTUALIZAR IMAGEN EN TIEMPO REAL
-    ========================= */
-    const img = card.querySelector('.pedido-img');
+if (btnImprimir) {
+    btnImprimir.onclick = () => {
+        abrirImpresion({
+            mensaje: p.mensaje || '',
+            para: p.para || '',
+            de: p.de || ''
+        });
+    };
+}
 
-    const pedidoRef = db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`);
-
-    pedidoRef.on('value', snap => {
-        const data = snap.val();
-        if (!data) return;
-
-        let nuevaImagen = '';
-
-        if (data.referencia && referenciasDrive[data.referencia]) {
-            nuevaImagen = referenciasDrive[data.referencia];
-        } else if (data.imagenUrl) {
-            nuevaImagen = data.imagenUrl;
-        }
-
-        if (nuevaImagen) {
-            const normalizada = normalizarImagen(nuevaImagen);
-            if (img.src !== normalizada) {
-                img.src = normalizada;
-            }
-        }
-    });
-
-    /* ====== IMPRIMIR ====== */
-    const btnImprimir = card.querySelector('.btn-imprimir');
-    if (btnImprimir) {
-        btnImprimir.onclick = () => {
-            abrirImpresion({
-                mensaje: p.mensaje || '',
-                para: p.para || '',
-                de: p.de || ''
-            });
-        };
-    }
-
-    /* ====== DOMICILIARIOS ====== */
+    /* ====== SPINNER DOMICILIARIOS ====== */
     const select = card.querySelector('.domi-select');
     const telSpan = card.querySelector('.domi-telefono');
 
@@ -1407,68 +1360,138 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         select.appendChild(option);
     });
 
+    /* ====== CAMBIO DOMICILIARIO ====== */
     select.addEventListener('change', async () => {
+
         const idDomiNuevo = select.value;
         if (idDomiNuevo === idDomiActual) return;
 
         try {
-            await moverPedidoDomiciliario(idPedido, idDomiActual, idDomiNuevo, p);
+            await moverPedidoDomiciliario(
+                idPedido,
+                idDomiActual,
+                idDomiNuevo,
+                p
+            );
+
+            // actualizar teléfono visual
             telSpan.textContent = `📞 ${domiciliarios[idDomiNuevo]?.telefono || ''}`;
+
             idDomiActual = idDomiNuevo;
-        } catch {
+
+        } catch (e) {
             alert('Error al cambiar domiciliario');
             select.value = idDomiActual;
         }
     });
 
-    /* ====== EN RUTA ====== */
-    const chkRuta = card.querySelector('.chkRuta');
-    const rutas = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
+    /* ====== EN RUTA (EFECTO VISUAL PERSISTENTE) ====== */
+const chkRuta = card.querySelector('.chkRuta');
 
-    if (rutas[idPedido]) {
-        chkRuta.checked = true;
-        card.classList.add('en-ruta');
-    }
+const rutas = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
 
-    chkRuta.addEventListener('change', () => {
-        const rutasActuales = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
-        if (chkRuta.checked) {
-            rutasActuales[idPedido] = true;
-            card.classList.add('en-ruta');
-        } else {
-            delete rutasActuales[idPedido];
-            card.classList.remove('en-ruta');
-        }
-        localStorage.setItem('pedidosEnRuta', JSON.stringify(rutasActuales));
-    });
-
-    activarEdicionMensaje();
-    return card;
+// restaurar estado al cargar
+if (rutas[idPedido]) {
+    chkRuta.checked = true;
+    card.classList.add('en-ruta');
 }
 
-let referenciasDrive = {}; // GLOBAL
+chkRuta.addEventListener('change', () => {
+    const rutasActuales = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
 
-function cargarReferenciasDesdeFirebase() {
+    if (chkRuta.checked) {
+        rutasActuales[idPedido] = true;
+        card.classList.add('en-ruta');
+    } else {
+        delete rutasActuales[idPedido];
+        card.classList.remove('en-ruta');
+    }
 
-    return db.ref(`${idEmpresa}/Referencias`).once('value')
-        .then(snapshot => {
+    localStorage.setItem('pedidosEnRuta', JSON.stringify(rutasActuales));
+});
 
-            referenciasDrive = {};
+/* ====== EDITAR MENSAJE (CORREGIDO) ====== */
 
-            snapshot.forEach(refSnap => {
-                const ref = refSnap.key;
-                const url = refSnap.val()?.imagen || refSnap.val();
+function activarEdicionMensaje() {
 
-                if (ref && url) {
-                    referenciasDrive[ref] = url;
-                }
-            });
+    const btnEditar = card.querySelector('.btn-editar-mensaje');
+    const mensajeSpan = card.querySelector('.mensaje-texto');
 
-            console.log('✅ Referencias cargadas:', referenciasDrive);
-        })
-        .catch(err => {
-            console.error('❌ Error cargando referencias:', err);
-        });
+    if (!btnEditar || !mensajeSpan) return;
+
+    btnEditar.onclick = () => {
+
+        const textoOriginal = mensajeSpan.textContent;
+
+        const textarea = document.createElement('textarea');
+        textarea.value = textoOriginal;
+        textarea.style.width = '100%';
+        textarea.rows = 3;
+
+        const btnGuardar = document.createElement('button');
+        btnGuardar.textContent = '💾 Guardar';
+        btnGuardar.style.marginRight = '6px';
+
+        const btnCancelar = document.createElement('button');
+        btnCancelar.textContent = '❌ Cancelar';
+
+        const contenedorBtns = document.createElement('div');
+        contenedorBtns.style.marginTop = '5px';
+        contenedorBtns.append(btnGuardar, btnCancelar);
+
+        mensajeSpan.replaceWith(textarea);
+        btnEditar.replaceWith(contenedorBtns);
+
+        /* ====== GUARDAR ====== */
+        btnGuardar.onclick = async () => {
+            const nuevoMensaje = textarea.value.trim();
+
+            try {
+                await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
+                    .update({ mensaje: nuevoMensaje });
+
+                const nuevoSpan = document.createElement('span');
+                nuevoSpan.className = 'mensaje-texto';
+                nuevoSpan.textContent = nuevoMensaje;
+
+                const nuevoBtnEditar = document.createElement('button');
+                nuevoBtnEditar.className = 'btn-editar-mensaje';
+                nuevoBtnEditar.textContent = '✏️';
+
+                textarea.replaceWith(nuevoSpan);
+                contenedorBtns.replaceWith(nuevoBtnEditar);
+
+                activarEdicionMensaje(); // 🔁 REACTIVAR
+
+            } catch (e) {
+                alert('Error guardando mensaje');
+            }
+        };
+
+        /* ====== CANCELAR ====== */
+        btnCancelar.onclick = () => {
+
+            const spanOriginal = document.createElement('span');
+            spanOriginal.className = 'mensaje-texto';
+            spanOriginal.textContent = textoOriginal;
+
+            const nuevoBtnEditar = document.createElement('button');
+            nuevoBtnEditar.className = 'btn-editar-mensaje';
+            nuevoBtnEditar.textContent = '✏️';
+
+            textarea.replaceWith(spanOriginal);
+            contenedorBtns.replaceWith(nuevoBtnEditar);
+
+            activarEdicionMensaje(); // 🔁 REACTIVAR
+        };
+    };
+}
+
+// 🚀 activar edición al crear la tarjeta
+activarEdicionMensaje();
+
+
+    return card;
 }
 
 
