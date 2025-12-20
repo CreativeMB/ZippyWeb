@@ -1211,24 +1211,33 @@ async function cargarReferenciasDesdeFirebase() {
 }
 
 // --- AUTO ASIGNAR IMAGEN DESDE REFERENCIA ---
+
 async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 
-    // Si ya tiene imagen en cualquier propiedad → no tocar
+    // 1️⃣ Si ya tiene imagen en cualquier propiedad → no tocar
     if ((pedido.imagenUrl && pedido.imagenUrl.trim() !== '') || (pedido.imagen && pedido.imagen.trim() !== '')) {
-        return;
+        return false; // nada cambió
     }
 
-    // Si no hay referencia → no hacer nada
-    if (!pedido.referencia) return;
+    // 2️⃣ Si no hay referencia → no hacer nada
+    if (!pedido.referencia) return false;
 
     const urlImagen = referenciasDrive[pedido.referencia];
-    if (!urlImagen) return;
+    if (!urlImagen) return false;
 
-    // 1️⃣ Asignar directamente en memoria
-    pedido.imagenUrl = urlImagen;
-
-    // 2️⃣ Actualizar Firebase
+    // 3️⃣ Solo actualizar si realmente no tiene imagen en Firebase
     try {
+        const snapshot = await db.ref(`${idEmpresa}/Pedidos/${idDomi}/${idPedido}/imagenUrl`).get();
+        if (snapshot.exists() && snapshot.val().trim() !== '') {
+            // Ya tiene imagen en Firebase, solo asignamos en memoria
+            pedido.imagenUrl = snapshot.val();
+            return false;
+        }
+
+        // 4️⃣ Asignar directamente en memoria
+        pedido.imagenUrl = urlImagen;
+
+        // 5️⃣ Actualizar Firebase
         await db
             .ref(`${idEmpresa}/Pedidos/${idDomi}/${idPedido}`)
             .update({
@@ -1237,11 +1246,14 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
             });
 
         console.log(`🖼️ Imagen asignada automáticamente → ${pedido.referencia}`);
+        return true; // hubo cambio
 
     } catch (e) {
         console.error('❌ Error asignando imagen', e);
+        return false;
     }
 }
+
 
 // --- OBTENER IMAGEN PARA MOSTRAR ---
 function obtenerImagenPedido(p){
@@ -2013,51 +2025,6 @@ function subirImagen(idImagen) {
 
 // Cargar logo al iniciar la página
 window.addEventListener('load', cargarLogo);
-const pedidosRenderizados = new Map(); // guardamos idPedido → elemento DOM
-
-// Listener en tiempo real
-db.ref(`${idEmpresa}/Pedidos/${idDomi}`).on('child_added', async snapshot => {
-    const idPedido = snapshot.key;
-    const pedido = snapshot.val();
-
-    // Si ya lo renderizamos, lo ignoramos
-    if (pedidosRenderizados.has(idPedido)) return;
-
-    await procesarPedido(idDomi, idPedido, pedido);
-});
-
-db.ref(`${idEmpresa}/Pedidos/${idDomi}`).on('child_changed', async snapshot => {
-    const idPedido = snapshot.key;
-    const pedido = snapshot.val();
-
-    // Si ya existe, actualizamos la tarjeta en lugar de crear otra
-    if (pedidosRenderizados.has(idPedido)) {
-        actualizarPedidoEnPantalla(idPedido, pedido);
-    } else {
-        await procesarPedido(idDomi, idPedido, pedido);
-    }
-});
-
-// Función que procesa y renderiza el pedido
-async function procesarPedido(idDomi, idPedido, pedido) {
-    await validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido);
-
-    const card = crearPedidoCard(idPedido, pedido); // tu función de creación de tarjeta
-    document.getElementById('contenedorPedidos').appendChild(card);
-
-    pedidosRenderizados.set(idPedido, card);
-}
-
-// Función para actualizar la tarjeta existente
-function actualizarPedidoEnPantalla(idPedido, pedidoActualizado) {
-    const card = pedidosRenderizados.get(idPedido);
-    if (!card) return;
-
-    // Aquí actualizas los elementos internos de la tarjeta
-    // Por ejemplo: imagen, estado, color, etc.
-    card.querySelector('.imagen-pedido').src = pedidoActualizado.imagenUrl || '';
-    card.style.backgroundColor = obtenerColorPedido(pedidoActualizado.color);
-}
 
 
 </script>
