@@ -1245,20 +1245,31 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 
 
 // --- OBTENER IMAGEN PARA MOSTRAR ---
-function normalizarImagen(url){
-    if(!url) return '';
+function obtenerImagenPedido(p){
+    let url = '';
 
-    // Detectar URLs tipo "drive.google.com/file/d/ID/view" o "drive.google.com/open?id=ID"
-    const regexId = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-
-    if(regexId && regexId[1]){
-        // Devolver URL directa para <img> en web/Android
-        return `https://drive.google.com/uc?export=view&id=${regexId[1]}`;
+    // 1️⃣ Usar imagen existente en el pedido
+    if(p.imagenUrl && p.imagenUrl.trim() !== ''){
+        url = p.imagenUrl;
+    } 
+    // 2️⃣ Si no hay, usar la referencia del JSON
+    else if(p.referencia && referenciasDrive[p.referencia]){
+        url = referenciasDrive[p.referencia];
     }
 
-    // Si ya es directa o no es de Drive
+    // 3️⃣ Normalizar URLs de Drive
+    if(url.includes('drive.google.com')){
+        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        if(match && match[1]){
+            // URL directa para web/Android
+            return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+        }
+    }
+
+    // 4️⃣ Si no es Drive, devolver tal cual
     return url;
 }
+
 
 
 // --- CARGAR PEDIDOS ---
@@ -1359,9 +1370,10 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     card.innerHTML = `
         <div class="pedido-top">
       
-   <img class="pedido-img"
-                 src="${normalizarImagen(p.imagenUrl)}"
-                 loading="lazy">
+ <img class="pedido-img"
+     src="${obtenerImagenPedido(p)}"
+     loading="lazy">
+
 
             <div class="pedido-info">
 
