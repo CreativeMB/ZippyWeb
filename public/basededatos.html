@@ -1246,24 +1246,24 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 
 // --- OBTENER IMAGEN PARA MOSTRAR ---
 function obtenerImagenPedido(p) {
-    if (p.imagen && p.imagen.trim() !== '') return p.imagen;
-    if (p.referencia && referenciasDrive[p.referencia]) {
-        return urlDriveDirecta(referenciasDrive[p.referencia]);
-    }
-    return '';
+    if (!p.urlimagen || p.urlimagen.trim() === '') return '';
+
+    // Si la URL apunta a un archivo de Drive tipo "file/d/ID/view"
+    return urlDriveDirecta(p.urlimagen);
 }
 
 function urlDriveDirecta(url) {
     if (!url) return '';
-    
+
+    // Detecta URL tipo "file/d/ID/view" y lo convierte en directa
     const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
     if (match && match[1]) {
         return `https://drive.google.com/uc?export=view&id=${match[1]}`;
     }
-    
-    return url; // si ya es directa
-}
 
+    // Si ya es directa, devolver tal cual
+    return url;
+}
 
 // --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
