@@ -1240,10 +1240,17 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 
 // --- OBTENER IMAGEN PARA MOSTRAR ---
 function obtenerImagenPedido(pedido) {
+    // 1️⃣ Si ya tiene imagen asignada en el pedido, la usamos
+    if (pedido.imagen && pedido.imagen.trim() !== '') {
+        return pedido.imagen;
+    }
+
+    // 2️⃣ Si tiene referencia en referenciasDrive, la usamos
     if (pedido.referencia && referenciasDrive[pedido.referencia]) {
         return referenciasDrive[pedido.referencia];
     }
-    // Imagen por defecto si no hay referencia
+
+    // 3️⃣ Si nada de lo anterior, imagen por defecto
     return "ruta/default.png"; 
 }
 
