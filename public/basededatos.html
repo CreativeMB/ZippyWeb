@@ -1181,7 +1181,7 @@ document.addEventListener('click', (e)=>{
     }
 });
 // --- CARGAR PEDIDOS ---
-function cargarPedidosRealtime() {
+function iniciarEscuchaPedidos() {
 
     const pedidosRef = db.ref(`${idEmpresa}/Pedidos`);
     const domiRef = db.ref(`${idEmpresa}/Domiciliarios`);
@@ -1198,7 +1198,6 @@ function cargarPedidosRealtime() {
         });
 
         pedidosRef.on('value', snapshot => {
-
             grid.innerHTML = '';
             const pedidosPorFecha = {};
 
@@ -1231,9 +1230,7 @@ function cargarPedidosRealtime() {
                     grid.appendChild(header);
 
                     pedidosPorFecha[fecha].forEach(item => {
-
                         const domiActual = domiciliarios[item.idDomiActual] || {};
-
                         const card = crearPedidoCard(
                             item.idPedido,
                             item.idDomiActual,
@@ -1241,7 +1238,70 @@ function cargarPedidosRealtime() {
                             domiActual,
                             domiciliarios
                         );
+                        grid.appendChild(card);
+                    });
+                });
+        });
+    });
+}
+/* ====== cargar pedidos  ====== */
+function iniciarEscuchaPedidos() {
 
+    const pedidosRef = db.ref(`${idEmpresa}/Pedidos`);
+    const domiRef = db.ref(`${idEmpresa}/Domiciliarios`);
+    const grid = document.getElementById("pedidosGrid");
+
+    domiRef.once('value').then(domiSnap => {
+
+        const domiciliarios = {};
+        domiSnap.forEach(d => {
+            domiciliarios[d.key] = {
+                nombre: d.child('nombre').val() || '',
+                telefono: d.child('telefono').val() || ''
+            };
+        });
+
+        pedidosRef.on('value', snapshot => {
+            grid.innerHTML = '';
+            const pedidosPorFecha = {};
+
+            snapshot.forEach(domicSnap => {
+                const idDomi = domicSnap.key;
+
+                domicSnap.forEach(pedidoSnap => {
+                    const p = pedidoSnap.val();
+                    if (!p || !p.diaEntrega) return;
+
+                    if (!pedidosPorFecha[p.diaEntrega]) {
+                        pedidosPorFecha[p.diaEntrega] = [];
+                    }
+
+                    pedidosPorFecha[p.diaEntrega].push({
+                        pedido: p,
+                        idPedido: pedidoSnap.key,
+                        idDomiActual: idDomi
+                    });
+                });
+            });
+
+            Object.keys(pedidosPorFecha)
+                .sort((a, b) => convertirFecha(a) - convertirFecha(b))
+                .forEach(fecha => {
+
+                    const header = document.createElement('div');
+                    header.className = 'fecha-header';
+                    header.textContent = formatearFechaBonita(fecha);
+                    grid.appendChild(header);
+
+                    pedidosPorFecha[fecha].forEach(item => {
+                        const domiActual = domiciliarios[item.idDomiActual] || {};
+                        const card = crearPedidoCard(
+                            item.idPedido,
+                            item.idDomiActual,
+                            item.pedido,
+                            domiActual,
+                            domiciliarios
+                        );
                         grid.appendChild(card);
                     });
                 });
@@ -1259,7 +1319,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     card.innerHTML = `
         <div class="pedido-top">
             <img class="pedido-img"
-                 src="${normalizarImagen(p.imagenUrl)}"
+                 src="${normalizarImagen(p.imagenUrl)}">
                  loading="lazy">
 
             <div class="pedido-info">
@@ -1337,6 +1397,8 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     `;
 /* ====== IMPRIMIR TARJETA ====== */
 const btnImprimir = card.querySelector('.btn-imprimir');
+const imagenDesdeReferencia =
+    referenciasDrive[p.referencia] || p.imagenUrl || '';
 
 if (btnImprimir) {
     btnImprimir.onclick = () => {
@@ -1492,6 +1554,28 @@ activarEdicionMensaje();
 
 
     return card;
+}
+
+/* ====== cargar foros de jason ====== */
+
+function cargarReferenciasDesdeDrive() {
+    const urlRef = db.ref(`${idEmpresa}/perfilempresa/urljason`);
+
+    return urlRef.once('value')
+        .then(snap => {
+            const urlJSON = snap.val();
+            if (!urlJSON) return;
+
+            return fetch(urlJSON)
+                .then(res => res.json())
+                .then(json => {
+                    referenciasDrive = json || {};
+                    console.log('Referencias cargadas:', referenciasDrive);
+                });
+        })
+        .catch(err => {
+            console.error('Error cargando JSON:', err);
+        });
 }
 
 
