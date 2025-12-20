@@ -1248,14 +1248,18 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 function normalizarImagen(url){
     if(!url) return '';
 
-    if(url.includes('drive.google.com')){
-        const match = url.match(/id=([^&]+)/);
-        if(match && match[1]){
-            return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
-        }
+    // Detectar URLs tipo "drive.google.com/file/d/ID/view" o "drive.google.com/open?id=ID"
+    const regexId = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+
+    if(regexId && regexId[1]){
+        // Devolver URL directa para <img> en web/Android
+        return `https://drive.google.com/uc?export=view&id=${regexId[1]}`;
     }
+
+    // Si ya es directa o no es de Drive
     return url;
 }
+
 
 // --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
