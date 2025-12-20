@@ -1246,10 +1246,22 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 
 // --- OBTENER IMAGEN PARA MOSTRAR ---
 function obtenerImagenPedido(p) {
-    if (p.imagenUrl && p.imagenUrl.trim() !== '') return p.imagenUrl;
     if (p.imagen && p.imagen.trim() !== '') return p.imagen;
-    if (p.referencia && referenciasDrive[p.referencia]) return referenciasDrive[p.referencia];
+    if (p.referencia && referenciasDrive[p.referencia]) {
+        return urlDriveDirecta(referenciasDrive[p.referencia]);
+    }
     return '';
+}
+
+function urlDriveDirecta(url) {
+    if (!url) return '';
+    
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+    }
+    
+    return url; // si ya es directa
 }
 
 
