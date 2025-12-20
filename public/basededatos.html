@@ -1188,7 +1188,7 @@ document.addEventListener('click', (e)=>{
     }
 });
 
-// --- CARGAR referencaias de imagen --
+// --- CARGAR REFERENCIAS DE IMAGEN ---
 async function cargarReferenciasDesdeFirebase() {
 
     const snap = await db.ref(`${idEmpresa}/perfilempresa/urljason`).once('value');
@@ -1209,7 +1209,36 @@ async function cargarReferenciasDesdeFirebase() {
         referenciasDrive = {};
     }
 }
-// --- optener imagen desde referencia--
+
+// --- AUTO ASIGNAR IMAGEN DESDE REFERENCIA ---
+async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
+
+    // 🛑 SI YA TIENE IMAGEN → NO TOCAR
+    if (pedido.imagenUrl && pedido.imagenUrl.trim() !== '') return;
+
+    // 🛑 SI NO HAY REFERENCIA
+    if (!pedido.referencia) return;
+
+    // 🛑 SI NO EXISTE EN EL JSON
+    const urlImagen = referenciasDrive[pedido.referencia];
+    if (!urlImagen) return;
+
+    try {
+        await db
+            .ref(`${idEmpresa}/Pedidos/${idDomi}/${idPedido}`)
+            .update({
+                imagenUrl: urlImagen,
+                imagenAuto: true   // ✅ MARCA QUE FUE AUTOMÁTICO
+            });
+
+        console.log(`🖼️ Imagen asignada automáticamente → ${pedido.referencia}`);
+
+    } catch (e) {
+        console.error('❌ Error asignando imagen', e);
+    }
+}
+
+// --- OBTENER IMAGEN PARA MOSTRAR ---
 function obtenerImagenPedido(p) {
 
     if (p.referencia && referenciasDrive[p.referencia]) {
@@ -1223,9 +1252,11 @@ function obtenerImagenPedido(p) {
 // --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
 
+    const grid = document.getElementById("pedidosGrid");
+    if (!grid) return;
+
     const pedidosRef = db.ref(`${idEmpresa}/Pedidos`);
     const domiRef = db.ref(`${idEmpresa}/Domiciliarios`);
-    const grid = document.getElementById("pedidosGrid");
 
     domiRef.once('value').then(domiSnap => {
 
@@ -1237,44 +1268,44 @@ function cargarPedidosRealtime() {
             };
         });
 
+        // 🔥 ESCUCHA REALTIME
         pedidosRef.on('value', snapshot => {
 
             grid.innerHTML = '';
             const pedidosPorFecha = {};
 
             snapshot.forEach(domicSnap => {
+
                 const idDomi = domicSnap.key;
 
                 domicSnap.forEach(pedidoSnap => {
+
                     const p = pedidoSnap.val();
                     if (!p || !p.diaEntrega) return;
 
-                    /* ===============================
-                       🔥 VALIDAR REFERENCIA + ACTUALIZAR IMAGEN
-                    =============================== */
-                    if (
-                        (!p.imagenUrl || p.imagenUrl.trim() === '') &&
-                        p.referencia &&
-                        referenciasDrive[p.referencia]
-                    ) {
-                        db.ref(`${idEmpresa}/Pedidos/${idDomi}/${pedidoSnap.key}`)
-                          .update({
-                              imagenUrl: referenciasDrive[p.referencia]
-                          });
-                    }
+                    const idPedido = pedidoSnap.key;
 
+                    // ✅ AUTO ASIGNAR IMAGEN (SOLO SI ESTÁ VACÍA)
+                    validarYAsignarImagenDesdeReferencia(
+                        idDomi,
+                        idPedido,
+                        p
+                    );
+
+                    // --- AGRUPAR POR FECHA ---
                     if (!pedidosPorFecha[p.diaEntrega]) {
                         pedidosPorFecha[p.diaEntrega] = [];
                     }
 
                     pedidosPorFecha[p.diaEntrega].push({
                         pedido: p,
-                        idPedido: pedidoSnap.key,
+                        idPedido,
                         idDomiActual: idDomi
                     });
                 });
             });
 
+            // --- PINTAR EN ORDEN ---
             Object.keys(pedidosPorFecha)
                 .sort((a, b) => convertirFecha(a) - convertirFecha(b))
                 .forEach(fecha => {
@@ -1302,6 +1333,7 @@ function cargarPedidosRealtime() {
         });
     });
 }
+
 
 
 function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
