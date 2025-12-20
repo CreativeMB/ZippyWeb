@@ -1239,20 +1239,21 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 }
 
 // --- OBTENER IMAGEN PARA MOSTRAR ---
-function obtenerImagenPedido(pedido) {
+function obtenerImagenPedido(p) {
     // 1️⃣ Usar imagen que venga en el pedido si existe
-    if (pedido.imagen && pedido.imagen.trim() !== '') {
-        return pedido.imagen;
+    if (p.imagen && p.imagen.trim() !== '') {
+        return p.imagen;
     }
 
     // 2️⃣ Si hay referencia en referenciasDrive, usarla
-    if (pedido.referencia && referenciasDrive[pedido.referencia]) {
-        return referenciasDrive[pedido.referencia];
+    if (p.referencia && referenciasDrive[p.referencia]) {
+        return referenciasDrive[p.referencia];
     }
 
-    // 3️⃣ Si nada de lo anterior, devolver vacío (no hay imagen)
+    // 3️⃣ Si nada de lo anterior, devolver vacío
     return '';
 }
+
 
 
 
@@ -1354,11 +1355,9 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     card.innerHTML = `
         <div class="pedido-top">
       
-            <img class="pedido-img"
+        <img class="pedido-img"
      src="${obtenerImagenPedido(p)}"
      loading="lazy">
-
-
 
 
             <div class="pedido-info">
