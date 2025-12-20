@@ -1252,8 +1252,8 @@ function obtenerImagenPedido(p) {
     return urlDriveDirecta(p.urlimagen);
 }
 
-function urlDriveDirecta(url) {
-       if(!url) return '';
+function normalizarImagen(url){
+    if(!url) return '';
 
     if(url.includes('drive.google.com')){
         const match = url.match(/id=([^&]+)/);
@@ -1362,7 +1362,9 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     card.innerHTML = `
         <div class="pedido-top">
       
-   <img class="pedido-img" src="${obtenerImagenPedido(p.urlimagen)}" loading="lazy">
+   <img class="pedido-img"
+                 src="${normalizarImagen(p.imagenUrl)}"
+                 loading="lazy">
 
             <div class="pedido-info">
 
