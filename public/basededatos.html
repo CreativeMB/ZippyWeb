@@ -1180,7 +1180,7 @@ document.addEventListener('click', (e)=>{
         suggestionsContainer.style.display='none';
     }
 });
-// --- CARGAR PEDIDOS ---
+
 // --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
 
@@ -1261,30 +1261,119 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     const card = document.createElement('div');
     card.className = 'pedido-card';
     card.style.backgroundColor = obtenerColorPedido(p.color);
-    card.dataset.idpedido = idPedido;
+
+    /* =========================
+       📸 IMAGEN INICIAL
+    ========================= */
+    const imagenInicial =
+        (p.referencia && referenciasDrive[p.referencia])
+            ? referenciasDrive[p.referencia]
+            : p.imagenUrl || '';
 
     card.innerHTML = `
         <div class="pedido-top">
             <img class="pedido-img"
-                 src="${normalizarImagen(p.imagenUrl)}"
+                 src="${normalizarImagen(imagenInicial)}"
                  loading="lazy">
 
             <div class="pedido-info">
+
                 <div class="linea ref">🏷️ ${p.referencia || 'Pedido'}</div>
-                ...
+
+                <div class="linea">
+                    👤 ${p.nombreCliente || ''}
+                    <div class="sub-linea">
+                        #️⃣N°:
+                        <a class="whatsapp-link"
+                           href="https://wa.me/${(p.cliente || '').replace(/\D/g, '')}"
+                           target="_blank">
+                           ${p.cliente || ''}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="linea">
+                    🎁 ${p.nombreDestinatario || ''}
+                    <div class="sub-linea">📞 ${p.destinatario || ''}</div>
+                </div>
+
+                <div class="linea">
+                    📍 
+                    <a class="maps-link"
+                       href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion || '')}"
+                       target="_blank">
+                        ${p.direccion || ''}
+                    </a>
+                </div>
+
+                <div class="linea">
+                    📅 ${p.diaEntrega || ''}
+                    <div class="sub-linea">⏰ ${p.horaEntrega || ''}</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="pedido-bottom">
+            <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
+
+            <div class="linea mensaje-linea">
+                <strong>📝:</strong>
+                <span class="mensaje-texto">${p.mensaje || ''}</span>
+                <button class="btn-editar-mensaje">✏️</button>
+                <button class="btn-imprimir">🖨 Imprimir</button>
+
+                <label class="switch-ruta">
+                    <input type="checkbox" class="chkRuta">
+                    🚘En Ruta
+                </label>
+
+                <div class="etiqueta-ruta">
+                    <span>EN</span>
+                    <span>RUTA</span>
+                </div>
+            </div>
+
+            <div class="linea">
+                👉 De: ${p.de || ''} 👉 Para: ${p.para || ''}
+            </div>
+
+            <div class="linea domiciliario-linea">
+                🚗 
+                <select class="domi-select"></select>
+                <span class="domi-telefono">📞 ${domiActual.telefono || ''}</span>
+            </div>
+
+            <div class="linea">
+                🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
             </div>
         </div>
     `;
 
-    /* ====== 🔁 ACTUALIZAR IMAGEN EN TIEMPO REAL ====== */
+    /* =========================
+       🔁 ACTUALIZAR IMAGEN EN TIEMPO REAL
+    ========================= */
     const img = card.querySelector('.pedido-img');
 
-    const imgRef = db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}/imagenUrl`);
+    const pedidoRef = db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`);
 
-    imgRef.on('value', snap => {
-        const nuevaUrl = snap.val();
-        if (nuevaUrl && img.src !== nuevaUrl) {
-            img.src = normalizarImagen(nuevaUrl);
+    pedidoRef.on('value', snap => {
+        const data = snap.val();
+        if (!data) return;
+
+        let nuevaImagen = '';
+
+        if (data.referencia && referenciasDrive[data.referencia]) {
+            nuevaImagen = referenciasDrive[data.referencia];
+        } else if (data.imagenUrl) {
+            nuevaImagen = data.imagenUrl;
+        }
+
+        if (nuevaImagen) {
+            const normalizada = normalizarImagen(nuevaImagen);
+            if (img.src !== normalizada) {
+                img.src = normalizada;
+            }
         }
     });
 
@@ -1300,7 +1389,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         };
     }
 
-    /* ====== SPINNER DOMICILIARIOS ====== */
+    /* ====== DOMICILIARIOS ====== */
     const select = card.querySelector('.domi-select');
     const telSpan = card.querySelector('.domi-telefono');
 
@@ -1312,137 +1401,42 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         select.appendChild(option);
     });
 
-    /* ====== CAMBIO DOMICILIARIO ====== */
     select.addEventListener('change', async () => {
-
         const idDomiNuevo = select.value;
         if (idDomiNuevo === idDomiActual) return;
 
         try {
-            await moverPedidoDomiciliario(
-                idPedido,
-                idDomiActual,
-                idDomiNuevo,
-                p
-            );
-
-            // actualizar teléfono visual
+            await moverPedidoDomiciliario(idPedido, idDomiActual, idDomiNuevo, p);
             telSpan.textContent = `📞 ${domiciliarios[idDomiNuevo]?.telefono || ''}`;
-
             idDomiActual = idDomiNuevo;
-
-        } catch (e) {
+        } catch {
             alert('Error al cambiar domiciliario');
             select.value = idDomiActual;
         }
     });
 
-    /* ====== EN RUTA (EFECTO VISUAL PERSISTENTE) ====== */
-const chkRuta = card.querySelector('.chkRuta');
+    /* ====== EN RUTA ====== */
+    const chkRuta = card.querySelector('.chkRuta');
+    const rutas = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
 
-const rutas = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
-
-// restaurar estado al cargar
-if (rutas[idPedido]) {
-    chkRuta.checked = true;
-    card.classList.add('en-ruta');
-}
-
-chkRuta.addEventListener('change', () => {
-    const rutasActuales = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
-
-    if (chkRuta.checked) {
-        rutasActuales[idPedido] = true;
+    if (rutas[idPedido]) {
+        chkRuta.checked = true;
         card.classList.add('en-ruta');
-    } else {
-        delete rutasActuales[idPedido];
-        card.classList.remove('en-ruta');
     }
 
-    localStorage.setItem('pedidosEnRuta', JSON.stringify(rutasActuales));
-});
+    chkRuta.addEventListener('change', () => {
+        const rutasActuales = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
+        if (chkRuta.checked) {
+            rutasActuales[idPedido] = true;
+            card.classList.add('en-ruta');
+        } else {
+            delete rutasActuales[idPedido];
+            card.classList.remove('en-ruta');
+        }
+        localStorage.setItem('pedidosEnRuta', JSON.stringify(rutasActuales));
+    });
 
-/* ====== EDITAR MENSAJE (CORREGIDO) ====== */
-
-function activarEdicionMensaje() {
-
-    const btnEditar = card.querySelector('.btn-editar-mensaje');
-    const mensajeSpan = card.querySelector('.mensaje-texto');
-
-    if (!btnEditar || !mensajeSpan) return;
-
-    btnEditar.onclick = () => {
-
-        const textoOriginal = mensajeSpan.textContent;
-
-        const textarea = document.createElement('textarea');
-        textarea.value = textoOriginal;
-        textarea.style.width = '100%';
-        textarea.rows = 3;
-
-        const btnGuardar = document.createElement('button');
-        btnGuardar.textContent = '💾 Guardar';
-        btnGuardar.style.marginRight = '6px';
-
-        const btnCancelar = document.createElement('button');
-        btnCancelar.textContent = '❌ Cancelar';
-
-        const contenedorBtns = document.createElement('div');
-        contenedorBtns.style.marginTop = '5px';
-        contenedorBtns.append(btnGuardar, btnCancelar);
-
-        mensajeSpan.replaceWith(textarea);
-        btnEditar.replaceWith(contenedorBtns);
-
-        /* ====== GUARDAR ====== */
-        btnGuardar.onclick = async () => {
-            const nuevoMensaje = textarea.value.trim();
-
-            try {
-                await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
-                    .update({ mensaje: nuevoMensaje });
-
-                const nuevoSpan = document.createElement('span');
-                nuevoSpan.className = 'mensaje-texto';
-                nuevoSpan.textContent = nuevoMensaje;
-
-                const nuevoBtnEditar = document.createElement('button');
-                nuevoBtnEditar.className = 'btn-editar-mensaje';
-                nuevoBtnEditar.textContent = '✏️';
-
-                textarea.replaceWith(nuevoSpan);
-                contenedorBtns.replaceWith(nuevoBtnEditar);
-
-                activarEdicionMensaje(); // 🔁 REACTIVAR
-
-            } catch (e) {
-                alert('Error guardando mensaje');
-            }
-        };
-
-        /* ====== CANCELAR ====== */
-        btnCancelar.onclick = () => {
-
-            const spanOriginal = document.createElement('span');
-            spanOriginal.className = 'mensaje-texto';
-            spanOriginal.textContent = textoOriginal;
-
-            const nuevoBtnEditar = document.createElement('button');
-            nuevoBtnEditar.className = 'btn-editar-mensaje';
-            nuevoBtnEditar.textContent = '✏️';
-
-            textarea.replaceWith(spanOriginal);
-            contenedorBtns.replaceWith(nuevoBtnEditar);
-
-            activarEdicionMensaje(); // 🔁 REACTIVAR
-        };
-    };
-}
-
-// 🚀 activar edición al crear la tarjeta
-activarEdicionMensaje();
-
-
+    activarEdicionMensaje();
     return card;
 }
 
