@@ -1239,13 +1239,12 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 }
 
 // --- OBTENER IMAGEN PARA MOSTRAR ---
-function obtenerImagenPedido(p) {
-
-    if (p.referencia && referenciasDrive[p.referencia]) {
-        return referenciasDrive[p.referencia];
+function obtenerImagenPedido(pedido) {
+    if (pedido.referencia && referenciasDrive[pedido.referencia]) {
+        return referenciasDrive[pedido.referencia];
     }
-
-    return normalizarImagen(p.imagenUrl);
+    // Imagen por defecto si no hay referencia
+    return "ruta/default.png"; 
 }
 
 
@@ -1333,8 +1332,10 @@ function cargarPedidosRealtime() {
         });
     });
 }
-
-
+function normalizarImagen(url){
+    if(!url) return '';
+    return url; // nada más
+}
 
 function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
@@ -1344,9 +1345,9 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     card.innerHTML = `
         <div class="pedido-top">
-           <img class="pedido-img"
-     src="${obtenerImagenPedido(p)}"
-     loading="lazy">
+         <img class="pedido-img"
+                src="${obtenerImagenPedido(p)}"
+                loading="lazy">
 
 
             <div class="pedido-info">
@@ -1604,11 +1605,6 @@ async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedid
 
     await refNuevo.child(idPedido).set(pedido);
     await refViejo.remove();
-}
-
-function normalizarImagen(url){
-    if(!url) return '';
-    return url; // nada más
 }
 
 
