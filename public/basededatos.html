@@ -1213,22 +1213,27 @@ async function cargarReferenciasDesdeFirebase() {
 // --- AUTO ASIGNAR IMAGEN DESDE REFERENCIA ---
 async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 
-    // 🛑 SI YA TIENE IMAGEN → NO TOCAR
-    if (pedido.imagenUrl && pedido.imagenUrl.trim() !== '') return;
+    // Si ya tiene imagen en cualquier propiedad → no tocar
+    if ((pedido.imagenUrl && pedido.imagenUrl.trim() !== '') || (pedido.imagen && pedido.imagen.trim() !== '')) {
+        return;
+    }
 
-    // 🛑 SI NO HAY REFERENCIA
+    // Si no hay referencia → no hacer nada
     if (!pedido.referencia) return;
 
-    // 🛑 SI NO EXISTE EN EL JSON
     const urlImagen = referenciasDrive[pedido.referencia];
     if (!urlImagen) return;
 
+    // 1️⃣ Asignar directamente en memoria
+    pedido.imagenUrl = urlImagen;
+
+    // 2️⃣ Actualizar Firebase
     try {
         await db
             .ref(`${idEmpresa}/Pedidos/${idDomi}/${idPedido}`)
             .update({
                 imagenUrl: urlImagen,
-                imagenAuto: true   // ✅ MARCA QUE FUE AUTOMÁTICO
+                imagenAuto: true
             });
 
         console.log(`🖼️ Imagen asignada automáticamente → ${pedido.referencia}`);
@@ -1238,20 +1243,15 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
     }
 }
 
+
 // --- OBTENER IMAGEN PARA MOSTRAR ---
 function obtenerImagenPedido(p) {
-    // 1️⃣ Prioridad: p.imagenUrl (asignada desde JSON o Firebase)
     if (p.imagenUrl && p.imagenUrl.trim() !== '') return p.imagenUrl;
-
-    // 2️⃣ Luego p.imagen (si alguna vez se asignó directamente al pedido)
     if (p.imagen && p.imagen.trim() !== '') return p.imagen;
-
-    // 3️⃣ Referencia desde JSON
     if (p.referencia && referenciasDrive[p.referencia]) return referenciasDrive[p.referencia];
-
-    // 4️⃣ Si nada, vacío
     return '';
 }
+
 
 // --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
