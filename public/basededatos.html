@@ -1619,22 +1619,28 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             btnEditarRef.replaceWith(contenedorBtns);
 
             /* ====== GUARDAR ====== */
-            btnGuardar.onclick = async () => {
-                const nuevaRef = input.value.trim();
-                try {
-                    await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
-                        .update({ referencia: nuevaRef });
+           btnGuardar.onclick = async () => {
+    const nuevaRef = input.value.trim();
+    const nuevaUrl = referenciasDrive[nuevaRef] || ''; // validar URL existente
 
-                    spanRef.textContent = nuevaRef;
-                    lineaRef.innerHTML = `🏷️ `;
-                    lineaRef.appendChild(spanRef);
-                    lineaRef.appendChild(btnEditarRef);
+    try {
+        await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
+            .update({ 
+                referencia: nuevaRef,
+                imagenUrl: nuevaUrl // o el campo donde guardes el URL
+            });
 
-                    activarEdicionReferencia(); // reactivar
-                } catch (e) {
-                    alert('Error guardando referencia');
-                }
-            };
+        spanRef.textContent = nuevaRef;
+        lineaRef.innerHTML = `🏷️ `;
+        lineaRef.appendChild(spanRef);
+        lineaRef.appendChild(btnEditarRef);
+
+        activarEdicionReferencia(); // reactivar
+    } catch (e) {
+        alert('Error guardando referencia');
+    }
+};
+
 
             /* ====== CANCELAR ====== */
             btnCancelar.onclick = () => {
