@@ -1253,15 +1253,14 @@ function obtenerImagenPedido(p) {
 }
 
 function urlDriveDirecta(url) {
-    if (!url) return '';
+       if(!url) return '';
 
-    // Detecta URL tipo "file/d/ID/view" y lo convierte en directa
-    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (match && match[1]) {
-        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+    if(url.includes('drive.google.com')){
+        const match = url.match(/id=([^&]+)/);
+        if(match && match[1]){
+            return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+        }
     }
-
-    // Si ya es directa, devolver tal cual
     return url;
 }
 
@@ -1363,7 +1362,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     card.innerHTML = `
         <div class="pedido-top">
       
-    <img class="pedido-img" src="${obtenerImagenPedido(p)}" loading="lazy">
+   <img class="pedido-img" src="${obtenerImagenPedido(p.urlimagen)}" loading="lazy">
 
             <div class="pedido-info">
 
