@@ -1181,26 +1181,14 @@ document.addEventListener('click', (e)=>{
     }
 });
 // --- CARGAR PEDIDOS ---
+// --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
 
-    cargarReferenciasDesdeDrive().then(() => {
-        iniciarEscuchaPedidos();
-    });
-
-}
-
-/* ====== cargar pedidos con imagen ====== */
-function iniciarEscuchaPedidos() {
+    const grid = document.getElementById("pedidosGrid");
+    if (!grid) return; // ✅ CORRECCIÓN CLAVE
 
     const pedidosRef = db.ref(`${idEmpresa}/Pedidos`);
     const domiRef = db.ref(`${idEmpresa}/Domiciliarios`);
-    const grid = document.getElementById("pedidosGrid");
-
-    // 🛑 PROTECCIÓN CRÍTICA
-    if (!grid) {
-        console.error('❌ No existe el contenedor #pedidosGrid');
-        return;
-    }
 
     domiRef.once('value').then(domiSnap => {
 
@@ -1214,7 +1202,9 @@ function iniciarEscuchaPedidos() {
 
         pedidosRef.on('value', snapshot => {
 
+            if (!grid) return; // ✅ seguridad extra
             grid.innerHTML = '';
+
             const pedidosPorFecha = {};
 
             snapshot.forEach(domicSnap => {
@@ -1246,7 +1236,9 @@ function iniciarEscuchaPedidos() {
                     grid.appendChild(header);
 
                     pedidosPorFecha[fecha].forEach(item => {
+
                         const domiActual = domiciliarios[item.idDomiActual] || {};
+
                         const card = crearPedidoCard(
                             item.idPedido,
                             item.idDomiActual,
@@ -1254,15 +1246,14 @@ function iniciarEscuchaPedidos() {
                             domiActual,
                             domiciliarios
                         );
+
                         grid.appendChild(card);
                     });
                 });
         });
-
-    }).catch(err => {
-        console.error('❌ Error cargando domiciliarios:', err);
     });
 }
+
 
 
 function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
@@ -1270,102 +1261,44 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     const card = document.createElement('div');
     card.className = 'pedido-card';
     card.style.backgroundColor = obtenerColorPedido(p.color);
+    card.dataset.idpedido = idPedido;
 
     card.innerHTML = `
-        <img class="pedido-img"
-     src="${normalizarImagen(imagenDesdeReferencia)}"
-     loading="lazy">
-
-
+        <div class="pedido-top">
+            <img class="pedido-img"
+                 src="${normalizarImagen(p.imagenUrl)}"
+                 loading="lazy">
 
             <div class="pedido-info">
-
                 <div class="linea ref">🏷️ ${p.referencia || 'Pedido'}</div>
-
-                <div class="linea">
-                    👤 ${p.nombreCliente || ''}
-                    <div class="sub-linea">
-                        #️⃣N°:
-                        <a class="whatsapp-link"
-                           href="https://wa.me/${(p.cliente || '').replace(/\D/g, '')}"
-                           target="_blank">
-                           ${p.cliente || ''}
-                        </a>
-                    </div>
-                </div>
-
-                <div class="linea">
-                    🎁 ${p.nombreDestinatario || ''}
-                    <div class="sub-linea">📞 ${p.destinatario || ''}</div>
-                </div>
-
-                <div class="linea">
-                    📍 
-                    <a class="maps-link"
-                       href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion || '')}"
-                       target="_blank">
-                        ${p.direccion || ''}
-                    </a>
-                </div>
-
-                <div class="linea">
-                    📅 ${p.diaEntrega || ''}
-                    <div class="sub-linea">⏰ ${p.horaEntrega || ''}</div>
-                </div>
-
+                ...
             </div>
         </div>
-
-        <div class="pedido-bottom">
-             <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
-
-          <div class="linea mensaje-linea">
-    <strong>📝:</strong>
-    <span class="mensaje-texto">${p.mensaje || ''}</span>
-    <button class="btn-editar-mensaje">✏️</button><button class="btn-imprimir">🖨 Imprimir</button>
-<label class="switch-ruta">
-    <input type="checkbox" class="chkRuta">
-    🚘En Ruta
-</label>
-  <div class="etiqueta-ruta">
-    <span>EN</span>
-    <span>RUTA</span>
-</div>
-</div>
-            <div class="linea">
-                👉 De: ${p.de || ''} 👉 Para: ${p.para || ''}
-            </div>
-
-            <div class="linea domiciliario-linea">
-                🚗 
-                <select class="domi-select"></select>
-                <span class="domi-telefono">📞 ${domiActual.telefono || ''}</span>
-            </div>
-
-            <div class="linea">
-                🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
-            </div>
-        
-
-
-        </div>
-        
     `;
-/* ====== IMPRIMIR TARJETA ====== */
-const btnImprimir = card.querySelector('.btn-imprimir');
-const imagenDesdeReferencia =
-    referenciasDrive[p.referencia] || p.imagenUrl || '';
 
+    /* ====== 🔁 ACTUALIZAR IMAGEN EN TIEMPO REAL ====== */
+    const img = card.querySelector('.pedido-img');
 
-if (btnImprimir) {
-    btnImprimir.onclick = () => {
-        abrirImpresion({
-            mensaje: p.mensaje || '',
-            para: p.para || '',
-            de: p.de || ''
-        });
-    };
-}
+    const imgRef = db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}/imagenUrl`);
+
+    imgRef.on('value', snap => {
+        const nuevaUrl = snap.val();
+        if (nuevaUrl && img.src !== nuevaUrl) {
+            img.src = normalizarImagen(nuevaUrl);
+        }
+    });
+
+    /* ====== IMPRIMIR ====== */
+    const btnImprimir = card.querySelector('.btn-imprimir');
+    if (btnImprimir) {
+        btnImprimir.onclick = () => {
+            abrirImpresion({
+                mensaje: p.mensaje || '',
+                para: p.para || '',
+                de: p.de || ''
+            });
+        };
+    }
 
     /* ====== SPINNER DOMICILIARIOS ====== */
     const select = card.querySelector('.domi-select');
@@ -1511,28 +1444,6 @@ activarEdicionMensaje();
 
 
     return card;
-}
-
-/* ====== cargar foros de jason ====== */
-
-function cargarReferenciasDesdeDrive() {
-    const urlRef = db.ref(`${idEmpresa}/perfilempresa/urljason`);
-
-    return urlRef.once('value')
-        .then(snap => {
-            const urlJSON = snap.val();
-            if (!urlJSON) return;
-
-            return fetch(urlJSON)
-                .then(res => res.json())
-                .then(json => {
-                    referenciasDrive = json || {};
-                    console.log('Referencias cargadas:', referenciasDrive);
-                });
-        })
-        .catch(err => {
-            console.error('Error cargando JSON:', err);
-        });
 }
 
 
