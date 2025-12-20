@@ -1366,11 +1366,9 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     card.innerHTML = `
         <div class="pedido-top">
-      
- <img class="pedido-img"
-     src="${obtenerImagenPedido(p)}"
-     loading="lazy">
-
+            <img class="pedido-img"
+                 src="${obtenerImagenPedido(p)}"
+                 loading="lazy">
 
             <div class="pedido-info">
 
@@ -1414,18 +1412,20 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
              <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
 
           <div class="linea mensaje-linea">
-    <strong>📝:</strong>
-    <span class="mensaje-texto">${p.mensaje || ''}</span>
-    <button class="btn-editar-mensaje">✏️</button><button class="btn-imprimir">🖨 Imprimir</button>
-<label class="switch-ruta">
-    <input type="checkbox" class="chkRuta">
-    🚘En Ruta
-</label>
-  <div class="etiqueta-ruta">
-    <span>EN</span>
-    <span>RUTA</span>
-</div>
-</div>
+            <strong>📝:</strong>
+            <span class="mensaje-texto">${p.mensaje || ''}</span>
+            <button class="btn-editar-mensaje">✏️</button>
+            <button class="btn-imprimir">🖨 Imprimir</button>
+            <label class="switch-ruta">
+                <input type="checkbox" class="chkRuta">
+                🚘En Ruta
+            </label>
+            <div class="etiqueta-ruta">
+                <span>EN</span>
+                <span>RUTA</span>
+            </div>
+          </div>
+
             <div class="linea">
                 👉 De: ${p.de || ''} 👉 Para: ${p.para || ''}
             </div>
@@ -1439,24 +1439,20 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             <div class="linea">
                 🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
             </div>
-        
-
-
         </div>
-        
     `;
-/* ====== IMPRIMIR TARJETA ====== */
-const btnImprimir = card.querySelector('.btn-imprimir');
 
-if (btnImprimir) {
-    btnImprimir.onclick = () => {
-        abrirImpresion({
-            mensaje: p.mensaje || '',
-            para: p.para || '',
-            de: p.de || ''
-        });
-    };
-}
+    /* ====== IMPRIMIR TARJETA ====== */
+    const btnImprimir = card.querySelector('.btn-imprimir');
+    if (btnImprimir) {
+        btnImprimir.onclick = () => {
+            abrirImpresion({
+                mensaje: p.mensaje || '',
+                para: p.para || '',
+                de: p.de || ''
+            });
+        };
+    }
 
     /* ====== SPINNER DOMICILIARIOS ====== */
     const select = card.querySelector('.domi-select');
@@ -1472,23 +1468,13 @@ if (btnImprimir) {
 
     /* ====== CAMBIO DOMICILIARIO ====== */
     select.addEventListener('change', async () => {
-
         const idDomiNuevo = select.value;
         if (idDomiNuevo === idDomiActual) return;
 
         try {
-            await moverPedidoDomiciliario(
-                idPedido,
-                idDomiActual,
-                idDomiNuevo,
-                p
-            );
-
-            // actualizar teléfono visual
+            await moverPedidoDomiciliario(idPedido, idDomiActual, idDomiNuevo, p);
             telSpan.textContent = `📞 ${domiciliarios[idDomiNuevo]?.telefono || ''}`;
-
             idDomiActual = idDomiNuevo;
-
         } catch (e) {
             alert('Error al cambiar domiciliario');
             select.value = idDomiActual;
@@ -1496,110 +1482,172 @@ if (btnImprimir) {
     });
 
     /* ====== EN RUTA (EFECTO VISUAL PERSISTENTE) ====== */
-const chkRuta = card.querySelector('.chkRuta');
+    const chkRuta = card.querySelector('.chkRuta');
+    const rutas = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
 
-const rutas = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
-
-// restaurar estado al cargar
-if (rutas[idPedido]) {
-    chkRuta.checked = true;
-    card.classList.add('en-ruta');
-}
-
-chkRuta.addEventListener('change', () => {
-    const rutasActuales = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
-
-    if (chkRuta.checked) {
-        rutasActuales[idPedido] = true;
+    if (rutas[idPedido]) {
+        chkRuta.checked = true;
         card.classList.add('en-ruta');
-    } else {
-        delete rutasActuales[idPedido];
-        card.classList.remove('en-ruta');
     }
 
-    localStorage.setItem('pedidosEnRuta', JSON.stringify(rutasActuales));
-});
+    chkRuta.addEventListener('change', () => {
+        const rutasActuales = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
+        if (chkRuta.checked) {
+            rutasActuales[idPedido] = true;
+            card.classList.add('en-ruta');
+        } else {
+            delete rutasActuales[idPedido];
+            card.classList.remove('en-ruta');
+        }
+        localStorage.setItem('pedidosEnRuta', JSON.stringify(rutasActuales));
+    });
 
-/* ====== EDITAR MENSAJE (CORREGIDO) ====== */
+    /* ====== EDITAR MENSAJE ====== */
+    function activarEdicionMensaje() {
+        const btnEditar = card.querySelector('.btn-editar-mensaje');
+        const mensajeSpan = card.querySelector('.mensaje-texto');
+        if (!btnEditar || !mensajeSpan) return;
 
-function activarEdicionMensaje() {
+        btnEditar.onclick = () => {
+            const textoOriginal = mensajeSpan.textContent;
 
-    const btnEditar = card.querySelector('.btn-editar-mensaje');
-    const mensajeSpan = card.querySelector('.mensaje-texto');
+            const textarea = document.createElement('textarea');
+            textarea.value = textoOriginal;
+            textarea.style.width = '100%';
+            textarea.rows = 3;
 
-    if (!btnEditar || !mensajeSpan) return;
+            const btnGuardar = document.createElement('button');
+            btnGuardar.textContent = '💾 Guardar';
+            btnGuardar.style.marginRight = '6px';
 
-    btnEditar.onclick = () => {
+            const btnCancelar = document.createElement('button');
+            btnCancelar.textContent = '❌ Cancelar';
 
-        const textoOriginal = mensajeSpan.textContent;
+            const contenedorBtns = document.createElement('div');
+            contenedorBtns.style.marginTop = '5px';
+            contenedorBtns.append(btnGuardar, btnCancelar);
 
-        const textarea = document.createElement('textarea');
-        textarea.value = textoOriginal;
-        textarea.style.width = '100%';
-        textarea.rows = 3;
+            mensajeSpan.replaceWith(textarea);
+            btnEditar.replaceWith(contenedorBtns);
 
-        const btnGuardar = document.createElement('button');
-        btnGuardar.textContent = '💾 Guardar';
-        btnGuardar.style.marginRight = '6px';
+            /* ====== GUARDAR ====== */
+            btnGuardar.onclick = async () => {
+                const nuevoMensaje = textarea.value.trim();
+                try {
+                    await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
+                        .update({ mensaje: nuevoMensaje });
 
-        const btnCancelar = document.createElement('button');
-        btnCancelar.textContent = '❌ Cancelar';
+                    const nuevoSpan = document.createElement('span');
+                    nuevoSpan.className = 'mensaje-texto';
+                    nuevoSpan.textContent = nuevoMensaje;
 
-        const contenedorBtns = document.createElement('div');
-        contenedorBtns.style.marginTop = '5px';
-        contenedorBtns.append(btnGuardar, btnCancelar);
+                    const nuevoBtnEditar = document.createElement('button');
+                    nuevoBtnEditar.className = 'btn-editar-mensaje';
+                    nuevoBtnEditar.textContent = '✏️';
 
-        mensajeSpan.replaceWith(textarea);
-        btnEditar.replaceWith(contenedorBtns);
+                    textarea.replaceWith(nuevoSpan);
+                    contenedorBtns.replaceWith(nuevoBtnEditar);
 
-        /* ====== GUARDAR ====== */
-        btnGuardar.onclick = async () => {
-            const nuevoMensaje = textarea.value.trim();
+                    activarEdicionMensaje(); // reactivar
+                } catch (e) {
+                    alert('Error guardando mensaje');
+                }
+            };
 
-            try {
-                await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
-                    .update({ mensaje: nuevoMensaje });
-
-                const nuevoSpan = document.createElement('span');
-                nuevoSpan.className = 'mensaje-texto';
-                nuevoSpan.textContent = nuevoMensaje;
+            /* ====== CANCELAR ====== */
+            btnCancelar.onclick = () => {
+                const spanOriginal = document.createElement('span');
+                spanOriginal.className = 'mensaje-texto';
+                spanOriginal.textContent = textoOriginal;
 
                 const nuevoBtnEditar = document.createElement('button');
                 nuevoBtnEditar.className = 'btn-editar-mensaje';
                 nuevoBtnEditar.textContent = '✏️';
 
-                textarea.replaceWith(nuevoSpan);
+                textarea.replaceWith(spanOriginal);
                 contenedorBtns.replaceWith(nuevoBtnEditar);
 
-                activarEdicionMensaje(); // 🔁 REACTIVAR
-
-            } catch (e) {
-                alert('Error guardando mensaje');
-            }
+                activarEdicionMensaje(); // reactivar
+            };
         };
+    }
+    activarEdicionMensaje();
 
-        /* ====== CANCELAR ====== */
-        btnCancelar.onclick = () => {
+    /* ====== EDITAR REFERENCIA ====== */
+    function activarEdicionReferencia() {
+        const lineaRef = card.querySelector('.linea.ref');
+        if (!lineaRef) return;
 
-            const spanOriginal = document.createElement('span');
-            spanOriginal.className = 'mensaje-texto';
-            spanOriginal.textContent = textoOriginal;
+        let btnEditarRef = lineaRef.querySelector('.btn-editar-ref');
+        if (!btnEditarRef) {
+            btnEditarRef = document.createElement('button');
+            btnEditarRef.className = 'btn-editar-ref';
+            btnEditarRef.textContent = '✏️';
+            btnEditarRef.style.marginLeft = '6px';
+            lineaRef.appendChild(btnEditarRef);
+        }
 
-            const nuevoBtnEditar = document.createElement('button');
-            nuevoBtnEditar.className = 'btn-editar-mensaje';
-            nuevoBtnEditar.textContent = '✏️';
+        const spanRef = document.createElement('span');
+        spanRef.className = 'referencia-texto';
+        spanRef.textContent = p.referencia || 'Pedido';
 
-            textarea.replaceWith(spanOriginal);
-            contenedorBtns.replaceWith(nuevoBtnEditar);
+        lineaRef.innerHTML = `🏷️ `;
+        lineaRef.appendChild(spanRef);
+        lineaRef.appendChild(btnEditarRef);
 
-            activarEdicionMensaje(); // 🔁 REACTIVAR
+        btnEditarRef.onclick = () => {
+            const textoOriginal = spanRef.textContent;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = textoOriginal;
+            input.style.width = '70%';
+
+            const btnGuardar = document.createElement('button');
+            btnGuardar.textContent = '💾 Guardar';
+            btnGuardar.style.marginRight = '6px';
+
+            const btnCancelar = document.createElement('button');
+            btnCancelar.textContent = '❌ Cancelar';
+
+            const contenedorBtns = document.createElement('div');
+            contenedorBtns.style.display = 'inline-block';
+            contenedorBtns.style.marginLeft = '6px';
+            contenedorBtns.append(btnGuardar, btnCancelar);
+
+            spanRef.replaceWith(input);
+            btnEditarRef.replaceWith(contenedorBtns);
+
+            /* ====== GUARDAR ====== */
+            btnGuardar.onclick = async () => {
+                const nuevaRef = input.value.trim();
+                try {
+                    await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
+                        .update({ referencia: nuevaRef });
+
+                    spanRef.textContent = nuevaRef;
+                    lineaRef.innerHTML = `🏷️ `;
+                    lineaRef.appendChild(spanRef);
+                    lineaRef.appendChild(btnEditarRef);
+
+                    activarEdicionReferencia(); // reactivar
+                } catch (e) {
+                    alert('Error guardando referencia');
+                }
+            };
+
+            /* ====== CANCELAR ====== */
+            btnCancelar.onclick = () => {
+                spanRef.textContent = textoOriginal;
+                lineaRef.innerHTML = `🏷️ `;
+                lineaRef.appendChild(spanRef);
+                lineaRef.appendChild(btnEditarRef);
+
+                activarEdicionReferencia(); // reactivar
+            };
         };
-    };
-}
-
-// 🚀 activar edición al crear la tarjeta
-activarEdicionMensaje();
-
+    }
+    activarEdicionReferencia();
 
     return card;
 }
