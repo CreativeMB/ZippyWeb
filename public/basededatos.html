@@ -1245,13 +1245,6 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 
 
 // --- OBTENER IMAGEN PARA MOSTRAR ---
-function obtenerImagenPedido(p) {
-    if (!p.urlimagen || p.urlimagen.trim() === '') return '';
-
-    // Si la URL apunta a un archivo de Drive tipo "file/d/ID/view"
-    return urlDriveDirecta(p.urlimagen);
-}
-
 function normalizarImagen(url){
     if(!url) return '';
 
