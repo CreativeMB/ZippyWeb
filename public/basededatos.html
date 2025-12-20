@@ -834,15 +834,20 @@ btnCerrarSesion.onclick = () => {
 
 // --- AUTH ---
 auth.onAuthStateChanged(user => {
-    if(!user){
+    if (!user) {
         window.location.href = "login.html";
     } else {
         idEmpresa = user.uid;
+
         cargarPerfilEmpresa();
         cargarBases();
-         cargarPedidosRealtime();
+
+        cargarJSONDesdeDrive().then(() => {
+            cargarPedidosRealtime();
+        });
     }
 });
+
 // Función para cargar el perfil de la empresa
 function cargarPerfilEmpresa() {
     const ref = db.ref(`${idEmpresa}/perfilempresa`);
@@ -1200,6 +1205,15 @@ async function cargarJSONDesdeDrive() {
         console.error('❌ Error cargando JSON Drive', e);
     }
 }
+// --- obteniendo imagen desde jason referencia
+function obtenerImagenPedido(p) {
+
+    if (p.referencia && referenciasDrive[p.referencia]) {
+        return referenciasDrive[p.referencia];
+    }
+
+    return normalizarImagen(p.imagenUrl);
+}
 
 // --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
@@ -1279,9 +1293,10 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     card.innerHTML = `
         <div class="pedido-top">
-            <img class="pedido-img"
-                 src="${normalizarImagen(p.imagenUrl)}"
-                 loading="lazy">
+           <img class="pedido-img"
+     src="${obtenerImagenPedido(p)}"
+     loading="lazy">
+
 
             <div class="pedido-info">
 
