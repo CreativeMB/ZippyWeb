@@ -1196,6 +1196,12 @@ function iniciarEscuchaPedidos() {
     const domiRef = db.ref(`${idEmpresa}/Domiciliarios`);
     const grid = document.getElementById("pedidosGrid");
 
+    // 🛑 PROTECCIÓN CRÍTICA
+    if (!grid) {
+        console.error('❌ No existe el contenedor #pedidosGrid');
+        return;
+    }
+
     domiRef.once('value').then(domiSnap => {
 
         const domiciliarios = {};
@@ -1207,6 +1213,7 @@ function iniciarEscuchaPedidos() {
         });
 
         pedidosRef.on('value', snapshot => {
+
             grid.innerHTML = '';
             const pedidosPorFecha = {};
 
@@ -1251,6 +1258,9 @@ function iniciarEscuchaPedidos() {
                     });
                 });
         });
+
+    }).catch(err => {
+        console.error('❌ Error cargando domiciliarios:', err);
     });
 }
 
@@ -1262,10 +1272,11 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     card.style.backgroundColor = obtenerColorPedido(p.color);
 
     card.innerHTML = `
-        <div class="pedido-top">
-            <img class="pedido-img"
-                 src="${normalizarImagen(p.imagenUrl)}">
-                 loading="lazy">
+        <img class="pedido-img"
+     src="${normalizarImagen(imagenDesdeReferencia)}"
+     loading="lazy">
+
+
 
             <div class="pedido-info">
 
@@ -1344,6 +1355,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 const btnImprimir = card.querySelector('.btn-imprimir');
 const imagenDesdeReferencia =
     referenciasDrive[p.referencia] || p.imagenUrl || '';
+
 
 if (btnImprimir) {
     btnImprimir.onclick = () => {
