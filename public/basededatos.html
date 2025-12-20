@@ -1240,16 +1240,18 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 
 // --- OBTENER IMAGEN PARA MOSTRAR ---
 function obtenerImagenPedido(p) {
-    // 1️⃣ Usar la imagen que ya tenga el pedido
+    // 1️⃣ Prioridad: p.imagenUrl (asignada desde JSON o Firebase)
+    if (p.imagenUrl && p.imagenUrl.trim() !== '') return p.imagenUrl;
+
+    // 2️⃣ Luego p.imagen (si alguna vez se asignó directamente al pedido)
     if (p.imagen && p.imagen.trim() !== '') return p.imagen;
 
-    // 2️⃣ Si hay referencia en referenciasDrive, usarla
+    // 3️⃣ Referencia desde JSON
     if (p.referencia && referenciasDrive[p.referencia]) return referenciasDrive[p.referencia];
 
-    // 3️⃣ Si nada, devolver vacío
+    // 4️⃣ Si nada, vacío
     return '';
 }
-
 
 // --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
@@ -1349,10 +1351,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     card.innerHTML = `
         <div class="pedido-top">
       
-       <img class="pedido-img"
-     src="${obtenerImagenPedido(p)}"
-     loading="lazy">
-
+    <img class="pedido-img" src="${obtenerImagenPedido(p)}" loading="lazy">
 
             <div class="pedido-info">
 
