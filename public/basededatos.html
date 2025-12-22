@@ -1709,7 +1709,8 @@ function convertirFecha(fecha) {
     return new Date(y, m - 1, d);
 }
 
-function formatearFechaBonita(fecha) {
+function formatearFechaBonita(fecha, pedido) {
+
     const [d, m, y] = fecha.split('-');
     const date = new Date(y, m - 1, d);
 
@@ -1720,8 +1721,11 @@ function formatearFechaBonita(fecha) {
         year: 'numeric'
     });
 
-    return `Pedidos para Entrega:  ${fechaTexto} · ${nombreEmpresa}`;
+    const nombreEmpresa = pedido?.nombreEmpresa || 'Empresa';
+
+    return `Pedidos para entrega: ${fechaTexto} · ${nombreEmpresa}`;
 }
+
 function formatearFechaBD(fechaHora) {
     if (!fechaHora) return '';
 
