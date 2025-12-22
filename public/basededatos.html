@@ -1709,7 +1709,12 @@ function convertirFecha(fecha) {
     return new Date(y, m - 1, d);
 }
 
-function formatearFechaBonita(fecha, perfil) {
+function formatearFechaBonita(fecha) {
+
+    const perfil = window.perfilEmpresa;
+    if (!perfil || !perfil.nombreEmpresa) {
+        return `Pedidos para entrega`;
+    }
 
     const [d, m, y] = fecha.split('-');
     const date = new Date(y, m - 1, d);
@@ -1721,10 +1726,11 @@ function formatearFechaBonita(fecha, perfil) {
         year: 'numeric'
     });
 
-    const nombreEmpresa = perfil?.nombreEmpresa?.trim() || 'Empresa';
+    const nombreEmpresa = perfil.nombreEmpresa.trim();
 
     return `Pedidos para entrega: ${fechaTexto} · ${nombreEmpresa}`;
 }
+
 
 
 function formatearFechaBD(fechaHora) {
