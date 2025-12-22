@@ -1719,18 +1719,23 @@ function formatearFechaBonita(fecha) {
     const [d, m, y] = fecha.split('-');
     const date = new Date(y, m - 1, d);
 
-    const fechaTexto = date.toLocaleDateString('es-CO', {
+    let fechaTexto = date.toLocaleDateString('es-CO', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
         year: 'numeric'
     });
 
+    // 🔹 Primera letra en mayúscula
+    fechaTexto = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
+
+    // 🔹 Reemplazar la coma por flecha
+    fechaTexto = fechaTexto.replace(',', ' →');
+
     const nombreEmpresa = perfil.nombreEmpresa.trim();
 
-    return `Pedidos para entrega: ${fechaTexto} · ${nombreEmpresa}`;
+    return `🎁 Pedidos para entrega: ${fechaTexto} ➜ ${nombreEmpresa}`;
 }
-
 
 
 function formatearFechaBD(fechaHora) {
