@@ -1730,11 +1730,11 @@ function formatearFechaBonita(fecha) {
     fechaTexto = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
 
     // 🔹 Reemplazar la coma por flecha
-    fechaTexto = fechaTexto.replace(',', ' →');
+    fechaTexto = fechaTexto.replace(',', ' ➜');
 
     const nombreEmpresa = perfil.nombreEmpresa.trim();
 
-    return `🎁 Pedidos para entrega: ${fechaTexto} ➜ ${nombreEmpresa}`;
+    return `🎁 Pedidos para entrega ➤ ${fechaTexto} ➡️ ${nombreEmpresa}`;
 }
 
 
