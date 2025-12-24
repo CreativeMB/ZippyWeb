@@ -701,6 +701,7 @@ th {
     height: 100%;
     object-fit: cover;
 }
+
 /* ===== CINTA ADICIONAL ===== */
 .cinta-adicional {
     position: absolute;
@@ -717,20 +718,28 @@ th {
     overflow: hidden;
 }
 
-
-.cinta-adicional.marquee span {
+/* 🔹 TEXTO NORMAL (quieto) */
+.cinta-adicional span {
     display: inline-block;
+    white-space: nowrap;
+}
+
+/* 🔹 SOLO SI NO CABE → MARQUEE */
+.cinta-adicional.marquee span {
     padding-left: 100%;
     animation: moverTexto 8s linear infinite;
+    will-change: transform;
 }
 
+/* 🔹 ANIMACIÓN */
 @keyframes moverTexto {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-100%); }
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-100%);
+    }
 }
-
-
-
 
 </style>
 </head>
@@ -1643,13 +1652,19 @@ function activarMarqueeSiNecesario(cinta) {
     const span = cinta.querySelector('span');
     if (!span) return;
 
-    // comparar tamaños
     if (span.scrollWidth > cinta.clientWidth) {
         cinta.classList.add('marquee');
     } else {
         cinta.classList.remove('marquee');
     }
 }
+
+/* 🔹 RECALCULAR CUANDO CARGA LA IMAGEN */
+const img = card.querySelector('.pedido-img');
+if (img && cinta) {
+    img.onload = () => activarMarqueeSiNecesario(cinta);
+}
+
 
     /* ====== EDITAR REFERENCIA ====== */
     function activarEdicionReferencia() {
