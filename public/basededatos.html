@@ -1639,6 +1639,17 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 const cinta = card.querySelector('.cinta-adicional');
 if (cinta) activarMarqueeSiNecesario(cinta);
 
+function activarMarqueeSiNecesario(cinta) {
+    const span = cinta.querySelector('span');
+    if (!span) return;
+
+    // comparar tamaños
+    if (span.scrollWidth > cinta.clientWidth) {
+        cinta.classList.add('marquee');
+    } else {
+        cinta.classList.remove('marquee');
+    }
+}
 
     /* ====== EDITAR REFERENCIA ====== */
     function activarEdicionReferencia() {
@@ -1725,17 +1736,7 @@ if (cinta) activarMarqueeSiNecesario(cinta);
     return card;
 }
 
-function activarMarqueeSiNecesario(cinta) {
-    const span = cinta.querySelector('span');
-    if (!span) return;
 
-    // comparar tamaños
-    if (span.scrollWidth > cinta.clientWidth) {
-        cinta.classList.add('marquee');
-    } else {
-        cinta.classList.remove('marquee');
-    }
-}
 
 
 async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedido) {
