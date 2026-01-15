@@ -1126,10 +1126,25 @@ function mostrarDatos(base) {
         li.style.borderRadius = '6px';
         li.style.backgroundColor = valor < 0 ? '#FFCDD2' : '#C8E6C9';
 
-        sidebarList.insertBefore(li, separadorActual.nextSibling);
+        li.dataset.fecha = item.fechaHora;
+insertarItemOrdenado(separadorActual, li, item.fechaHora);
+
 
         actualizarTotales(totalPositivo, totalNegativo);
     });
+}
+function insertarItemOrdenado(separador, li, fechaItem) {
+    let nodo = separador.nextSibling;
+
+    while (nodo && !nodo.classList?.contains('separador-dia')) {
+        const fechaNodo = nodo.dataset.fecha;
+        if (fechaNodo && new Date(fechaItem) > new Date(fechaNodo)) {
+            break;
+        }
+        nodo = nodo.nextSibling;
+    }
+
+    separador.parentNode.insertBefore(li, nodo);
 }
 
 function crearSeparadorDiaEditable(fechaISO) {
