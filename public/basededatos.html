@@ -997,6 +997,7 @@ document.addEventListener('keydown', e => {
 });
 
 // --- FUNCION MOSTRAR DATOS DE BASE ---
+// --- FUNCION MOSTRAR DATOS DE BASE ---
 function mostrarDatos(base) {
     baseSeleccionada = base;
 
@@ -1014,6 +1015,7 @@ function mostrarDatos(base) {
     sidebarList.innerHTML = '';
 
     const itemsMostrados = new Set();
+    const separadoresPorDia = {}; // 👈 CLAVE
 
     let totalPositivo = 0;
     let totalNegativo = 0;
@@ -1029,32 +1031,32 @@ function mostrarDatos(base) {
             }
         });
 
-        // Ordenar por fecha (más reciente primero)
+        // orden correcto
         itemsArray.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
-
-        let diaActual = null;
-        let separadorActual = null;
 
         itemsArray.forEach(item => {
 
             const fechaDia = item.fechaHora.split('T')[0];
 
-            // 🟢 NUEVO DÍA → crear separador
-            if (fechaDia !== diaActual) {
-                diaActual = fechaDia;
-                separadorActual = crearSeparadorDiaEditable(fechaDia);
-                sidebarList.appendChild(separadorActual);
+            // 🟢 crear separador SOLO UNA VEZ
+            if (!separadoresPorDia[fechaDia]) {
+                const separador = crearSeparadorDiaEditable(fechaDia);
+                separadoresPorDia[fechaDia] = separador;
+                sidebarList.appendChild(separador);
             }
+
+            const separadorActual = separadoresPorDia[fechaDia];
 
             itemsMostrados.add(item.key);
 
             const valor = Number(item.valor) || 0;
 
-            // 👉 acumular en separador
+            // 👉 acumular en el separador EXISTENTE
             if (valor > 0) {
                 separadorActual.dataset.pos =
                     Number(separadorActual.dataset.pos) + valor;
             }
+
             if (valor < 0) {
                 separadorActual.dataset.neg =
                     Number(separadorActual.dataset.neg) + valor;
@@ -1099,11 +1101,33 @@ function mostrarDatos(base) {
         const item = itemSnap.val();
         if (!item || !item.nombre) return;
 
-        itemsMostrados.add(itemSnap.key);
+        const fechaDia = item.fechaHora.split('T')[0];
+
+        // 🟢 si no existe separador para hoy, crearlo
+        if (!separadoresPorDia[fechaDia]) {
+            const separador = crearSeparadorDiaEditable(fechaDia);
+            separadoresPorDia[fechaDia] = separador;
+            sidebarList.insertBefore(separador, sidebarList.firstChild);
+        }
+
+        const separadorActual = separadoresPorDia[fechaDia];
 
         const valor = Number(item.valor) || 0;
+
         if (valor > 0) totalPositivo += valor;
         if (valor < 0) totalNegativo += valor;
+
+        if (valor > 0) {
+            separadorActual.dataset.pos =
+                Number(separadorActual.dataset.pos) + valor;
+        }
+
+        if (valor < 0) {
+            separadorActual.dataset.neg =
+                Number(separadorActual.dataset.neg) + valor;
+        }
+
+        separadorActual.actualizar();
 
         const li = document.createElement('li');
         li.dataset.key = itemSnap.key;
@@ -1125,11 +1149,12 @@ function mostrarDatos(base) {
         li.style.marginBottom = '5px';
         li.style.borderRadius = '6px';
 
-        sidebarList.insertBefore(li, sidebarList.firstChild);
+        sidebarList.insertBefore(li, separadorActual.nextSibling);
 
         actualizarTotales(totalPositivo, totalNegativo);
     });
 }
+
 
 function crearSeparadorDiaEditable(fechaISO) {
     const li = document.createElement('li');
