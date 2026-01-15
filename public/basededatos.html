@@ -1132,7 +1132,6 @@ function mostrarDatos(base) {
     });
 }
 
-
 function crearSeparadorDiaEditable(fechaISO) {
     const li = document.createElement('li');
 
@@ -1146,7 +1145,11 @@ function crearSeparadorDiaEditable(fechaISO) {
 
     li.dataset.pos = 0;
     li.dataset.neg = 0;
-    li.className = 'separador-dia positivo';
+
+    li.style.padding = '12px';
+    li.style.margin = '12px 0 6px';
+    li.style.borderRadius = '8px';
+    li.style.fontWeight = 'bold';
 
     li.actualizar = function () {
         const pos = Number(this.dataset.pos);
@@ -1154,19 +1157,26 @@ function crearSeparadorDiaEditable(fechaISO) {
         const restante = pos + neg;
 
         this.innerHTML = `
-            <strong>📅 ${fechaTexto}</strong><br>
+            📅 ${fechaTexto}<br>
             ➕ $${pos.toLocaleString('es-CO')} |
             ➖ $${Math.abs(neg).toLocaleString('es-CO')} |
             💰 <strong>$${restante.toLocaleString('es-CO')}</strong>
         `;
 
-        this.classList.toggle('negativo', restante < 0);
-        this.classList.toggle('positivo', restante >= 0);
+        // 🎨 COLOR SEGÚN RESTANTE
+        if (restante < 0) {
+            this.style.backgroundColor = '#FFCDD2';
+            this.style.color = '#B71C1C';
+        } else {
+            this.style.backgroundColor = '#C8E6C9';
+            this.style.color = '#1B5E20';
+        }
     };
 
     li.actualizar();
     return li;
 }
+
 
 
 // --- FUNCION GUARDAR DATO ---
