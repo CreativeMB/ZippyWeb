@@ -1021,78 +1021,68 @@ function mostrarDatos(base) {
     let totalNegativo = 0;
 
     /* ===================== 🔵 CARGA INICIAL ===================== */
-    ref.once('value', snapshot => {
-        const itemsArray = [];
+    ref.on('child_added', itemSnap => {
+    if (itemsMostrados.has(itemSnap.key)) return;
 
-        snapshot.forEach(itemSnap => {
-            const item = itemSnap.val();
-            if (item && item.nombre) {
-                itemsArray.push({ ...item, key: itemSnap.key });
-            }
-        });
+    const item = itemSnap.val();
+    if (!item || !item.nombre) return;
 
-        // orden correcto
-        itemsArray.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+    itemsMostrados.add(itemSnap.key);
 
-        itemsArray.forEach(item => {
+    const fechaDia = item.fechaHora.split('T')[0];
 
-            const fechaDia = item.fechaHora.split('T')[0];
+    // 🟢 crear separador SOLO si no existe
+    if (!separadoresPorDia[fechaDia]) {
+        const separador = crearSeparadorDiaEditable(fechaDia);
+        separadoresPorDia[fechaDia] = separador;
+        sidebarList.insertBefore(separador, sidebarList.firstChild);
+    }
 
-            // 🟢 crear separador SOLO UNA VEZ
-            if (!separadoresPorDia[fechaDia]) {
-                const separador = crearSeparadorDiaEditable(fechaDia);
-                separadoresPorDia[fechaDia] = separador;
-                sidebarList.appendChild(separador);
-            }
+    const separadorActual = separadoresPorDia[fechaDia];
 
-            const separadorActual = separadoresPorDia[fechaDia];
+    const valor = Number(item.valor) || 0;
 
-            itemsMostrados.add(item.key);
+    if (valor > 0) totalPositivo += valor;
+    if (valor < 0) totalNegativo += valor;
 
-            const valor = Number(item.valor) || 0;
+    if (valor > 0) {
+        separadorActual.dataset.pos =
+            Number(separadorActual.dataset.pos) + valor;
+    }
 
-            // 👉 acumular en el separador EXISTENTE
-            if (valor > 0) {
-                separadorActual.dataset.pos =
-                    Number(separadorActual.dataset.pos) + valor;
-            }
+    if (valor < 0) {
+        separadorActual.dataset.neg =
+            Number(separadorActual.dataset.neg) + valor;
+    }
 
-            if (valor < 0) {
-                separadorActual.dataset.neg =
-                    Number(separadorActual.dataset.neg) + valor;
-            }
+    separadorActual.actualizar();
 
-            separadorActual.actualizar();
+    const li = document.createElement('li');
+    li.dataset.key = itemSnap.key;
 
-            // totales generales
-            if (valor > 0) totalPositivo += valor;
-            if (valor < 0) totalNegativo += valor;
+    const fechaFormateada = formatearFechaBD(item.fechaHora);
+    const valorTexto = `$${valor.toLocaleString('es-CO')}`;
 
-            const li = document.createElement('li');
-            li.dataset.key = item.key;
+    li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
 
-            const fechaFormateada = formatearFechaBD(item.fechaHora);
-            const valorTexto = `$${valor.toLocaleString('es-CO')}`;
+    if (valor < 0) {
+        li.style.color = '#D32F2F';
+        li.style.backgroundColor = '#FFCDD2';
+    } else {
+        li.style.color = '#388E3C';
+        li.style.backgroundColor = '#C8E6C9';
+    }
 
-            li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
+    li.style.padding = '10px';
+    li.style.marginBottom = '5px';
+    li.style.borderRadius = '6px';
 
-            if (valor < 0) {
-                li.style.color = '#D32F2F';
-                li.style.backgroundColor = '#FFCDD2';
-            } else {
-                li.style.color = '#388E3C';
-                li.style.backgroundColor = '#C8E6C9';
-            }
+    // 👉 insertar SIEMPRE debajo del separador
+    sidebarList.insertBefore(li, separadorActual.nextSibling);
 
-            li.style.padding = '10px';
-            li.style.marginBottom = '5px';
-            li.style.borderRadius = '6px';
+    actualizarTotales(totalPositivo, totalNegativo);
+});
 
-            sidebarList.appendChild(li);
-        });
-
-        actualizarTotales(totalPositivo, totalNegativo);
-    });
 
     /* ===================== 🔴 TIEMPO REAL ===================== */
     ref.on('child_added', itemSnap => {
