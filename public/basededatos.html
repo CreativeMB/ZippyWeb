@@ -1006,55 +1006,49 @@ function mostrarDatos(base) {
     formNuevoDato.style.display = "none";
     opcionesExtra.style.display = "none";
 
-    const resumen = document.getElementById('resumenTotales');
-    resumen.style.display = 'grid';
+    document.getElementById('resumenTotales').style.display = 'grid';
 
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
     ref.off();
-
     sidebarList.innerHTML = '';
 
-    const itemsMostrados = new Set();
     const separadoresPorDia = {};
+    const itemsMostrados = new Set();
 
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    // ✅ UN SOLO child_added (carga inicial + tiempo real)
-    ref.on('child_added', itemSnap => {
-        if (itemsMostrados.has(itemSnap.key)) return;
+    ref.on('child_added', snap => {
+        if (itemsMostrados.has(snap.key)) return;
 
-        const item = itemSnap.val();
-        if (!item || !item.nombre) return;
+        const item = snap.val();
+        if (!item || !item.nombre || !item.fechaHora) return;
 
-        itemsMostrados.add(itemSnap.key);
+        itemsMostrados.add(snap.key);
 
-        const fechaDia = item.fechaHora.split('T')[0];
+        // ✅ NORMALIZAR FECHA (CLAVE ÚNICA POR DÍA)
+        const fechaObj = new Date(item.fechaHora);
+        const fechaDia = fechaObj.toISOString().split('T')[0]; // ← CLAVE
 
-        // 🟢 crear separador SOLO UNA VEZ por día
+        // 🟢 crear separador SOLO UNA VEZ
         if (!separadoresPorDia[fechaDia]) {
             const separador = crearSeparadorDiaEditable(fechaDia);
             separadoresPorDia[fechaDia] = separador;
-
-            // insertar separador arriba (día más reciente primero)
-            sidebarList.insertBefore(separador, sidebarList.firstChild);
+            sidebarList.appendChild(separador);
         }
 
         const separadorActual = separadoresPorDia[fechaDia];
 
         const valor = Number(item.valor) || 0;
 
-        // 🔢 totales generales
-        if (valor > 0) totalPositivo += valor;
-        if (valor < 0) totalNegativo += valor;
-
-        // 🔢 totales por día
         if (valor > 0) {
+            totalPositivo += valor;
             separadorActual.dataset.pos =
                 Number(separadorActual.dataset.pos) + valor;
         }
 
         if (valor < 0) {
+            totalNegativo += valor;
             separadorActual.dataset.neg =
                 Number(separadorActual.dataset.neg) + valor;
         }
@@ -1063,12 +1057,16 @@ function mostrarDatos(base) {
 
         // 📄 ITEM
         const li = document.createElement('li');
-        li.dataset.key = itemSnap.key;
+        li.dataset.key = snap.key;
 
-        const fechaFormateada = formatearFechaBD(item.fechaHora);
         const valorTexto = `$${valor.toLocaleString('es-CO')}`;
+        const fechaTexto = item.fechaHora;
 
-        li.textContent = `${item.nombre} : ${valorTexto} ${fechaFormateada}`;
+        li.textContent = `${item.nombre} : ${valorTexto} ${fechaTexto}`;
+
+        li.style.padding = '10px';
+        li.style.marginBottom = '5px';
+        li.style.borderRadius = '6px';
 
         if (valor < 0) {
             li.style.color = '#D32F2F';
@@ -1078,11 +1076,6 @@ function mostrarDatos(base) {
             li.style.backgroundColor = '#C8E6C9';
         }
 
-        li.style.padding = '10px';
-        li.style.marginBottom = '5px';
-        li.style.borderRadius = '6px';
-
-        // 👉 SIEMPRE debajo de su separador
         sidebarList.insertBefore(li, separadorActual.nextSibling);
 
         actualizarTotales(totalPositivo, totalNegativo);
