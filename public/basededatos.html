@@ -1018,7 +1018,7 @@ function mostrarDatos(base) {
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    /* ===================== 🔵 CARGA INICIAL ORDENADA ===================== */
+    /* ===================== 🔵 CARGA INICIAL ===================== */
     ref.once('value', snapshot => {
         const items = [];
 
@@ -1029,83 +1029,52 @@ function mostrarDatos(base) {
             }
         });
 
-        // 🔥 ORDEN CORRECTO (más reciente primero)
+        // 🔥 ordenar por fecha (más reciente primero)
         items.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
 
         items.forEach(item => {
-            itemsMostrados.add(item.key);
-
-            // ✅ FECHA LOCAL SIN UTC
-            const fechaObj = new Date(item.fechaHora);
-            const fechaDia =
-                fechaObj.getFullYear() + '-' +
-                String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
-                String(fechaObj.getDate()).padStart(2, '0');
-
-            if (!separadoresPorDia[fechaDia]) {
-                const separador = crearSeparadorDiaEditable(fechaDia);
-                separadoresPorDia[fechaDia] = separador;
-                sidebarList.appendChild(separador);
-            }
-
-            const separadorActual = separadoresPorDia[fechaDia];
-            const valor = Number(item.valor) || 0;
-
-            if (valor > 0) {
-                totalPositivo += valor;
-                separadorActual.dataset.pos =
-                    Number(separadorActual.dataset.pos) + valor;
-            }
-
-            if (valor < 0) {
-                totalNegativo += valor;
-                separadorActual.dataset.neg =
-                    Number(separadorActual.dataset.neg) + valor;
-            }
-
-            separadorActual.actualizar();
-
-            const li = document.createElement('li');
-            li.dataset.key = item.key;
-
-            li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${item.fechaHora}`;
-
-            li.style.padding = '10px';
-            li.style.marginBottom = '5px';
-            li.style.borderRadius = '6px';
-            li.style.backgroundColor = valor < 0 ? '#FFCDD2' : '#C8E6C9';
-            li.style.color = valor < 0 ? '#D32F2F' : '#388E3C';
-
-            sidebarList.insertBefore(li, separadorActual.nextSibling);
+            procesarItem(item);
         });
 
         actualizarTotales(totalPositivo, totalNegativo);
     });
 
-    /* ===================== 🔴 TIEMPO REAL (SOLO NUEVOS) ===================== */
+    /* ===================== 🔴 TIEMPO REAL ===================== */
     ref.on('child_added', snap => {
         if (itemsMostrados.has(snap.key)) return;
 
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
 
-        itemsMostrados.add(snap.key);
+        procesarItem({ ...item, key: snap.key });
+        actualizarTotales(totalPositivo, totalNegativo);
+    });
+
+    /* ===================== 🔧 FUNCIÓN INTERNA ===================== */
+    function procesarItem(item) {
+        if (itemsMostrados.has(item.key)) return;
+        itemsMostrados.add(item.key);
 
         const fechaObj = new Date(item.fechaHora);
+        const timestamp = fechaObj.getTime();
+
+        // 🔑 clave única por día (LOCAL, sin UTC)
         const fechaDia =
             fechaObj.getFullYear() + '-' +
             String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
             String(fechaObj.getDate()).padStart(2, '0');
 
+        // 🟢 crear separador si no existe
         if (!separadoresPorDia[fechaDia]) {
             const separador = crearSeparadorDiaEditable(fechaDia);
             separadoresPorDia[fechaDia] = separador;
-            sidebarList.insertBefore(separador, sidebarList.firstChild);
+            sidebarList.appendChild(separador);
         }
 
         const separadorActual = separadoresPorDia[fechaDia];
         const valor = Number(item.valor) || 0;
 
+        // ➕➖ acumular totales
         if (valor > 0) {
             totalPositivo += valor;
             separadorActual.dataset.pos =
@@ -1120,27 +1089,40 @@ function mostrarDatos(base) {
 
         separadorActual.actualizar();
 
+        // 📄 ITEM
         const li = document.createElement('li');
-        li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${item.fechaHora}`;
+        li.dataset.key = item.key;
+        li.dataset.timestamp = timestamp;
+
+        const fechaFormateada = formatearFechaBD(item.fechaHora);
+        li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${fechaFormateada}`;
+
         li.style.padding = '10px';
+        li.style.marginBottom = '5px';
         li.style.borderRadius = '6px';
-        li.style.backgroundColor = valor < 0 ? '#FFCDD2' : '#C8E6C9';
 
-        li.dataset.fecha = item.fechaHora;
-insertarItemOrdenado(separadorActual, li, item.fechaHora);
+        if (valor < 0) {
+            li.style.color = '#D32F2F';
+            li.style.backgroundColor = '#FFCDD2';
+        } else {
+            li.style.color = '#388E3C';
+            li.style.backgroundColor = '#C8E6C9';
+        }
 
-
-        actualizarTotales(totalPositivo, totalNegativo);
-    });
+        // 🔥 insertar ordenado dentro del día
+        insertarItemOrdenado(separadorActual, li, timestamp);
+    }
 }
-function insertarItemOrdenado(separador, li, fechaItem) {
+
+function insertarItemOrdenado(separador, li, timestamp) {
     let nodo = separador.nextSibling;
 
     while (nodo && !nodo.classList?.contains('separador-dia')) {
-        const fechaNodo = nodo.dataset.fecha;
-        if (fechaNodo && new Date(fechaItem) > new Date(fechaNodo)) {
-            break;
-        }
+        const tsNodo = Number(nodo.dataset.timestamp);
+
+        // si el nuevo es más reciente → va antes
+        if (timestamp > tsNodo) break;
+
         nodo = nodo.nextSibling;
     }
 
@@ -1149,6 +1131,7 @@ function insertarItemOrdenado(separador, li, fechaItem) {
 
 function crearSeparadorDiaEditable(fechaISO) {
     const li = document.createElement('li');
+    li.classList.add('separador-dia');
 
     const fecha = new Date(fechaISO);
     const fechaTexto = fecha.toLocaleDateString('es-CO', {
@@ -1178,7 +1161,6 @@ function crearSeparadorDiaEditable(fechaISO) {
             💰 <strong>$${restante.toLocaleString('es-CO')}</strong>
         `;
 
-        // 🎨 COLOR SEGÚN RESTANTE
         if (restante < 0) {
             this.style.backgroundColor = '#FFCDD2';
             this.style.color = '#B71C1C';
