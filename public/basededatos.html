@@ -997,7 +997,6 @@ document.addEventListener('keydown', e => {
 });
 
 // --- FUNCION MOSTRAR DATOS DE BASE ---
-// --- FUNCION MOSTRAR DATOS DE BASE ---
 function mostrarDatos(base) {
     baseSeleccionada = base;
 
@@ -1007,7 +1006,6 @@ function mostrarDatos(base) {
     formNuevoDato.style.display = "none";
     opcionesExtra.style.display = "none";
 
-    // Mostrar resumen
     const resumen = document.getElementById('resumenTotales');
     resumen.style.display = 'grid';
 
@@ -1034,32 +1032,35 @@ function mostrarDatos(base) {
         // Ordenar por fecha (más reciente primero)
         itemsArray.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
 
-        // 👉 variables para separador diario
         let diaActual = null;
-        let totalDiaPos = 0;
-        let totalDiaNeg = 0;
+        let separadorActual = null;
 
-        itemsArray.forEach((item, index) => {
+        itemsArray.forEach(item => {
 
             const fechaDia = item.fechaHora.split('T')[0];
 
-            // 🔄 cambio de día → imprimir separador anterior
-            if (diaActual && fechaDia !== diaActual) {
-                sidebarList.appendChild(
-                    crearSeparadorDia(diaActual, totalDiaPos, totalDiaNeg)
-                );
-                totalDiaPos = 0;
-                totalDiaNeg = 0;
+            // 🟢 NUEVO DÍA → crear separador
+            if (fechaDia !== diaActual) {
+                diaActual = fechaDia;
+                separadorActual = crearSeparadorDiaEditable(fechaDia);
+                sidebarList.appendChild(separadorActual);
             }
 
-            diaActual = fechaDia;
             itemsMostrados.add(item.key);
 
             const valor = Number(item.valor) || 0;
 
-            // totales del día
-            if (valor > 0) totalDiaPos += valor;
-            if (valor < 0) totalDiaNeg += valor;
+            // 👉 acumular en separador
+            if (valor > 0) {
+                separadorActual.dataset.pos =
+                    Number(separadorActual.dataset.pos) + valor;
+            }
+            if (valor < 0) {
+                separadorActual.dataset.neg =
+                    Number(separadorActual.dataset.neg) + valor;
+            }
+
+            separadorActual.actualizar();
 
             // totales generales
             if (valor > 0) totalPositivo += valor;
@@ -1086,16 +1087,8 @@ function mostrarDatos(base) {
             li.style.borderRadius = '6px';
 
             sidebarList.appendChild(li);
-
-            // 👉 último registro → separador final
-            if (index === itemsArray.length - 1) {
-                sidebarList.appendChild(
-                    crearSeparadorDia(diaActual, totalDiaPos, totalDiaNeg)
-                );
-            }
         });
 
-        // resumen general
         actualizarTotales(totalPositivo, totalNegativo);
     });
 
@@ -1138,8 +1131,7 @@ function mostrarDatos(base) {
     });
 }
 
-
-function crearSeparadorDia(fechaISO, totalPos, totalNeg) {
+function crearSeparadorDiaEditable(fechaISO) {
     const li = document.createElement('li');
 
     const fecha = new Date(fechaISO);
@@ -1150,30 +1142,30 @@ function crearSeparadorDia(fechaISO, totalPos, totalNeg) {
         year: 'numeric'
     });
 
-    const restante = totalPos + totalNeg;
+    li.dataset.pos = 0;
+    li.dataset.neg = 0;
+    li.className = 'separador-dia positivo';
 
-    li.innerHTML = `
-        <strong>📅 ${fechaTexto}</strong><br>
-        ➕ $${totalPos.toLocaleString('es-CO')} |
-        ➖ $${Math.abs(totalNeg).toLocaleString('es-CO')} |
-        💰 <strong>$${restante.toLocaleString('es-CO')}</strong>
-    `;
+    li.actualizar = function () {
+        const pos = Number(this.dataset.pos);
+        const neg = Number(this.dataset.neg);
+        const restante = pos + neg;
 
-    li.style.padding = '12px';
-    li.style.margin = '12px 0 6px';
-    li.style.borderRadius = '8px';
-    li.style.fontWeight = 'bold';
+        this.innerHTML = `
+            <strong>📅 ${fechaTexto}</strong><br>
+            ➕ $${pos.toLocaleString('es-CO')} |
+            ➖ $${Math.abs(neg).toLocaleString('es-CO')} |
+            💰 <strong>$${restante.toLocaleString('es-CO')}</strong>
+        `;
 
-    if (restante < 0) {
-        li.style.backgroundColor = '#FFCDD2';
-        li.style.color = '#B71C1C';
-    } else {
-        li.style.backgroundColor = '#C8E6C9';
-        li.style.color = '#1B5E20';
-    }
+        this.classList.toggle('negativo', restante < 0);
+        this.classList.toggle('positivo', restante >= 0);
+    };
 
+    li.actualizar();
     return li;
 }
+
 
 // --- FUNCION GUARDAR DATO ---
 function guardarDato() {
