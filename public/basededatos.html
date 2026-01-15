@@ -1018,6 +1018,71 @@ function mostrarDatos(base) {
     let totalPositivo = 0;
     let totalNegativo = 0;
 
+    /* ===================== 🔵 CARGA INICIAL ORDENADA ===================== */
+    ref.once('value', snapshot => {
+        const items = [];
+
+        snapshot.forEach(snap => {
+            const item = snap.val();
+            if (item && item.nombre && item.fechaHora) {
+                items.push({ ...item, key: snap.key });
+            }
+        });
+
+        // 🔥 ORDEN CORRECTO (más reciente primero)
+        items.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+
+        items.forEach(item => {
+            itemsMostrados.add(item.key);
+
+            // ✅ FECHA LOCAL SIN UTC
+            const fechaObj = new Date(item.fechaHora);
+            const fechaDia =
+                fechaObj.getFullYear() + '-' +
+                String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
+                String(fechaObj.getDate()).padStart(2, '0');
+
+            if (!separadoresPorDia[fechaDia]) {
+                const separador = crearSeparadorDiaEditable(fechaDia);
+                separadoresPorDia[fechaDia] = separador;
+                sidebarList.appendChild(separador);
+            }
+
+            const separadorActual = separadoresPorDia[fechaDia];
+            const valor = Number(item.valor) || 0;
+
+            if (valor > 0) {
+                totalPositivo += valor;
+                separadorActual.dataset.pos =
+                    Number(separadorActual.dataset.pos) + valor;
+            }
+
+            if (valor < 0) {
+                totalNegativo += valor;
+                separadorActual.dataset.neg =
+                    Number(separadorActual.dataset.neg) + valor;
+            }
+
+            separadorActual.actualizar();
+
+            const li = document.createElement('li');
+            li.dataset.key = item.key;
+
+            li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${item.fechaHora}`;
+
+            li.style.padding = '10px';
+            li.style.marginBottom = '5px';
+            li.style.borderRadius = '6px';
+            li.style.backgroundColor = valor < 0 ? '#FFCDD2' : '#C8E6C9';
+            li.style.color = valor < 0 ? '#D32F2F' : '#388E3C';
+
+            sidebarList.insertBefore(li, separadorActual.nextSibling);
+        });
+
+        actualizarTotales(totalPositivo, totalNegativo);
+    });
+
+    /* ===================== 🔴 TIEMPO REAL (SOLO NUEVOS) ===================== */
     ref.on('child_added', snap => {
         if (itemsMostrados.has(snap.key)) return;
 
@@ -1026,19 +1091,19 @@ function mostrarDatos(base) {
 
         itemsMostrados.add(snap.key);
 
-        // ✅ NORMALIZAR FECHA (CLAVE ÚNICA POR DÍA)
         const fechaObj = new Date(item.fechaHora);
-        const fechaDia = fechaObj.toISOString().split('T')[0]; // ← CLAVE
+        const fechaDia =
+            fechaObj.getFullYear() + '-' +
+            String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
+            String(fechaObj.getDate()).padStart(2, '0');
 
-        // 🟢 crear separador SOLO UNA VEZ
         if (!separadoresPorDia[fechaDia]) {
             const separador = crearSeparadorDiaEditable(fechaDia);
             separadoresPorDia[fechaDia] = separador;
-            sidebarList.appendChild(separador);
+            sidebarList.insertBefore(separador, sidebarList.firstChild);
         }
 
         const separadorActual = separadoresPorDia[fechaDia];
-
         const valor = Number(item.valor) || 0;
 
         if (valor > 0) {
@@ -1055,26 +1120,11 @@ function mostrarDatos(base) {
 
         separadorActual.actualizar();
 
-        // 📄 ITEM
         const li = document.createElement('li');
-        li.dataset.key = snap.key;
-
-        const valorTexto = `$${valor.toLocaleString('es-CO')}`;
-        const fechaTexto = item.fechaHora;
-
-        li.textContent = `${item.nombre} : ${valorTexto} ${fechaTexto}`;
-
+        li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${item.fechaHora}`;
         li.style.padding = '10px';
-        li.style.marginBottom = '5px';
         li.style.borderRadius = '6px';
-
-        if (valor < 0) {
-            li.style.color = '#D32F2F';
-            li.style.backgroundColor = '#FFCDD2';
-        } else {
-            li.style.color = '#388E3C';
-            li.style.backgroundColor = '#C8E6C9';
-        }
+        li.style.backgroundColor = valor < 0 ? '#FFCDD2' : '#C8E6C9';
 
         sidebarList.insertBefore(li, separadorActual.nextSibling);
 
