@@ -1029,8 +1029,12 @@ function mostrarDatos(base) {
             }
         });
 
+        // 🔥 ordenar por fecha (más reciente primero)
         items.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
-        items.forEach(item => procesarItem(item));
+
+        items.forEach(item => {
+            procesarItem(item);
+        });
 
         actualizarTotales(totalPositivo, totalNegativo);
     });
@@ -1038,6 +1042,7 @@ function mostrarDatos(base) {
     /* ===================== 🔴 TIEMPO REAL ===================== */
     ref.on('child_added', snap => {
         if (itemsMostrados.has(snap.key)) return;
+
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
 
@@ -1053,31 +1058,30 @@ function mostrarDatos(base) {
         const fechaObj = new Date(item.fechaHora);
         const timestamp = fechaObj.getTime();
 
+        // 🔑 clave única por día (LOCAL, sin UTC)
         const fechaDia =
             fechaObj.getFullYear() + '-' +
             String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
             String(fechaObj.getDate()).padStart(2, '0');
 
-        // 🟢 SEPARADOR
+        // 🟢 crear separador si no existe
         if (!separadoresPorDia[fechaDia]) {
             const separador = crearSeparadorDiaEditable(fechaDia);
             separadoresPorDia[fechaDia] = separador;
-
-            let nodo = sidebarList.firstChild;
-            while (nodo && nodo.dataset?.fecha > fechaDia) {
-                nodo = nodo.nextSibling;
-            }
-            sidebarList.insertBefore(separador, nodo);
+            sidebarList.appendChild(separador);
         }
 
         const separadorActual = separadoresPorDia[fechaDia];
         const valor = Number(item.valor) || 0;
 
+        // ➕➖ acumular totales
         if (valor > 0) {
             totalPositivo += valor;
             separadorActual.dataset.pos =
                 Number(separadorActual.dataset.pos) + valor;
-        } else {
+        }
+
+        if (valor < 0) {
             totalNegativo += valor;
             separadorActual.dataset.neg =
                 Number(separadorActual.dataset.neg) + valor;
@@ -1105,10 +1109,10 @@ function mostrarDatos(base) {
             li.style.backgroundColor = '#C8E6C9';
         }
 
+        // 🔥 insertar ordenado dentro del día
         insertarItemOrdenado(separadorActual, li, timestamp);
     }
 }
-
 
 function insertarItemOrdenado(separador, li, timestamp) {
     let nodo = separador.nextSibling;
