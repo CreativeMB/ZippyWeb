@@ -1006,35 +1006,61 @@ function mostrarDatos(base) {
     formNuevoDato.style.display = "none";
     opcionesExtra.style.display = "none";
 
-    const resumen = document.getElementById("resumenTotales");
-    resumen.style.display = "grid";
+    document.getElementById('resumenTotales').style.display = 'grid';
 
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
     ref.off();
-    sidebarList.innerHTML = "";
+    sidebarList.innerHTML = '';
 
-    const itemsMostrados = new Set();
     const separadoresPorDia = {};
+    const itemsMostrados = new Set();
 
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    ref.on("child_added", snap => {
-        if (itemsMostrados.has(snap.key)) return;
+    /* ===================== 🔵 CARGA INICIAL ===================== */
+    ref.once('value', snapshot => {
+        const items = [];
 
+        snapshot.forEach(snap => {
+            const item = snap.val();
+            if (item && item.nombre && item.fechaHora) {
+                items.push({ ...item, key: snap.key });
+            }
+        });
+
+        items.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
+        items.forEach(item => procesarItem(item));
+
+        actualizarTotales(totalPositivo, totalNegativo);
+    });
+
+    /* ===================== 🔴 TIEMPO REAL ===================== */
+    ref.on('child_added', snap => {
+        if (itemsMostrados.has(snap.key)) return;
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
 
-        itemsMostrados.add(snap.key);
+        procesarItem({ ...item, key: snap.key });
+        actualizarTotales(totalPositivo, totalNegativo);
+    });
 
-        const fechaObj = parseFechaLocal(item.fechaHora);
+    /* ===================== 🔧 FUNCIÓN INTERNA ===================== */
+    function procesarItem(item) {
+        if (itemsMostrados.has(item.key)) return;
+        itemsMostrados.add(item.key);
 
-        // ✅ FECHA DEL SEPARADOR = FECHA LOCAL REAL DEL ITEM
-        const fechaDia = `${fechaObj.getFullYear()}-${String(fechaObj.getMonth() + 1).padStart(2, "0")}-${String(fechaObj.getDate()).padStart(2, "0")}`;
+        const fechaObj = new Date(item.fechaHora);
+        const timestamp = fechaObj.getTime();
 
-        // === SEPARADOR ===
+        const fechaDia =
+            fechaObj.getFullYear() + '-' +
+            String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
+            String(fechaObj.getDate()).padStart(2, '0');
+
+        // 🟢 SEPARADOR
         if (!separadoresPorDia[fechaDia]) {
-            const separador = crearSeparadorDiaEditable(fechaDia, fechaObj);
+            const separador = crearSeparadorDiaEditable(fechaDia);
             separadoresPorDia[fechaDia] = separador;
 
             let nodo = sidebarList.firstChild;
@@ -1059,31 +1085,28 @@ function mostrarDatos(base) {
 
         separadorActual.actualizar();
 
-        // === ITEM ===
-        const li = document.createElement("li");
-        li.dataset.key = snap.key;
-        li.dataset.fecha = item.fechaHora;
+        // 📄 ITEM
+        const li = document.createElement('li');
+        li.dataset.key = item.key;
+        li.dataset.timestamp = timestamp;
 
-        const textoFecha = formatearFechaItem(fechaObj);
-        const valorTexto = `$${valor.toLocaleString("es-CO")}`;
+        const fechaFormateada = formatearFechaBD(item.fechaHora);
+        li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${fechaFormateada}`;
 
-        li.textContent = `${item.nombre} : ${valorTexto} ${textoFecha}`;
+        li.style.padding = '10px';
+        li.style.marginBottom = '5px';
+        li.style.borderRadius = '6px';
 
         if (valor < 0) {
-            li.style.color = "#D32F2F";
-            li.style.backgroundColor = "#FFEBEE";
+            li.style.color = '#D32F2F';
+            li.style.backgroundColor = '#FFCDD2';
         } else {
-            li.style.color = "#2E7D32";
-            li.style.backgroundColor = "#E8F5E9";
+            li.style.color = '#388E3C';
+            li.style.backgroundColor = '#C8E6C9';
         }
 
-        li.style.padding = "10px";
-        li.style.marginBottom = "5px";
-        li.style.borderRadius = "6px";
-
-        insertarItemOrdenado(separadorActual, li, item.fechaHora);
-        actualizarTotales(totalPositivo, totalNegativo);
-    });
+        insertarItemOrdenado(separadorActual, li, timestamp);
+    }
 }
 
 
