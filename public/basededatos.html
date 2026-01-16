@@ -1066,7 +1066,7 @@ function mostrarDatos(base) {
 
         // 🟢 crear separador si no existe
         if (!separadoresPorDia[fechaDia]) {
-            const separador = crearSeparadorDiaEditable(fechaDia);
+           const separador = crearSeparadorDiaEditable(fechaObj, fechaDia);
             separadoresPorDia[fechaDia] = separador;
             sidebarList.appendChild(separador);
         }
@@ -1130,24 +1130,21 @@ function insertarItemOrdenado(separador, li, timestamp) {
 }
 
 
-function crearSeparadorDiaEditable(fechaISO) {
+function crearSeparadorDiaEditable(fechaObj, fechaDia) {
     const li = document.createElement('li');
 
-    const fecha = new Date(fechaISO);
-    const fechaTexto = fecha.toLocaleDateString('es-CO', {
+    // 🔑 guardar fecha para orden
+    li.dataset.fecha = fechaDia;
+
+    li.dataset.pos = 0;
+    li.dataset.neg = 0;
+
+    const fechaTexto = fechaObj.toLocaleDateString('es-CO', {
         weekday: 'long',
         day: '2-digit',
         month: 'long',
         year: 'numeric'
     });
-
-    li.dataset.pos = 0;
-    li.dataset.neg = 0;
-
-    li.style.padding = '12px';
-    li.style.margin = '12px 0 6px';
-    li.style.borderRadius = '8px';
-    li.style.fontWeight = 'bold';
 
     li.actualizar = function () {
         const pos = Number(this.dataset.pos);
@@ -1155,13 +1152,16 @@ function crearSeparadorDiaEditable(fechaISO) {
         const restante = pos + neg;
 
         this.innerHTML = `
-            📅 ${fechaTexto}<br>
+            <strong>📅 ${fechaTexto}</strong><br>
             ➕ $${pos.toLocaleString('es-CO')} |
             ➖ $${Math.abs(neg).toLocaleString('es-CO')} |
             💰 <strong>$${restante.toLocaleString('es-CO')}</strong>
         `;
 
-        // 🎨 COLOR SEGÚN RESTANTE
+        this.style.padding = '10px';
+        this.style.marginBottom = '6px';
+        this.style.borderRadius = '6px';
+
         if (restante < 0) {
             this.style.backgroundColor = '#FFCDD2';
             this.style.color = '#B71C1C';
