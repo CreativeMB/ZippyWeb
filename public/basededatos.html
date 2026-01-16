@@ -1821,16 +1821,22 @@ if (img && cinta) {
 }
 
 
-
-
 async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedido) {
 
     if (idDomiViejo === idDomiNuevo) return;
 
-    const baseRef = db.ref(`${idEmpresa}/Pedidos`);
-    const refViejo = baseRef.child(idDomiViejo).child(idPedido);
-    const refNuevo = baseRef.child(idDomiNuevo);
+    const basePedidosRef = db.ref(`${idEmpresa}/Pedidos`);
+    const refViejo = basePedidosRef.child(idDomiViejo).child(idPedido);
+    const refNuevo = basePedidosRef.child(idDomiNuevo);
 
+    // 🔹 Obtener nombre del nuevo domiciliario
+    const domiSnap = await db
+        .ref(`${idEmpresa}/Domiciliarios/${idDomiNuevo}`)
+        .once('value');
+
+    const nombreDomiciliarioNuevo = domiSnap.child('nombre').val() || '';
+
+    // 🔹 Calcular nueva posición
     const snap = await refNuevo.once('value');
     let ultimaPos = 0;
 
@@ -1839,13 +1845,19 @@ async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedid
         if (pos > ultimaPos) ultimaPos = pos;
     });
 
+    // 🔹 Actualizar datos del pedido
     pedido.idDomiciliario = idDomiNuevo;
+    pedido.nombreDomiciliario = nombreDomiciliarioNuevo;
     pedido.posicion = ultimaPos + 1;
     pedido.notificado = false;
 
+    // 🔹 Guardar en el nuevo domiciliario
     await refNuevo.child(idPedido).set(pedido);
+
+    // 🔹 Eliminar del domiciliario viejo
     await refViejo.remove();
 }
+
 
 function obtenerColorPedido(color) {
     if (!color) return '#ffffff';
