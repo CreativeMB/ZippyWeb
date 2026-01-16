@@ -1006,82 +1006,51 @@ function mostrarDatos(base) {
     formNuevoDato.style.display = "none";
     opcionesExtra.style.display = "none";
 
-    document.getElementById('resumenTotales').style.display = 'grid';
+    const resumen = document.getElementById("resumenTotales");
+    resumen.style.display = "grid";
 
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
     ref.off();
-    sidebarList.innerHTML = '';
+    sidebarList.innerHTML = "";
 
-    const separadoresPorDia = {};
     const itemsMostrados = new Set();
+    const separadoresPorDia = {};
 
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    /* ===================== 🔵 CARGA INICIAL ===================== */
-    ref.once('value', snapshot => {
-        const items = [];
-
-        snapshot.forEach(snap => {
-            const item = snap.val();
-            if (item && item.nombre && item.fechaHora) {
-                items.push({ ...item, key: snap.key });
-            }
-        });
-
-        // 🔥 ordenar por fecha (más reciente primero)
-        items.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
-
-        items.forEach(item => {
-            procesarItem(item);
-        });
-
-        actualizarTotales(totalPositivo, totalNegativo);
-    });
-
-    /* ===================== 🔴 TIEMPO REAL ===================== */
-    ref.on('child_added', snap => {
+    ref.on("child_added", snap => {
         if (itemsMostrados.has(snap.key)) return;
 
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
 
-        procesarItem({ ...item, key: snap.key });
-        actualizarTotales(totalPositivo, totalNegativo);
-    });
+        itemsMostrados.add(snap.key);
 
-    /* ===================== 🔧 FUNCIÓN INTERNA ===================== */
-    function procesarItem(item) {
-        if (itemsMostrados.has(item.key)) return;
-        itemsMostrados.add(item.key);
+        const fechaObj = parseFechaLocal(item.fechaHora);
+        const fechaDia = fechaObj.toISOString().split("T")[0];
 
-        const fechaObj = new Date(item.fechaHora);
-        const timestamp = fechaObj.getTime();
-
-        // 🔑 clave única por día (LOCAL, sin UTC)
-        const fechaDia =
-            fechaObj.getFullYear() + '-' +
-            String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
-            String(fechaObj.getDate()).padStart(2, '0');
-
-        // 🟢 crear separador si no existe
+        // === SEPARADOR ===
         if (!separadoresPorDia[fechaDia]) {
-            const separador = crearSeparadorDiaEditable(fechaDia);
+            const separador = crearSeparadorDiaEditable(fechaDia, fechaObj);
             separadoresPorDia[fechaDia] = separador;
-            sidebarList.appendChild(separador);
+
+            // ordenar separadores por fecha (más reciente arriba)
+            let nodo = sidebarList.firstChild;
+            while (nodo && nodo.dataset?.fecha > fechaDia) {
+                nodo = nodo.nextSibling;
+            }
+            sidebarList.insertBefore(separador, nodo);
         }
 
         const separadorActual = separadoresPorDia[fechaDia];
         const valor = Number(item.valor) || 0;
 
-        // ➕➖ acumular totales
         if (valor > 0) {
             totalPositivo += valor;
             separadorActual.dataset.pos =
                 Number(separadorActual.dataset.pos) + valor;
-        }
-
-        if (valor < 0) {
+        } else {
             totalNegativo += valor;
             separadorActual.dataset.neg =
                 Number(separadorActual.dataset.neg) + valor;
@@ -1089,92 +1058,117 @@ function mostrarDatos(base) {
 
         separadorActual.actualizar();
 
-        // 📄 ITEM
-        const li = document.createElement('li');
-        li.dataset.key = item.key;
-        li.dataset.timestamp = timestamp;
+        // === ITEM ===
+        const li = document.createElement("li");
+        li.dataset.key = snap.key;
+        li.dataset.fecha = item.fechaHora;
 
-        const fechaFormateada = formatearFechaBD(item.fechaHora);
-        li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${fechaFormateada}`;
+        const textoFecha = formatearFechaItem(fechaObj);
+        const valorTexto = `$${valor.toLocaleString("es-CO")}`;
 
-        li.style.padding = '10px';
-        li.style.marginBottom = '5px';
-        li.style.borderRadius = '6px';
+        li.textContent = `${item.nombre} : ${valorTexto} ${textoFecha}`;
 
         if (valor < 0) {
-            li.style.color = '#D32F2F';
-            li.style.backgroundColor = '#FFCDD2';
+            li.style.color = "#D32F2F";
+            li.style.backgroundColor = "#FFEBEE";
         } else {
-            li.style.color = '#388E3C';
-            li.style.backgroundColor = '#C8E6C9';
+            li.style.color = "#2E7D32";
+            li.style.backgroundColor = "#E8F5E9";
         }
 
-        // 🔥 insertar ordenado dentro del día
-        insertarItemOrdenado(separadorActual, li, timestamp);
-    }
+        li.style.padding = "10px";
+        li.style.marginBottom = "5px";
+        li.style.borderRadius = "6px";
+
+        insertarItemOrdenado(separadorActual, li, item.fechaHora);
+
+        actualizarTotales(totalPositivo, totalNegativo);
+    });
 }
 
-function insertarItemOrdenado(separador, li, timestamp) {
+
+function insertarItemOrdenado(separador, li, fechaHora) {
+    const fechaNueva = parseFechaLocal(fechaHora).getTime();
+
     let nodo = separador.nextSibling;
 
-    while (nodo && !nodo.classList?.contains('separador-dia')) {
-        const tsNodo = Number(nodo.dataset.timestamp);
-
-        // si el nuevo es más reciente → va antes
-        if (timestamp > tsNodo) break;
-
+    while (nodo && nodo.tagName === "LI") {
+        const fechaExistente = parseFechaLocal(nodo.dataset.fecha).getTime();
+        if (fechaNueva > fechaExistente) break;
         nodo = nodo.nextSibling;
     }
 
-    separador.parentNode.insertBefore(li, nodo);
+    sidebarList.insertBefore(li, nodo);
 }
 
-function crearSeparadorDiaEditable(fechaISO) {
-    const li = document.createElement('li');
-    li.classList.add('separador-dia');
+function crearSeparadorDiaEditable(fechaDia, fechaObj) {
+    const div = document.createElement("div");
+    div.className = "separador-dia";
 
-    const fecha = new Date(fechaISO);
-    const fechaTexto = fecha.toLocaleDateString('es-CO', {
-        weekday: 'long',
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-    });
+    div.dataset.fecha = fechaDia;
+    div.dataset.pos = 0;
+    div.dataset.neg = 0;
 
-    li.dataset.pos = 0;
-    li.dataset.neg = 0;
+    const titulo = document.createElement("div");
+    const resumen = document.createElement("div");
 
-    li.style.padding = '12px';
-    li.style.margin = '12px 0 6px';
-    li.style.borderRadius = '8px';
-    li.style.fontWeight = 'bold';
+    div.actualizar = function () {
+        const pos = Number(div.dataset.pos);
+        const neg = Number(div.dataset.neg);
+        const total = pos + neg;
 
-    li.actualizar = function () {
-        const pos = Number(this.dataset.pos);
-        const neg = Number(this.dataset.neg);
-        const restante = pos + neg;
+        titulo.textContent = `📅 ${fechaObj.toLocaleDateString("es-CO", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        })}`;
 
-        this.innerHTML = `
-            📅 ${fechaTexto}<br>
-            ➕ $${pos.toLocaleString('es-CO')} |
-            ➖ $${Math.abs(neg).toLocaleString('es-CO')} |
-            💰 <strong>$${restante.toLocaleString('es-CO')}</strong>
-        `;
+        resumen.textContent =
+            `➕ $${pos.toLocaleString("es-CO")} | ` +
+            `➖ $${Math.abs(neg).toLocaleString("es-CO")} | ` +
+            `💰 $${total.toLocaleString("es-CO")}`;
 
-        if (restante < 0) {
-            this.style.backgroundColor = '#FFCDD2';
-            this.style.color = '#B71C1C';
+        // color según balance
+        if (total < 0) {
+            div.style.background = "#FFCDD2";
+            div.style.color = "#B71C1C";
         } else {
-            this.style.backgroundColor = '#C8E6C9';
-            this.style.color = '#1B5E20';
+            div.style.background = "#C8E6C9";
+            div.style.color = "#1B5E20";
         }
     };
 
-    li.actualizar();
-    return li;
+    div.appendChild(titulo);
+    div.appendChild(resumen);
+    div.actualizar();
+
+    return div;
 }
 
+function parseFechaLocal(fechaStr) {
+    const partes = fechaStr.replace("T", " ").split(" ");
 
+    const [y, m, d] = partes[0].split("-").map(Number);
+    const horaPartes = partes[1].split(":").map(Number);
+
+    const hh = horaPartes[0];
+    const mm = horaPartes[1];
+    const ss = horaPartes[2] || 0;
+
+    return new Date(y, m - 1, d, hh, mm, ss);
+}
+function formatearFechaItem(fechaObj) {
+    return fechaObj.toLocaleString("es-CO", {
+        weekday: "long",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+    });
+}
 
 // --- FUNCION GUARDAR DATO ---
 function guardarDato() {
