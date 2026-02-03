@@ -1168,8 +1168,6 @@ function crearSeparadorDiaEditable(fechaObj, fechaDia) {
     return li;
 }
 
-
-
 // --- FUNCION GUARDAR DATO ---
 function guardarDato() {
     const nombre = inputNombre.value.trim();
@@ -1177,23 +1175,51 @@ function guardarDato() {
     const negativo = inputNegativo.checked;
     const nota = inputNota.value.trim();
 
-    if(!nombre || isNaN(valor)){ alert("Nombre y valor son requeridos"); return; }
-    if(negativo) valor = -Math.abs(valor);
+    if (!nombre || isNaN(valor)) {
+        alert("Nombre y valor son requeridos");
+        return;
+    }
+
+    // 🔴 manejar negativo igual que en Kotlin
+    if (negativo) valor = -Math.abs(valor);
 
     const ref = db.ref(`${idEmpresa}/basededatos/${baseSeleccionada}`);
     const newKey = ref.push().key;
 
     const ahora = new Date();
-    const fechaHora = `${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')} ${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
+
+    // 📅 fechaHora (igual formato Kotlin)
+    const fechaHora = `${ahora.getFullYear()}-${
+        String(ahora.getMonth() + 1).padStart(2, '0')
+    }-${
+        String(ahora.getDate()).padStart(2, '0')
+    } ${
+        String(ahora.getHours()).padStart(2, '0')
+    }:${
+        String(ahora.getMinutes()).padStart(2, '0')
+    }`;
+
+    // ⏱ timestamp
+    const timestamp = ahora.getTime();
+
+    // 📆 año, mes, mesKey
+    const anio = ahora.getFullYear();
+    const mes = ahora.getMonth() + 1;
+    const mesKey = `${anio}-${String(mes).padStart(2, '0')}`;
 
     ref.child(newKey).set({
         id: newKey,
-        fechaHora,
         nombre,
         valor,
-        nota: nota || ""
+        nota: nota || "",
+        fechaHora,
+        timestamp,
+        anio,
+        mes,
+        mesKey
     }).then(() => {
-        // Limpiar formulario
+
+        // 🧹 Limpiar formulario
         inputNombre.value = "";
         inputValor.value = "";
         inputNegativo.checked = false;
@@ -1201,10 +1227,11 @@ function guardarDato() {
         formNuevoDato.style.display = "none";
         opcionesExtra.style.display = "none";
 
-        // El listener de Firebase se encargará de agregar el item automáticamente al DOM
-    }).catch(err => alert("Error guardando dato: " + err.message));
+        // Firebase listener actualizará la vista
+    }).catch(err => {
+        alert("Error guardando dato: " + err.message);
+    });
 }
-
 
 
 function mostrarItemsConColores(items) {
