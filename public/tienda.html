@@ -204,21 +204,17 @@ const contenedor = document.getElementById("productos");
 
 contenedor.innerHTML="";
 
-for(const id in productos){
+for(const nombreProducto in productos){
 
-const p = productos[id];
+const imagen = productos[nombreProducto];
 
 contenedor.innerHTML += `
 
 <div class="producto">
 
-<img src="${p.imagen || ''}">
+<img src="${imagen}">
 
-<div class="nombre">${p.nombre}</div>
-
-<div class="precio">$ ${p.precio}</div>
-
-${p.promocion ? `<div class="promocion">${p.promocion}</div>` : ""}
+<div class="nombre">${nombreProducto}</div>
 
 </div>
 
