@@ -679,22 +679,31 @@ let imagenProducto=""
 function abrirProducto(nombre,imagen,precio,descripcion){
 
 productoSeleccionado=nombre
-imagenProducto=imagen
+
+// normalizamos la imagen (IMPORTANTE para Google Drive)
+imagenProducto=normalizarImagen(imagen)
 
 document.getElementById("productoTitulo").innerText=nombre
 document.getElementById("productoDescripcion").innerText=descripcion || ""
-document.getElementById("productoImagen").src=imagen
+document.getElementById("productoImagen").src=imagenProducto
 document.getElementById("productoPrecio").innerText=formatearPrecio(precio)
 
+// mostrar modal
 document.getElementById("modalPedido").style.display="flex"
 
 }
+
+// para que funcione desde onclick
 window.abrirProducto=abrirProducto
+
+
 function cerrarModal(){
 
 document.getElementById("modalPedido").style.display="none"
 
 }
+
+
 function enviarPedido(){
 
 const productoAdicional=document.getElementById("productoAdicional").value
@@ -760,12 +769,19 @@ firebase.database()
 .then(()=>{
 
 alert("Pedido enviado")
+document.querySelectorAll("#modalPedido input,#modalPedido textarea").forEach(e=>e.value="")
 cerrarModal()
 
 })
 
-}
+.catch((error)=>{
 
+console.log(error)
+alert("Error enviando pedido")
+
+})
+
+}
 </script>
 
 </body>
