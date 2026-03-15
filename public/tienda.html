@@ -347,45 +347,58 @@
         }
 
         function render() {
-            const contenedor = document.getElementById("productos");
-            contenedor.innerHTML = "";
+    const contenedor = document.getElementById("productos");
+    contenedor.innerHTML = "";
 
-            for (const refP in productosJson) {
-                const imgUrl = productosJson[refP];
-                const real = productosRealtime[refP];
-                if (!real) continue;
+    for (const refP in productosJson) {
+        const imgUrl = productosJson[refP];
+        const real = productosRealtime[refP];
+        
+        if (!real) continue;
 
-                const card = document.createElement("div");
-                card.className = `producto ${real.agotado ? 'agotado' : ''}`;
-                
-                const precioFinal = real.promocion ? real.valorPromocion : real.valor;
-                const precioHTML = real.promocion ? 
-                    `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>` : 
-                    `<div class="precio">${formatearPrecio(real.valor)}</div>`;
+        const card = document.createElement("div");
+        // Se añade la clase 'agotado' si el producto no tiene stock
+        card.className = `producto ${real.agotado ? 'agotado' : ''}`;
+        
+        const precioFinal = real.promocion ? real.valorPromocion : real.valor;
+        
+        // Lógica de Precios
+        const precioHTML = real.promocion ? 
+            `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>` : 
+            `<div class="precio">${formatearPrecio(real.valor)}</div>`;
 
-                card.innerHTML = `
-                    <div class="img-container">
-                        ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-                        ${real.agotado ? '<div class="etiquetaAgotado">AGOTADO</div>' : ''}
-                        <img src="${normalizarImagen(imgUrl)}" onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')">
-                    </div>
-                    <div class="nombre">${refP}</div>
-                    ${precioHTML}
-                    <div class="btn" onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')">Comprar</div>
-                `;
-                contenedor.appendChild(card);
-            }
+        // Lógica de Botón: Si está agotado, muestra texto. Si no, muestra el botón verde de compra.
+        const botonHTML = real.agotado ? 
+            `<div class="btn" style="background:#999; cursor:not-allowed;">Agotado</div>` : 
+            `<div class="btn" onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')">Comprar</div>`;
 
-            // Animación y QUITAR LOADER
-            setTimeout(() => {
-                document.querySelectorAll(".producto").forEach((el, i) => {
-                    setTimeout(() => el.classList.add("visible"), i * 50);
-                });
-                const ld = document.getElementById("loader");
-                ld.style.opacity = "0";
-                setTimeout(() => ld.style.display = "none", 500);
-            }, 600);
+        card.innerHTML = `
+            <div class="img-container">
+                ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+                ${real.agotado ? '<div class="etiquetaAgotado">AGOTADO</div>' : ''}
+                <img src="${normalizarImagen(imgUrl)}" 
+                     ${real.agotado ? "" : `onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')"`} 
+                     style="${real.agotado ? 'filter: grayscale(100%);' : ''}">
+            </div>
+            <div class="nombre">${refP}</div>
+            ${precioHTML}
+            ${botonHTML}
+        `;
+        contenedor.appendChild(card);
+    }
+
+    // Animación y control del Loader
+    setTimeout(() => {
+        document.querySelectorAll(".producto").forEach((el, i) => {
+            setTimeout(() => el.classList.add("visible"), i * 50);
+        });
+        const ld = document.getElementById("loader");
+        if(ld){
+            ld.style.opacity = "0";
+            setTimeout(() => ld.style.display = "none", 500);
         }
+    }, 600);
+}
 
         function abrirProducto(nombre, imagen, precio, descripcion) {
             productoSeleccionado = nombre;
