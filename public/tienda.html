@@ -33,12 +33,35 @@ color:#666;
 margin-top:5px;
 }
 
-.publicidad{
+.publicidad-container{
 margin-top:15px;
 background:#ffefc2;
-padding:10px;
 border-radius:8px;
+overflow:hidden;
+position:relative;
+height:40px;
+display:flex;
+align-items:center;
+}
+
+.publicidad-texto{
+white-space:nowrap;
 font-weight:bold;
+position:absolute;
+animation: moverPublicidad 15s linear infinite;
+padding-left:100%;
+}
+
+@keyframes moverPublicidad{
+
+0%{
+transform:translateX(0);
+}
+
+100%{
+transform:translateX(-100%);
+}
+
 }
 
 .productos{
@@ -124,7 +147,9 @@ text-decoration:none;
 <h1 id="nombreEmpresa"></h1>
 <div class="eslogan" id="eslogan"></div>
 
-<div class="publicidad" id="publicidad"></div>
+<div class="publicidad-container">
+    <div class="publicidad-texto" id="publicidad"></div>
+</div>
 
 </div>
 
