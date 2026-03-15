@@ -133,7 +133,55 @@ color:#999;
 font-size:14px;
 margin-top:3px;
 }
+/* CONTENEDOR IMAGEN */
 
+.img-container{
+position:relative;
+}
+
+/* ETIQUETA PROMOCION */
+
+.etiquetaPromo{
+position:absolute;
+top:8px;
+left:8px;
+background:#e53935;
+color:white;
+font-size:12px;
+font-weight:bold;
+padding:4px 8px;
+border-radius:6px;
+box-shadow:0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* ETIQUETA AGOTADO */
+
+.etiquetaAgotado{
+position:absolute;
+top:8px;
+right:8px;
+background:#424242;
+color:white;
+font-size:12px;
+font-weight:bold;
+padding:4px 8px;
+border-radius:6px;
+}
+
+/* PRODUCTO AGOTADO */
+
+.producto.agotado{
+opacity:0.6;
+}
+
+.producto.agotado img{
+filter:grayscale(100%);
+}
+
+.producto.agotado .btn{
+background:#999;
+pointer-events:none;
+}
 .btn{
 display:inline-block;
 margin-top:8px;
@@ -354,6 +402,9 @@ return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
 return url;
 
 }
+function formatearPrecio(valor){
+return "$" + valor.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".");
+}
 
 function render(){
 
@@ -365,8 +416,9 @@ for(const refProducto in productosJson){
 const imagen = productosJson[refProducto];
 const realtime = productosRealtime[refProducto];
 
-let precioHTML="";
-let linkWhats="";
+let etiquetaPromo="";
+let etiquetaAgotado="";
+let claseAgotado="";
 
 if(realtime){
 
@@ -375,15 +427,24 @@ let precio = realtime.valor;
 if(realtime.promocion){
 
 precioHTML=`
-<div class="precio">${realtime.valorPromocion}</div>
-<div class="precioViejo">${realtime.valor}</div>
+<div class="precio">${formatearPrecio(realtime.valorPromocion)}</div>
+<div class="precioViejo">${formatearPrecio(realtime.valor)}</div>
 `;
 
 precio = realtime.valorPromocion;
 
+etiquetaPromo=`<div class="etiquetaPromo">PROMO</div>`;
+
 }else{
 
-precioHTML=`<div class="precio">$${realtime.valor}</div>`;
+precioHTML=`<div class="precio">${formatearPrecio(realtime.valor)}</div>`;
+
+}
+
+if(realtime.agotado){
+
+etiquetaAgotado=`<div class="etiquetaAgotado">AGOTADO</div>`;
+claseAgotado="agotado";
 
 }
 
@@ -395,9 +456,16 @@ linkWhats=`https://wa.me/${telefonoEmpresa}?text=${mensaje}`;
 
 contenedor.innerHTML+=`
 
-<div class="producto">
+<div class="producto ${claseAgotado}">
+
+<div class="img-container">
+
+${etiquetaPromo}
+${etiquetaAgotado}
 
 <img src="${normalizarImagen(imagen)}" loading="lazy">
+
+</div>
 
 <div class="nombre">${refProducto}</div>
 
