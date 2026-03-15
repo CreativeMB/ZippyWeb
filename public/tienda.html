@@ -497,7 +497,7 @@ let productosJson={}
 let productosRealtime={}
 let telefonoEmpresa=""
 let empresaId=""
-
+let idDomiciliarioAsignado = "";
 const slug=window.location.pathname.split("/").pop()
 
 buscarEmpresa()
@@ -523,6 +523,9 @@ telefonoEmpresa=perfil.WhatsApp.replace("+","")
 document.getElementById("nombreEmpresa").innerText=perfil.nombreEmpresa
 document.getElementById("eslogan").innerText=perfil.eslogan
 document.getElementById("publicidad").innerText=perfil.publicidad
+if(data.domiciliarios) {
+                    idDomiciliarioAsignado = Object.keys(data.domiciliarios)[0];
+                }
 
 document.getElementById("descripcion").innerText=perfil.descripcionEmpresa
 document.getElementById("direccion").innerText="Dirección: "+perfil.direccion
@@ -687,87 +690,110 @@ document.getElementById("modalPedido").style.display="none"
 
 }
 
-function enviarPedido(){
+function enviarPedido() {
+    // 1. Captura de valores del formulario
+    const productoAdicional = document.getElementById("productoAdicional").value;
+    const medioPago = document.getElementById("medioPago").value;
+    const nombreComprador = document.getElementById("nombreComprador").value;
+    const celularComprador = document.getElementById("celularComprador").value;
+    const nombreDestinatario = document.getElementById("nombreDestinatario").value;
+    const celularDestinatario = document.getElementById("celularDestinatario").value;
+    const direccionEntrega = document.getElementById("direccionEntrega").value;
+    const notasPedido = document.getElementById("notasPedido").value;
+    const mensajeTarjeta = document.getElementById("mensajeTarjeta").value;
+    const deTarjeta = document.getElementById("deTarjeta").value;
+    const paraTarjeta = document.getElementById("paraTarjeta").value;
+    const fechaEntrega = document.getElementById("fechaEntrega").value;
+    const horaEntrega = document.getElementById("horaEntrega").value;
 
-  const productoAdicional=document.getElementById("productoAdicional").value;
-  const medioPago=document.getElementById("medioPago").value;
+    // 2. Validación de campos obligatorios (Todos menos productoAdicional)
+    if (
+        !medioPago || 
+        !nombreComprador.trim() || 
+        !celularComprador.trim() || 
+        !nombreDestinatario.trim() || 
+        !celularDestinatario.trim() || 
+        !direccionEntrega.trim() || 
+        !notasPedido.trim() || 
+        !mensajeTarjeta.trim() || 
+        !deTarjeta.trim() || 
+        !paraTarjeta.trim() || 
+        !fechaEntrega || 
+        !horaEntrega
+    ) {
+        alert("⚠️ Por favor, completa todos los campos requeridos para procesar tu pedido.");
+        return; 
+    }
 
-  const nombreComprador=document.getElementById("nombreComprador").value;
-  const celularComprador=document.getElementById("celularComprador").value;
+    // 3. Verificar si tenemos un domiciliario asignado
+    if (!idDomiciliarioAsignado) {
+        alert("❌ Error de configuración: No se encontró un domiciliario disponible. Por favor contacta a la tienda.");
+        return;
+    }
 
-  const nombreDestinatario=document.getElementById("nombreDestinatario").value;
-  const celularDestinatario=document.getElementById("celularDestinatario").value;
+    // 4. Referencia al nodo de pedidos del domiciliario específico
+    // Estructura: empresaId / Pedidos / idDomiciliario
+    const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
 
-  const direccionEntrega=document.getElementById("direccionEntrega").value;
-  const notasPedido=document.getElementById("notasPedido").value;
+    // 5. Consultar pedidos actuales para calcular la 'posicion' (como en Android)
+    onValue(pedidosRef, (snapshot) => {
+        let maxPosicion = 0;
+        
+        if (snapshot.exists()) {
+            snapshot.forEach((child) => {
+                const p = child.val().posicion || 0;
+                if (p > maxPosicion) maxPosicion = p;
+            });
+        }
+        
+        const nuevaPosicion = maxPosicion + 1;
 
-  const mensajeTarjeta=document.getElementById("mensajeTarjeta").value;
+        // 6. Generar nuevo ID de pedido
+        const nuevoPedidoRef = push(pedidosRef);
+        const idPedido = nuevoPedidoRef.key;
 
-  const deTarjeta=document.getElementById("deTarjeta").value;
-  const paraTarjeta=document.getElementById("paraTarjeta").value;
+        // 7. Objeto Pedido compatible con la App Android (Clase Pedido en Kotlin)
+        const pedido = {
+            idPedido: idPedido,
+            direccion: direccionEntrega,
+            imagenUrl: imagenProducto,
+            cliente: celularComprador,
+            nombreCliente: nombreComprador,
+            referencia: productoSeleccionado,
+            adicional: productoAdicional,
+            banco: medioPago,
+            destinatario: celularDestinatario,
+            nombreDestinatario: nombreDestinatario,
+            de: deTarjeta,
+            para: paraTarjeta,
+            diaEntrega: fechaEntrega,
+            horaEntrega: horaEntrega,
+            mensaje: mensajeTarjeta,
+            notas: notasPedido,
+            posicion: nuevaPosicion, // Vital para el orden en la App
+            fechaRegistro: new Date().toLocaleDateString(),
+            horaRegistro: new Date().toLocaleTimeString(),
+            notificado: false, // Para que la App dispare la notificación
+            color: "" // Valor inicial vacío como en la App
+        };
 
-  const fechaEntrega=document.getElementById("fechaEntrega").value;
-  const horaEntrega=document.getElementById("horaEntrega").value;
+        // 8. Guardar en Firebase
+        set(nuevoPedidoRef, pedido)
+            .then(() => {
+                alert("✅ ¡Pedido enviado con éxito! Nos pondremos en contacto pronto.");
+                
+                // Limpiar campos del modal
+                document.querySelectorAll("#modalPedido input, #modalPedido textarea, #modalPedido select").forEach(e => e.value = "");
+                
+                // Cerrar modal
+                cerrarModal();
+            })
+            .catch((error) => {
+                console.error("Error en Firebase:", error);
+                alert("❌ Hubo un error al enviar el pedido. Intenta nuevamente.");
+            });
 
-  // ==========================================
-  // AQUÍ INICIA LA VALIDACIÓN DE CAMPOS
-  // ==========================================
-  if(
-    !medioPago || 
-    !nombreComprador.trim() || 
-    !celularComprador.trim() || 
-    !nombreDestinatario.trim() || 
-    !celularDestinatario.trim() || 
-    !direccionEntrega.trim() || 
-    !notasPedido.trim() || 
-    !mensajeTarjeta.trim() || 
-    !deTarjeta.trim() || 
-    !paraTarjeta.trim() || 
-    !fechaEntrega || 
-    !horaEntrega
-  ){
-    alert("Por favor, completa todos los campos requeridos.");
-    return; // Esto detiene la función y evita que se envíe el pedido a Firebase
-  }
-  // ==========================================
-
-  const pedido={
-    direccion:direccionEntrega,
-    imagenUrl:imagenProducto,
-    cliente:celularComprador,
-    nombreCliente:nombreComprador,
-    referencia:productoSeleccionado,
-    adicional:productoAdicional, // Este es el único que puede ir vacío
-    banco:medioPago,
-    destinatario:celularDestinatario,
-    nombreDestinatario:nombreDestinatario,
-    de:deTarjeta,
-    para:paraTarjeta,
-    diaEntrega:fechaEntrega,
-    horaEntrega:horaEntrega,
-    mensaje:mensajeTarjeta,
-    notas:notasPedido,
-    fechaRegistro:new Date().toLocaleDateString(),
-    horaRegistro:new Date().toLocaleTimeString(),
-    color:"",
-    notificado:false
-  }
-
-  const pedidosRef = ref(db,"/Pedidos")
-  const nuevoPedido = push(pedidosRef)
-
-  set(nuevoPedido, pedido)
-  .then(()=>{
-    alert("Pedido enviado con éxito")
-    // Limpiar formulario
-    document.querySelectorAll("#modalPedido input, #modalPedido textarea, #modalPedido select").forEach(e=>e.value="")
-    cerrarModal()
-  })
-  .catch((error)=>{
-    console.log(error)
-    alert("Error enviando pedido")
-  })
-
+    }, { onlyOnce: true }); // Solo consultamos una vez para evitar bucles
 }
 
 // AQUÍ: Exponemos las funciones al objeto global window para que funcionen con los "onclick" del HTML
