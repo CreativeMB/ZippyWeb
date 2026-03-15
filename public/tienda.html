@@ -2,806 +2,481 @@
 <html lang="es">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tienda</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda</title>
 
-<style>
+    <style>
+        /* ============================= */
+        /* GENERAL */
+        /* ============================= */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            background: #f5f6fa;
+            color: #333;
+        }
 
-/* ============================= */
-/* GENERAL */
-/* ============================= */
+        /* ============================= */
+        /* HEADER */
+        /* ============================= */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+        }
 
-body{
-font-family:Arial, Helvetica, sans-serif;
-margin:0;
-background:#f5f6fa;
-color:#333;
-}
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
 
-/* ============================= */
-/* HEADER */
-/* ============================= */
+        .eslogan {
+            opacity: .9;
+            margin-top: 6px;
+        }
 
-.header{
-text-align:center;
-padding:30px 20px;
-background:linear-gradient(135deg,#4f46e5,#6366f1);
-color:white;
-}
+        /* ============================= */
+        /* PUBLICIDAD - ESTILO ELEGANTE */
+        /* ============================= */
+        .publicidad-container {
+            width: 100%;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+            background-size: 200% auto;
+            color: white;
+            overflow: hidden;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            box-shadow: inset 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-.header h1{
-margin:0;
-font-size:28px;
-}
+        .publicidad-texto {
+            white-space: nowrap;
+            position: absolute;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 13px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            animation: publicidad-elegante 20s linear infinite;
+            padding-left: 100%;
+        }
 
-.eslogan{
-opacity:.9;
-margin-top:6px;
-}
+        @keyframes publicidad-elegante {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-180%); }
+        }
 
-/* ============================= */
-/* PUBLICIDAD - ESTILO ELEGANTE */
-/* ============================= */
+        /* ============================= */
+        /* PRODUCTOS GRID */
+        /* ============================= */
+        .productos {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 18px;
+            min-height: 400px;
+        }
 
-.publicidad-container {
-    width: 100%;
-    background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
-    background-size: 200% auto;
-    color: white;
-    overflow: hidden;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    position: relative;
-    box-shadow: inset 0 -2px 5px rgba(0,0,0,0.1);
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-}
+        .producto {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            text-align: center;
+            transition: .25s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
 
-.publicidad-texto {
-    white-space: nowrap;
-    position: absolute;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-size: 13px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-    animation: publicidad-elegante 20s linear infinite;
-    padding-left: 100%;
-}
+        .producto.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-@keyframes publicidad-elegante {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-150%); } /* Ajustado para que fluya mejor */
-}
-/* ============================= */
-/* PRODUCTOS GRID */
-/* ============================= */
+        .producto img {
+            width: 100%;
+            height: 230px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
 
-.productos{
-padding:20px;
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-gap:18px;
-}
+        .nombre { font-weight: 600; margin-top: 8px; font-size: 15px; }
+        .precio { color: #16a34a; font-size: 20px; font-weight: bold; }
+        .precioViejo { text-decoration: line-through; color: #999; font-size: 14px; }
 
-/* TARJETA PRODUCTO */
+        .img-container { position: relative; }
+        .etiquetaPromo { position: absolute; top: 8px; left: 8px; background: #e53935; color: white; font-size: 12px; padding: 4px 8px; border-radius: 6px; }
+        .etiquetaAgotado { position: absolute; top: 8px; right: 8px; background: #424242; color: white; font-size: 12px; padding: 4px 8px; border-radius: 6px; }
 
-.producto{
-background:white;
-border-radius:12px;
-box-shadow:0 3px 10px rgba(0,0,0,0.15);
-padding:10px;
-text-align:center;
-transition:.25s;
-opacity:0;
-transform:translateY(20px);
-}
+        .btn { display: inline-block; margin-top: 8px; background: #25D366; color: white; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 14px; cursor: pointer; }
 
-.producto.visible{
-opacity:1;
-transform:translateY(0);
-}
+        /* ============================= */
+        /* LOADER - BLOQUEO TOTAL */
+        /* ============================= */
+        #loader {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999; /* Por encima de todo */
+            transition: opacity 0.5s ease;
+        }
 
-.producto:hover{
-transform:translateY(-5px);
-box-shadow:0 8px 18px rgba(0,0,0,0.25);
-}
+        .spinner {
+            width: 50px; height: 50px;
+            border: 5px solid #eee;
+            border-top: 5px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-/* IMAGEN */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-.producto img{
-width:100%;
-height:230px;
-object-fit:contain;
-background:white;
-border-radius:10px;
-display:block;
-}
+        /* ============================= */
+        /* MODAL */
+        /* ============================= */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
 
-/* NOMBRE */
+        .modal-contenido {
+            background: white;
+            width: 95%;
+            max-width: 500px;
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
 
-.nombre{
-font-weight:600;
-margin-top:8px;
-font-size:15px;
-}
+        .formulario input, .formulario textarea, .formulario select {
+            width: 100%; padding: 10px; margin: 6px 0;
+            border-radius: 6px; border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
 
-/* PRECIOS */
+        .fila2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-.precio{
-color:#16a34a;
-font-size:20px;
-font-weight:bold;
-}
+        #enviarPedidoBtn {
+            width: 100%; background: #25D366; color: white;
+            border: none; padding: 12px; border-radius: 8px;
+            font-size: 16px; cursor: pointer; margin-top: 10px;
+        }
 
-.precioViejo{
-text-decoration:line-through;
-color:#999;
-font-size:14px;
-}
+        .footer { background: #111; color: white; padding: 30px 20px; text-align: center; }
+        .whatsapp { position: fixed; bottom: 20px; right: 20px; background: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,.3); z-index: 999; }
+        .whatsapp img { width: 32px; }
 
-/* ETIQUETAS */
-
-.img-container{
-position:relative;
-}
-
-.etiquetaPromo{
-position:absolute;
-top:8px;
-left:8px;
-background:#e53935;
-color:white;
-font-size:12px;
-padding:4px 8px;
-border-radius:6px;
-}
-
-.etiquetaAgotado{
-position:absolute;
-top:8px;
-right:8px;
-background:#424242;
-color:white;
-font-size:12px;
-padding:4px 8px;
-border-radius:6px;
-}
-
-/* AGOTADO */
-
-.producto.agotado{
-opacity:.6;
-}
-
-.producto.agotado img{
-filter:grayscale(100%);
-}
-
-/* BOTON */
-
-.btn{
-display:inline-block;
-margin-top:8px;
-background:#25D366;
-color:white;
-padding:8px 12px;
-border-radius:6px;
-text-decoration:none;
-font-size:14px;
-}
-
-/* ============================= */
-/* FOOTER */
-/* ============================= */
-
-.footer{
-background:#111;
-color:white;
-padding:30px 20px;
-margin-top:40px;
-text-align:center;
-}
-
-.footer p{
-margin:6px 0;
-}
-
-/* ============================= */
-/* LOADER - MEJORADO */
-/* ============================= */
-
-#loader {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: #ffffff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    transition: opacity 0.5s ease; /* Transición suave al quitarse */
-}
-
-.spinner{
-width:50px;
-height:50px;
-border:5px solid #eee;
-border-top:5px solid #25D366;
-border-radius:50%;
-animation:spin 1s linear infinite;
-}
-
-@keyframes spin{
-0%{transform:rotate(0deg);}
-100%{transform:rotate(360deg);}
-}
-
-/* ============================= */
-/* WHATSAPP */
-/* ============================= */
-
-.whatsapp{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#25D366;
-width:60px;
-height:60px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-box-shadow:0 4px 10px rgba(0,0,0,.3);
-}
-
-.whatsapp img{
-width:32px;
-}
-
-/* ============================= */
-/* MODAL */
-/* ============================= */
-.modal{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.6);
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-
-.modal-contenido{
-background:white;
-width:95%;
-max-width:500px;
-border-radius:12px;
-padding:20px;
-/* Permite hacer scroll si la pantalla es muy pequeña */
-max-height: 90vh;
-overflow-y: auto; 
-}
-
-.cerrar{
-float:right;
-font-size:28px;
-cursor:pointer;
-}
-
-.cabeceraPedido{
-display:flex;
-gap:10px;
-margin-bottom:15px;
-}
-
-.cabeceraPedido img{
-width:110px;
-height:110px;
-object-fit:contain;
-background:#f5f5f5;
-border-radius:8px;
-}
-
-.infoProducto{
-flex:1;
-}
-
-.precioModal{
-font-size:20px;
-font-weight:bold;
-color:#16a34a;
-}
-
-.formulario input,
-.formulario textarea,
-.formulario select{
-width:100%;
-padding:10px;
-margin:6px 0;
-border-radius:6px;
-border:1px solid #ccc;
-box-sizing: border-box; /* Previene que los inputs se salgan del contenedor */
-}
-
-.fila2{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
-}
-
-#enviarPedido{
-width:100%;
-background:#25D366;
-color:white;
-border:none;
-padding:12px;
-border-radius:8px;
-font-size:16px;
-cursor:pointer;
-margin-top: 10px;
-}
-/* ============================= */
-/* MOVIL */
-/* ============================= */
-
-@media (max-width:600px){
-
-.productos{
-grid-template-columns:repeat(2,1fr);
-gap:10px;
-padding:10px;
-}
-
-.producto img{
-height:190px;
-}
-
-}
-
-</style>
+        @media (max-width:600px) {
+            .productos { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
+            .producto img { height: 160px; }
+        }
+    </style>
 </head>
 
 <body>
 
-<div id="loader">
-<div class="spinner"></div>
-<p>Cargando tienda...</p>
-</div>
-
-<div class="header">
-<h1 id="nombreEmpresa"></h1>
-<div id="eslogan" class="eslogan"></div>
-</div>
-
-<div class="publicidad-container">
-<div id="publicidad" class="publicidad-texto"></div>
-</div>
-
-<div id="productos" class="productos"></div>
-
-<div id="modalPedido" class="modal">
-
-<div class="modal-contenido">
-
-<span class="cerrar" onclick="cerrarModal()">×</span>
-
-<div class="cabeceraPedido">
-
-<img id="productoImagen">
-
-<div class="infoProducto">
-
-<div id="productoTitulo"></div>
-
-<div id="productoDescripcion"></div>
-
-<div id="productoPrecio" class="precioModal"></div>
-
-</div>
-
-</div>
-
-<div class="formulario">
-
-<div class="fila2">
-<input id="productoAdicional" placeholder="Producto adicional">
-<select id="medioPago">
-<option value="">Medio de pago</option>
-<option>Nequi</option>
-<option>Bancolombia</option>
-<option>Daviplata</option>
-<option>Bre-be</option>
-<option>Wompi</option>
-<option>Efectivo</option>
-</select>
-</div>
-
-<div class="fila2">
-<input id="nombreComprador" placeholder="Nombre comprador">
-<input id="celularComprador" placeholder="Celular comprador">
-</div>
-
-<div class="fila2">
-<input id="nombreDestinatario" placeholder="Nombre destinatario">
-<input id="celularDestinatario" placeholder="Celular destinatario">
-</div>
-
-<input id="direccionEntrega" placeholder="Dirección entrega">
-
-<textarea id="notasPedido" placeholder="Notas dirección"></textarea>
-
-<textarea id="mensajeTarjeta" placeholder="Mensaje tarjeta"></textarea>
-
-<div class="fila2">
-<input id="deTarjeta" placeholder="De">
-<input id="paraTarjeta" placeholder="Para">
-</div>
-
-<div class="fila2">
-<input type="date" id="fechaEntrega">
-
-<select id="horaEntrega">
-<option>8AM-10AM</option>
-<option>10AM-12PM</option>
-<option>12PM-2PM</option>
-<option>2PM-4PM</option>
-<option>4PM-6PM</option>
-<option>6PM-8PM</option>
-<option>8PM-10PM</option>
-</select>
-</div>
-
-<button id="enviarPedido" onclick="enviarPedido()">Enviar pedido</button>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="footer">
-<p id="descripcion"></p>
-<p id="direccion"></p>
-<p id="ciudad"></p>
-<p id="telefono"></p>
-<p id="correo"></p>
-<p style="margin-top:15px;font-size:13px;opacity:.8;">Creado con Zippy</p>
-</div>
-
-<a id="btnWhats" class="whatsapp" target="_blank">
-<img src="https://cdn-icons-png.flaticon.com/512/733/733585.png">
-</a>
-
-<script type="module">
-// AQUÍ: Agregué 'set' a los imports para poder escribir en la base de datos
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-const firebaseConfig={
-apiKey:"TU_API_KEY",
-authDomain:"zippy-727d5.firebaseapp.com",
-databaseURL:"https://zippy-727d5-default-rtdb.firebaseio.com",
-projectId:"zippy-727d5"
-}
-
-const app=initializeApp(firebaseConfig)
-const db=getDatabase(app)
-
-let productosJson={}
-let productosRealtime={}
-let telefonoEmpresa=""
-let empresaId=""
-let idDomiciliarioAsignado = "";
-const slug=window.location.pathname.split("/").pop()
-
-buscarEmpresa()
-
-function buscarEmpresa(){
-
-const empresasRef=ref(db)
-
-onValue(empresasRef,(snapshot)=>{
-
-snapshot.forEach((child)=>{
-
-const data=child.val()
-
-if(data.perfilempresa?.slug===slug){
-
-empresaId=child.key
-
-const perfil=data.perfilempresa
-
-telefonoEmpresa=perfil.WhatsApp.replace("+","")
-
-document.getElementById("nombreEmpresa").innerText=perfil.nombreEmpresa
-document.getElementById("eslogan").innerText=perfil.eslogan
-document.getElementById("publicidad").innerText=perfil.publicidad
-if(data.domiciliarios) {
-                    idDomiciliarioAsignado = Object.keys(data.domiciliarios)[0];
-                }
-
-document.getElementById("descripcion").innerText=perfil.descripcionEmpresa
-document.getElementById("direccion").innerText="Dirección: "+perfil.direccion
-document.getElementById("ciudad").innerText="Ciudad: "+perfil.ciudad
-document.getElementById("telefono").innerText="WhatsApp: "+perfil.WhatsApp
-document.getElementById("correo").innerText="Correo: "+perfil.correo
-
-document.getElementById("btnWhats").href=`https://wa.me/${telefonoEmpresa}`
-
-cargarProductosJSON(perfil.urljason)
-escucharCambios(empresaId)
-
-}
-
-})
-
-})
-
-}
-
-function cargarProductosJSON(url){
-
-fetch(url)
-.then(res=>res.json())
-.then(data=>{
-
-productosJson=data
-render()
-
-})
-
-}
-
-function escucharCambios(id){
-
-const productosRef=ref(db,id+"/productos")
-
-onValue(productosRef,(snapshot)=>{
-
-productosRealtime={}
-
-snapshot.forEach((child)=>{
-
-const p=child.val()
-productosRealtime[p.referencia]=p
-
-})
-
-render()
-
-})
-
-}
-
-function formatearPrecio(valor){
-return "$"+valor.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".")
-}
-
-function normalizarImagen(url){
-
-if(!url) return ""
-
-if(url.includes("drive.google.com")){
-
-const match=url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
-
-if(match) return "https://drive.google.com/thumbnail?id="+match[1]+"&sz=w1000"
-
-}
-
-return url
-
-}
-
-function render(){
-    const contenedor = document.getElementById("productos");
-    contenedor.innerHTML = "";
-
-    // Creamos un array de promesas para las imágenes
-    const promesasImagenes = [];
-
-    for(const refProducto in productosJson){
-        const imagen = productosJson[refProducto];
-        const realtime = productosRealtime[refProducto];
-
-        if(!realtime) continue;
-
-        let precioHTML = "";
-        let etiquetaPromo = realtime.promocion ? `<div class="etiquetaPromo">PROMO</div>` : "";
-        let etiquetaAgotado = realtime.agotado ? `<div class="etiquetaAgotado">AGOTADO</div>` : "";
-        let claseAgotado = realtime.agotado ? "agotado" : "";
-
-        if(realtime.promocion){
-            precioHTML = `
-                <div class="precio">${formatearPrecio(realtime.valorPromocion)}</div>
-                <div class="precioViejo">${formatearPrecio(realtime.valor)}</div>
-            `;
-        } else {
-            precioHTML = `<div class="precio">${formatearPrecio(realtime.valor)}</div>`;
-        }
-
-        const mensaje = encodeURIComponent("Hola quiero comprar " + refProducto);
-        const linkWhats = `https://wa.me/${telefonoEmpresa}?text=${mensaje}`;
-
-        // Construir el HTML del producto
-        const cardHTML = `
-            <div class="producto ${claseAgotado}">
-                <div class="img-container">
-                    ${etiquetaPromo}
-                    ${etiquetaAgotado}
-                    <img src="${normalizarImagen(imagen)}" 
-                         ${realtime.agotado ? "" : `onclick="abrirProducto('${refProducto}','${imagen}','${realtime.valor}','${realtime.descripcion || ""}')"`}>
+    <div id="loader">
+        <div class="spinner"></div>
+        <p style="margin-top:15px; font-weight:bold; color:#4f46e5;">Cargando tienda...</p>
+    </div>
+
+    <div class="header">
+        <h1 id="nombreEmpresa"></h1>
+        <div id="eslogan" class="eslogan"></div>
+    </div>
+
+    <div class="publicidad-container">
+        <div id="publicidad" class="publicidad-texto"></div>
+    </div>
+
+    <div id="productos" class="productos"></div>
+
+    <div id="modalPedido" class="modal">
+        <div class="modal-contenido">
+            <span style="float:right; cursor:pointer; font-size:24px;" onclick="cerrarModal()">×</span>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <img id="productoImagen" style="width:100px; height:100px; object-fit:contain; background:#f9f9f9; border-radius:8px;">
+                <div class="infoProducto">
+                    <div id="productoTitulo" style="font-weight:bold;"></div>
+                    <div id="productoDescripcion" style="font-size:12px; color:#666;"></div>
+                    <div id="productoPrecio" style="font-weight:bold; color:#16a34a; font-size:18px;"></div>
                 </div>
-                <div class="nombre">${refProducto}</div>
-                ${precioHTML}
-                ${realtime.agotado ? 
-                    `<div class="btn" style="background:#999">Agotado</div>` : 
-                    `<a class="btn" href="${linkWhats}" target="_blank">WhatsApp</a>`
-                }
             </div>
-        `;
-        contenedor.innerHTML += cardHTML;
-    }
 
-    // Animación de entrada de productos
-    document.querySelectorAll(".producto").forEach((el, i) => {
-        setTimeout(() => { el.classList.add("visible"); }, i * 50);
-    });
+            <div class="formulario">
+                <div class="fila2">
+                    <input id="productoAdicional" placeholder="Producto adicional (Opcional)">
+                    <select id="medioPago">
+                        <option value="">Medio de pago</option>
+                        <option>Nequi</option>
+                        <option>Bancolombia</option>
+                        <option>Daviplata</option>
+                        <option>Efectivo</option>
+                    </select>
+                </div>
+                <div class="fila2">
+                    <input id="nombreComprador" placeholder="Nombre comprador">
+                    <input id="celularComprador" placeholder="Celular comprador">
+                </div>
+                <div class="fila2">
+                    <input id="nombreDestinatario" placeholder="Nombre destinatario">
+                    <input id="celularDestinatario" placeholder="Celular destinatario">
+                </div>
+                <input id="direccionEntrega" placeholder="Dirección entrega">
+                <textarea id="notasPedido" placeholder="Notas dirección"></textarea>
+                <textarea id="mensajeTarjeta" placeholder="Mensaje tarjeta"></textarea>
+                <div class="fila2">
+                    <input id="deTarjeta" placeholder="De">
+                    <input id="paraTarjeta" placeholder="Para">
+                </div>
+                <div class="fila2">
+                    <input type="date" id="fechaEntrega">
+                    <select id="horaEntrega">
+                        <option>8AM-10AM</option>
+                        <option>10AM-12PM</option>
+                        <option>12PM-2PM</option>
+                        <option>2PM-4PM</option>
+                        <option>4PM-6PM</option>
+                        <option>6PM-8PM</option>
+                    </select>
+                </div>
+                <button id="enviarPedidoBtn" onclick="enviarPedido()">Enviar pedido</button>
+            </div>
+        </div>
+    </div>
 
-    // QUITAMOS EL LOADER SOLO CUANDO TODO ESTÁ EN EL DOM
-    // Le damos un pequeño margen de 300ms para que el navegador procese el render
-    setTimeout(() => {
-        const loader = document.getElementById("loader");
-        loader.style.opacity = "0";
-        setTimeout(() => { loader.style.display = "none"; }, 500);
-    }, 400);
-}
+    <div class="footer">
+        <p id="descripcion"></p>
+        <p id="direccion"></p>
+        <p id="ciudad"></p>
+        <p id="telefono"></p>
+        <p style="margin-top:15px;font-size:12px;opacity:.5;">Creado con Zippy</p>
+    </div>
 
-let productoSeleccionado=""
-let imagenProducto=""
+    <a id="btnWhats" class="whatsapp" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png">
+    </a>
 
-function abrirProducto(nombre,imagen,precio,descripcion){
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-productoSeleccionado=nombre
-
-// normalizamos la imagen (IMPORTANTE para Google Drive)
-imagenProducto=normalizarImagen(imagen)
-
-document.getElementById("productoTitulo").innerText=nombre
-document.getElementById("productoDescripcion").innerText=descripcion || ""
-document.getElementById("productoImagen").src=imagenProducto
-document.getElementById("productoPrecio").innerText=formatearPrecio(precio)
-
-// mostrar modal
-document.getElementById("modalPedido").style.display="flex"
-
-}
-
-function cerrarModal(){
-
-document.getElementById("modalPedido").style.display="none"
-
-}
-
-function enviarPedido() {
-    // 1. Captura de valores del formulario
-    const productoAdicional = document.getElementById("productoAdicional").value;
-    const medioPago = document.getElementById("medioPago").value;
-    const nombreComprador = document.getElementById("nombreComprador").value;
-    const celularComprador = document.getElementById("celularComprador").value;
-    const nombreDestinatario = document.getElementById("nombreDestinatario").value;
-    const celularDestinatario = document.getElementById("celularDestinatario").value;
-    const direccionEntrega = document.getElementById("direccionEntrega").value;
-    const notasPedido = document.getElementById("notasPedido").value;
-    const mensajeTarjeta = document.getElementById("mensajeTarjeta").value;
-    const deTarjeta = document.getElementById("deTarjeta").value;
-    const paraTarjeta = document.getElementById("paraTarjeta").value;
-    const fechaEntrega = document.getElementById("fechaEntrega").value;
-    const horaEntrega = document.getElementById("horaEntrega").value;
-
-    // 2. Validación de campos obligatorios (Todos menos productoAdicional)
-    if (
-        !medioPago || 
-        !nombreComprador.trim() || 
-        !celularComprador.trim() || 
-        !nombreDestinatario.trim() || 
-        !celularDestinatario.trim() || 
-        !direccionEntrega.trim() || 
-        !notasPedido.trim() || 
-        !mensajeTarjeta.trim() || 
-        !deTarjeta.trim() || 
-        !paraTarjeta.trim() || 
-        !fechaEntrega || 
-        !horaEntrega
-    ) {
-        alert("⚠️ Por favor, completa todos los campos requeridos para procesar tu pedido.");
-        return; 
-    }
-
-    // 3. Verificar si tenemos un domiciliario asignado
-    if (!idDomiciliarioAsignado) {
-        alert("❌ Error de configuración: No se encontró un domiciliario disponible. Por favor contacta a la tienda.");
-        return;
-    }
-
-    // 4. Referencia al nodo de pedidos del domiciliario específico
-    // Estructura: empresaId / Pedidos / idDomiciliario
-    const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
-
-    // 5. Consultar pedidos actuales para calcular la 'posicion' (como en Android)
-    onValue(pedidosRef, (snapshot) => {
-        let maxPosicion = 0;
-        
-        if (snapshot.exists()) {
-            snapshot.forEach((child) => {
-                const p = child.val().posicion || 0;
-                if (p > maxPosicion) maxPosicion = p;
-            });
-        }
-        
-        const nuevaPosicion = maxPosicion + 1;
-
-        // 6. Generar nuevo ID de pedido
-        const nuevoPedidoRef = push(pedidosRef);
-        const idPedido = nuevoPedidoRef.key;
-
-        // 7. Objeto Pedido compatible con la App Android (Clase Pedido en Kotlin)
-        const pedido = {
-            idPedido: idPedido,
-            direccion: direccionEntrega,
-            imagenUrl: imagenProducto,
-            cliente: celularComprador,
-            nombreCliente: nombreComprador,
-            referencia: productoSeleccionado,
-            adicional: productoAdicional,
-            banco: medioPago,
-            destinatario: celularDestinatario,
-            nombreDestinatario: nombreDestinatario,
-            de: deTarjeta,
-            para: paraTarjeta,
-            diaEntrega: fechaEntrega,
-            horaEntrega: horaEntrega,
-            mensaje: mensajeTarjeta,
-            notas: notasPedido,
-            posicion: nuevaPosicion, // Vital para el orden en la App
-            fechaRegistro: new Date().toLocaleDateString(),
-            horaRegistro: new Date().toLocaleTimeString(),
-            notificado: false, // Para que la App dispare la notificación
-            color: "" // Valor inicial vacío como en la App
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "zippy-727d5.firebaseapp.com",
+            databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
+            projectId: "zippy-727d5"
         };
 
-        // 8. Guardar en Firebase
-        set(nuevoPedidoRef, pedido)
-            .then(() => {
-                alert("✅ ¡Pedido enviado con éxito! Nos pondremos en contacto pronto.");
-                
-                // Limpiar campos del modal
-                document.querySelectorAll("#modalPedido input, #modalPedido textarea, #modalPedido select").forEach(e => e.value = "");
-                
-                // Cerrar modal
-                cerrarModal();
-            })
-            .catch((error) => {
-                console.error("Error en Firebase:", error);
-                alert("❌ Hubo un error al enviar el pedido. Intenta nuevamente.");
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let productosJson = {};
+        let productosRealtime = {};
+        let telefonoEmpresa = "";
+        let empresaId = "";
+        let idDomiciliarioAsignado = "";
+        let productoSeleccionado = "";
+        let imagenProducto = "";
+
+        const slug = window.location.pathname.split("/").pop();
+
+        // 1. BUSCAR EMPRESA Y DOMICILIARIO
+        const empresasRef = ref(db);
+        onValue(empresasRef, (snapshot) => {
+            snapshot.forEach((child) => {
+                const data = child.val();
+                if (data.perfilempresa?.slug === slug) {
+                    empresaId = child.key;
+                    const perfil = data.perfilempresa;
+                    telefonoEmpresa = perfil.WhatsApp.replace("+", "");
+
+                    // Asignar primer domiciliario (Ruta corregida a 'Domiciliarios' con D mayúscula)
+                    if (data.Domiciliarios) {
+                        idDomiciliarioAsignado = Object.keys(data.Domiciliarios)[0];
+                    }
+
+                    document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
+                    document.getElementById("eslogan").innerText = perfil.eslogan;
+                    document.getElementById("publicidad").innerText = perfil.publicidad;
+                    document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
+                    document.getElementById("direccion").innerText = "Dirección: " + perfil.direccion;
+                    document.getElementById("ciudad").innerText = "Ciudad: " + perfil.ciudad;
+                    document.getElementById("telefono").innerText = "WhatsApp: " + perfil.WhatsApp;
+                    document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
+
+                    cargarProductosJSON(perfil.urljason);
+                    escucharCambios(empresaId);
+                }
             });
+        });
 
-    }, { onlyOnce: true }); // Solo consultamos una vez para evitar bucles
-}
+        function cargarProductosJSON(url) {
+            fetch(url).then(res => res.json()).then(data => {
+                productosJson = data;
+                render();
+            });
+        }
 
-// AQUÍ: Exponemos las funciones al objeto global window para que funcionen con los "onclick" del HTML
-window.abrirProducto = abrirProducto;
-window.cerrarModal = cerrarModal;
-window.enviarPedido = enviarPedido;
+        function escucharCambios(id) {
+            const productosRef = ref(db, id + "/productos");
+            onValue(productosRef, (snapshot) => {
+                productosRealtime = {};
+                snapshot.forEach((child) => {
+                    const p = child.val();
+                    productosRealtime[p.referencia] = p;
+                });
+                render();
+            });
+        }
 
-</script>
+        function render() {
+            const contenedor = document.getElementById("productos");
+            contenedor.innerHTML = "";
 
+            for (const refP in productosJson) {
+                const imgUrl = productosJson[refP];
+                const real = productosRealtime[refP];
+                if (!real) continue;
+
+                const card = document.createElement("div");
+                card.className = `producto ${real.agotado ? 'agotado' : ''}`;
+                
+                const precioFinal = real.promocion ? real.valorPromocion : real.valor;
+                const precioHTML = real.promocion ? 
+                    `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>` : 
+                    `<div class="precio">${formatearPrecio(real.valor)}</div>`;
+
+                card.innerHTML = `
+                    <div class="img-container">
+                        ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+                        ${real.agotado ? '<div class="etiquetaAgotado">AGOTADO</div>' : ''}
+                        <img src="${normalizarImagen(imgUrl)}" onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')">
+                    </div>
+                    <div class="nombre">${refP}</div>
+                    ${precioHTML}
+                    <div class="btn" onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')">Comprar</div>
+                `;
+                contenedor.appendChild(card);
+            }
+
+            // Animación y QUITAR LOADER
+            setTimeout(() => {
+                document.querySelectorAll(".producto").forEach((el, i) => {
+                    setTimeout(() => el.classList.add("visible"), i * 50);
+                });
+                const ld = document.getElementById("loader");
+                ld.style.opacity = "0";
+                setTimeout(() => ld.style.display = "none", 500);
+            }, 600);
+        }
+
+        function abrirProducto(nombre, imagen, precio, descripcion) {
+            productoSeleccionado = nombre;
+            imagenProducto = normalizarImagen(imagen);
+            document.getElementById("productoTitulo").innerText = nombre;
+            document.getElementById("productoDescripcion").innerText = descripcion;
+            document.getElementById("productoImagen").src = imagenProducto;
+            document.getElementById("productoPrecio").innerText = formatearPrecio(precio);
+            document.getElementById("modalPedido").style.display = "flex";
+        }
+
+        function enviarPedido() {
+            const btn = document.getElementById("enviarPedidoBtn");
+            const campos = {
+                medioPago: document.getElementById("medioPago").value,
+                nombreComprador: document.getElementById("nombreComprador").value,
+                celularComprador: document.getElementById("celularComprador").value,
+                nombreDestinatario: document.getElementById("nombreDestinatario").value,
+                celularDestinatario: document.getElementById("celularDestinatario").value,
+                direccionEntrega: document.getElementById("direccionEntrega").value,
+                notasPedido: document.getElementById("notasPedido").value,
+                mensajeTarjeta: document.getElementById("mensajeTarjeta").value,
+                deTarjeta: document.getElementById("deTarjeta").value,
+                paraTarjeta: document.getElementById("paraTarjeta").value,
+                fechaEntrega: document.getElementById("fechaEntrega").value,
+                horaEntrega: document.getElementById("horaEntrega").value
+            };
+
+            if (Object.values(campos).some(v => !v.trim())) {
+                alert("⚠️ Por favor completa todos los campos.");
+                return;
+            }
+
+            if (!idDomiciliarioAsignado) {
+                alert("❌ Error: No hay domiciliarios en el sistema.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Enviando...";
+
+            const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
+            
+            onValue(pedidosRef, (snapshot) => {
+                let maxPos = 0;
+                snapshot.forEach(c => { if(c.val().posicion > maxPos) maxPos = c.val().posicion; });
+
+                const nuevoRef = push(pedidosRef);
+                const pedidoObj = {
+                    idPedido: nuevoRef.key,
+                    direccion: campos.direccionEntrega,
+                    imagenUrl: imagenProducto,
+                    cliente: campos.celularComprador,
+                    nombreCliente: campos.nombreComprador,
+                    referencia: productoSeleccionado,
+                    adicional: document.getElementById("productoAdicional").value,
+                    banco: campos.medioPago,
+                    destinatario: campos.celularDestinatario,
+                    nombreDestinatario: campos.nombreDestinatario,
+                    de: campos.deTarjeta,
+                    para: campos.paraTarjeta,
+                    diaEntrega: campos.fechaEntrega,
+                    horaEntrega: campos.horaEntrega,
+                    mensaje: campos.mensajeTarjeta,
+                    notas: campos.notasPedido,
+                    posicion: maxPos + 1,
+                    fechaRegistro: new Date().toLocaleDateString(),
+                    horaRegistro: new Date().toLocaleTimeString(),
+                    notificado: false,
+                    color: ""
+                };
+
+                set(nuevoRef, pedidoObj).then(() => {
+                    alert("✅ Pedido enviado correctamente");
+                    location.reload();
+                });
+            }, { onlyOnce: true });
+        }
+
+        // Utilidades
+        window.cerrarModal = () => document.getElementById("modalPedido").style.display = "none";
+        window.abrirProducto = abrirProducto;
+        window.enviarPedido = enviarPedido;
+        const formatearPrecio = (v) => "$" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        const normalizarImagen = (url) => {
+            if (url?.includes("drive.google.com")) {
+                const id = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+                return id ? `https://drive.google.com/thumbnail?id=${id[1]}&sz=w1000` : url;
+            }
+            return url || "";
+        };
+    </script>
 </body>
 </html>
