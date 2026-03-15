@@ -346,7 +346,7 @@
             });
         }
 
-        function render() {
+       function render() {
     const contenedor = document.getElementById("productos");
     contenedor.innerHTML = "";
 
@@ -357,28 +357,26 @@
         if (!real) continue;
 
         const card = document.createElement("div");
-        // Se añade la clase 'agotado' si el producto no tiene stock
+        // Si está agotado, le ponemos la clase 'agotado' para que el CSS haga su magia
         card.className = `producto ${real.agotado ? 'agotado' : ''}`;
         
         const precioFinal = real.promocion ? real.valorPromocion : real.valor;
         
-        // Lógica de Precios
         const precioHTML = real.promocion ? 
             `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>` : 
             `<div class="precio">${formatearPrecio(real.valor)}</div>`;
 
-        // Lógica de Botón: Si está agotado, muestra texto. Si no, muestra el botón verde de compra.
+        // Lógica de Botón: Solo sale "Comprar" si hay stock
         const botonHTML = real.agotado ? 
-            `<div class="btn" style="background:#999; cursor:not-allowed;">Agotado</div>` : 
+            `<div class="btn" style="background:#b2bec3; cursor:not-allowed;">Agotado</div>` : 
             `<div class="btn" onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')">Comprar</div>`;
 
         card.innerHTML = `
             <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-                ${real.agotado ? '<div class="etiquetaAgotado">AGOTADO</div>' : ''}
                 <img src="${normalizarImagen(imgUrl)}" 
                      ${real.agotado ? "" : `onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')"`} 
-                     style="${real.agotado ? 'filter: grayscale(100%);' : ''}">
+                     style="${real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : ''}">
             </div>
             <div class="nombre">${refP}</div>
             ${precioHTML}
@@ -387,15 +385,18 @@
         contenedor.appendChild(card);
     }
 
-    // Animación y control del Loader
+    // Control del Loader: No se quita hasta que los productos están listos
     setTimeout(() => {
         document.querySelectorAll(".producto").forEach((el, i) => {
             setTimeout(() => el.classList.add("visible"), i * 50);
         });
+        
         const ld = document.getElementById("loader");
         if(ld){
             ld.style.opacity = "0";
-            setTimeout(() => ld.style.display = "none", 500);
+            setTimeout(() => {
+                ld.style.display = "none";
+            }, 500);
         }
     }, 600);
 }
