@@ -8,8 +8,16 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/login",
+        "destination": "/login.html"
+      },
+      {
+        "source": "/admin",
         "destination": "/index.html"
+      },
+      {
+        "source": "/t/**",
+        "destination": "/tienda.html"
       }
     ]
   }
