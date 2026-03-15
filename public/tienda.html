@@ -425,7 +425,7 @@ Creado con Zippy
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
 
@@ -442,6 +442,7 @@ const db=getDatabase(app);
 let productosJson={}
 let productosRealtime={}
 let telefonoEmpresa=""
+let empresaId="" 
 
 const slug=window.location.pathname.split("/").pop()
 
@@ -458,8 +459,7 @@ snapshot.forEach((child)=>{
 const data=child.val()
 
 if(data.perfilempresa?.slug===slug){
-
-const empresaId=child.key
+empresaId=child.key
 const perfil=data.perfilempresa
 
 telefonoEmpresa=perfil.WhatsApp.replace("+","")
@@ -579,7 +579,7 @@ precioHTML=`<div class="precio">${formatearPrecio(realtime.valor)}</div>`
 
 }
 
-if(realtime.agotado){
+if(realtime.agotado === true || realtime.agotado === "true"){
 
 etiquetaAgotado=`<div class="etiquetaAgotado">AGOTADO</div>`
 claseAgotado="agotado"
@@ -643,7 +643,7 @@ document.getElementById("productoPrecio").innerText = formatearPrecio(precio)
 document.getElementById("modalPedido").style.display="flex"
 
 }
-
+window.abrirProducto = abrirProducto
 /* Esperar que cargue el DOM */
 
 window.addEventListener("DOMContentLoaded",()=>{
