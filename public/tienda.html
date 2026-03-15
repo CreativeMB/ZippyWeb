@@ -41,33 +41,39 @@ margin-top:6px;
 }
 
 /* ============================= */
-/* PUBLICIDAD */
+/* PUBLICIDAD - ESTILO ELEGANTE */
 /* ============================= */
 
-.publicidad-container{
-width:100%;
-background:#f59e0b;
-color:white;
-overflow:hidden;
-height:40px;
-display:flex;
-align-items:center;
-position:relative;
+.publicidad-container {
+    width: 100%;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+    background-size: 200% auto;
+    color: white;
+    overflow: hidden;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    box-shadow: inset 0 -2px 5px rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-.publicidad-texto{
-white-space:nowrap;
-position:absolute;
-font-weight:bold;
-animation:publicidad 14s linear infinite;
-padding-left:100%;
+.publicidad-texto {
+    white-space: nowrap;
+    position: absolute;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 13px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    animation: publicidad-elegante 20s linear infinite;
+    padding-left: 100%;
 }
 
-@keyframes publicidad{
-0%{transform:translateX(0);}
-100%{transform:translateX(-100%);}
+@keyframes publicidad-elegante {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-150%); } /* Ajustado para que fluya mejor */
 }
-
 /* ============================= */
 /* PRODUCTOS GRID */
 /* ============================= */
@@ -203,21 +209,20 @@ margin:6px 0;
 }
 
 /* ============================= */
-/* LOADER */
+/* LOADER - MEJORADO */
 /* ============================= */
 
-#loader{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:white;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-z-index:9999;
+#loader {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    transition: opacity 0.5s ease; /* Transición suave al quitarse */
 }
 
 .spinner{
@@ -593,88 +598,67 @@ return url
 }
 
 function render(){
+    const contenedor = document.getElementById("productos");
+    contenedor.innerHTML = "";
 
-const contenedor=document.getElementById("productos")
-contenedor.innerHTML=""
+    // Creamos un array de promesas para las imágenes
+    const promesasImagenes = [];
 
-for(const refProducto in productosJson){
+    for(const refProducto in productosJson){
+        const imagen = productosJson[refProducto];
+        const realtime = productosRealtime[refProducto];
 
-const imagen=productosJson[refProducto]
-const realtime=productosRealtime[refProducto]
+        if(!realtime) continue;
 
-if(!realtime) continue
+        let precioHTML = "";
+        let etiquetaPromo = realtime.promocion ? `<div class="etiquetaPromo">PROMO</div>` : "";
+        let etiquetaAgotado = realtime.agotado ? `<div class="etiquetaAgotado">AGOTADO</div>` : "";
+        let claseAgotado = realtime.agotado ? "agotado" : "";
 
-let precio=realtime.valor
-let etiquetaPromo=""
-let etiquetaAgotado=""
-let claseAgotado=""
-let precioHTML=""
+        if(realtime.promocion){
+            precioHTML = `
+                <div class="precio">${formatearPrecio(realtime.valorPromocion)}</div>
+                <div class="precioViejo">${formatearPrecio(realtime.valor)}</div>
+            `;
+        } else {
+            precioHTML = `<div class="precio">${formatearPrecio(realtime.valor)}</div>`;
+        }
 
-if(realtime.promocion){
+        const mensaje = encodeURIComponent("Hola quiero comprar " + refProducto);
+        const linkWhats = `https://wa.me/${telefonoEmpresa}?text=${mensaje}`;
 
-precio=realtime.valorPromocion
+        // Construir el HTML del producto
+        const cardHTML = `
+            <div class="producto ${claseAgotado}">
+                <div class="img-container">
+                    ${etiquetaPromo}
+                    ${etiquetaAgotado}
+                    <img src="${normalizarImagen(imagen)}" 
+                         ${realtime.agotado ? "" : `onclick="abrirProducto('${refProducto}','${imagen}','${realtime.valor}','${realtime.descripcion || ""}')"`}>
+                </div>
+                <div class="nombre">${refProducto}</div>
+                ${precioHTML}
+                ${realtime.agotado ? 
+                    `<div class="btn" style="background:#999">Agotado</div>` : 
+                    `<a class="btn" href="${linkWhats}" target="_blank">WhatsApp</a>`
+                }
+            </div>
+        `;
+        contenedor.innerHTML += cardHTML;
+    }
 
-precioHTML=`
-<div class="precio">${formatearPrecio(realtime.valorPromocion)}</div>
-<div class="precioViejo">${formatearPrecio(realtime.valor)}</div>
-`
+    // Animación de entrada de productos
+    document.querySelectorAll(".producto").forEach((el, i) => {
+        setTimeout(() => { el.classList.add("visible"); }, i * 50);
+    });
 
-etiquetaPromo=`<div class="etiquetaPromo">PROMO</div>`
-
-}else{
-
-precioHTML=`<div class="precio">${formatearPrecio(realtime.valor)}</div>`
-
-}
-
-if(realtime.agotado){
-
-claseAgotado="agotado"
-etiquetaAgotado=`<div class="etiquetaAgotado">AGOTADO</div>`
-
-}
-
-const mensaje=encodeURIComponent("Hola quiero comprar "+refProducto)
-const linkWhats=`https://wa.me/${telefonoEmpresa}?text=${mensaje}`
-
-contenedor.innerHTML+=`
-
-<div class="producto ${claseAgotado}">
-
-<div class="img-container">
-
-${etiquetaPromo}
-${etiquetaAgotado}
-
-<img src="${normalizarImagen(imagen)}"
-${realtime.agotado ? "" : `onclick="abrirProducto('${refProducto}','${imagen}','${precio}','${realtime.descripcion || ""}')"`}>
-
-</div>
-
-<div class="nombre">${refProducto}</div>
-
-${precioHTML}
-
-${realtime.agotado ?
-`<div class="btn" style="background:#999">Agotado</div>`
-:
-`<a class="btn" href="${linkWhats}" target="_blank">Comprar por WhatsApp</a>`
-}
-
-</div>
-
-`
-
-}
-
-document.querySelectorAll(".producto").forEach((el,i)=>{
-setTimeout(()=>{el.classList.add("visible")},i*80)
-})
-
-setTimeout(()=>{
-document.getElementById("loader").style.display="none"
-},200)
-
+    // QUITAMOS EL LOADER SOLO CUANDO TODO ESTÁ EN EL DOM
+    // Le damos un pequeño margen de 300ms para que el navegador procese el render
+    setTimeout(() => {
+        const loader = document.getElementById("loader");
+        loader.style.opacity = "0";
+        setTimeout(() => { loader.style.display = "none"; }, 500);
+    }, 400);
 }
 
 let productoSeleccionado=""
