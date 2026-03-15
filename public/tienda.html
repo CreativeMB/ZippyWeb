@@ -254,6 +254,67 @@ height:200px;
 }
 
 }
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+z-index:9999;
+justify-content:center;
+align-items:center;
+}
+
+.modal-contenido{
+background:white;
+width:95%;
+max-width:500px;
+border-radius:12px;
+padding:20px;
+max-height:90vh;
+overflow:auto;
+}
+
+.cerrar{
+float:right;
+font-size:28px;
+cursor:pointer;
+}
+
+.modal img{
+width:100%;
+height:220px;
+object-fit:contain;
+margin-bottom:10px;
+}
+
+.formulario input,
+.formulario textarea,
+.formulario select{
+
+width:100%;
+padding:10px;
+margin:6px 0;
+border-radius:6px;
+border:1px solid #ccc;
+font-size:14px;
+
+}
+
+#enviarPedido{
+
+width:100%;
+background:#25D366;
+color:white;
+border:none;
+padding:12px;
+font-size:16px;
+border-radius:8px;
+cursor:pointer;
+
+}
 
 </style>
 </head>
@@ -277,6 +338,71 @@ height:200px;
 </div>
 
 <div id="productos" class="productos"></div>
+<div id="modalPedido" class="modal">
+
+<div class="modal-contenido">
+
+<span id="cerrarModal" class="cerrar">&times;</span>
+
+<h2 id="productoTitulo"></h2>
+
+<img id="productoImagen">
+
+<div class="precioModal" id="productoPrecio"></div>
+
+<div class="formulario">
+
+<input id="nombreComprador" placeholder="Nombre comprador">
+
+<input id="celularComprador" placeholder="Número celular">
+
+<select id="medioPago">
+
+<option value="">Medio de pago</option>
+<option>Nequi</option>
+<option>Bancolombia</option>
+<option>Daviplata</option>
+<option>Bre-be</option>
+<option>Wompi</option>
+<option>Efectivo</option>
+
+</select>
+
+<input id="nombreDestinatario" placeholder="Nombre destinatario">
+
+<input id="celularDestinatario" placeholder="Número destinatario">
+
+<input id="direccionEntrega" placeholder="Dirección entrega">
+
+<textarea id="notasPedido" placeholder="Notas del pedido"></textarea>
+
+<input id="paraTarjeta" placeholder="Para">
+
+<input id="deTarjeta" placeholder="De">
+
+<textarea id="mensajeTarjeta" placeholder="Mensaje de tarjeta"></textarea>
+
+<input type="date" id="fechaEntrega">
+
+<select id="horaEntrega">
+
+<option>8AM-10AM</option>
+<option>10AM-12PM</option>
+<option>12PM-2PM</option>
+<option>2PM-4PM</option>
+<option>4PM-6PM</option>
+<option>6PM-8PM</option>
+<option>8PM-10PM</option>
+
+</select>
+
+<button id="enviarPedido">Enviar pedido</button>
+
+</div>
+
+</div>
+
+</div>
 
 <div class="footer">
 
@@ -417,6 +543,7 @@ return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
 return url;
 
 }
+
 function render(){
 
 const contenedor=document.getElementById("productos")
@@ -472,7 +599,8 @@ contenedor.innerHTML+=`
 ${etiquetaPromo}
 ${etiquetaAgotado}
 
-<img src="${normalizarImagen(imagen)}" loading="lazy">
+<img src="${normalizarImagen(imagen)}"
+onclick="abrirProducto('${refProducto.replace(/'/g,"")}','${imagen}','${precio}')">
 
 </div>
 
@@ -502,6 +630,104 @@ document.getElementById("loader").style.display="none"
 
 }
 
+let productoSeleccionado = ""
+
+function abrirProducto(nombre,imagen,precio){
+
+productoSeleccionado = nombre
+
+document.getElementById("productoTitulo").innerText = nombre
+document.getElementById("productoImagen").src = normalizarImagen(imagen)
+document.getElementById("productoPrecio").innerText = formatearPrecio(precio)
+
+document.getElementById("modalPedido").style.display="flex"
+
+}
+
+/* Esperar que cargue el DOM */
+
+window.addEventListener("DOMContentLoaded",()=>{
+
+document.getElementById("cerrarModal").onclick=()=>{
+document.getElementById("modalPedido").style.display="none"
+}
+
+document.getElementById("enviarPedido").onclick = async ()=>{
+
+const nombreComprador =
+document.getElementById("nombreComprador").value
+
+const celularComprador =
+document.getElementById("celularComprador").value
+
+const medioPago =
+document.getElementById("medioPago").value
+
+const nombreDestinatario =
+document.getElementById("nombreDestinatario").value
+
+const celularDestinatario =
+document.getElementById("celularDestinatario").value
+
+const direccionEntrega =
+document.getElementById("direccionEntrega").value
+
+const notas =
+document.getElementById("notasPedido").value
+
+const para =
+document.getElementById("paraTarjeta").value
+
+const de =
+document.getElementById("deTarjeta").value
+
+const mensaje =
+document.getElementById("mensajeTarjeta").value
+
+const fechaEntrega =
+document.getElementById("fechaEntrega").value
+
+const horaEntrega =
+document.getElementById("horaEntrega").value
+
+if(!nombreComprador || !celularComprador || !direccionEntrega){
+
+alert("Completa los campos obligatorios")
+return
+
+}
+
+const pedido = {
+
+producto: productoSeleccionado,
+cliente: celularComprador,
+nombreCliente: nombreComprador,
+medioPago: medioPago,
+destinatario: celularDestinatario,
+nombreDestinatario: nombreDestinatario,
+direccion: direccionEntrega,
+notas: notas,
+de: de,
+para: para,
+mensaje: mensaje,
+diaEntrega: fechaEntrega,
+horaEntrega: horaEntrega,
+fechaRegistro: new Date().toLocaleDateString(),
+horaRegistro: new Date().toLocaleTimeString()
+
+}
+
+const pedidosRef = ref(db, empresaId + "/PedidosWeb")
+
+push(pedidosRef, pedido)
+
+alert("Pedido enviado")
+
+document.getElementById("modalPedido").style.display="none"
+
+}
+
+})
 </script>
 
 </body>
