@@ -760,16 +760,22 @@ notificado:false
 
 }
 
-const idPedido=firebase.database().ref().push().key
+// referencia correcta
+const pedidosRef = ref(db, empresaId+"/PedidosWeb")
 
-firebase.database()
-.ref(idEmpresa+"/PedidosWeb/"+idPedido)
-.set(pedido)
+// crear id automático
+const nuevoPedido = push(pedidosRef)
+
+import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js").then(({set})=>{
+
+set(nuevoPedido,pedido)
 
 .then(()=>{
 
 alert("Pedido enviado")
+
 document.querySelectorAll("#modalPedido input,#modalPedido textarea").forEach(e=>e.value="")
+
 cerrarModal()
 
 })
@@ -778,6 +784,8 @@ cerrarModal()
 
 console.log(error)
 alert("Error enviando pedido")
+
+})
 
 })
 
