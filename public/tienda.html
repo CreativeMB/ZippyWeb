@@ -4,28 +4,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Tienda</title>
 
 <style>
 
 body{
-font-family: Arial;
+font-family:Arial;
 margin:0;
-background:#f5f5f5;
+background:#f4f4f4;
+color:#333;
 }
 
 .header{
-background:#222;
-color:white;
-padding:20px;
 text-align:center;
+padding:30px 20px;
+background:white;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
 
-.productos-grid{
+.header h1{
+margin:0;
+font-size:28px;
+}
+
+.eslogan{
+color:#666;
+margin-top:5px;
+}
+
+.publicidad{
+margin-top:15px;
+background:#ffefc2;
+padding:10px;
+border-radius:8px;
+font-weight:bold;
+}
+
+.productos{
+padding:20px;
 display:grid;
 grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
 gap:20px;
-padding:20px;
 }
 
 .producto{
@@ -40,11 +60,12 @@ text-align:center;
 width:100%;
 height:150px;
 object-fit:cover;
+border-radius:6px;
 }
 
 .nombre{
 font-weight:bold;
-margin-top:8px;
+margin:8px 0;
 }
 
 .precio{
@@ -52,17 +73,43 @@ color:green;
 font-size:18px;
 }
 
-.promocion{
-background:red;
-color:white;
-padding:3px 6px;
-border-radius:5px;
-font-size:12px;
+.precioViejo{
+text-decoration:line-through;
+color:#888;
+font-size:14px;
 }
 
-.agotado{
-color:red;
-font-weight:bold;
+.btn{
+display:inline-block;
+margin-top:8px;
+background:#25D366;
+color:white;
+padding:8px 12px;
+border-radius:6px;
+text-decoration:none;
+font-size:14px;
+}
+
+.footer{
+background:#222;
+color:white;
+padding:30px 20px;
+margin-top:40px;
+}
+
+.footer p{
+margin:5px 0;
+}
+
+.credito{
+margin-top:15px;
+font-size:13px;
+opacity:0.8;
+}
+
+.credito a{
+color:#4fc3f7;
+text-decoration:none;
 }
 
 </style>
@@ -71,11 +118,31 @@ font-weight:bold;
 
 <body>
 
-<header class="header">
-<h1 id="nombreEmpresa">Tienda</h1>
-</header>
+<div class="header">
 
-<div id="productos" class="productos-grid"></div>
+<h1 id="nombreEmpresa"></h1>
+<div class="eslogan" id="eslogan"></div>
+
+<div class="publicidad" id="publicidad"></div>
+
+</div>
+
+<div class="productos" id="productos"></div>
+
+<div class="footer">
+
+<p id="descripcion"></p>
+<p id="direccion"></p>
+<p id="ciudad"></p>
+<p id="telefono"></p>
+<p id="correo"></p>
+
+<div class="credito">
+Creado por 
+<a href="https://zipy.carrd.co/" target="_blank">Zippy</a>
+</div>
+
+</div>
 
 
 <script type="module">
@@ -97,11 +164,11 @@ const db = getDatabase(app);
 
 let productosJson = {};
 let productosRealtime = {};
+let telefonoEmpresa = "";
 
 const slug = window.location.pathname.split("/").pop();
 
 buscarEmpresa();
-
 
 
 function buscarEmpresa(){
@@ -117,9 +184,21 @@ const data = child.val();
 if(data.perfilempresa?.slug === slug){
 
 const empresaId = child.key;
+const perfil = data.perfilempresa;
 
-cargarProductosJSON(data.perfilempresa.urljason);
+telefonoEmpresa = perfil.WhatsApp.replace("+","");
 
+document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
+document.getElementById("eslogan").innerText = perfil.eslogan;
+document.getElementById("publicidad").innerText = perfil.publicidad;
+
+document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
+document.getElementById("direccion").innerText = "Dirección: " + perfil.direccion;
+document.getElementById("ciudad").innerText = "Ciudad: " + perfil.ciudad;
+document.getElementById("telefono").innerText = "WhatsApp: " + perfil.WhatsApp;
+document.getElementById("correo").innerText = "Correo: " + perfil.correo;
+
+cargarProductosJSON(perfil.urljason);
 escucharCambios(empresaId);
 
 }
@@ -131,7 +210,6 @@ escucharCambios(empresaId);
 }
 
 
-
 function cargarProductosJSON(url){
 
 fetch(url)
@@ -139,13 +217,11 @@ fetch(url)
 .then(data=>{
 
 productosJson = data;
-
 render();
 
 })
 
 }
-
 
 
 function escucharCambios(empresaId){
@@ -159,7 +235,6 @@ productosRealtime = {};
 snapshot.forEach((child)=>{
 
 const p = child.val();
-
 productosRealtime[p.referencia] = p;
 
 });
@@ -171,49 +246,45 @@ render();
 }
 
 
-
 function render(){
 
 const contenedor = document.getElementById("productos");
-
 contenedor.innerHTML="";
 
 for(const refProducto in productosJson){
 
 const imagen = productosJson[refProducto];
-
 const realtime = productosRealtime[refProducto];
 
-let precio = "";
-let promo = "";
-let agotado = "";
+let precioHTML="";
+let linkWhats="";
 
 if(realtime){
 
-if(realtime.agotado){
-
-agotado = `<div class="agotado">AGOTADO</div>`;
-
-}else{
+let precio = realtime.valor;
 
 if(realtime.promocion){
 
-precio = `<div class="precio">$${realtime.valorPromocion}</div>
-<div style="text-decoration:line-through;color:gray">$${realtime.valor}</div>`;
+precioHTML=`
+<div class="precio">${realtime.valorPromocion}</div>
+<div class="precioViejo">${realtime.valor}</div>
+`;
 
-promo = `<div class="promocion">PROMO</div>`;
+precio = realtime.valorPromocion;
 
 }else{
 
-precio = `<div class="precio">$${realtime.valor}</div>`;
+precioHTML=`<div class="precio">$${realtime.valor}</div>`;
 
 }
 
-}
+const mensaje = encodeURIComponent("Hola quiero comprar " + refProducto);
+
+linkWhats=`https://wa.me/${telefonoEmpresa}?text=${mensaje}`;
 
 }
 
-contenedor.innerHTML += `
+contenedor.innerHTML+=`
 
 <div class="producto">
 
@@ -221,9 +292,11 @@ contenedor.innerHTML += `
 
 <div class="nombre">${refProducto}</div>
 
-${promo}
-${precio}
-${agotado}
+${precioHTML}
+
+<a class="btn" href="${linkWhats}" target="_blank">
+Comprar por WhatsApp
+</a>
 
 </div>
 
@@ -236,5 +309,4 @@ ${agotado}
 </script>
 
 </body>
-
 </html>
