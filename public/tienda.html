@@ -357,7 +357,6 @@
         if (!real) continue;
 
         const card = document.createElement("div");
-        // Si está agotado, le ponemos la clase 'agotado' para que el CSS haga su magia
         card.className = `producto ${real.agotado ? 'agotado' : ''}`;
         
         const precioFinal = real.promocion ? real.valorPromocion : real.valor;
@@ -366,17 +365,24 @@
             `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>` : 
             `<div class="precio">${formatearPrecio(real.valor)}</div>`;
 
-        // Lógica de Botón: Solo sale "Comprar" si hay stock
-        const botonHTML = real.agotado ? 
-            `<div class="btn" style="background:#b2bec3; cursor:not-allowed;">Agotado</div>` : 
-            `<div class="btn" onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')">Comprar</div>`;
+        // LÓGICA DEL BOTÓN Y WHATSAPP
+        let botonHTML = "";
+        if (real.agotado) {
+            botonHTML = `<div class="btn" style="background:#b2bec3; cursor:not-allowed;">Agotado</div>`;
+        } else {
+            // Creamos el mensaje para WhatsApp
+            const mensajeWa = encodeURIComponent(`Hola, me interesa el producto: ${refP}`);
+            const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
+            
+            botonHTML = `<a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none;">WhatsApp</a>`;
+        }
 
         card.innerHTML = `
             <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
                 <img src="${normalizarImagen(imgUrl)}" 
                      ${real.agotado ? "" : `onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')"`} 
-                     style="${real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : ''}">
+                     style="${real.agotado ? 'filter: grayscale(100%); opacity: 0.7; cursor:default;' : 'cursor:pointer;'}">
             </div>
             <div class="nombre">${refP}</div>
             ${precioHTML}
@@ -385,7 +391,7 @@
         contenedor.appendChild(card);
     }
 
-    // Control del Loader: No se quita hasta que los productos están listos
+    // Control del Loader para que no desaparezca antes de tiempo
     setTimeout(() => {
         document.querySelectorAll(".producto").forEach((el, i) => {
             setTimeout(() => el.classList.add("visible"), i * 50);
@@ -398,7 +404,7 @@
                 ld.style.display = "none";
             }, 500);
         }
-    }, 600);
+    }, 800); // Un poco más de tiempo para asegurar carga visual
 }
 
         function abrirProducto(nombre, imagen, precio, descripcion) {
