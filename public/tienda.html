@@ -769,7 +769,7 @@ function enviarPedido(){
     notificado:false
   }
 
-  const pedidosRef = ref(db, empresaId+"/PedidosWeb")
+  const pedidosRef = ref(db, empresaId+"/Pedidos")
   const nuevoPedido = push(pedidosRef)
 
   set(nuevoPedido, pedido)
