@@ -673,19 +673,20 @@ contenedor.innerHTML+=`
 ${etiquetaPromo}
 ${etiquetaAgotado}
 
-${realtime.agotado ? 
-`<div class="btn" style="background:#aaa">Producto agotado</div>` 
-:
-`<a class="btn" href="${linkWhats}" target="_blank">Comprar por WhatsApp</a>`
-}
+<img src="${normalizarImagen(imagen)}"
+${realtime.agotado ? "" : `onclick="abrirProducto('${refProducto.replace(/'/g,"")}','${imagen}','${precio}','${realtime.descripcion || ""}')"`}>
+
+</div>
 
 <div class="nombre">${refProducto}</div>
 
 ${precioHTML}
 
-<a class="btn" href="${linkWhats}" target="_blank">
-Comprar por WhatsApp
-</a>
+${realtime.agotado ? 
+`<div class="btn" style="background:#aaa">Agotado</div>` 
+:
+`<a class="btn" href="${linkWhats}" target="_blank">Comprar por WhatsApp</a>`
+}
 
 </div>
 
