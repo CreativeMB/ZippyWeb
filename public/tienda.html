@@ -705,63 +705,84 @@ document.getElementById("modalPedido").style.display="none"
 
 function enviarPedido(){
 
-const productoAdicional=document.getElementById("productoAdicional").value
-const medioPago=document.getElementById("medioPago").value
+  const productoAdicional=document.getElementById("productoAdicional").value;
+  const medioPago=document.getElementById("medioPago").value;
 
-const nombreComprador=document.getElementById("nombreComprador").value
-const celularComprador=document.getElementById("celularComprador").value
+  const nombreComprador=document.getElementById("nombreComprador").value;
+  const celularComprador=document.getElementById("celularComprador").value;
 
-const nombreDestinatario=document.getElementById("nombreDestinatario").value
-const celularDestinatario=document.getElementById("celularDestinatario").value
+  const nombreDestinatario=document.getElementById("nombreDestinatario").value;
+  const celularDestinatario=document.getElementById("celularDestinatario").value;
 
-const direccionEntrega=document.getElementById("direccionEntrega").value
-const notasPedido=document.getElementById("notasPedido").value
+  const direccionEntrega=document.getElementById("direccionEntrega").value;
+  const notasPedido=document.getElementById("notasPedido").value;
 
-const mensajeTarjeta=document.getElementById("mensajeTarjeta").value
+  const mensajeTarjeta=document.getElementById("mensajeTarjeta").value;
 
-const deTarjeta=document.getElementById("deTarjeta").value
-const paraTarjeta=document.getElementById("paraTarjeta").value
+  const deTarjeta=document.getElementById("deTarjeta").value;
+  const paraTarjeta=document.getElementById("paraTarjeta").value;
 
-const fechaEntrega=document.getElementById("fechaEntrega").value
-const horaEntrega=document.getElementById("horaEntrega").value
+  const fechaEntrega=document.getElementById("fechaEntrega").value;
+  const horaEntrega=document.getElementById("horaEntrega").value;
 
-const pedido={
-direccion:direccionEntrega,
-imagenUrl:imagenProducto,
-cliente:celularComprador,
-nombreCliente:nombreComprador,
-referencia:productoSeleccionado,
-adicional:productoAdicional,
-banco:medioPago,
-destinatario:celularDestinatario,
-nombreDestinatario:nombreDestinatario,
-de:deTarjeta,
-para:paraTarjeta,
-diaEntrega:fechaEntrega,
-horaEntrega:horaEntrega,
-mensaje:mensajeTarjeta,
-notas:notasPedido,
-fechaRegistro:new Date().toLocaleDateString(),
-horaRegistro:new Date().toLocaleTimeString(),
-color:"",
-notificado:false
-}
+  // ==========================================
+  // AQUÍ INICIA LA VALIDACIÓN DE CAMPOS
+  // ==========================================
+  if(
+    !medioPago || 
+    !nombreComprador.trim() || 
+    !celularComprador.trim() || 
+    !nombreDestinatario.trim() || 
+    !celularDestinatario.trim() || 
+    !direccionEntrega.trim() || 
+    !notasPedido.trim() || 
+    !mensajeTarjeta.trim() || 
+    !deTarjeta.trim() || 
+    !paraTarjeta.trim() || 
+    !fechaEntrega || 
+    !horaEntrega
+  ){
+    alert("Por favor, completa todos los campos requeridos.");
+    return; // Esto detiene la función y evita que se envíe el pedido a Firebase
+  }
+  // ==========================================
 
-// AQUÍ: Código corregido para guardar en Firebase
-const pedidosRef = ref(db, empresaId+"/PedidosWeb")
-const nuevoPedido = push(pedidosRef)
+  const pedido={
+    direccion:direccionEntrega,
+    imagenUrl:imagenProducto,
+    cliente:celularComprador,
+    nombreCliente:nombreComprador,
+    referencia:productoSeleccionado,
+    adicional:productoAdicional, // Este es el único que puede ir vacío
+    banco:medioPago,
+    destinatario:celularDestinatario,
+    nombreDestinatario:nombreDestinatario,
+    de:deTarjeta,
+    para:paraTarjeta,
+    diaEntrega:fechaEntrega,
+    horaEntrega:horaEntrega,
+    mensaje:mensajeTarjeta,
+    notas:notasPedido,
+    fechaRegistro:new Date().toLocaleDateString(),
+    horaRegistro:new Date().toLocaleTimeString(),
+    color:"",
+    notificado:false
+  }
 
-set(nuevoPedido, pedido)
-.then(()=>{
-alert("Pedido enviado")
-// Limpiar formulario
-document.querySelectorAll("#modalPedido input, #modalPedido textarea, #modalPedido select").forEach(e=>e.value="")
-cerrarModal()
-})
-.catch((error)=>{
-console.log(error)
-alert("Error enviando pedido")
-})
+  const pedidosRef = ref(db, empresaId+"/PedidosWeb")
+  const nuevoPedido = push(pedidosRef)
+
+  set(nuevoPedido, pedido)
+  .then(()=>{
+    alert("Pedido enviado con éxito")
+    // Limpiar formulario
+    document.querySelectorAll("#modalPedido input, #modalPedido textarea, #modalPedido select").forEach(e=>e.value="")
+    cerrarModal()
+  })
+  .catch((error)=>{
+    console.log(error)
+    alert("Error enviando pedido")
+  })
 
 }
 
