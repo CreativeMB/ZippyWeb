@@ -1,85 +1,74 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html>
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Tienda</title>
 
 <style>
 
 body{
-font-family:Arial, Helvetica, sans-serif;
 margin:0;
-background:#f5f6fa;
-color:#333;
+font-family:Arial;
+background:#f4f6f8;
 }
 
-/* HEADER */
+/* ENCABEZADO */
 
-.header{
-text-align:center;
-padding:30px 20px;
-background:linear-gradient(135deg,#4f46e5,#6366f1);
+header{
+background:linear-gradient(135deg,#1e88e5,#42a5f5);
 color:white;
-}
-
-.header h1{
-margin:0;
-font-size:28px;
-}
-
-.eslogan{
-opacity:.9;
-margin-top:6px;
+padding:18px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
 }
 
 /* PUBLICIDAD */
 
-.publicidad-container{
+.publicidad{
 width:100%;
-background:#f59e0b;
+background:#ff7043;
 color:white;
-overflow:hidden;
-height:40px;
-display:flex;
-align-items:center;
-position:relative;
-}
-
-.publicidad-texto{
-white-space:nowrap;
-position:absolute;
+text-align:center;
+padding:12px;
 font-weight:bold;
-animation:publicidad 14s linear infinite;
-padding-left:100%;
 }
 
-@keyframes publicidad{
-0%{transform:translateX(0);}
-100%{transform:translateX(-100%);}
-}
-
-/* GRID PRODUCTOS */
+/* PRODUCTOS */
 
 .productos{
-padding:20px;
+padding:15px;
 display:grid;
-grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-gap:18px;
+grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+gap:15px;
 }
 
-/* TARJETA */
+/* MOVIL 2 COLUMNAS */
+
+@media(max-width:600px){
+
+.productos{
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+padding:10px;
+}
+
+}
+
+/* TARJETA PRODUCTO */
 
 .producto{
 background:white;
-border-radius:12px;
-box-shadow:0 3px 10px rgba(0,0,0,0.15);
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.15);
 padding:10px;
 text-align:center;
-transition:.25s;
 opacity:0;
 transform:translateY(20px);
+transition:.4s;
 }
 
 .producto.visible{
@@ -87,48 +76,53 @@ opacity:1;
 transform:translateY(0);
 }
 
-.producto:hover{
-transform:translateY(-5px);
-box-shadow:0 8px 18px rgba(0,0,0,0.25);
+.img-container{
+position:relative;
 }
-
-/* IMAGEN */
 
 .producto img{
 width:100%;
-height:230px;
-object-fit:contain;
-background:white;
-border-radius:10px;
+aspect-ratio:4/5;
+object-fit:cover;
+border-radius:8px;
+cursor:pointer;
 }
 
 /* NOMBRE */
 
 .nombre{
-font-weight:600;
+font-weight:bold;
 margin-top:8px;
-font-size:15px;
 }
 
-/* PRECIO */
+/* PRECIOS */
 
 .precio{
-color:#16a34a;
-font-size:20px;
+color:#2e7d32;
+font-size:18px;
 font-weight:bold;
 }
 
 .precioViejo{
 text-decoration:line-through;
-color:#999;
+color:#888;
 font-size:14px;
 }
 
-/* ETIQUETAS */
+/* BOTON */
 
-.img-container{
-position:relative;
+.btn{
+display:block;
+background:#1e88e5;
+color:white;
+padding:8px;
+border-radius:6px;
+margin-top:8px;
+text-decoration:none;
+font-size:14px;
 }
+
+/* PROMO */
 
 .etiquetaPromo{
 position:absolute;
@@ -136,273 +130,153 @@ top:8px;
 left:8px;
 background:#e53935;
 color:white;
+padding:3px 6px;
 font-size:12px;
-padding:4px 8px;
-border-radius:6px;
+border-radius:4px;
 }
+
+/* AGOTADO */
 
 .etiquetaAgotado{
 position:absolute;
 top:8px;
 right:8px;
-background:#424242;
+background:#555;
 color:white;
+padding:3px 6px;
 font-size:12px;
-padding:4px 8px;
-border-radius:6px;
+border-radius:4px;
 }
 
-/* AGOTADO */
-
-.producto.agotado{
-opacity:.6;
-}
-
-.producto.agotado img{
-filter:grayscale(100%);
-}
-
-/* BOTON */
-
-.btn{
-display:inline-block;
-margin-top:8px;
-background:#25D366;
-color:white;
-padding:8px 12px;
-border-radius:6px;
-text-decoration:none;
-font-size:14px;
-}
-
-/* FOOTER */
-
-.footer{
-background:#111;
-color:white;
-padding:30px 20px;
-margin-top:40px;
-text-align:center;
-}
-
-.footer p{
-margin:6px 0;
+.agotado img{
+opacity:.5;
 }
 
 /* LOADER */
 
-#loader{
+.loader{
+text-align:center;
+padding:40px;
+}
+
+/* MODAL */
+
+.modal{
 position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
+background:rgba(0,0,0,.5);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:10;
+}
+
+.modal-contenido{
 background:white;
+width:95%;
+max-width:420px;
+border-radius:10px;
+padding:15px;
+max-height:90%;
+overflow:auto;
+}
+
+.cerrar{
+float:right;
+font-size:22px;
+cursor:pointer;
+}
+
+/* CABECERA PRODUCTO */
+
+.cabeceraPedido{
 display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-z-index:9999;
+gap:10px;
+margin-bottom:10px;
 }
 
-.spinner{
-width:50px;
-height:50px;
-border:5px solid #eee;
-border-top:5px solid #25D366;
-border-radius:50%;
-animation:spin 1s linear infinite;
+.cabeceraPedido img{
+width:90px;
+height:110px;
+object-fit:cover;
+border-radius:6px;
 }
 
-@keyframes spin{
-0%{transform:rotate(0deg);}
-100%{transform:rotate(360deg);}
+.infoProducto{
+flex:1;
 }
 
-/* WHATSAPP FLOTANTE */
-
-.whatsapp{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#25D366;
-width:60px;
-height:60px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-box-shadow:0 4px 10px rgba(0,0,0,.3);
+.refProducto{
+font-weight:bold;
+font-size:16px;
 }
 
-.whatsapp img{
-width:32px;
-}
 .descripcionProducto{
 font-size:13px;
 color:#666;
 margin-top:4px;
 }
 
-/* MOVIL */
-
-@media (max-width:600px){
-
-.productos{
-grid-template-columns:repeat(2,1fr);
-gap:12px;
-padding:12px;
+.precioModal{
+font-size:18px;
+color:#2e7d32;
+margin-top:5px;
 }
 
-.producto img{
-height:200px;
-}
-
-}
-.modal{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.6);
-z-index:9999;
-
-display:flex;
-justify-content:center;
-align-items:center;
-
-overflow-y:auto;
-padding:20px;
-box-sizing:border-box;
-}
-
-.modal-contenido{
-background:white;
-width:95%;
-max-width:500px;
-border-radius:12px;
-padding:20px;
-margin:auto;
-box-sizing:border-box;
-}
-
-.cerrar{
-float:right;
-font-size:28px;
-cursor:pointer;
-}
-
-.modal img{
-width:100%;
-height:220px;
-object-fit:contain;
-margin-bottom:10px;
-}
+/* FORMULARIO */
 
 .formulario input,
 .formulario textarea,
 .formulario select{
-
 width:100%;
-padding:10px;
-margin:6px 0;
-border-radius:6px;
+padding:8px;
+margin-top:6px;
 border:1px solid #ccc;
+border-radius:6px;
 font-size:14px;
-
-}
-
-#enviarPedido{
-
-width:100%;
-background:#25D366;
-color:white;
-border:none;
-padding:12px;
-font-size:16px;
-border-radius:8px;
-cursor:pointer;
-
-}
-.cabeceraPedido{
-display:flex;
-gap:12px;
-margin-bottom:10px;
-}
-
-.cabeceraPedido img{
-width:110px;
-height:110px;
-object-fit:contain;
-border-radius:8px;
-background:#f5f5f5;
-}
-
-.infoProducto{
-flex:1;
-display:flex;
-flex-direction:column;
-justify-content:center;
-}
-
-.refLabel{
-font-size:13px;
-color:#666;
-}
-
-.refProducto{
-font-weight:bold;
-font-size:16px;
-color:#0d9488;
-}
-
-.precioModal{
-font-size:18px;
-font-weight:bold;
-color:#16a34a;
-margin-top:4px;
 }
 
 .fila2{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
+display:flex;
+gap:6px;
 }
 
-textarea{
-min-height:60px;
-resize:none;
+.formulario button{
+background:#1e88e5;
+color:white;
+border:none;
+padding:10px;
+margin-top:10px;
+border-radius:6px;
+width:100%;
+font-size:16px;
 }
+
 </style>
 </head>
 
 <body>
 
-<div id="loader">
-<div class="spinner"></div>
-<p>Cargando tienda...</p>
+<header>Tienda</header>
+
+<div class="publicidad">
+Envíos en Bogotá hoy mismo
 </div>
 
-<div class="header">
-
-<h1 id="nombreEmpresa"></h1>
-<div id="eslogan" class="eslogan"></div>
-
-</div>
-
-<div class="publicidad-container">
-<div id="publicidad" class="publicidad-texto"></div>
-</div>
+<div id="loader" class="loader">Cargando productos...</div>
 
 <div id="productos" class="productos"></div>
+
+<!-- MODAL -->
 
 <div id="modalPedido" class="modal">
 
 <div class="modal-contenido">
 
-<span id="cerrarModal" class="cerrar">&times;</span>
+<span id="cerrarModal" class="cerrar">×</span>
 
 <div class="cabeceraPedido">
 
@@ -410,7 +284,6 @@ resize:none;
 
 <div class="infoProducto">
 
-<div class="refLabel">Referencia</div>
 <div id="productoTitulo" class="refProducto"></div>
 
 <div id="productoDescripcion" class="descripcionProducto"></div>
@@ -430,193 +303,70 @@ resize:none;
 <option>Nequi</option>
 <option>Bancolombia</option>
 <option>Daviplata</option>
-<option>Bre-be</option>
-<option>Wompi</option>
 <option>Efectivo</option>
 </select>
 
-<div class="fila2">
 <input id="nombreComprador" placeholder="Comprador">
-<input id="celularComprador" placeholder="Número comprador">
-</div>
 
-<div class="fila2">
-<input id="nombreDestinatario" placeholder="Destinatario">
-<input id="celularDestinatario" placeholder="Número destinatario">
-</div>
+<input id="celularComprador" placeholder="Número comprador">
 
 <input id="direccionEntrega" placeholder="Dirección">
 
-<textarea id="notasPedido" placeholder="Notas, torre, apartamento, etc"></textarea>
-
-<textarea id="mensajeTarjeta" placeholder="Mensaje"></textarea>
-
-<div class="fila2">
-<input id="deTarjeta" placeholder="De">
-<input id="paraTarjeta" placeholder="Para">
-</div>
-
-<div class="fila2">
+<textarea id="mensajeTarjeta" placeholder="Mensaje tarjeta"></textarea>
 
 <input type="date" id="fechaEntrega">
 
-<select id="horaEntrega">
-<option>8AM-10AM</option>
-<option>10AM-12PM</option>
-<option>12PM-2PM</option>
-<option>2PM-4PM</option>
-<option>4PM-6PM</option>
-<option>6PM-8PM</option>
-<option>8PM-10PM</option>
-</select>
+<button id="enviarPedido">Enviar pedido</button>
 
 </div>
 
-<button id="enviarPedido">Enviar</button>
-
 </div>
-</div>
-</div>
-
-<div class="footer">
-
-<p id="descripcion"></p>
-<p id="direccion"></p>
-<p id="ciudad"></p>
-<p id="telefono"></p>
-<p id="correo"></p>
-
-<p style="margin-top:15px;font-size:13px;opacity:.8;">
-Creado con Zippy
-</p>
 
 </div>
 
-<a id="btnWhats" class="whatsapp" target="_blank">
-<img src="https://cdn-icons-png.flaticon.com/512/733/733585.png">
-</a>
+<script>
 
-<script type="module">
+/* TELEFONO EMPRESA */
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+const telefonoEmpresa="573000000000"
 
-const firebaseConfig = {
+/* JSON PRODUCTOS (IMAGENES) */
 
-apiKey:"TU_API_KEY",
-authDomain:"zippy-727d5.firebaseapp.com",
-databaseURL:"https://zippy-727d5-default-rtdb.firebaseio.com",
-projectId:"zippy-727d5"
+const productosJson={
+producto1:"https://drive.google.com/uc?export=view&id=1dN2dJSbkhShgUNZn-_d6H7IQY8Q4A0sB"
+}
 
-};
+/* FIREBASE REALTIME */
 
-const app=initializeApp(firebaseConfig);
-const db=getDatabase(app);
+const productosRealtime={}
 
-let productosJson={}
-let productosRealtime={}
-let telefonoEmpresa=""
-let empresaId="" 
+/* FORMATEAR PRECIO */
 
-const slug=window.location.pathname.split("/").pop()
+function formatearPrecio(v){
 
-buscarEmpresa()
-
-function buscarEmpresa(){
-
-const empresasRef=ref(db)
-
-onValue(empresasRef,(snapshot)=>{
-
-snapshot.forEach((child)=>{
-
-const data=child.val()
-
-if(data.perfilempresa?.slug===slug){
-empresaId=child.key
-const perfil=data.perfilempresa
-
-telefonoEmpresa=perfil.WhatsApp.replace("+","")
-
-document.getElementById("nombreEmpresa").innerText=perfil.nombreEmpresa
-document.getElementById("eslogan").innerText=perfil.eslogan
-document.getElementById("publicidad").innerText=perfil.publicidad
-
-document.getElementById("descripcion").innerText=perfil.descripcionEmpresa
-document.getElementById("direccion").innerText="Dirección: "+perfil.direccion
-document.getElementById("ciudad").innerText="Ciudad: "+perfil.ciudad
-document.getElementById("telefono").innerText="WhatsApp: "+perfil.WhatsApp
-document.getElementById("correo").innerText="Correo: "+perfil.correo
-
-document.getElementById("btnWhats").href=`https://wa.me/${telefonoEmpresa}`
-
-cargarProductosJSON(perfil.urljason)
-escucharCambios(empresaId)
+return "$"+v.toLocaleString("es-CO")
 
 }
 
-})
+/* NORMALIZAR IMAGEN */
 
-})
-
-}
-
-function cargarProductosJSON(url){
-
-fetch(url)
-.then(res=>res.json())
-.then(data=>{
-
-productosJson=data
-render()
-
-})
-
-}
-
-function escucharCambios(empresaId){
-
-const productosRef=ref(db,empresaId+"/productos")
-
-onValue(productosRef,(snapshot)=>{
-
-productosRealtime={}
-
-snapshot.forEach((child)=>{
-
-const p=child.val()
-productosRealtime[p.referencia]=p
-
-})
-
-render()
-
-})
-
-}
-
-function formatearPrecio(valor){
-return "$"+valor.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".")
-}
 function normalizarImagen(url){
 
-if(!url) return "";
+if(!url) return ""
 
 if(url.includes("drive.google.com")){
 
-const match =
-url.match(/\/d\/([a-zA-Z0-9_-]+)/) ||
-url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+const id=url.split("id=")[1]
 
-if(match && match[1]){
-return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
-}
+return "https://drive.google.com/thumbnail?id="+id+"&sz=w600"
 
 }
 
-return url;
+return url
 
 }
+
+/* RENDER */
 
 function render(){
 
@@ -673,8 +423,7 @@ contenedor.innerHTML+=`
 ${etiquetaPromo}
 ${etiquetaAgotado}
 
-<img src="${normalizarImagen(imagen)}"
-${realtime.agotado ? "" : `onclick="abrirProducto('${refProducto.replace(/'/g,"")}','${imagen}','${precio}','${realtime.descripcion || ""}')"`}>
+<img src="${normalizarImagen(imagen)}">
 
 </div>
 
@@ -682,8 +431,8 @@ ${realtime.agotado ? "" : `onclick="abrirProducto('${refProducto.replace(/'/g,""
 
 ${precioHTML}
 
-${realtime.agotado ? 
-`<div class="btn" style="background:#aaa">Agotado</div>` 
+${realtime.agotado ?
+`<div class="btn" style="background:#999">Agotado</div>`
 :
 `<a class="btn" href="${linkWhats}" target="_blank">Comprar por WhatsApp</a>`
 }
@@ -706,110 +455,19 @@ document.getElementById("loader").style.display="none"
 
 }
 
-let productoSeleccionado = ""
+/* DEMO DATOS */
 
-function abrirProducto(nombre,imagen,precio,descripcion){
-
-productoSeleccionado = nombre
-
-document.getElementById("productoTitulo").innerText = nombre
-document.getElementById("productoDescripcion").innerText = descripcion || ""
-
-document.getElementById("productoImagen").src = normalizarImagen(imagen)
-document.getElementById("productoPrecio").innerText = formatearPrecio(precio)
-
-document.getElementById("modalPedido").style.display="flex"
-
-}
-window.abrirProducto = abrirProducto
-/* Esperar que cargue el DOM */
-
-window.addEventListener("DOMContentLoaded",()=>{
-
-document.getElementById("cerrarModal").onclick=()=>{
-document.getElementById("modalPedido").style.display="none"
+productosRealtime["producto1"]={
+valor:60000,
+valorPromocion:50000,
+promocion:true,
+agotado:false,
+descripcion:"chocolates jugá y mas"
 }
 
-document.getElementById("enviarPedido").onclick = async ()=>{
+render()
 
-const nombreComprador =
-document.getElementById("nombreComprador").value
-
-const celularComprador =
-document.getElementById("celularComprador").value
-
-const medioPago =
-document.getElementById("medioPago").value
-const productoAdicional =
-document.getElementById("productoAdicional").value
-
-const nombreDestinatario =
-document.getElementById("nombreDestinatario").value
-
-const celularDestinatario =
-document.getElementById("celularDestinatario").value
-
-const direccionEntrega =
-document.getElementById("direccionEntrega").value
-
-const notas =
-document.getElementById("notasPedido").value
-
-const para =
-document.getElementById("paraTarjeta").value
-
-const de =
-document.getElementById("deTarjeta").value
-
-const mensaje =
-document.getElementById("mensajeTarjeta").value
-
-const fechaEntrega =
-document.getElementById("fechaEntrega").value
-
-const horaEntrega =
-document.getElementById("horaEntrega").value
-
-if(!nombreComprador || !celularComprador || !direccionEntrega){
-
-alert("Completa los campos obligatorios")
-return
-
-}
-const pedido = {
-
-producto: productoSeleccionado,
-productoAdicional: productoAdicional,
-cliente: celularComprador,
-nombreCliente: nombreComprador,
-medioPago: medioPago,
-destinatario: celularDestinatario,
-nombreDestinatario: nombreDestinatario,
-direccion: direccionEntrega,
-notas: notas,
-de: de,
-para: para,
-mensaje: mensaje,
-diaEntrega: fechaEntrega,
-horaEntrega: horaEntrega,
-fechaRegistro: new Date().toLocaleDateString(),
-horaRegistro: new Date().toLocaleTimeString()
-
-}
-
-const pedidosRef = ref(db, empresaId + "/PedidosWeb")
-
-push(pedidosRef, pedido)
-
-alert("Pedido enviado")
-
-document.getElementById("modalPedido").style.display="none"
-
-}
-
-})
 </script>
 
 </body>
 </html>
-
