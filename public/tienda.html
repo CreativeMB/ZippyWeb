@@ -259,7 +259,6 @@ width:32px;
 /* ============================= */
 /* MODAL */
 /* ============================= */
-
 .modal{
 display:none;
 position:fixed;
@@ -268,11 +267,9 @@ left:0;
 width:100%;
 height:100%;
 background:rgba(0,0,0,0.6);
-z-index:9999;
 justify-content:center;
 align-items:center;
-overflow-y:auto;
-padding:20px;
+z-index:9999;
 }
 
 .modal-contenido{
@@ -291,47 +288,26 @@ cursor:pointer;
 
 .cabeceraPedido{
 display:flex;
-gap:12px;
-margin-bottom:10px;
+gap:10px;
+margin-bottom:15px;
 }
 
 .cabeceraPedido img{
 width:110px;
 height:110px;
 object-fit:contain;
-border-radius:8px;
 background:#f5f5f5;
+border-radius:8px;
 }
 
 .infoProducto{
 flex:1;
-display:flex;
-flex-direction:column;
-justify-content:center;
-}
-
-.refLabel{
-font-size:13px;
-color:#666;
-}
-
-.refProducto{
-font-weight:bold;
-font-size:16px;
-color:#0d9488;
-}
-
-.descripcionProducto{
-font-size:13px;
-color:#666;
-margin-top:4px;
 }
 
 .precioModal{
-font-size:18px;
+font-size:20px;
 font-weight:bold;
 color:#16a34a;
-margin-top:4px;
 }
 
 .formulario input,
@@ -342,18 +318,6 @@ padding:10px;
 margin:6px 0;
 border-radius:6px;
 border:1px solid #ccc;
-font-size:14px;
-}
-
-#enviarPedido{
-width:100%;
-background:#25D366;
-color:white;
-border:none;
-padding:12px;
-font-size:16px;
-border-radius:8px;
-cursor:pointer;
 }
 
 .fila2{
@@ -362,11 +326,16 @@ grid-template-columns:1fr 1fr;
 gap:8px;
 }
 
-textarea{
-min-height:60px;
-resize:none;
+#enviarPedido{
+width:100%;
+background:#25D366;
+color:white;
+border:none;
+padding:12px;
+border-radius:8px;
+font-size:16px;
+cursor:pointer;
 }
-
 /* ============================= */
 /* MOVIL */
 /* ============================= */
@@ -408,6 +377,28 @@ height:190px;
 
 <!-- MODAL -->
 
+<div id="modalPedido" class="modal">
+
+<div class="modal-contenido">
+
+<span class="cerrar" onclick="cerrarModal()">×</span>
+
+<div class="cabeceraPedido">
+
+<img id="productoImagen">
+
+<div class="infoProducto">
+
+<div id="productoTitulo"></div>
+
+<div id="productoDescripcion"></div>
+
+<div id="productoPrecio" class="precioModal"></div>
+
+</div>
+
+</div>
+
 <div class="formulario">
 
 <input id="productoAdicional" placeholder="Producto adicional">
@@ -423,20 +414,20 @@ height:190px;
 </select>
 
 <div class="fila2">
-<input id="nombreComprador" placeholder="Comprador">
-<input id="celularComprador" placeholder="Número comprador">
+<input id="nombreComprador" placeholder="Nombre comprador">
+<input id="celularComprador" placeholder="Celular comprador">
 </div>
 
 <div class="fila2">
-<input id="nombreDestinatario" placeholder="Destinatario">
-<input id="celularDestinatario" placeholder="Número destinatario">
+<input id="nombreDestinatario" placeholder="Nombre destinatario">
+<input id="celularDestinatario" placeholder="Celular destinatario">
 </div>
 
-<input id="direccionEntrega" placeholder="Dirección">
+<input id="direccionEntrega" placeholder="Dirección entrega">
 
-<textarea id="notasPedido" placeholder="Notas, torre, apartamento, etc"></textarea>
+<textarea id="notasPedido" placeholder="Notas dirección"></textarea>
 
-<textarea id="mensajeTarjeta" placeholder="Mensaje"></textarea>
+<textarea id="mensajeTarjeta" placeholder="Mensaje tarjeta"></textarea>
 
 <div class="fila2">
 <input id="deTarjeta" placeholder="De">
@@ -444,7 +435,6 @@ height:190px;
 </div>
 
 <div class="fila2">
-
 <input type="date" id="fechaEntrega">
 
 <select id="horaEntrega">
@@ -456,14 +446,14 @@ height:190px;
 <option>6PM-8PM</option>
 <option>8PM-10PM</option>
 </select>
+</div>
+
+<button id="enviarPedido" onclick="enviarPedido()">Enviar pedido</button>
 
 </div>
 
-<button id="enviarPedido">Enviar</button>
-
 </div>
 
-</div>
 </div>
 
 <div class="footer">
@@ -684,49 +674,97 @@ document.getElementById("loader").style.display="none"
 }
 
 let productoSeleccionado=""
+let imagenProducto=""
 
-function abrirProducto(nombre, imagen, precio, descripcion){
+function abrirProducto(nombre,imagen,precio,descripcion){
 
-productoSeleccionado = nombre
+productoSeleccionado=nombre
+imagenProducto=imagen
 
-// DATOS DEL PRODUCTO
-document.getElementById("productoTitulo").innerText = nombre
-document.getElementById("productoDescripcion").innerText = descripcion || ""
-document.getElementById("productoImagen").src = normalizarImagen(imagen)
-document.getElementById("productoPrecio").innerText = formatearPrecio(precio)
+document.getElementById("productoTitulo").innerText=nombre
+document.getElementById("productoDescripcion").innerText=descripcion || ""
+document.getElementById("productoImagen").src=imagen
+document.getElementById("productoPrecio").innerText=formatearPrecio(precio)
 
-
-// LIMPIAR FORMULARIO
-
-document.getElementById("productoAdicional").value = ""
-
-document.getElementById("medioPago").value = ""
-
-document.getElementById("nombreComprador").value = ""
-document.getElementById("celularComprador").value = ""
-
-document.getElementById("nombreDestinatario").value = ""
-document.getElementById("celularDestinatario").value = ""
-
-document.getElementById("direccionEntrega").value = ""
-
-document.getElementById("notasPedido").value = ""
-
-document.getElementById("mensajeTarjeta").value = ""
-
-document.getElementById("deTarjeta").value = ""
-document.getElementById("paraTarjeta").value = ""
-
-document.getElementById("fechaEntrega").value = ""
-
-document.getElementById("horaEntrega").selectedIndex = 0
-
-
-// MOSTRAR MODAL
-document.getElementById("modalPedido").style.display = "flex"
+document.getElementById("modalPedido").style.display="flex"
 
 }
 window.abrirProducto=abrirProducto
+function cerrarModal(){
+
+document.getElementById("modalPedido").style.display="none"
+
+}
+function enviarPedido(){
+
+const productoAdicional=document.getElementById("productoAdicional").value
+const medioPago=document.getElementById("medioPago").value
+
+const nombreComprador=document.getElementById("nombreComprador").value
+const celularComprador=document.getElementById("celularComprador").value
+
+const nombreDestinatario=document.getElementById("nombreDestinatario").value
+const celularDestinatario=document.getElementById("celularDestinatario").value
+
+const direccionEntrega=document.getElementById("direccionEntrega").value
+const notasPedido=document.getElementById("notasPedido").value
+
+const mensajeTarjeta=document.getElementById("mensajeTarjeta").value
+
+const deTarjeta=document.getElementById("deTarjeta").value
+const paraTarjeta=document.getElementById("paraTarjeta").value
+
+const fechaEntrega=document.getElementById("fechaEntrega").value
+const horaEntrega=document.getElementById("horaEntrega").value
+
+
+const pedido={
+
+direccion:direccionEntrega,
+imagenUrl:imagenProducto,
+
+cliente:celularComprador,
+nombreCliente:nombreComprador,
+
+referencia:productoSeleccionado,
+
+adicional:productoAdicional,
+banco:medioPago,
+
+destinatario:celularDestinatario,
+nombreDestinatario:nombreDestinatario,
+
+de:deTarjeta,
+para:paraTarjeta,
+
+diaEntrega:fechaEntrega,
+horaEntrega:horaEntrega,
+
+mensaje:mensajeTarjeta,
+notas:notasPedido,
+
+fechaRegistro:new Date().toLocaleDateString(),
+horaRegistro:new Date().toLocaleTimeString(),
+
+color:"",
+notificado:false
+
+}
+
+const idPedido=firebase.database().ref().push().key
+
+firebase.database()
+.ref(idEmpresa+"/PedidosWeb/"+idPedido)
+.set(pedido)
+
+.then(()=>{
+
+alert("Pedido enviado")
+cerrarModal()
+
+})
+
+}
 
 </script>
 
