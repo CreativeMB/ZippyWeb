@@ -278,6 +278,9 @@ width:95%;
 max-width:500px;
 border-radius:12px;
 padding:20px;
+/* Permite hacer scroll si la pantalla es muy pequeña */
+max-height: 90vh;
+overflow-y: auto; 
 }
 
 .cerrar{
@@ -318,6 +321,7 @@ padding:10px;
 margin:6px 0;
 border-radius:6px;
 border:1px solid #ccc;
+box-sizing: border-box; /* Previene que los inputs se salgan del contenedor */
 }
 
 .fila2{
@@ -335,6 +339,7 @@ padding:12px;
 border-radius:8px;
 font-size:16px;
 cursor:pointer;
+margin-top: 10px;
 }
 /* ============================= */
 /* MOVIL */
@@ -375,8 +380,6 @@ height:190px;
 
 <div id="productos" class="productos"></div>
 
-<!-- MODAL -->
-
 <div id="modalPedido" class="modal">
 
 <div class="modal-contenido">
@@ -401,8 +404,8 @@ height:190px;
 
 <div class="formulario">
 
+<div class="fila2">
 <input id="productoAdicional" placeholder="Producto adicional">
-
 <select id="medioPago">
 <option value="">Medio de pago</option>
 <option>Nequi</option>
@@ -412,6 +415,7 @@ height:190px;
 <option>Wompi</option>
 <option>Efectivo</option>
 </select>
+</div>
 
 <div class="fila2">
 <input id="nombreComprador" placeholder="Nombre comprador">
@@ -470,9 +474,9 @@ height:190px;
 </a>
 
 <script type="module">
-
+// AQUÍ: Agregué 'set' a los imports para poder escribir en la base de datos
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig={
 apiKey:"TU_API_KEY",
@@ -693,16 +697,11 @@ document.getElementById("modalPedido").style.display="flex"
 
 }
 
-// para que funcione desde onclick
-window.abrirProducto=abrirProducto
-
-
 function cerrarModal(){
 
 document.getElementById("modalPedido").style.display="none"
 
 }
-
 
 function enviarPedido(){
 
@@ -726,70 +725,51 @@ const paraTarjeta=document.getElementById("paraTarjeta").value
 const fechaEntrega=document.getElementById("fechaEntrega").value
 const horaEntrega=document.getElementById("horaEntrega").value
 
-
 const pedido={
-
 direccion:direccionEntrega,
 imagenUrl:imagenProducto,
-
 cliente:celularComprador,
 nombreCliente:nombreComprador,
-
 referencia:productoSeleccionado,
-
 adicional:productoAdicional,
 banco:medioPago,
-
 destinatario:celularDestinatario,
 nombreDestinatario:nombreDestinatario,
-
 de:deTarjeta,
 para:paraTarjeta,
-
 diaEntrega:fechaEntrega,
 horaEntrega:horaEntrega,
-
 mensaje:mensajeTarjeta,
 notas:notasPedido,
-
 fechaRegistro:new Date().toLocaleDateString(),
 horaRegistro:new Date().toLocaleTimeString(),
-
 color:"",
 notificado:false
-
 }
 
-// referencia correcta
+// AQUÍ: Código corregido para guardar en Firebase
 const pedidosRef = ref(db, empresaId+"/PedidosWeb")
-
-// crear id automático
 const nuevoPedido = push(pedidosRef)
 
-import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js").then(({set})=>{
-
-set(nuevoPedido,pedido)
-
+set(nuevoPedido, pedido)
 .then(()=>{
-
 alert("Pedido enviado")
-
-document.querySelectorAll("#modalPedido input,#modalPedido textarea").forEach(e=>e.value="")
-
+// Limpiar formulario
+document.querySelectorAll("#modalPedido input, #modalPedido textarea, #modalPedido select").forEach(e=>e.value="")
 cerrarModal()
-
 })
-
 .catch((error)=>{
-
 console.log(error)
 alert("Error enviando pedido")
-
-})
-
 })
 
 }
+
+// AQUÍ: Exponemos las funciones al objeto global window para que funcionen con los "onclick" del HTML
+window.abrirProducto = abrirProducto;
+window.cerrarModal = cerrarModal;
+window.enviarPedido = enviarPedido;
+
 </script>
 
 </body>
