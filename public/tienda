@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tienda</title>
+
+<script src="/js/init.js"></script>
+
+</head>
+
+<body>
+
+<h1 id="empresa"></h1>
+
+<div id="productos"></div>
+
+<script>
+
+const slug = window.location.pathname.replace("/", "");
+
+const db = firebase.database();
+
+db.ref()
+.orderByChild("perfilempresa/slug")
+.equalTo(slug)
+.once("value")
+.then(snapshot => {
+
+ snapshot.forEach(child => {
+
+   const empresaId = child.key;
+
+   cargarProductos(empresaId);
+
+ });
+
+});
+
+function cargarProductos(empresaId){
+
+db.ref(empresaId + "/productos")
+.on("value", snap => {
+
+ const productos = snap.val();
+
+ let html = "";
+
+ for(let id in productos){
+
+  html += `
+   <div>
+     <h3>${productos[id].nombre}</h3>
+     <p>$${productos[id].precio}</p>
+   </div>
+  `;
+
+ }
+
+ document.getElementById("productos").innerHTML = html;
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
