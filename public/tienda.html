@@ -1,73 +1,71 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Tienda</title>
 
 <style>
 
 body{
-font-family:Arial;
+font-family:Arial, sans-serif;
 margin:0;
-background:#f4f4f4;
+background:#f5f5f5;
 color:#333;
 }
+
+/* HEADER */
 
 .header{
 text-align:center;
 padding:30px 20px;
 background:white;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
+box-shadow:0 3px 10px rgba(0,0,0,0.08);
 }
 
 .header h1{
 margin:0;
-font-size:28px;
+font-size:30px;
 }
 
 .eslogan{
-color:#666;
-margin-top:5px;
+color:#777;
+margin-top:6px;
+font-size:15px;
 }
+
+/* PUBLICIDAD */
 
 .publicidad-container{
 margin-top:15px;
-background:#ffefc2;
+background:#fff3cd;
 border-radius:8px;
 overflow:hidden;
-position:relative;
 height:40px;
 display:flex;
 align-items:center;
+position:relative;
 }
 
 .publicidad-texto{
 white-space:nowrap;
-font-weight:bold;
 position:absolute;
-animation: moverPublicidad 15s linear infinite;
+font-weight:bold;
+animation:publicidad 14s linear infinite;
 padding-left:100%;
 }
 
-@keyframes moverPublicidad{
-
-0%{
-transform:translateX(0);
+@keyframes publicidad{
+0%{transform:translateX(0);}
+100%{transform:translateX(-100%);}
 }
 
-100%{
-transform:translateX(-100%);
-}
-
-}
+/* GRID PRODUCTOS */
 
 .productos{
 padding:20px;
 display:grid;
-grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
 gap:20px;
 }
 
@@ -76,102 +74,67 @@ gap:20px;
 .producto{
 background:white;
 border-radius:12px;
-box-shadow:0 3px 8px rgba(0,0,0,0.15);
+box-shadow:0 3px 12px rgba(0,0,0,0.12);
 padding:12px;
 text-align:center;
-transition:transform .25s ease, box-shadow .25s ease;
+transition:all .25s ease;
 opacity:0;
 transform:translateY(20px);
 }
-
-/* animación cuando aparecen */
 
 .producto.visible{
 opacity:1;
 transform:translateY(0);
 }
 
-/* efecto hover */
-
 .producto:hover{
 transform:translateY(-6px);
-box-shadow:0 8px 18px rgba(0,0,0,0.25);
+box-shadow:0 10px 22px rgba(0,0,0,0.18);
 }
 
 /* IMAGEN */
+
+.img-container{
+position:relative;
+}
 
 .producto img{
 width:100%;
 height:240px;
 object-fit:cover;
 border-radius:10px;
-margin-bottom:8px;
 }
 
-/* NOMBRE */
-
-.nombre{
-font-weight:600;
-font-size:15px;
-margin:8px 0;
-min-height:40px;
-}
-
-/* PRECIO */
-
-.precio{
-color:#2e7d32;
-font-size:20px;
-font-weight:bold;
-}
-
-/* PRECIO ANTERIOR */
-
-.precioViejo{
-text-decoration:line-through;
-color:#999;
-font-size:14px;
-margin-top:3px;
-}
-/* CONTENEDOR IMAGEN */
-
-.img-container{
-position:relative;
-}
-
-/* ETIQUETA PROMOCION */
+/* ETIQUETAS */
 
 .etiquetaPromo{
 position:absolute;
-top:8px;
-left:8px;
+top:10px;
+left:10px;
 background:#e53935;
 color:white;
+padding:4px 9px;
 font-size:12px;
 font-weight:bold;
-padding:4px 8px;
 border-radius:6px;
-box-shadow:0 2px 6px rgba(0,0,0,0.3);
 }
-
-/* ETIQUETA AGOTADO */
 
 .etiquetaAgotado{
 position:absolute;
-top:8px;
-right:8px;
+top:10px;
+right:10px;
 background:#424242;
 color:white;
+padding:4px 9px;
 font-size:12px;
 font-weight:bold;
-padding:4px 8px;
 border-radius:6px;
 }
 
-/* PRODUCTO AGOTADO */
+/* AGOTADO */
 
 .producto.agotado{
-opacity:0.6;
+opacity:.6;
 }
 
 .producto.agotado img{
@@ -179,41 +142,72 @@ filter:grayscale(100%);
 }
 
 .producto.agotado .btn{
-background:#999;
+background:#aaa;
 pointer-events:none;
 }
+
+/* NOMBRE */
+
+.nombre{
+font-weight:600;
+font-size:15px;
+margin:10px 0;
+min-height:38px;
+}
+
+/* PRECIOS */
+
+.precio{
+color:#2e7d32;
+font-size:20px;
+font-weight:bold;
+}
+
+.precioViejo{
+text-decoration:line-through;
+color:#999;
+font-size:14px;
+}
+
+/* BOTON */
+
 .btn{
 display:inline-block;
 margin-top:8px;
 background:#25D366;
 color:white;
-padding:8px 12px;
-border-radius:6px;
+padding:9px 14px;
+border-radius:7px;
 text-decoration:none;
 font-size:14px;
 }
 
+/* FOOTER */
+
 .footer{
 background:#222;
 color:white;
-padding:30px 20px;
+padding:35px 20px;
 margin-top:40px;
+text-align:center;
 }
 
 .footer p{
-margin:5px 0;
+margin:6px 0;
+font-size:14px;
 }
 
 .credito{
 margin-top:15px;
 font-size:13px;
-opacity:0.8;
+opacity:.8;
 }
 
 .credito a{
 color:#4fc3f7;
 text-decoration:none;
 }
+
 /* LOADER */
 
 #loader{
@@ -238,40 +232,35 @@ border:5px solid #eee;
 border-top:5px solid #25D366;
 border-radius:50%;
 animation:spin 1s linear infinite;
-margin-bottom:10px;
 }
 
 @keyframes spin{
-0%{transform:rotate(0deg);}
-100%{transform:rotate(360deg);}
+0%{transform:rotate(0)}
+100%{transform:rotate(360deg)}
 }
-</style>
 
+</style>
 </head>
 
 <body>
-  <div id="loader">
 
+<div id="loader">
 <div class="spinner"></div>
 <p>Cargando tienda...</p>
-
 </div>
 
 <div class="header">
-
 <h1 id="nombreEmpresa"></h1>
 <div class="eslogan" id="eslogan"></div>
 
 <div class="publicidad-container">
-    <div class="publicidad-texto" id="publicidad"></div>
+<div class="publicidad-texto" id="publicidad"></div>
 </div>
-
 </div>
 
 <div class="productos" id="productos"></div>
 
 <div class="footer">
-
 <p id="descripcion"></p>
 <p id="direccion"></p>
 <p id="ciudad"></p>
@@ -279,69 +268,62 @@ margin-bottom:10px;
 <p id="correo"></p>
 
 <div class="credito">
-Creado por 
-<a href="https://zipy.carrd.co/" target="_blank">Zippy</a>
+Creado por <a href="https://zipy.carrd.co/" target="_blank">Zippy</a>
 </div>
-
-
 </div>
-
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const firebaseConfig = {
-
-apiKey: "TU_API_KEY",
-authDomain: "zippy-727d5.firebaseapp.com",
-databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
-projectId: "zippy-727d5"
-
+const firebaseConfig={
+apiKey:"TU_API_KEY",
+authDomain:"zippy-727d5.firebaseapp.com",
+databaseURL:"https://zippy-727d5-default-rtdb.firebaseio.com",
+projectId:"zippy-727d5"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
 
-let productosJson = {};
-let productosRealtime = {};
-let telefonoEmpresa = "";
+let productosJson={}
+let productosRealtime={}
+let telefonoEmpresa=""
 
-const slug = window.location.pathname.split("/").pop();
+const slug=window.location.pathname.split("/").pop()
 
-buscarEmpresa();
-
+buscarEmpresa()
 
 function buscarEmpresa(){
 
-const empresasRef = ref(db);
+const empresasRef=ref(db)
 
 onValue(empresasRef,(snapshot)=>{
 
 snapshot.forEach((child)=>{
 
-const data = child.val();
+const data=child.val()
 
-if(data.perfilempresa?.slug === slug){
+if(data.perfilempresa?.slug===slug){
 
-const empresaId = child.key;
-const perfil = data.perfilempresa;
+const empresaId=child.key
+const perfil=data.perfilempresa
 
-telefonoEmpresa = perfil.WhatsApp.replace("+","");
+telefonoEmpresa=perfil.WhatsApp.replace("+","")
 
-document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
-document.getElementById("eslogan").innerText = perfil.eslogan;
-document.getElementById("publicidad").innerText = perfil.publicidad;
+document.getElementById("nombreEmpresa").innerText=perfil.nombreEmpresa
+document.getElementById("eslogan").innerText=perfil.eslogan
+document.getElementById("publicidad").innerText=perfil.publicidad
 
-document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
-document.getElementById("direccion").innerText = "Dirección: " + perfil.direccion;
-document.getElementById("ciudad").innerText = "Ciudad: " + perfil.ciudad;
-document.getElementById("telefono").innerText = "WhatsApp: " + perfil.WhatsApp;
-document.getElementById("correo").innerText = "Correo: " + perfil.correo;
+document.getElementById("descripcion").innerText=perfil.descripcionEmpresa
+document.getElementById("direccion").innerText="Dirección: "+perfil.direccion
+document.getElementById("ciudad").innerText="Ciudad: "+perfil.ciudad
+document.getElementById("telefono").innerText="WhatsApp: "+perfil.WhatsApp
+document.getElementById("correo").innerText="Correo: "+perfil.correo
 
-cargarProductosJSON(perfil.urljason);
-escucharCambios(empresaId);
+cargarProductosJSON(perfil.urljason)
+escucharCambios(empresaId)
 
 }
 
@@ -350,38 +332,32 @@ escucharCambios(empresaId);
 })
 
 }
-
 
 function cargarProductosJSON(url){
 
 fetch(url)
 .then(res=>res.json())
 .then(data=>{
-
-productosJson = data;
-render();
-
+productosJson=data
+render()
 })
 
 }
 
+function escucharCambios(id){
 
-function escucharCambios(empresaId){
-
-const productosRef = ref(db, empresaId + "/productos");
+const productosRef=ref(db,id+"/productos")
 
 onValue(productosRef,(snapshot)=>{
 
-productosRealtime = {};
+productosRealtime={}
 
 snapshot.forEach((child)=>{
+const p=child.val()
+productosRealtime[p.referencia]=p
+})
 
-const p = child.val();
-productosRealtime[p.referencia] = p;
-
-});
-
-render();
+render()
 
 })
 
@@ -389,70 +365,68 @@ render();
 
 function normalizarImagen(url){
 
-if(!url) return "";
+if(!url) return ""
 
 if(url.includes("drive.google.com")){
 
-const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+const match=url.match(/\/d\/([a-zA-Z0-9_-]+)/)||url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
 
-if(match && match[1]){
-return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
-}
-
-}
-
-return url;
+if(match && match[1])
+return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`
 
 }
-function formatearPrecio(valor){
-return "$" + valor.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".");
+
+return url
+
+}
+
+function precioCOP(v){
+return "$"+v.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".")
 }
 
 function render(){
 
-const contenedor = document.getElementById("productos");
-contenedor.innerHTML="";
+const contenedor=document.getElementById("productos")
+contenedor.innerHTML=""
 
 for(const refProducto in productosJson){
 
-const imagen = productosJson[refProducto];
-const realtime = productosRealtime[refProducto];
+const imagen=productosJson[refProducto]
+const realtime=productosRealtime[refProducto]
 
-let etiquetaPromo="";
-let etiquetaAgotado="";
-let claseAgotado="";
+let etiquetaPromo=""
+let etiquetaAgotado=""
+let claseAgotado=""
+let precioHTML=""
+let linkWhats=""
 
 if(realtime){
-
-let precio = realtime.valor;
 
 if(realtime.promocion){
 
 precioHTML=`
-<div class="precio">${formatearPrecio(realtime.valorPromocion)}</div>
-<div class="precioViejo">${formatearPrecio(realtime.valor)}</div>
-`;
+<div class="precio">${precioCOP(realtime.valorPromocion)}</div>
+<div class="precioViejo">${precioCOP(realtime.valor)}</div>
+`
 
-precio = realtime.valorPromocion;
-
-etiquetaPromo=`<div class="etiquetaPromo">PROMO</div>`;
+etiquetaPromo=`<div class="etiquetaPromo">PROMO</div>`
 
 }else{
 
-precioHTML=`<div class="precio">${formatearPrecio(realtime.valor)}</div>`;
+precioHTML=`<div class="precio">${precioCOP(realtime.valor)}</div>`
 
 }
 
 if(realtime.agotado){
 
-etiquetaAgotado=`<div class="etiquetaAgotado">AGOTADO</div>`;
-claseAgotado="agotado";
+etiquetaAgotado=`<div class="etiquetaAgotado">AGOTADO</div>`
+claseAgotado="agotado"
 
 }
 
-const mensaje = encodeURIComponent("Hola quiero comprar " + refProducto);
+const mensaje=encodeURIComponent("Hola quiero comprar "+refProducto)
 
-linkWhats=`https://wa.me/${telefonoEmpresa}?text=${mensaje}`;
+linkWhats=`https://wa.me/${telefonoEmpresa}?text=${mensaje}`
 
 }
 
@@ -465,7 +439,7 @@ contenedor.innerHTML+=`
 ${etiquetaPromo}
 ${etiquetaAgotado}
 
-<img src="${normalizarImagen(imagen)}" loading="lazy">
+<img src="${normalizarImagen(imagen)}">
 
 </div>
 
@@ -473,23 +447,25 @@ ${etiquetaAgotado}
 
 ${precioHTML}
 
-<a class="btn" href="${linkWhats}" target="_blank">
-Comprar por WhatsApp
-</a>
+<a class="btn" href="${linkWhats}" target="_blank">Comprar por WhatsApp</a>
 
 </div>
 
-`;
+`
 
 }
-setTimeout(()=>{
-document.getElementById("loader").style.opacity="0";
+
+document.querySelectorAll(".producto").forEach((p,i)=>{
+setTimeout(()=>p.classList.add("visible"),i*80)
+})
 
 setTimeout(()=>{
-document.getElementById("loader").style.display="none";
-},400);
+document.getElementById("loader").style.opacity="0"
+setTimeout(()=>{
+document.getElementById("loader").style.display="none"
+},400)
+},200)
 
-},200);
 }
 
 </script>
