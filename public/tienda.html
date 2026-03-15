@@ -14,6 +14,7 @@ margin:0;
 background:#f5f6fa;
 color:#333;
 }
+
 /* HEADER */
 
 .header{
@@ -237,6 +238,11 @@ box-shadow:0 4px 10px rgba(0,0,0,.3);
 .whatsapp img{
 width:32px;
 }
+.descripcionProducto{
+font-size:13px;
+color:#666;
+margin-top:4px;
+}
 
 /* MOVIL */
 
@@ -365,6 +371,10 @@ grid-template-columns:1fr 1fr;
 gap:8px;
 }
 
+textarea{
+min-height:60px;
+resize:none;
+}
 </style>
 </head>
 
@@ -387,6 +397,7 @@ gap:8px;
 </div>
 
 <div id="productos" class="productos"></div>
+
 <div id="modalPedido" class="modal">
 
 <div class="modal-contenido">
@@ -401,6 +412,8 @@ gap:8px;
 
 <div class="refLabel">Referencia</div>
 <div id="productoTitulo" class="refProducto"></div>
+
+<div id="productoDescripcion" class="descripcionProducto"></div>
 
 <div id="productoPrecio" class="precioModal"></div>
 
@@ -462,7 +475,7 @@ gap:8px;
 <button id="enviarPedido">Enviar</button>
 
 </div>
-
+</div>
 </div>
 
 <div class="footer">
@@ -640,7 +653,7 @@ precioHTML=`<div class="precio">${formatearPrecio(realtime.valor)}</div>`
 
 }
 
-if(realtime.agotado === true || realtime.agotado === "true"){
+if(realtime.agotado){
 
 etiquetaAgotado=`<div class="etiquetaAgotado">AGOTADO</div>`
 claseAgotado="agotado"
@@ -660,10 +673,11 @@ contenedor.innerHTML+=`
 ${etiquetaPromo}
 ${etiquetaAgotado}
 
-<img src="${normalizarImagen(imagen)}"
-onclick="abrirProducto('${refProducto.replace(/'/g,"")}','${imagen}','${precio}')">
-
-</div>
+${realtime.agotado ? 
+`<div class="btn" style="background:#aaa">Producto agotado</div>` 
+:
+`<a class="btn" href="${linkWhats}" target="_blank">Comprar por WhatsApp</a>`
+}
 
 <div class="nombre">${refProducto}</div>
 
@@ -693,11 +707,13 @@ document.getElementById("loader").style.display="none"
 
 let productoSeleccionado = ""
 
-function abrirProducto(nombre,imagen,precio){
+function abrirProducto(nombre,imagen,precio,descripcion){
 
 productoSeleccionado = nombre
 
 document.getElementById("productoTitulo").innerText = nombre
+document.getElementById("productoDescripcion").innerText = descripcion || ""
+
 document.getElementById("productoImagen").src = normalizarImagen(imagen)
 document.getElementById("productoPrecio").innerText = formatearPrecio(precio)
 
