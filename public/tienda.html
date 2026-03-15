@@ -4,13 +4,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Tienda</title>
 
 <style>
 
 body{
-font-family: Arial, sans-serif;
+font-family: Arial;
 margin:0;
 background:#f5f5f5;
 }
@@ -22,83 +21,61 @@ padding:20px;
 text-align:center;
 }
 
-.productos-container{
-padding:20px;
-}
-
 .productos-grid{
-
 display:grid;
 grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
 gap:20px;
-
+padding:20px;
 }
 
 .producto{
-
 background:white;
 border-radius:10px;
-overflow:hidden;
 box-shadow:0 2px 6px rgba(0,0,0,0.2);
 padding:10px;
 text-align:center;
-
 }
 
 .producto img{
-
 width:100%;
 height:150px;
 object-fit:cover;
-
 }
 
 .nombre{
-
-font-size:16px;
 font-weight:bold;
-margin:10px 0;
-
+margin-top:8px;
 }
 
 .precio{
-
 color:green;
 font-size:18px;
-
 }
 
 .promocion{
-
 background:red;
 color:white;
-padding:4px 6px;
-font-size:12px;
+padding:3px 6px;
 border-radius:5px;
+font-size:12px;
+}
 
+.agotado{
+color:red;
+font-weight:bold;
 }
 
 </style>
 
 </head>
 
-
 <body>
 
 <header class="header">
-
 <h1 id="nombreEmpresa">Tienda</h1>
-<p id="eslogan"></p>
-
 </header>
 
-
-<section class="productos-container">
-
 <div id="productos" class="productos-grid"></div>
-
-</section>
-
 
 
 <script type="module">
@@ -108,24 +85,20 @@ import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10
 
 const firebaseConfig = {
 
- apiKey: "AIzaSyBTphfyjQbU1AKt6sYFepJ8Q8mGp3sbtOA",
-    authDomain: "zippy-727d5.firebaseapp.com",
-    databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
-    projectId: "zippy-727d5",
-storageBucket: "zippy-727d5.appspot.com",
-messagingSenderId: "XXXX",
-appId: "XXXX"
+apiKey: "TU_API_KEY",
+authDomain: "zippy-727d5.firebaseapp.com",
+databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
+projectId: "zippy-727d5"
 
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+let productosJson = {};
+let productosRealtime = {};
 
 const slug = window.location.pathname.split("/").pop();
-
-let empresaId = null;
-let productos = {};
 
 buscarEmpresa();
 
@@ -143,14 +116,11 @@ const data = child.val();
 
 if(data.perfilempresa?.slug === slug){
 
-empresaId = child.key;
-
-document.getElementById("nombreEmpresa").innerText = data.perfilempresa.nombreEmpresa;
-document.getElementById("eslogan").innerText = data.perfilempresa.eslogan;
+const empresaId = child.key;
 
 cargarProductosJSON(data.perfilempresa.urljason);
 
-escucharCambios();
+escucharCambios(empresaId);
 
 }
 
@@ -168,9 +138,9 @@ fetch(url)
 .then(res=>res.json())
 .then(data=>{
 
-productos = data;
+productosJson = data;
 
-mostrarProductos();
+render();
 
 })
 
@@ -178,19 +148,23 @@ mostrarProductos();
 
 
 
-function escucharCambios(){
+function escucharCambios(empresaId){
 
 const productosRef = ref(db, empresaId + "/productos");
 
 onValue(productosRef,(snapshot)=>{
 
+productosRealtime = {};
+
 snapshot.forEach((child)=>{
 
-productos[child.key] = child.val();
+const p = child.val();
 
-})
+productosRealtime[p.referencia] = p;
 
-mostrarProductos();
+});
+
+render();
 
 })
 
@@ -198,15 +172,46 @@ mostrarProductos();
 
 
 
-function mostrarProductos(){
+function render(){
 
 const contenedor = document.getElementById("productos");
 
 contenedor.innerHTML="";
 
-for(const nombreProducto in productos){
+for(const refProducto in productosJson){
 
-const imagen = productos[nombreProducto];
+const imagen = productosJson[refProducto];
+
+const realtime = productosRealtime[refProducto];
+
+let precio = "";
+let promo = "";
+let agotado = "";
+
+if(realtime){
+
+if(realtime.agotado){
+
+agotado = `<div class="agotado">AGOTADO</div>`;
+
+}else{
+
+if(realtime.promocion){
+
+precio = `<div class="precio">$${realtime.valorPromocion}</div>
+<div style="text-decoration:line-through;color:gray">$${realtime.valor}</div>`;
+
+promo = `<div class="promocion">PROMO</div>`;
+
+}else{
+
+precio = `<div class="precio">$${realtime.valor}</div>`;
+
+}
+
+}
+
+}
 
 contenedor.innerHTML += `
 
@@ -214,7 +219,11 @@ contenedor.innerHTML += `
 
 <img src="${imagen}">
 
-<div class="nombre">${nombreProducto}</div>
+<div class="nombre">${refProducto}</div>
+
+${promo}
+${precio}
+${agotado}
 
 </div>
 
