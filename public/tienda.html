@@ -350,33 +350,42 @@
 /* DISEÑO PARA MÓVIL (PANTALLAS PEQUEÑAS)    */
 /* ========================================= */
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .productos {
-        /* 2 Columnas exactas en móviles */
-        grid-template-columns: repeat(2, 1fr); 
-        gap: 12px;
-        padding: 12px;
+        grid-template-columns: repeat(2, 1fr) !important; 
+        gap: 10px !important;
+        padding: 10px !important;
     }
 
     .producto img {
-        /* AQUÍ LO PEDIDO: Imagen más alta en móvil */
-        aspect-ratio: 2 / 3 ;
-        object-fit: cover;
-        object-position: center;
+        /* Forzamos la proporción 2/3 (Muy alta) */
+        aspect-ratio: 2 / 3 !important; 
+        object-fit: cover !important;
+        height: auto !important;
+        display: block !important;
     }
 
     .nombre {
-        font-size: 14px; /* Un poco más pequeño para el móvil */
-        margin: 6px 0 2px 0;
+        font-size: 13px !important;
+        margin: 5px 0 !important;
+        padding: 0 4px !important;
+        /* Limitamos a 2 líneas para que no empuje el botón */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
     .precio {
-        font-size: 17px; /* Ajuste de precio para que no rompa el diseño */
+        font-size: 16px !important;
     }
 
-    .etiquetaPromo, .etiquetaAgotado {
-        font-size: 9px; /* Etiquetas más discretas */
-        padding: 5px 10px;
+    /* Ajuste del botón para que quepa en tarjetas estrechas */
+    .btn {
+        margin: 10px 5px !important;
+        padding: 8px !important;
+        font-size: 12px !important;
+        border-radius: 8px !important;
     }
 }
 /* BOTÓN DE WHATSAPP */
