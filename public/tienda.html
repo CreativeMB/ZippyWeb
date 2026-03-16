@@ -7,69 +7,69 @@
     <title>Mi Tienda En linea</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* ============================= */
-        /* GENERAL */
-        /* ============================= */
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            margin: 0;
-            background: #f5f6fa;
-            color: #333;
-        }
+       /* ========================================= */
+/* 1. CONFIGURACIÓN GLOBAL Y FUENTES         */
+/* ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,700&family=Poppins:wght@300;400;600&family=Montserrat:wght@700;900&display=swap');
 
- /* ============================= */
-/* HEADER MODERNO Y ELEGANTE - TIENDA DE REGALOS */
-/* ============================= */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,700&family=Poppins:wght@300;400;600&display=swap');
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    background: #f5f6fa;
+    color: #333;
+}
+
+/* ========================================= */
+/* 2. HEADER Y ELEMENTOS DE MARCA            */
+/* ========================================= */
 .header {
     text-align: center;
     padding: 50px 20px;
-    /* Dirección vertical: de arriba hacia abajo */
     background: linear-gradient(180deg, #000000 0%, #13b0bb 50%, #ffffff 100%);
     color: white;
     position: relative;
     overflow: hidden;
 }
+
 .header h1 {
     margin: 0;
     font-family: 'Cormorant Garamond', serif;
-    font-size: 45px; /* Un poco más grande porque es una letra estilizada */
+    font-size: 45px;
     font-weight: 700;
-    text-transform: capitalize; /* Cambiado: Se ve más premium que todo en mayúsculas */
-    letter-spacing: 1px; /* Menos espacio entre letras para que se lea mejor */
-    color: #34c274; /* Tu verde */
+    text-transform: capitalize;
+    letter-spacing: 1px;
+    color: #34c274;
     line-height: 1;
-    /* Efecto 3D sutil para que resalte sobre el degradado */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
-/* ESLOGAN - LEGIBLE, MODERNO Y AMIGABLE */
+
 .eslogan {
-    font-family: 'Poppins', sans-serif; /* Tipografía limpia y moderna */
-    font-weight: 300; /* Letra delgada para contrastar con el título */
-    font-size: 22px; 
-    color: #535353; 
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
+    font-size: 22px;
+    color: #535353;
     letter-spacing: 1px;
     margin-top: 5px;
     margin-bottom: 25px;
     text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
 }
-/* CONTENEDOR DE PUBLICIDAD */
+
+/* ========================================= */
+/* 3. BANNER INFORMATIVO ANIMADO             */
+/* ========================================= */
 .banner-informativo {
     display: flex;
     align-items: center;
     justify-content: center;
     perspective: 1000px;
     width: 100%;
-    height: auto;
-    min-height: 40px; /* Aumentado un poco para dar espacio al movimiento */
+    min-height: 40px;
     padding: 5px 0;
     margin: 0;
-    /* Quitamos overflow: hidden temporalmente si la letra desaparece al subir */
 }
 
-/* TEXTO ANIMADO */
 .texto-destacado {
-    display: inline-block; /* CRUCIAL: Las animaciones de transformación requieren esto */
+    display: inline-block;
     font-family: 'Montserrat', sans-serif;
     color: #000000;
     font-weight: 900;
@@ -78,278 +78,258 @@
     letter-spacing: 2px;
     text-align: center;
     text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-
-    /* Asegúrate que el nombre coincida con el @keyframes */
     animation: drop-3d-header 6s ease-in-out infinite;
-    
-    /* Propiedades para fluidez */
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform-style: preserve-3d;
-    will-change: transform, opacity; /* Ayuda al navegador a preparar la animación */
+    will-change: transform, opacity;
 }
 
-/* ANIMACIÓN REVISADA */
 @keyframes drop-3d-header {
-    0% { 
-        opacity: 0; 
-        transform: translateY(-15px) rotateX(-45deg); 
-    }
-    10%, 85% { 
-        opacity: 1; 
-        transform: translateY(0) rotateX(0deg); 
-    }
-    95%, 100% { 
-        opacity: 0; 
-        transform: translateY(15px) rotateX(45deg); 
-    }
+    0% { opacity: 0; transform: translateY(-15px) rotateX(-45deg); }
+    10%, 85% { opacity: 1; transform: translateY(0) rotateX(0deg); }
+    95%, 100% { opacity: 0; transform: translateY(15px) rotateX(45deg); }
 }
 
 /* ========================================= */
-/* FOOTER COMPACTO Y PROFESIONAL             */
+/* 4. GRID DE PRODUCTOS (VISTA PC)           */
+/* ========================================= */
+.productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+    gap: 20px;
+    padding: 20px;
+}
+
+.producto {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.1);
+    padding: 0; 
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.producto img {
+    width: 100%;
+    aspect-ratio: 4 / 5; 
+    object-fit: fill; 
+    display: block;
+    margin: 0;
+}
+
+.nombre { 
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700; 
+    font-size: 15px;
+    color: #333;
+    margin: 8px 0 2px 0; 
+    text-transform: capitalize;
+    line-height: 1.2;
+    padding: 0 5px;
+}
+
+.precio-contenedor {
+    margin: 0;
+    padding: 0 5px 12px 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.precioViejo { 
+    text-decoration: line-through; 
+    color: #a0a0a0;
+    font-size: 13px; 
+    font-weight: 400;
+    line-height: 1;
+}
+
+.precio { 
+    color: #111; 
+    font-size: 20px; 
+    font-weight: 800; 
+    margin: 2px 0 0 0;
+    line-height: 1;
+}
+
+/* ETIQUETAS */
+.etiquetaPromo, .etiquetaAgotado { 
+    position: absolute; 
+    top: 0; 
+    font-size: 11px; 
+    padding: 8px 15px; 
+    z-index: 5;
+}
+
+.etiquetaPromo { 
+    left: 0; 
+    background: #e53935; 
+    color: white; 
+    font-weight: bold;
+    border-radius: 0 0 12px 0; 
+}
+
+.etiquetaAgotado { 
+    right: 0;
+    background: rgba(0,0,0,0.7); 
+    color: white; 
+    border-radius: 0 0 0 12px;
+}
+
+/* ========================================= */
+/* 5. MODALES, FORMULARIOS Y LOADER          */
+/* ========================================= */
+#loader {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    transition: opacity 0.5s ease;
+}
+
+.spinner {
+    width: 50px; height: 50px;
+    border: 5px solid #eee;
+    border-top: 5px solid #242424;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-contenido {
+    background: white;
+    width: 95%;
+    max-width: 500px;
+    border-radius: 12px;
+    padding: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+#productoDescripcion {
+    white-space: pre-wrap; 
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    display: block;
+    margin-bottom: 15px; 
+}
+
+.formulario input, .formulario textarea, .formulario select {
+    width: 100%; padding: 10px; margin: 6px 0;
+    border-radius: 6px; border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.fila2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+#enviarPedidoBtn {
+    width: 100%; background: #25D366; color: white;
+    border: none; padding: 12px; border-radius: 8px;
+    font-size: 16px; cursor: pointer; margin-top: 10px;
+}
+
+/* ========================================= */
+/* 6. BOTONES Y CONTACTO                     */
+/* ========================================= */
+.btn { 
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px; 
+    background: #25D366; 
+    color: white; 
+    padding: 12px; 
+    border-radius: 12px; 
+    text-decoration: none; 
+    font-weight: bold;
+    font-size: 14px; 
+    transition: background 0.3s;
+}
+
+.btn:hover {
+    background: #1da851;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+}
+
+.whatsapp { 
+    position: fixed; 
+    bottom: 20px; right: 20px; 
+    background: #25D366; 
+    width: 60px; height: 60px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    box-shadow: 0 4px 10px rgba(0,0,0,.3); 
+    z-index: 999; 
+}
+
+.whatsapp img { width: 32px; }
+
+/* ========================================= */
+/* 7. FOOTER Y AVISOS                        */
 /* ========================================= */
 .footer {
-    background: #000000; /* Fondo negro puro */
+    background: #000000;
     color: white;
-    padding: 15px 20px; /* Padding muy reducido arriba y abajo */
+    padding: 30px 20px;
     text-align: center;
-    border-top: 2px solid #34c274; /* Combinando con tu color verde del header */
+    border-top: 2px solid #34c274;
     font-family: 'Poppins', sans-serif;
 }
 
-/* Info general del footer */
 .info-footer-elegante {
-    margin: 2px 0; /* Margen casi nulo entre líneas para ahorrar espacio */
-    font-size: 14px; /* Tamaño normal para datos de contacto */
+    margin: 2px 0;
+    font-size: 14px;
     color: #ffffff;
     line-height: 1.2;
 }
 
-/* DESCRIPCIÓN PEQUEÑA Y DISCRETA */
 #descripcion.info-footer-elegante {
-    font-size: 12px; /* Letra más pequeña para la descripción */
-    color: #b3b3b3; /* Gris claro para que no distraiga tanto */
+    font-size: 12px;
+    color: #b3b3b3;
     max-width: 600px;
-    margin: 0 auto 10px auto; /* Un poco de espacio solo abajo de la descripción */
+    margin: 0 auto 10px auto;
     line-height: 1.4;
     font-weight: 300;
 }
 
-/* CRÉDITOS FINALES */
-.footer p[style*="margin-top:25px"] {
-    margin-top: 10px !important; /* Forzamos a que suba más */
-    padding-top: 10px !important;
-    border-top: 1px solid #222 !important;
-}
- /* ============================= */
-
-/* GRID DE PRODUCTOS RESPONSIVO  */
-
-/* ============================= */
-
-.productos {
-
-    display: grid;
-
-    /* Esto hace que las tarjetas se acomoden solas en varias filas */
-
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-
-    gap: 20px;
-
-    padding: 20px;
-
+.aviso-privacidad {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.3;
+    padding: 8px 12px;
+    background-color: #f1f5f9;
+    border-left: 3px solid #25D366;
+    margin-bottom: 10px;
+    border-radius: 4px;
 }
 
-
-
-
-
-.producto {
-
-    background: #ffffff;
-
-    border-radius: 12px;
-
-    border: 1px solid rgba(0,0,0,0.1);
-
-    padding: 0;
-
-    text-align: center;
-
-    position: relative;
-
-    overflow: hidden;
-
-    display: flex;
-
-    flex-direction: column;
-
-}
-
-
-
-/* IMAGEN QUE SE AJUSTA AL CONTENEDOR */
-
-.producto img {
-
-    width: 100%; /* Ocupa todo el ancho de la tarjeta */
-
-   
-
-    /* BLOQUEO DE PROPORCIÓN: Más alta que ancha (Retrato) */
-
-    aspect-ratio: 4 / 5;
-
-   
-
-    /* Ajusta la imagen al tamaño sin dejar huecos */
-
-    object-fit: fill;
-
-   
-
-    display: block;
-
-    margin: 0;
-
-}
-
-
-
-/* ETIQUETAS INTEGRADAS A LOS BORDES */
-
-.etiquetaPromo {
-
-    position: absolute;
-
-    top: 0;
-
-    left: 0;
-
-    background: #e53935;
-
-    color: white;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    padding: 8px 15px;
-
-    border-radius: 0 0 12px 0;
-
-    z-index: 5;
-
-}
-
-
-
-.etiquetaAgotado {
-
-    position: absolute;
-
-    top: 0;
-
-    right: 0;
-
-    background: rgba(0,0,0,0.7);
-
-    color: white;
-
-    font-size: 11px;
-
-    padding: 8px 15px;
-
-    border-radius: 0 0 0 12px;
-
-    z-index: 5;
-
-}
-
-
-
-/* NOMBRE DEL PRODUCTO - COMPACTO */
-
-.nombre {
-
-    font-family: 'Montserrat', sans-serif;
-
-    font-weight: 700;
-
-    font-size: 15px; /* Un poco más pequeño para que quepa mejor */
-
-    color: #333;
-
-    /* Eliminamos márgenes laterales (0) y pegamos más a la imagen (8px arriba) */
-
-    margin: 8px 0 2px 0;
-
-    text-transform: capitalize;
-
-    line-height: 1.2;
-
-    padding: 0 5px; /* Un mínimo de respiro interno para que la letra no toque el borde físico */
-
-}
-
-/* CONTENEDOR DE PRECIOS */
-
-.precio-contenedor {
-
-    margin: 0;
-
-    padding: 0 5px 12px 5px; /* Espacio solo abajo para cerrar la tarjeta */
-
-    display: flex;
-
-    flex-direction: column; /* El precio tachado irá arriba del nuevo */
-
-    align-items: center;
-
-}
-
-
-
-/* PRECIO ANTERIOR (TACHADO Y PÁLIDO) */
-
-.precioViejo {
-
-    text-decoration: line-through;
-
-    color: #a0a0a0; /* Gris pálido */
-
-    font-size: 13px;
-
-    font-weight: 400;
-
-    margin: 0; /* Sin márgenes */
-
-    line-height: 1;
-
-}
-
-
-
-/* PRECIO ACTUAL - DESTACADO */
-
-.precio {
-
-    color: #111;
-
-    font-size: 20px;
-
-    font-weight: 800;
-
-    margin: 2px 0 0 0; /* Casi pegado al precio tachado */
-
-    line-height: 1;
-
-}
 /* ========================================= */
-/* DISEÑO PARA MÓVIL (PANTALLAS PEQUEÑAS)    */
+/* 8. DISEÑO RESPONSIVO (MÓVIL)              */
 /* ========================================= */
-
 @media screen and (max-width: 767px) {
     .productos {
         grid-template-columns: repeat(2, 1fr) !important; 
@@ -358,8 +338,7 @@
     }
 
     .producto img {
-        /* Forzamos la proporción 2/3 (Muy alta) */
-        aspect-ratio: 2 / 3 !important; 
+        aspect-ratio: 2 / 3 !important; /* IMAGEN ALTA EN MÓVIL */
         object-fit: cover !important;
         height: auto !important;
         display: block !important;
@@ -369,7 +348,6 @@
         font-size: 13px !important;
         margin: 5px 0 !important;
         padding: 0 4px !important;
-        /* Limitamos a 2 líneas para que no empuje el botón */
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
@@ -380,12 +358,16 @@
         font-size: 16px !important;
     }
 
-    /* Ajuste del botón para que quepa en tarjetas estrechas */
     .btn {
         margin: 10px 5px !important;
         padding: 8px !important;
         font-size: 12px !important;
         border-radius: 8px !important;
+    }
+
+    .etiquetaPromo, .etiquetaAgotado {
+        font-size: 9px !important;
+        padding: 5px 10px !important;
     }
 }
 /* BOTÓN DE WHATSAPP */
