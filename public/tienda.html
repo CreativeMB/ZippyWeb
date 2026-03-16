@@ -168,7 +168,7 @@
     gap: 15px; /* Un poco menos de espacio en móvil se ve más limpio */
     padding: 15px;
 }
-@media (min-width: 500px) {
+@media (min-width: 768px) {
     .productos {
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
         gap: 20px;
@@ -179,9 +179,9 @@
     width: 100%; /* Ocupa todo el ancho de la tarjeta */
     
     /* BLOQUEO DE PROPORCIÓN: Más alta que ancha (Retrato) */
-    aspect-ratio: 3 / 4; 
+   aspect-ratio: 3 / 4 !important;
     object-fit: cover;
-    
+    height: auto;
     /* Ajusta la imagen al tamaño sin dejar huecos */
     object-fit: fill; 
     
