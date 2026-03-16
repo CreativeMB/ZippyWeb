@@ -327,6 +327,16 @@
             .productos { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
             .producto img { height: 160px; }
         }
+        .aviso-privacidad {
+    font-size: 12px; /* Aquí ajustas el tamaño */
+    color: #64748b; /* Un gris un poco más claro para que sea discreto */
+    line-height: 1.3;
+    padding: 8px 12px;
+    background-color: #f1f5f9;
+    border-left: 3px solid #25D366;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
     </style>
 </head>
 
@@ -334,7 +344,7 @@
 
     <div id="loader">
         <div class="spinner"></div>
-        <p style="margin-top:15px; font-weight:bold; color:#4f46e5;">Cargando tienda...</p>
+        <p style="margin-top:15px; font-weight:bold; color:#202020;">Cargando tienda...</p>
     </div>
 
  <div class="header">
@@ -353,9 +363,9 @@
             <div style="display:flex; gap:10px; margin-bottom:15px;">
                 <img id="productoImagen" style="width:100px; height:100px; object-fit:contain; background:#f9f9f9; border-radius:8px;">
                 <div class="infoProducto">
-                  <div class="aviso-privacidad" style="font-size:12px;>
-        🔒 Tus datos están protegidos y se usan exclusivamente para procesar y entregar tu pedido, conforme a la <strong>Normativa colombiana</strong> de protección de datos.
-    </div>
+                 <div class="aviso-privacidad" style="font-size: 12px; line-height: 1.2; color: #666;">
+    🔒 Tus datos están protegidos y se usan exclusivamente para procesar y entregar tu pedido, conforme a la <strong>Normativa colombiana</strong> de protección de datos.
+</div>
                     <div id="productoTitulo" style="font-weight:bold;"></div>
                     <div id="productoDescripcion" style="font-size:18px; color:#666;"></div>
                     <div id="productoPrecio" style="font-weight:bold; color:#000000; font-size:30px;"></div>
@@ -384,6 +394,9 @@
                 </div>
                 <input id="direccionEntrega" placeholder="Direccion de entrega Exacta Ejemplo, Calle 140a#132-21">
                 <textarea id="notasPedido" placeholder="Casa primer piso, torre 5 Apartamen 201, Conjunto, Productos adicionales, Peluche, Chocolates "></textarea>
+                <div class="separador-tarjeta">
+    <strong>Tarjeta para el Regalo</strong>
+</div>
                  <textarea id="mensajeTarjeta" placeholder="Mensaje que va impreso enla tarjeta del producto"></textarea>
                 <div class="fila2">
                     <input id="deTarjeta" placeholder="Persona que Envia el Regalo">
