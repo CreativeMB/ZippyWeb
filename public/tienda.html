@@ -245,38 +245,55 @@
     margin: 2px 0 0 0; /* Casi pegado al precio tachado */
     line-height: 1;
 }
-/* AJUSTES EXCLUSIVOS PARA CELULAR */
-@media (max-width: 480px) {
+/* ============================================= */
+/* FORZAR ESTIRADO DE FOTO EN MÓVIL (AL FINAL)  */
+/* ============================================= */
+@media screen and (max-width: 480px) {
+    /* Forzamos 2 columnas para que no se vea una sola foto gigante */
     .productos {
-        /* Mantenemos 2 columnas para que no se vea gigante */
-        grid-template-columns: repeat(2, 1fr); 
-        gap: 8px; /* Espacio mínimo entre tarjetas */
-        padding: 8px;
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        padding: 8px !important;
+    }
+
+    .producto {
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
     }
 
     .producto img {
-        /* ESTO ESTIRA LA FOTO HACIA ABAJO */
-        /* Cambiamos de 3/4 a 2/3 para que sea mucho más alta */
-        aspect-ratio: 2 / 3; 
-        
-        /* 'fill' asegura que la imagen cubra todo el nuevo espacio alto */
-        object-fit: fill; 
+        width: 100% !important;
+        /* PROPORCIÓN 1:2 -> El doble de alto que de ancho (Máximo estirado) */
+        aspect-ratio: 1 / 2 !important; 
+        object-fit: fill !important;
+        display: block !important;
+        margin: 0 !important;
     }
 
-    /* Compactamos aún más el texto para que la foto sea la protagonista */
+    /* Compactar textos al máximo para que luzca la foto larga */
     .nombre {
-        font-size: 13px;
-        margin: 5px 0 2px 0;
-        padding: 0 2px;
+        font-size: 12px !important;
+        margin: 5px 0 0 0 !important;
+        padding: 0 4px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .precio-contenedor {
+        padding-bottom: 8px !important;
     }
 
     .precio {
-        font-size: 17px;
-        margin-bottom: 8px;
+        font-size: 16px !important;
+        margin: 0 !important;
     }
 
     .precioViejo {
-        font-size: 11px;
+        font-size: 10px !important;
+        opacity: 0.6 !important;
     }
 }
 /* BOTÓN DE WHATSAPP */
