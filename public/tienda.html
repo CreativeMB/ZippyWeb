@@ -164,8 +164,16 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+    gap: 15px; /* Un poco menos de espacio en móvil se ve más limpio */
+    padding: 15px;
 }
-
+@media (min-width: 768px) {
+    .productos {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+}
 /* IMAGEN QUE SE AJUSTA AL CONTENEDOR */
 .producto img {
     width: 100%; /* Ocupa todo el ancho de la tarjeta */
