@@ -934,17 +934,7 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             productoSeleccionado = nombre;
             imagenProducto = normalizarImagen(imagen);
             document.getElementById("productoTitulo").innerText = nombre;
-         function escaparHTML(texto) {
-    return texto
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-document.getElementById("productoDescripcion").innerHTML =
-    escaparHTML(descripcion).replace(/\r\n|\n/g, "<br>");
+            document.getElementById("productoDescripcion").innerText = descripcion;
             document.getElementById("productoImagen").src = imagenProducto;
             document.getElementById("productoPrecio").innerText = formatearPrecio(precio);
             document.getElementById("modalPedido").style.display = "flex";
