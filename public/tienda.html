@@ -18,87 +18,70 @@
         }
 
  /* ============================= */
-/* HEADER MODERNO Y ELEGANTE - TIENDA DE REGALOS */
+/* HEADER COMPACTO Y OPTIMIZADO  */
 /* ============================= */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap');
 .header {
     text-align: center;
-    padding: 50px 20px;
-    /* Dirección vertical: de arriba hacia abajo */
+    /* Reducimos el padding superior a 20px para que el nombre suba */
+    padding: 20px 20px 30px 20px; 
     background: linear-gradient(180deg, #000000 0%, #13b0bb 50%, #ffffff 100%);
     color: white;
     position: relative;
     overflow: hidden;
 }
-/* NOMBRE DE LA EMPRESA - ESTILO PREMIUM Y PROFESIONAL */
+
+/* NOMBRE DE LA EMPRESA - MÁS PEGADO AL INICIO */
 .header h1 {
-    margin: 0;
+    margin: 0; /* Eliminamos cualquier margen externo */
     font-family: 'Montserrat', sans-serif;
     font-size: 42px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 4px;
     color: #34c274;
-    /* Efecto 3D sutil y moderno (sin verse exagerado) */
-    text-shadow: 
-        2px 2px 0px #10dd32,
-        4px 4px 10px rgba(65, 55, 55, 0.4),
-        0px 0px 20px rgba(26, 25, 25, 0.1);
+    line-height: 1; /* Ajustamos la altura de línea para quitar aire arriba/abajo */
+    text-shadow: 2px 2px 0px #10dd32, 4px 4px 10px rgba(65, 55, 55, 0.4);
 }
 
-/* ESLOGAN - LEGIBLE, MODERNO Y AMIGABLE */
+/* ESLOGAN - PEGADO AL NOMBRE */
 .eslogan {
-    font-family: 'Poppins', sans-serif; /* Tipografía limpia y moderna */
-    font-weight: 300; /* Letra delgada para contrastar con el título */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
     font-size: 22px; 
     color: #535353; 
     letter-spacing: 1px;
-    margin-top: 5px;
-    margin-bottom: 25px;
+    /* Bajamos el margen superior a casi 0 para pegarlo al H1 */
+    margin-top: 2px; 
+    /* Reducimos el margen inferior para pegarlo al banner */
+    margin-bottom: 10px; 
     text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
 }
-/* CONTENEDOR DE PUBLICIDAD (INFO DESTACADA) */
+
+/* CONTENEDOR DE PUBLICIDAD - SIN MÁRGENES EXCESIVOS */
 .banner-informativo {
     display: flex;
     align-items: center;
     justify-content: center;
     perspective: 1000px;
     width: 100%;
-    
-    /* CAMBIOS CLAVE: */
-    height: auto;           /* Permite que crezca según el texto */
-    min-height: 30px;       /* Un mínimo pequeño para que no desaparezca */
-    padding: 10px 0;        /* Margen interno pequeño arriba y abajo */
-    overflow: hidden;       /* Evita desbordes si el texto es muy grande */
+    height: auto;
+    min-height: 20px; /* Reducido */
+    padding: 5px 0;   /* Padding mínimo para que no ocupe espacio de más */
+    margin: 0;        /* Sin márgenes externos */
 }
-/* TEXTO ANIMADO - IMPACTANTE PERO CLARO */
+
+/* TEXTO ANIMADO */
 .texto-destacado {
     font-family: 'Montserrat', sans-serif;
-    color: #000000; /* Oro clásico elegante */
+    color: #000000;
     font-weight: 900;
     text-transform: uppercase;
     font-size: 20px;
     letter-spacing: 2px;
     text-align: center;
-    
-    /* Sombra profesional */
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
-
+    margin: 0; /* Aseguramos que el texto no empuje el contenedor */
+    line-height: 1.2;
     animation: drop-3d-header 6s ease-in-out infinite;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform-style: preserve-3d;
-}
-
-/* ANIMACIÓN (Suavizada para verse más natural) */
-@keyframes drop-3d-header {
-    0% { opacity: 0; transform: translateY(-20px) rotateX(-45deg); }
-    10% { opacity: 1; transform: translateY(0) rotateX(0deg); }
-    15% { transform: translateY(-3px); }
-    20% { transform: translateY(0); }
-    85% { opacity: 1; transform: translateY(0) scale(1.05); }
-    95% { opacity: 0; transform: translateY(15px) rotateX(30deg); }
-    100% { opacity: 0; }
 }
 
 /* ============================= */
