@@ -119,6 +119,17 @@ body {
     /* (Opcional) Prepara la tarjeta para una animación suave en PC */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+/* Efecto de elevación interactiva (Hover) en PC */
+.producto:hover {
+    /* La tarjeta sube sutilmente */
+    transform: translateY(-5px); 
+    
+    /* La sombra se vuelve un poco más oscura y grande para simular más altura */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12); 
+    
+    /* Ocultamos el borde sutil para que la sombra destaque más */
+    border-color: transparent;
+}
 
 .producto img {
     width: 100%;
