@@ -721,18 +721,17 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             document.getElementById("modalPedido").style.display = "flex";
         }
 
-       function enviarPedido() {
+      function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
 
     // --- LÓGICA PARA FORMATEAR LA FECHA ---
-    const fechaOriginal = document.getElementById("fechaEntrega").value; // "2026-03-21"
+    const fechaOriginal = document.getElementById("fechaEntrega").value; 
     let fechaFormateada = "";
     
     if (fechaOriginal) {
-        const partes = fechaOriginal.split("-"); // ["2026", "03", "21"]
-        fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`; // "21-03-2026"
+        const partes = fechaOriginal.split("-"); 
+        fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`; 
     }
-    // ---------------------------------------
 
     const campos = {
         medioPago: document.getElementById("medioPago").value,
@@ -745,7 +744,7 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
         mensajeTarjeta: document.getElementById("mensajeTarjeta").value,
         deTarjeta: document.getElementById("deTarjeta").value,
         paraTarjeta: document.getElementById("paraTarjeta").value,
-        fechaEntrega: fechaFormateada, // <--- Aquí usamos la fecha ya formateada
+        fechaEntrega: fechaFormateada,
         horaEntrega: document.getElementById("horaEntrega").value
     };
 
@@ -769,8 +768,12 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
         snapshot.forEach(c => { if(c.val().posicion > maxPos) maxPos = c.val().posicion; });
 
         const nuevoRef = push(pedidosRef);
+        
+        // --- OBJETO ACTUALIZADO CON TODOS LOS CAMPOS ---
         const pedidoObj = {
             idPedido: nuevoRef.key,
+            idEmpresa: empresaId,                   // <--- Agregado
+            idDomiciliario: idDomiciliarioAsignado, // <--- Agregado
             direccion: campos.direccionEntrega,
             imagenUrl: imagenProducto,
             cliente: campos.celularComprador,
@@ -782,7 +785,7 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             nombreDestinatario: campos.nombreDestinatario,
             de: campos.deTarjeta,
             para: campos.paraTarjeta,
-            diaEntrega: campos.fechaEntrega, // <--- Se guardará como "16-03-2026"
+            diaEntrega: campos.fechaEntrega,
             horaEntrega: campos.horaEntrega,
             mensaje: campos.mensajeTarjeta,
             notas: campos.notasPedido,
@@ -790,7 +793,8 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             fechaRegistro: new Date().toLocaleDateString(),
             horaRegistro: new Date().toLocaleTimeString(),
             notificado: false,
-            color: ""
+            color: "#C8E6C9", // Puedes dejarlo fijo o dinámico
+            correo: "nandram@hotmail.com" // O capturarlo de un input si lo prefieres
         };
 
         set(nuevoRef, pedidoObj).then(() => {
