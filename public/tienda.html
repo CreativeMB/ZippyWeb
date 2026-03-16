@@ -43,68 +43,27 @@
     margin-bottom: 10px;
 }
 
-/* Contenedor corregido */
+/* ============================= */
+/* PUBLICIDAD ESTÁTICA (SIN ANIMACIÓN) */
+/* ============================= */
 .publicidad-integrada {
-    height: 45px; /* Un poco más de aire */
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    perspective: 1200px;
     width: 100%;
-    position: relative;
-    margin-top: 5px;
+    margin-top: 10px;
 }
 
 .publicidad-texto {
-    color: #fbbf24;
-    font-weight: 900;
+    color: #fbbf24; /* Dorado */
+    font-weight: 800;
     text-transform: uppercase;
-    font-size: 20px; /* Un poco más grande para PC */
-    letter-spacing: 2px;
-    width: 100%;
-    display: block; /* Forzar renderizado */
-    
-    /* Efecto 3D con sombras más profundas */
-    text-shadow: 
-        0 1px 0 #b48608,
-        0 2px 0 #8d6906,
-        0 4px 8px rgba(0,0,0,0.5);
-
-    /* Propiedades críticas para navegadores Web */
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform-style: preserve-3d;
-    
-    animation: drop-3d-header 6s ease-in-out infinite;
-}
-
-/* Animación optimizada para no desaparecer en el inicio */
-@keyframes drop-3d-header {
-    0% {
-        opacity: 0;
-        transform: translateY(-20px) rotateX(-70deg); /* Menos rotación inicial */
-    }
-    10% {
-        opacity: 1;
-        transform: translateY(0) rotateX(0deg);
-    }
-    15% {
-        transform: translateY(-5px);
-    }
-    20% {
-        transform: translateY(0);
-    }
-    85% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-    95% {
-        opacity: 0;
-        transform: translateY(15px) rotateX(20deg);
-    }
-    100% {
-        opacity: 0;
-    }
+    font-size: 19px;
+    letter-spacing: 1.5px;
+    text-align: center;
+    /* Quitamos transformaciones y animaciones */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5); 
 }
         /* ============================= */
         /* PRODUCTOS GRID */
@@ -353,12 +312,7 @@
 
                     document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
                     document.getElementById("eslogan").innerText = perfil.eslogan;
-                    // Y asegúrate de que esté así (o cámbiala por esta):
-const publicidadDiv = document.getElementById("publicidad");
-if (publicidadDiv) {
-    publicidadDiv.innerText = perfil.publicidad || "OFERTAS ESPECIALES"; 
-    // El "||" pone un texto por defecto si Firebase viene vacío por error
-}
+                    document.getElementById("publicidad").innerText = perfil.publicidad;
                     document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
                     document.getElementById("direccion").innerText = "Dirección: " + perfil.direccion;
                     document.getElementById("ciudad").innerText = "Ciudad: " + perfil.ciudad;
