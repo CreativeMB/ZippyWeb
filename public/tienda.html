@@ -245,57 +245,7 @@
     margin: 2px 0 0 0; /* Casi pegado al precio tachado */
     line-height: 1;
 }
-/* ============================================= */
-/* FORZAR ESTIRADO DE FOTO EN MÓVIL (AL FINAL)  */
-/* ============================================= */
-@media screen and (max-width: 480px) {
-    /* Forzamos 2 columnas para que no se vea una sola foto gigante */
-    .productos {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 8px !important;
-        padding: 8px !important;
-    }
 
-    .producto {
-        display: flex !important;
-        flex-direction: column !important;
-        height: auto !important;
-    }
-
-    .producto img {
-        width: 100% !important;
-        /* PROPORCIÓN 1:2 -> El doble de alto que de ancho (Máximo estirado) */
-        aspect-ratio: 3 / 4 !important; 
-        object-fit: fill !important;
-        display: block !important;
-        margin: 0 !important;
-    }
-
-    /* Compactar textos al máximo para que luzca la foto larga */
-    .nombre {
-        font-size: 12px !important;
-        margin: 5px 0 0 0 !important;
-        padding: 0 4px !important;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .precio-contenedor {
-        padding-bottom: 8px !important;
-    }
-
-    .precio {
-        font-size: 16px !important;
-        margin: 0 !important;
-    }
-
-    .precioViejo {
-        font-size: 10px !important;
-        opacity: 0.6 !important;
-    }
-}
 /* BOTÓN DE WHATSAPP */
 .btn { 
     display: flex; 
