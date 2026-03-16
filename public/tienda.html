@@ -843,20 +843,49 @@ function copiarLink(e) {
     }
 }
 
-function metodoAntiguo(texto) {
-    const inputTemporal = document.createElement("input");
-    inputTemporal.value = texto;
-    document.body.appendChild(inputTemporal);
-    inputTemporal.select();
-    inputTemporal.setSelectionRange(0, 99999); // Para móviles
+function copiarLink(e) {
+    if (e) e.preventDefault();
+    
+    // Obtenemos la URL actual
+    const urlParaCopiar = window.location.href;
+
+    // CREAMOS UN ELEMENTO INVISIBLE (El truco infalible)
+    const el = document.createElement('textarea');
+    el.value = urlParaCopiar;
+    el.setAttribute('readonly', '');
+    el.style.position = 'absolute';
+    el.style.left = '-9999px'; // Lo sacamos de la pantalla
+    document.body.appendChild(el);
+
+    // SELECCIONAMOS EL TEXTO
+    const seleccionado =
+        document.getSelection().rangeCount > 0
+            ? document.getSelection().getRangeAt(0)
+            : false;
+    
+    el.select();
+    
+    // SOPORTE PARA iOS (iPhone/iPad)
+    el.setSelectionRange(0, 99999);
 
     try {
-        document.execCommand("copy");
-        alert("✅ Enlace copiado. ¡Pégalo en tu Instagram!");
+        // EJECUTAMOS LA COPIA
+        const exito = document.execCommand('copy');
+        if (exito) {
+            alert("✅ ¡Enlace copiado! Pégalo en tu Instagram o redes sociales.");
+        } else {
+            alert("No se pudo copiar el enlace automáticamente.");
+        }
     } catch (err) {
-        console.error("No se pudo copiar", err);
+        console.error('Error al copiar:', err);
     }
-    document.body.removeChild(inputTemporal);
+
+    // LIMPIAMOS
+    document.body.removeChild(el);
+    if (seleccionado) {
+        document.getSelection().removeAllRanges();
+        document.getSelection().addRange(seleccionado);
+    }
 }
     </script>
 </body>
