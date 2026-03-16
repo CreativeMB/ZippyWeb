@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Tienda En linea</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <style>
        /* ========================================= */
@@ -798,21 +799,34 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             return url || "";
         };
         // Detectamos la URL actual de la barra del navegador
+   document.addEventListener("DOMContentLoaded", function() {
+    // Detectamos la URL real del navegador
     const urlActual = window.location.href;
-    const tituloPagina = document.title;
+    const mensaje = "Mira esta tienda, ¡te la recomiendo!: ";
 
-    // Configuramos el botón de Facebook
-    document.getElementById('shareFB').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlActual)}`;
-
-    // Configuramos el botón de WhatsApp
-    document.getElementById('shareWA').href = `https://api.whatsapp.com/send?text=Mira esta tienda, ¡te la recomiendo!: ${encodeURIComponent(urlActual)}`;
-
-    // Función extra para copiar el link al portapapeles
-    function copiarLink(e) {
-        e.preventDefault();
-        navigator.clipboard.writeText(urlActual);
-        alert("¡Enlace copiado para compartir!");
+    // Configurar Facebook
+    const btnFB = document.getElementById('shareFB');
+    if(btnFB) {
+        btnFB.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlActual)}`;
     }
+
+    // Configurar WhatsApp (Formato universal para móvil y PC)
+    const btnWA = document.getElementById('shareWA');
+    if(btnWA) {
+        btnWA.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje + urlActual)}`;
+    }
+});
+
+// Función para copiar el link
+function copiarLink(e) {
+    e.preventDefault();
+    const urlActual = window.location.href;
+    navigator.clipboard.writeText(urlActual).then(() => {
+        alert("✅ Enlace de la tienda copiado.");
+    }).catch(err => {
+        console.error('Error al copiar: ', err);
+    });
+}
     </script>
 </body>
 </html>
