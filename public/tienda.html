@@ -382,6 +382,7 @@ body {
     transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
+
 /* Asegura que el icono de la cadena se vea blanco */
 .icono-red i {
     color: white !important;
@@ -720,73 +721,84 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             document.getElementById("modalPedido").style.display = "flex";
         }
 
-        function enviarPedido() {
-            const btn = document.getElementById("enviarPedidoBtn");
-            const campos = {
-                medioPago: document.getElementById("medioPago").value,
-                nombreComprador: document.getElementById("nombreComprador").value,
-                celularComprador: document.getElementById("celularComprador").value,
-                nombreDestinatario: document.getElementById("nombreDestinatario").value,
-                celularDestinatario: document.getElementById("celularDestinatario").value,
-                direccionEntrega: document.getElementById("direccionEntrega").value,
-                notasPedido: document.getElementById("notasPedido").value,
-                mensajeTarjeta: document.getElementById("mensajeTarjeta").value,
-                deTarjeta: document.getElementById("deTarjeta").value,
-                paraTarjeta: document.getElementById("paraTarjeta").value,
-                fechaEntrega: document.getElementById("fechaEntrega").value,
-                horaEntrega: document.getElementById("horaEntrega").value
-            };
+       function enviarPedido() {
+    const btn = document.getElementById("enviarPedidoBtn");
 
-            if (Object.values(campos).some(v => !v.trim())) {
-                alert("⚠️ Por favor completa todos los campos.");
-                return;
-            }
+    // --- LÓGICA PARA FORMATEAR LA FECHA ---
+    const fechaOriginal = document.getElementById("fechaEntrega").value; // "2026-03-21"
+    let fechaFormateada = "";
+    
+    if (fechaOriginal) {
+        const partes = fechaOriginal.split("-"); // ["2026", "03", "21"]
+        fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`; // "21-03-2026"
+    }
+    // ---------------------------------------
 
-            if (!idDomiciliarioAsignado) {
-                alert("❌ Error: No hay domiciliarios en el sistema.");
-                return;
-            }
+    const campos = {
+        medioPago: document.getElementById("medioPago").value,
+        nombreComprador: document.getElementById("nombreComprador").value,
+        celularComprador: document.getElementById("celularComprador").value,
+        nombreDestinatario: document.getElementById("nombreDestinatario").value,
+        celularDestinatario: document.getElementById("celularDestinatario").value,
+        direccionEntrega: document.getElementById("direccionEntrega").value,
+        notasPedido: document.getElementById("notasPedido").value,
+        mensajeTarjeta: document.getElementById("mensajeTarjeta").value,
+        deTarjeta: document.getElementById("deTarjeta").value,
+        paraTarjeta: document.getElementById("paraTarjeta").value,
+        fechaEntrega: fechaFormateada, // <--- Aquí usamos la fecha ya formateada
+        horaEntrega: document.getElementById("horaEntrega").value
+    };
 
-            btn.disabled = true;
-            btn.innerText = "Enviando...";
+    if (Object.values(campos).some(v => !v.trim())) {
+        alert("⚠️ Por favor completa todos los campos.");
+        return;
+    }
 
-            const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
-            
-            onValue(pedidosRef, (snapshot) => {
-                let maxPos = 0;
-                snapshot.forEach(c => { if(c.val().posicion > maxPos) maxPos = c.val().posicion; });
+    if (!idDomiciliarioAsignado) {
+        alert("❌ Error: No hay domiciliarios en el sistema.");
+        return;
+    }
 
-                const nuevoRef = push(pedidosRef);
-                const pedidoObj = {
-                    idPedido: nuevoRef.key,
-                    direccion: campos.direccionEntrega,
-                    imagenUrl: imagenProducto,
-                    cliente: campos.celularComprador,
-                    nombreCliente: campos.nombreComprador,
-                    referencia: productoSeleccionado,
-                    adicional: document.getElementById("productoAdicional").value,
-                    banco: campos.medioPago,
-                    destinatario: campos.celularDestinatario,
-                    nombreDestinatario: campos.nombreDestinatario,
-                    de: campos.deTarjeta,
-                    para: campos.paraTarjeta,
-                    diaEntrega: campos.fechaEntrega,
-                    horaEntrega: campos.horaEntrega,
-                    mensaje: campos.mensajeTarjeta,
-                    notas: campos.notasPedido,
-                    posicion: maxPos + 1,
-                    fechaRegistro: new Date().toLocaleDateString(),
-                    horaRegistro: new Date().toLocaleTimeString(),
-                    notificado: false,
-                    color: ""
-                };
+    btn.disabled = true;
+    btn.innerText = "Enviando...";
 
-                set(nuevoRef, pedidoObj).then(() => {
-                    alert("✅ Pedido enviado correctamente continuamos por WhatsApp");
-                    location.reload();
-                });
-            }, { onlyOnce: true });
-        }
+    const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
+    
+    onValue(pedidosRef, (snapshot) => {
+        let maxPos = 0;
+        snapshot.forEach(c => { if(c.val().posicion > maxPos) maxPos = c.val().posicion; });
+
+        const nuevoRef = push(pedidosRef);
+        const pedidoObj = {
+            idPedido: nuevoRef.key,
+            direccion: campos.direccionEntrega,
+            imagenUrl: imagenProducto,
+            cliente: campos.celularComprador,
+            nombreCliente: campos.nombreComprador,
+            referencia: productoSeleccionado,
+            adicional: document.getElementById("productoAdicional").value,
+            banco: campos.medioPago,
+            destinatario: campos.celularDestinatario,
+            nombreDestinatario: campos.nombreDestinatario,
+            de: campos.deTarjeta,
+            para: campos.paraTarjeta,
+            diaEntrega: campos.fechaEntrega, // <--- Se guardará como "16-03-2026"
+            horaEntrega: campos.horaEntrega,
+            mensaje: campos.mensajeTarjeta,
+            notas: campos.notasPedido,
+            posicion: maxPos + 1,
+            fechaRegistro: new Date().toLocaleDateString(),
+            horaRegistro: new Date().toLocaleTimeString(),
+            notificado: false,
+            color: ""
+        };
+
+        set(nuevoRef, pedidoObj).then(() => {
+            alert("✅ Pedido enviado correctamente continuamos por WhatsApp");
+            location.reload();
+        });
+    }, { onlyOnce: true });
+}
 
         // Utilidades
         window.cerrarModal = () => document.getElementById("modalPedido").style.display = "none";
