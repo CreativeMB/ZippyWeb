@@ -151,6 +151,15 @@
     gap: 20px;
     padding: 20px;
 }
+/* Ajuste específico para pantallas muy pequeñas (celulares) */
+@media (max-width: 480px) {
+    .productos {
+        /* Obligamos a que salgan 2 columnas exactas para que no se vea una sola gigante */
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 10px;
+        padding: 10px;
+    }
+}
 
 .producto {
     background: #ffffff;
