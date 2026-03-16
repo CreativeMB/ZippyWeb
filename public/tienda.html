@@ -344,6 +344,53 @@ body {
     margin-bottom: 10px;
     border-radius: 4px;
 }
+/* ========================================= */
+/* redes sociales */
+/* ========================================= */
+.compartir-contenedor {
+    margin: 10px 0 20px 0;
+}
+
+.texto-compartir {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.7); /* Blanco suave para que no compita con el título */
+    margin-bottom: 8px;
+}
+
+.redes-header {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.icono-red {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Colores de marca al pasar el mouse */
+.facebook:hover { background: #1877F2; border-color: #1877F2; }
+.whatsapp-share:hover { background: #25D366; border-color: #25D366; }
+
+/* Ajuste para celular */
+@media screen and (max-width: 767px) {
+    .icono-red {
+        width: 42px;
+        height: 42px;
+    }
+}
 
 /* ========================================= */
 /* 8 DISEÑO PARA MÓVIL (PANTALLAS PEQUEÑAS)    */
@@ -410,14 +457,29 @@ body {
         <p style="margin-top:15px; font-weight:bold; color:#202020;">Cargando tienda...</p>
     </div>
 
- <div class="header">
+<div class="header">
     <h1 id="nombreEmpresa"></h1>
     <div id="eslogan" class="eslogan"></div>
+    
+    <div class="compartir-contenedor">
+        <p class="texto-compartir">Recomienda esta tienda:</p>
+        <div class="redes-header">
+            <a href="#" id="shareFB" target="_blank" class="icono-red facebook">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" id="shareWA" target="_blank" class="icono-red whatsapp-share">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="#" onclick="copiarLink(event)" class="icono-red link-copy">
+                <i class="fas fa-link"></i>
+            </a>
+        </div>
+    </div>
+
     <div class="banner-informativo">
         <div id="info-destacada" class="texto-destacado"></div>
     </div>
 </div>
-
     <div id="productos" class="productos"></div>
 
     <div id="modalPedido" class="modal">
@@ -735,6 +797,22 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             }
             return url || "";
         };
+        // Detectamos la URL actual de la barra del navegador
+    const urlActual = window.location.href;
+    const tituloPagina = document.title;
+
+    // Configuramos el botón de Facebook
+    document.getElementById('shareFB').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlActual)}`;
+
+    // Configuramos el botón de WhatsApp
+    document.getElementById('shareWA').href = `https://api.whatsapp.com/send?text=Mira esta tienda, ¡te la recomiendo!: ${encodeURIComponent(urlActual)}`;
+
+    // Función extra para copiar el link al portapapeles
+    function copiarLink(e) {
+        e.preventDefault();
+        navigator.clipboard.writeText(urlActual);
+        alert("¡Enlace copiado para compartir!");
+    }
     </script>
 </body>
 </html>
