@@ -133,61 +133,99 @@
     opacity: 0.9;
 }
        /* ============================= */
-/* TARJETAS COMPACTAS Y PROPORCIONALES */
+/* TARJETAS MINI - MÁXIMO AJUSTE */
 /* ============================= */
 
 .productos {
-    padding: 20px;
+    padding: 15px;
     display: grid;
-    /* Bajamos el mínimo de ancho para que quepan mejor en PC */
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
-    gap: 20px;
+    /* Reducimos un poco más el ancho mínimo para que quepan más en horizontal */
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+    gap: 15px; /* Espacios más cerrados */
 }
 
 .producto {
     background: #ffffff;
-    border-radius: 18px;
-    border: 1px solid rgba(0,0,0,0.05);
-    padding: 12px; /* Menos padding para compactar */
+    border-radius: 15px;
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 10px; /* Padding mínimo */
     text-align: center;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    
+    /* Forzamos a que la tarjeta no crezca de más */
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Mantiene el botón siempre abajo */
+    height: auto; 
 }
 
-/* IMAGEN: Ahora no se corta */
+/* IMAGEN: "Inteligente" y rellena todo el cuadro */
 .producto img {
     width: 100%;
-    height: 180px; /* Altura reducida para que no sea alargada */
-    object-fit: contain; /* Muestra la imagen COMPLETA sin estirar */
-    background-color: #f9f9f9; /* Fondo suave por si la foto es de otro tamaño */
-    border-radius: 12px;
-    transition: transform 0.5s ease;
+    height: 150px; /* Mucho más corta para que la tarjeta sea pequeña */
+    
+    /* El truco mágico: Estira si es pequeña, recorta si es grande, 
+       pero SIEMPRE rellena el contenedor al 100% */
+    object-fit: cover; 
+    
+    border-radius: 10px;
+    background-color: #eee;
 }
 
 .nombre { 
     font-family: 'Montserrat', sans-serif;
     font-weight: 700; 
-    margin-top: 12px; 
-    font-size: 15px; /* Un punto más pequeña para ahorrar espacio */
+    margin-top: 8px; 
+    font-size: 14px; /* Letra más pequeña */
     color: #333;
-    line-height: 1.2;
+    /* Limitamos a 2 líneas de texto para que no se alargue la tarjeta */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .precio { 
     color: #16a34a; 
-    font-size: 20px; /* Más equilibrado */
+    font-size: 18px; 
     font-weight: 800; 
-    margin: 5px 0;
+    margin: 4px 0;
 }
 
-/* Etiquetas más pequeñas para no tapar la foto */
-.etiquetaPromo, .etiquetaAgotado { 
-    font-size: 10px;
-    padding: 3px 10px;
-    top: 10px;
+/* El botón también lo hacemos un poco más pequeño */
+.btn {
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 8px;
+    margin-top: 5px;
+}
+
+/* ETIQUETAS (PROMO Y AGOTADO) */
+.etiquetaPromo { 
+    position: absolute; 
+    top: 15px; 
+    left: 15px; 
+    background: #e53935; 
+    color: white; 
+    font-size: 11px; 
+    font-weight: bold;
+    padding: 5px 12px; 
+    border-radius: 50px; /* Estilo píldora */
+    z-index: 10;
+    box-shadow: 0 4px 8px rgba(229, 57, 53, 0.3);
+}
+
+.etiquetaAgotado { 
+    position: absolute; 
+    top: 15px; 
+    right: 15px; 
+    background: rgba(0,0,0,0.7); 
+    backdrop-filter: blur(5px); /* Efecto cristal traslúcido */
+    color: white; 
+    font-size: 11px; 
+    padding: 5px 12px; 
+    border-radius: 50px;
+    z-index: 10;
 }
 
 /* BOTÓN DE WHATSAPP */
