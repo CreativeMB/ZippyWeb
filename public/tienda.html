@@ -105,6 +105,48 @@
     95% { opacity: 0; transform: translateY(20px) rotateX(40deg); }
     100% { opacity: 0; }
 }
+/* ============================= */
+/* ESTILO UNIFICADO (TIPO ESLOGAN) */
+/* ============================= */
+
+/* Aplicamos la fuente Dancing Script y el color dorado a todo */
+.texto-cursivo {
+    font-family: 'Dancing Script', cursive;
+    color: #fbbf24; /* El dorado del eslogan */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    margin: 5px 0;
+    line-height: 1.4;
+    font-size: 22px; /* Tamaño similar al eslogan */
+    opacity: 1;
+    text-align: center;
+}
+
+/* Ajuste específico para la descripción larga para que no sea gigante */
+#descripcion {
+    font-size: 18px; 
+    padding: 0 15px;
+    max-width: 900px;
+    margin: 15px auto;
+}
+
+/* Mantenemos el nombre de la empresa en 3D (Montserrat) */
+.header h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 38px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 5px 10px rgba(0,0,0,0.25);
+    margin-bottom: 10px;
+}
+
+/* Publicidad animada (se mantiene igual) */
+.texto-destacado {
+    font-family: 'Montserrat', sans-serif;
+    color: #fbbf24;
+    font-weight: 900;
+    font-size: 22px;
+    animation: drop-3d-header 6s ease-in-out infinite;
+}
         /* ============================= */
         /* PRODUCTOS GRID */
         /* ============================= */
@@ -233,7 +275,17 @@
 
  <div class="header">
     <h1 id="nombreEmpresa"></h1>
-    <div id="eslogan" class="eslogan"></div>
+    
+    <div class="info-empresa-elegante">
+        <div id="eslogan" class="texto-cursivo"></div>
+        <p id="descripcion" class="texto-cursivo"></p>
+        <div class="texto-cursivo">
+            <span id="direccion"></span> - <span id="ciudad"></span>
+        </div>
+        <div id="telefono" class="texto-cursivo"></div>
+        <div id="correo" class="texto-cursivo"></div>
+    </div>
+
     <div class="banner-informativo">
         <div id="info-destacada" class="texto-destacado"></div>
     </div>
@@ -350,26 +402,15 @@
                         idDomiciliarioAsignado = Object.keys(data.Domiciliarios)[0];
                     }
 
-                   // Asignación con verificaciones (Safe Assignment)
-// Asignación de textos normales
+                 // Dentro de tu función de carga de Firebase
 document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
-document.title = perfil.nombreEmpresa;
 document.getElementById("eslogan").innerText = perfil.eslogan;
-
-// Cambio de ID para evitar bloqueadores de anuncios en PC
-const campoInfo = document.getElementById("info-destacada");
-if (campoInfo) {
-    // Usamos exactamente 'publicidad' que es como está en tu Firebase
-    campoInfo.innerText = perfil.publicidad || ""; 
-    console.log("Dato de Firebase:", perfil.publicidad);
-}
-
 document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
-
-document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
-document.getElementById("direccion").innerText = "Dirección: " + perfil.direccion;
-document.getElementById("ciudad").innerText = "Ciudad: " + perfil.ciudad;
-document.getElementById("telefono").innerText = "WhatsApp: " + perfil.WhatsApp;
+document.getElementById("direccion").innerText = "📍 " + perfil.direccion;
+document.getElementById("ciudad").innerText = perfil.ciudad;
+document.getElementById("telefono").innerText = "📞 " + perfil.WhatsApp;
+document.getElementById("correo").innerText = "✉️ " + perfil.correo;
+document.getElementById("info-destacada").innerText = perfil.publicidad;
 document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
 
                     cargarProductosJSON(perfil.urljason);
