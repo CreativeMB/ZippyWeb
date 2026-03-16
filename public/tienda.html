@@ -352,27 +352,31 @@
                     }
 
                    // Asignación con verificaciones (Safe Assignment)
-document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa || "Mi Tienda";
-document.getElementById("eslogan").innerText = perfil.eslogan || "";
+// Asignación de textos normales
+document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
+document.getElementById("eslogan").innerText = perfil.eslogan;
 
-// PRIORIDAD: Verificamos si la publicidad existe antes de asignarla
-const txtPublicidad = perfil.publicidad || perfil.Publicidad || ""; 
-const elPublicidad = document.getElementById("publicidad");
-
-if (elPublicidad) {
-    elPublicidad.innerText = txtPublicidad;
-    // Si está vacío en Firebase, forzamos un texto para probar si es eso
-    if (txtPublicidad === "") {
-        console.warn("Aviso: El campo publicidad en Firebase está vacío.");
-        elPublicidad.innerText = "¡Bienvenidos a nuestra tienda!"; 
-    }
+// FIX PARA PUBLICIDAD EN NAVEGADOR PC
+const campoPub = document.getElementById("publicidad");
+if (campoPub) {
+    // Primero asignamos el valor normal
+    campoPub.innerText = perfil.publicidad || "";
+    
+    // Forzamos al navegador a "despertar" el elemento tras 500ms
+    setTimeout(() => {
+        if (perfil.publicidad) {
+            campoPub.innerText = perfil.publicidad;
+            console.log("Publicidad forzada en PC:", perfil.publicidad);
+        }
+    }, 500);
 }
 
-document.getElementById("descripcion").innerText = perfil.descripcionEmpresa || "";
-document.getElementById("direccion").innerText = "Dirección: " + (perfil.direccion || "");
-document.getElementById("ciudad").innerText = "Ciudad: " + (perfil.ciudad || "");
-document.getElementById("telefono").innerText = "WhatsApp: " + (perfil.WhatsApp || "");
+document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
+document.getElementById("direccion").innerText = "Dirección: " + perfil.direccion;
+document.getElementById("ciudad").innerText = "Ciudad: " + perfil.ciudad;
+document.getElementById("telefono").innerText = "WhatsApp: " + perfil.WhatsApp;
 document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
+
                     cargarProductosJSON(perfil.urljason);
                     escucharCambios(empresaId);
                 }
