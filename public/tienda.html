@@ -17,12 +17,12 @@
             color: #333;
         }
 
-    /* ============================= */
-/* HEADER MODERNO Y 3D */
+   /* ============================= */
+/* HEADER MODERNO Y 3D - FLORISTERÍA */
 /* ============================= */
 .header {
     text-align: center;
-    padding: 40px 20px; /* Más espacio para que luzca */
+    padding: 40px 20px;
     background: linear-gradient(135deg, #1a1a1a, #4a4a4a);
     color: white;
     position: relative;
@@ -33,12 +33,11 @@
 .header h1 {
     margin: 0;
     font-family: 'Montserrat', sans-serif;
-    font-size: 38px; /* Más grande */
+    font-size: 38px;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: #ffffff;
     
-    /* EFECTO 3D PERMANENTE */
     text-shadow: 
         0 1px 0 #ccc,
         0 2px 0 #c9c9c9,
@@ -54,35 +53,37 @@
         0 20px 20px rgba(0,0,0,.15);
 }
 
-/* ESLOGAN EN CURSIVA ELEGANTE */
+/* ESLOGAN EN CURSIVA DORADA */
 .eslogan {
     font-family: 'Dancing Script', cursive;
-    font-size: 22px; /* Un poco más grande para que se lea bien */
-    color: #fbbf24; /* Color dorado para resaltar */
+    font-size: 24px; 
+    color: #fbbf24;
     margin-top: 10px;
     margin-bottom: 20px;
-    opacity: 1; /* Que se vea claro */
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
-/* CONTENEDOR DE PUBLICIDAD CON ANIMACIÓN */
+/* CONTENEDOR DE PUBLICIDAD (INFO DESTACADA) */
 .banner-informativo {
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     perspective: 1000px;
+    width: 100%;
 }
 
-.banner-informativo-texto {
+/* ESTA ES LA CLASE QUE ANTES NO COINCIDÍA */
+.texto-destacado {
     font-family: 'Montserrat', sans-serif;
     color: #fbbf24;
     font-weight: 900;
     text-transform: uppercase;
     font-size: 22px;
     letter-spacing: 3px;
+    text-align: center;
     
-    /* EFECTO 3D EN LA PUBLICIDAD */
+    /* EFECTO 3D EN EL TEXTO ANIMADO */
     text-shadow: 
         0 1px 0 #b48608,
         0 2px 0 #8d6906,
@@ -94,12 +95,13 @@
     transform-style: preserve-3d;
 }
 
+/* ANIMACIÓN */
 @keyframes drop-3d-header {
     0% { opacity: 0; transform: translateY(-30px) rotateX(-70deg); }
     10% { opacity: 1; transform: translateY(0) rotateX(0deg); }
     15% { transform: translateY(-5px); }
     20% { transform: translateY(0); }
-    85% { opacity: 1; transform: translateY(0) scale(1.1); } /* Crece un poquito al final */
+    85% { opacity: 1; transform: translateY(0) scale(1.1); }
     95% { opacity: 0; transform: translateY(20px) rotateX(40deg); }
     100% { opacity: 0; }
 }
@@ -351,6 +353,7 @@
                    // Asignación con verificaciones (Safe Assignment)
 // Asignación de textos normales
 document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
+document.title = perfil.nombreEmpresa;
 document.getElementById("eslogan").innerText = perfil.eslogan;
 
 // Cambio de ID para evitar bloqueadores de anuncios en PC
