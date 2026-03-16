@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda</title>
-
+    <title>Mi Tienda En linea</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <style>
         /* ============================= */
         /* GENERAL */
@@ -17,94 +17,91 @@
             color: #333;
         }
 
-     /* ============================= */
-/* HEADER CON PUBLICIDAD INTEGRADA - FIX NAVEGADOR */
+    /* ============================= */
+/* HEADER MODERNO Y 3D */
 /* ============================= */
 .header {
     text-align: center;
-    padding: 25px 20px;
-    background: linear-gradient(135deg, #181818, #5f5f5f);
+    padding: 40px 20px; /* Más espacio para que luzca */
+    background: linear-gradient(135deg, #1a1a1a, #4a4a4a);
     color: white;
     position: relative;
     overflow: hidden;
 }
 
+/* NOMBRE DE LA EMPRESA EN 3D */
 .header h1 {
     margin: 0;
-    font-size: 28px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 38px; /* Más grande */
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
+    color: #ffffff;
+    
+    /* EFECTO 3D PERMANENTE */
+    text-shadow: 
+        0 1px 0 #ccc,
+        0 2px 0 #c9c9c9,
+        0 3px 0 #bbb,
+        0 4px 0 #b9b9b9,
+        0 5px 0 #aaa,
+        0 6px 1px rgba(0,0,0,.1),
+        0 0 5px rgba(0,0,0,.1),
+        0 1px 3px rgba(0,0,0,.3),
+        0 3px 5px rgba(0,0,0,.2),
+        0 5px 10px rgba(0,0,0,.25),
+        0 10px 10px rgba(0,0,0,.2),
+        0 20px 20px rgba(0,0,0,.15);
 }
 
+/* ESLOGAN EN CURSIVA ELEGANTE */
 .eslogan {
-    opacity: .8;
-    margin-top: 4px;
-    font-size: 14px;
-    margin-bottom: 10px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 22px; /* Un poco más grande para que se lea bien */
+    color: #fbbf24; /* Color dorado para resaltar */
+    margin-top: 10px;
+    margin-bottom: 20px;
+    opacity: 1; /* Que se vea claro */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
-/* Contenedor corregido */
+/* CONTENEDOR DE PUBLICIDAD CON ANIMACIÓN */
 .publicidad-integrada {
-    height: 45px; /* Un poco más de aire */
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    perspective: 1200px;
-    width: 100%;
-    position: relative;
-    margin-top: 5px;
+    perspective: 1000px;
 }
 
 .publicidad-texto {
+    font-family: 'Montserrat', sans-serif;
     color: #fbbf24;
     font-weight: 900;
     text-transform: uppercase;
-    font-size: 20px; /* Un poco más grande para PC */
-    letter-spacing: 2px;
-    width: 100%;
-    display: block; /* Forzar renderizado */
+    font-size: 22px;
+    letter-spacing: 3px;
     
-    /* Efecto 3D con sombras más profundas */
+    /* EFECTO 3D EN LA PUBLICIDAD */
     text-shadow: 
         0 1px 0 #b48608,
         0 2px 0 #8d6906,
-        0 4px 8px rgba(0,0,0,0.5);
+        0 4px 8px rgba(0,0,0,0.6);
 
-    /* Propiedades críticas para navegadores Web */
+    animation: drop-3d-header 6s ease-in-out infinite;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform-style: preserve-3d;
-    
-    animation: drop-3d-header 6s ease-in-out infinite;
 }
 
-/* Animación optimizada para no desaparecer en el inicio */
 @keyframes drop-3d-header {
-    0% {
-        opacity: 0;
-        transform: translateY(-20px) rotateX(-70deg); /* Menos rotación inicial */
-    }
-    10% {
-        opacity: 1;
-        transform: translateY(0) rotateX(0deg);
-    }
-    15% {
-        transform: translateY(-5px);
-    }
-    20% {
-        transform: translateY(0);
-    }
-    85% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-    95% {
-        opacity: 0;
-        transform: translateY(15px) rotateX(20deg);
-    }
-    100% {
-        opacity: 0;
-    }
+    0% { opacity: 0; transform: translateY(-30px) rotateX(-70deg); }
+    10% { opacity: 1; transform: translateY(0) rotateX(0deg); }
+    15% { transform: translateY(-5px); }
+    20% { transform: translateY(0); }
+    85% { opacity: 1; transform: translateY(0) scale(1.1); } /* Crece un poquito al final */
+    95% { opacity: 0; transform: translateY(20px) rotateX(40deg); }
+    100% { opacity: 0; }
 }
         /* ============================= */
         /* PRODUCTOS GRID */
