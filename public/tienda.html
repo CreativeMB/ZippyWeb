@@ -879,13 +879,6 @@ function copiarLink(e) {
     } catch (err) {
         console.error('Error al copiar:', err);
     }
-
-    // LIMPIAMOS
-    document.body.removeChild(el);
-    if (seleccionado) {
-        document.getSelection().removeAllRanges();
-        document.getSelection().addRange(seleccionado);
-    }
 }
     </script>
 </body>
