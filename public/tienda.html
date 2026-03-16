@@ -24,72 +24,80 @@
 /* HEADER FONDO NEGRO PREMIUM                */
 /* ========================================= */
 .header-negro {
-    background-color: #000000; /* Negro total para máximo contraste */
-    padding: 60px 20px;
+    background-color: #0a0a0a; /* Negro profundo y elegante */
+    padding: 40px 20px 60px 20px;
     text-align: center;
-    border-bottom: 4px solid #D4AF37; 
+    font-family: 'Poppins', sans-serif;
+    border-bottom: 3px solid #D4AF37; /* Línea dorada al final del header */
 }
 
 /* ========================================= */
-/* TÍTULO - PLAYFAIR DISPLAY (LUJO)          */
+/* BANNER ANIMADO Y TEXTO DESTACADO          */
+/* ========================================= */
+.banner-informativo {
+    height: 40px;
+    margin-bottom: 20px;
+    perspective: 1000px;
+}
+
+.texto-destacado {
+    color: #E5C07B; /* Dorado suave */
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 16px;
+    letter-spacing: 2px;
+    animation: fade-in-out 5s ease-in-out infinite;
+}
+
+@keyframes fade-in-out {
+    0% { opacity: 0.2; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0.2; transform: scale(0.98); }
+}
+
+/* ========================================= */
+/* TÍTULO DE LA TIENDA (NOMBRE)              */
 /* ========================================= */
 .titulo-tienda {
     margin: 0;
-    font-family: 'Playfair Display', serif; /* Letra de revista de lujo */
-    font-size: 52px;
-    font-weight: 900;
-    color: #FFFFFF; 
-    letter-spacing: 2px;
-    line-height: 1.1;
-    
-    /* Efecto de relieve elegante */
-    text-shadow: 2px 2px 0px #D4AF37; 
+    font-size: 46px;
+    font-weight: 700;
+    color: #FAFAFA; /* Blanco humo, no lastima la vista */
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    /* Brillo sutil para que resalte sobre el negro */
+    text-shadow: 0px 4px 15px rgba(255, 255, 255, 0.15);
 }
 
 /* ========================================= */
-/* ESLOGAN - ORO VIBRANTE                    */
+/* ESLOGAN                                   */
 /* ========================================= */
 .eslogan-tienda {
-    font-family: 'Poppins', sans-serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: #FFD700; /* Oro brillante */
-    text-transform: uppercase;
-    letter-spacing: 4px;
-    margin-top: 15px;
-    margin-bottom: 40px;
+    font-size: 20px;
+    font-weight: 400;
+    color: #D4AF37; /* Oro clásico */
+    margin-top: 10px;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
 }
 
 /* ========================================= */
-/* DESCRIPCIÓN - MÁXIMA LEGIBILIDAD          */
+/* DESCRIPCIÓN DE LA EMPRESA                 */
 /* ========================================= */
 .descripcion-empresa {
-    max-width: 750px;
-    margin: 0 auto;
-    padding: 30px;
-    /* Un toque de brillo sutil de fondo */
-    background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0) 70%);
+    max-width: 800px; /* Evita que el texto sea muy ancho y difícil de leer */
+    margin: 0 auto; /* Centra el bloque de texto */
+    background: rgba(255, 255, 255, 0.03); /* Un recuadro casi transparente */
+    padding: 25px;
+    border-radius: 8px; /* Bordes redondeados modernos */
 }
 
 .descripcion-empresa p {
-    font-family: 'Poppins', sans-serif;
     margin: 0;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 300;
-    color: #E0E0E0; /* Blanco suave, muy legible */
-    line-height: 1.9; /* Espaciado generoso para que no canse */
-    text-align: center;
-}
-
-/* Texto del banner animado */
-.texto-destacado {
-    font-family: 'Poppins', sans-serif;
-    color: #D4AF37;
-    font-weight: 400;
-    font-size: 14px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
+    color: #B3B3B3; /* Gris plata: EL SECRETO PARA LEER BIEN EN FONDO NEGRO */
+    line-height: 1.8; /* Espacio entre líneas para dar "aire" a la lectura */
 }
         /* ============================= */
 /* PRODUCTOS GRID PROFESIONAL */
