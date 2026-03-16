@@ -150,6 +150,7 @@
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
     gap: 20px;
     padding: 20px;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 
@@ -171,12 +172,14 @@
     
     /* BLOQUEO DE PROPORCIÓN: Más alta que ancha (Retrato) */
     aspect-ratio: 3 / 4; 
+    object-fit: cover;
     
     /* Ajusta la imagen al tamaño sin dejar huecos */
     object-fit: fill; 
     
     display: block;
     margin: 0;
+    transition: transform 0.5s ease;
 }
 
 /* ETIQUETAS INTEGRADAS A LOS BORDES */
