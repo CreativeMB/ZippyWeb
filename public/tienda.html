@@ -37,64 +37,68 @@
             margin-top: 6px;
         }
 
-       /* ============================= */
-/* PUBLICIDAD - ESTILO 3D MODERNO */
+   /* ============================= */
+/* PUBLICIDAD - ESTILO 3D MEJORADO */
 /* ============================= */
 .publicidad-container {
     width: 100%;
-    background: #1a1a1a; /* Fondo oscuro para que resalte el 3D */
-    height: 50px;
+    background: #000000; /* Fondo negro puro para máximo contraste */
+    height: 60px; /* Un poco más alto para el 3D */
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    perspective: 1000px; /* Necesario para efectos 3D */
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    perspective: 1000px;
+    box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.2); /* Resplandor dorado tenue */
     border-bottom: 2px solid #fbbf24;
 }
 
 .publicidad-texto {
-    color: #fbbf24; /* Dorado moderno */
+    color: #fbbf24;
     font-weight: 900;
     text-transform: uppercase;
-    font-size: 18px;
-    letter-spacing: 2px;
+    font-size: 20px;
+    letter-spacing: 3px;
+    position: relative;
+    text-align: center;
     
-    /* EFECTO TEXTO 3D */
+    /* EFECTO TEXTO 3D REALISTA */
     text-shadow: 
-        0 1px 0 #997a00,
-        0 2px 0 #886c00,
-        0 3px 0 #775e00,
-        0 4px 0 #665100,
-        0 5px 10px rgba(0,0,0,0.5);
+        0 1px 0 #b48608,
+        0 2px 0 #8d6906,
+        0 3px 0 #6d5104,
+        0 4px 0 #4d3903,
+        0 6px 10px rgba(0,0,0,0.8);
 
-    /* ANIMACIÓN DE CAÍDA */
-    animation: drop-3d 5s ease-in-out infinite;
-    transform-origin: top center;
+    /* ANIMACIÓN DE CAÍDA FIJA AL CENTRO */
+    animation: drop-3d-fixed 6s ease-in-out infinite;
 }
 
-@keyframes drop-3d {
+@keyframes drop-3d-fixed {
     0% {
         opacity: 0;
-        transform: translateY(-50px) rotateX(-90deg);
+        transform: translateY(-60px) rotateX(-90deg);
     }
     10% {
         opacity: 1;
         transform: translateY(0) rotateX(0deg);
     }
     15% {
-        transform: translateY(-5px); /* Pequeño rebote */
+        transform: translateY(-8px); /* Rebote */
     }
     20% {
         transform: translateY(0);
     }
-    85% {
+    80% {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
+    90% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.5);
+    }
     100% {
         opacity: 0;
-        transform: translateY(20px) scale(0.8);
     }
 }
         /* ============================= */
@@ -289,14 +293,14 @@
         </div>
     </div>
 
-   <div class="footer">
+  <div class="footer">
     <p id="descripcion"></p>
     <p id="direccion"></p>
     <p id="ciudad"></p>
     <p id="telefono"></p>
     <p id="correo"></p>
-    <p style="margin-top:20px; font-size:13px; opacity:.7;">
-        © 2026 - <a href="https://zipy.carrd.co/" target="_blank" style="color:white; text-decoration:none; font-weight:bold;">Creado con Zippy</a>
+    <p style="margin-top:25px; font-size:13px; opacity:.8; border-top: 1px solid #333; padding-top: 20px;">
+        © 2026 - <a href="https://zipy.carrd.co/" target="_blank" style="color:#fbbf24; text-decoration:none; font-weight:bold;">Creado con Zippy</a>
     </p>
 </div>
 
