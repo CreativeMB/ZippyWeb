@@ -33,7 +33,7 @@
 .header h1 {
     margin: 0;
     font-family: 'Cormorant Garamond', serif;
-    font-size: 55px; /* Un poco más grande porque es una letra estilizada */
+    font-size: 45px; /* Un poco más grande porque es una letra estilizada */
     font-weight: 700;
     text-transform: capitalize; /* Cambiado: Se ve más premium que todo en mayúsculas */
     letter-spacing: 1px; /* Menos espacio entre letras para que se lea mejor */
@@ -141,92 +141,113 @@
     padding-top: 10px !important;
     border-top: 1px solid #222 !important;
 }
-        /* ============================= */
-/* PRODUCTOS GRID PROFESIONAL */
+ /* ============================= */
+/* PRODUCTOS GRID - MÁXIMA IMAGEN */
 /* ============================= */
-.productos {
-    padding: 20px; /* Reducido para aprovechar espacio */
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
-    gap: 20px; 
-    min-height: 350px;
-}
-
 .producto {
     background: #ffffff;
-    border-radius: 12px; /* Un poco más curvo se ve más premium */
-    border: 1px solid rgba(0,0,0,0.08);
-    padding: 0; /* ELIMINAMOS EL PADDING PARA QUE LA IMAGEN TOQUE LOS BORDES */
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.1);
+    padding: 0; /* Sin márgenes para que la imagen mande */
     text-align: center;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    opacity: 0;
-    transform: translateY(30px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.4s ease;
     position: relative;
-    overflow: hidden; /* Esto corta la imagen según el borde redondeado de la tarjeta */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-.producto.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.producto:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-    border-color: #34c274; /* Usando tu verde profesional */
-}
-
-/* IMAGEN DEL PRODUCTO - FORMATO RETRATO */
+/* IMAGEN ALTA (TIPO RETRATO) SIN RECORTAR */
 .producto img {
     width: 100%;
-    /* Ajustamos la altura para que sea más larga que ancha (Proporción Retrato) */
-    height: 400px; 
-    object-fit: cover; /* 'cover' es mejor que 'fill' para no estirar la cara de las personas o flores */
-    border-radius: 0; /* Que la imagen sea plana arriba para que encaje con el borde */
-    display: block; /* Quita espacios fantasmas abajo de la imagen */
-    transition: transform 0.5s ease;
+    height: 450px; /* Más alta para formato retrato */
+    /* 'contain' ajusta la imagen completa al contenedor sin recortar nada */
+    object-fit: contain; 
+    /* Fondo gris muy claro por si la imagen es más angosta que el cuadro */
+    background-color: #f9f9f9; 
+    display: block;
+    margin: 0 auto;
 }
 
-.producto:hover img {
-    transform: scale(1.08);
+/* REUBICACIÓN DE ETIQUETAS PARA QUE NO SE DAÑEN */
+.etiquetaPromo { 
+    position: absolute; 
+    top: 10px; 
+    left: 10px; 
+    background: #e53935; 
+    color: white; 
+    font-size: 12px; 
+    font-weight: bold;
+    padding: 6px 15px; 
+    border-radius: 4px; /* Un toque más cuadrado se ve más moderno */
+    z-index: 20; /* Prioridad máxima */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
-/* CONTENEDOR DE TEXTO - PEGADO Y SIN MÁRGENES */
-.info-contenedor {
-    padding: 12px; /* Solo un pequeño respiro para el texto */
-    background: #fff;
+.etiquetaAgotado { 
+    position: absolute; 
+    top: 10px; 
+    right: 10px; 
+    background: rgba(0,0,0,0.8); 
+    color: white; 
+    font-size: 11px; 
+    padding: 6px 15px; 
+    border-radius: 4px;
+    z-index: 20;
 }
 
+/* ÁREA DE TEXTO COMPACTA */
 .nombre { 
     font-family: 'Montserrat', sans-serif;
     font-weight: 700; 
-    margin: 0; /* Sin márgenes arriba */
-    font-size: 15px; 
+    margin: 10px 10px 0 10px; 
+    font-size: 16px; 
     color: #333;
-    text-transform: capitalize;
+    line-height: 1.2;
 }
 
 .precio { 
     color: #111; 
-    font-size: 20px; 
+    font-size: 22px; 
     font-weight: 800; 
-    margin: 2px 0 8px 0; /* Muy pegado al nombre */
+    margin: 5px 0 15px 0; /* Espacio limpio antes del final de la tarjeta */
 }
 
-/* BOTÓN AJUSTADO */
-.boton-comprar {
-    width: 100%;
-    padding: 10px;
-    margin: 0;
-    border: none;
-    background: #34c274;
-    color: white;
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 0 0 12px 12px; /* Redondeado solo abajo */
+.precioViejo { 
+    display: block; /* Para que aparezca arriba del precio nuevo y no estorbe */
+    text-decoration: line-through; 
+    color: #999; 
+    font-size: 14px;
 }
+
+/* ETIQUETAS (PROMO Y AGOTADO) */
+.etiquetaPromo { 
+    position: absolute; 
+    top: 15px; 
+    left: 15px; 
+    background: #e53935; 
+    color: white; 
+    font-size: 11px; 
+    font-weight: bold;
+    padding: 5px 12px; 
+    border-radius: 50px; /* Estilo píldora */
+    z-index: 10;
+    box-shadow: 0 4px 8px rgba(229, 57, 53, 0.3);
+}
+
+.etiquetaAgotado { 
+    position: absolute; 
+    top: 15px; 
+    right: 15px; 
+    background: rgba(0,0,0,0.7); 
+    backdrop-filter: blur(5px); /* Efecto cristal traslúcido */
+    color: white; 
+    font-size: 11px; 
+    padding: 5px 12px; 
+    border-radius: 50px;
+    z-index: 10;
+}
+
 /* BOTÓN DE WHATSAPP */
 .btn { 
     display: flex; 
