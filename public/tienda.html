@@ -17,13 +17,13 @@
             color: #333;
         }
 
-       /* ============================= */
-/* HEADER CON PUBLICIDAD INTEGRADA */
+     /* ============================= */
+/* HEADER CON PUBLICIDAD INTEGRADA - FIX NAVEGADOR */
 /* ============================= */
 .header {
     text-align: center;
     padding: 25px 20px;
-    background: linear-gradient(135deg, #afaeaf, #b3b3b3);
+    background: linear-gradient(135deg, #181818, #5f5f5f);
     color: white;
     position: relative;
     overflow: hidden;
@@ -40,47 +40,56 @@
     opacity: .8;
     margin-top: 4px;
     font-size: 14px;
-    margin-bottom: 15px; /* Espacio para la publicidad */
+    margin-bottom: 10px;
 }
 
-/* Contenedor interno de la publicidad */
+/* Contenedor corregido */
 .publicidad-integrada {
-    height: 40px;
+    height: 45px; /* Un poco más de aire */
     display: flex;
     align-items: center;
     justify-content: center;
-    perspective: 1000px;
+    perspective: 1200px;
+    width: 100%;
+    position: relative;
+    margin-top: 5px;
 }
 
 .publicidad-texto {
-    color: #fbbf24; /* Dorado para que resalte sobre el azul */
+    color: #fbbf24;
     font-weight: 900;
     text-transform: uppercase;
-    font-size: 18px;
+    font-size: 20px; /* Un poco más grande para PC */
     letter-spacing: 2px;
     width: 100%;
+    display: block; /* Forzar renderizado */
     
-    /* EFECTO 3D AJUSTADO PARA FONDO AZUL */
+    /* Efecto 3D con sombras más profundas */
     text-shadow: 
         0 1px 0 #b48608,
         0 2px 0 #8d6906,
-        0 4px 8px rgba(0,0,0,0.4);
+        0 4px 8px rgba(0,0,0,0.5);
 
-    animation: drop-3d-header 6s ease-in-out infinite;
+    /* Propiedades críticas para navegadores Web */
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    
+    animation: drop-3d-header 6s ease-in-out infinite;
 }
 
+/* Animación optimizada para no desaparecer en el inicio */
 @keyframes drop-3d-header {
     0% {
         opacity: 0;
-        transform: translateY(-30px) rotateX(-90deg);
+        transform: translateY(-20px) rotateX(-70deg); /* Menos rotación inicial */
     }
     10% {
         opacity: 1;
         transform: translateY(0) rotateX(0deg);
     }
     15% {
-        transform: translateY(-5px); /* Pequeño rebote */
+        transform: translateY(-5px);
     }
     20% {
         transform: translateY(0);
@@ -91,13 +100,12 @@
     }
     95% {
         opacity: 0;
-        transform: translateY(15px);
+        transform: translateY(15px) rotateX(20deg);
     }
     100% {
         opacity: 0;
     }
 }
-
         /* ============================= */
         /* PRODUCTOS GRID */
         /* ============================= */
