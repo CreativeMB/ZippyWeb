@@ -136,13 +136,13 @@
 /* PRODUCTOS GRID PROFESIONAL */
 /* ============================= */
 .productos {
-    padding: 30px 20px;
+    padding: 20px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* Un poco más anchas para que luzcan */
-    gap: 25px; /* Más espacio entre tarjetas */
+    /* Bajamos de 240px a 180px para que las tarjetas sean más pequeñas y elegantes */
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+    gap: 15px; /* Menos espacio entre ellas para aprovechar el ancho */
     min-height: 300px;
 }
-
 .producto {
     background: #ffffff;
     border-radius: 20px; /* Bordes más redondeados y modernos */
