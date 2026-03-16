@@ -17,118 +17,87 @@
             color: #333;
         }
 
- /* ============================= */
-/* HEADER MODERNO Y ELEGANTE - TIENDA DE REGALOS */
-/* ============================= */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap');
+ /* Importamos fuente moderna y súper legible */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-.header {
+/* ========================================= */
+/* HEADER FONDO NEGRO PREMIUM                */
+/* ========================================= */
+.header-negro {
+    background-color: #0a0a0a; /* Negro profundo y elegante */
+    padding: 40px 20px 60px 20px;
     text-align: center;
-    padding: 50px 20px;
-    /* Un degradado oscuro más profundo y elegante (tipo carbón) */
-    background: linear-gradient(135deg, #2c3e50, #1a1a1a);
-    color: white;
-    position: relative;
-    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    border-bottom: 3px solid #D4AF37; /* Línea dorada al final del header */
 }
 
-/* NOMBRE DE LA EMPRESA - ESTILO PREMIUM Y PROFESIONAL */
-.header h1 {
-    margin: 0;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 42px;
+/* ========================================= */
+/* BANNER ANIMADO Y TEXTO DESTACADO          */
+/* ========================================= */
+.banner-informativo {
+    height: 40px;
+    margin-bottom: 20px;
+    perspective: 1000px;
+}
+
+.texto-destacado {
+    color: #E5C07B; /* Dorado suave */
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 4px;
-    color: #ffffff;
-    
-    /* Efecto 3D sutil y moderno (sin verse exagerado) */
-    text-shadow: 
-        2px 2px 0px #aaa,
-        4px 4px 10px rgba(0, 0, 0, 0.4),
-        0px 0px 20px rgba(255, 255, 255, 0.1);
-}
-
-/* ESLOGAN - LEGIBLE, MODERNO Y AMIGABLE */
-.eslogan {
-    font-family: 'Poppins', sans-serif; /* Tipografía limpia y moderna */
-    font-weight: 300; /* Letra delgada para contrastar con el título */
-    font-size: 22px; 
-    color: #E5C07B; /* Oro Champaña moderno */
-    letter-spacing: 1px;
-    margin-top: 15px;
-    margin-bottom: 25px;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
-}
-
-/* CONTENEDOR DE PUBLICIDAD (INFO DESTACADA) */
-.banner-informativo {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 1000px;
-    width: 100%;
-}
-
-/* TEXTO ANIMADO - IMPACTANTE PERO CLARO */
-.texto-destacado {
-    font-family: 'Montserrat', sans-serif;
-    color: #D4AF37; /* Oro clásico elegante */
-    font-weight: 900;
-    text-transform: uppercase;
-    font-size: 20px;
+    font-size: 16px;
     letter-spacing: 2px;
-    text-align: center;
-    
-    /* Sombra profesional */
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
-
-    animation: drop-3d-header 6s ease-in-out infinite;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform-style: preserve-3d;
+    animation: fade-in-out 5s ease-in-out infinite;
 }
 
-/* ANIMACIÓN (Suavizada para verse más natural) */
-@keyframes drop-3d-header {
-    0% { opacity: 0; transform: translateY(-20px) rotateX(-45deg); }
-    10% { opacity: 1; transform: translateY(0) rotateX(0deg); }
-    15% { transform: translateY(-3px); }
-    20% { transform: translateY(0); }
-    85% { opacity: 1; transform: translateY(0) scale(1.05); }
-    95% { opacity: 0; transform: translateY(15px) rotateX(30deg); }
-    100% { opacity: 0; }
+@keyframes fade-in-out {
+    0% { opacity: 0.2; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0.2; transform: scale(0.98); }
 }
 
-/* ============================= */
-/* ESTILO ELEGANTE PARA EL FOOTER */
-/* ============================= */
-.footer {
-    background: #151515; /* Un negro un poco más suave */
-    color: white;
-    padding: 50px 20px;
-    text-align: center;
-    border-top: 2px solid #E5C07B; /* Línea decorativa dorada */
+/* ========================================= */
+/* TÍTULO DE LA TIENDA (NOMBRE)              */
+/* ========================================= */
+.titulo-tienda {
+    margin: 0;
+    font-size: 46px;
+    font-weight: 700;
+    color: #FAFAFA; /* Blanco humo, no lastima la vista */
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    /* Brillo sutil para que resalte sobre el negro */
+    text-shadow: 0px 4px 15px rgba(255, 255, 255, 0.15);
 }
 
-.info-footer-elegante {
-    font-family: 'Poppins', sans-serif; /* Sin cursiva, muy fácil de leer */
+/* ========================================= */
+/* ESLOGAN                                   */
+/* ========================================= */
+.eslogan-tienda {
+    font-size: 20px;
     font-weight: 400;
-    color: #E5C07B; 
-    font-size: 16px; /* Tamaño perfecto para pantallas pequeñas */
-    margin: 12px 0;
-    letter-spacing: 0.5px;
-    line-height: 1.6;
+    color: #D4AF37; /* Oro clásico */
+    margin-top: 10px;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
 }
 
-/* Ajuste especial para la descripción si es muy larga */
-#descripcion.info-footer-elegante {
-    font-size: 15px;
+/* ========================================= */
+/* DESCRIPCIÓN DE LA EMPRESA                 */
+/* ========================================= */
+.descripcion-empresa {
+    max-width: 800px; /* Evita que el texto sea muy ancho y difícil de leer */
+    margin: 0 auto; /* Centra el bloque de texto */
+    background: rgba(255, 255, 255, 0.03); /* Un recuadro casi transparente */
+    padding: 25px;
+    border-radius: 8px; /* Bordes redondeados modernos */
+}
+
+.descripcion-empresa p {
+    margin: 0;
+    font-size: 16px;
     font-weight: 300;
-    color: #cccccc; /* Gris claro para diferenciar la descripción del título */
-    max-width: 700px;
-    margin: 0 auto 20px auto;
+    color: #B3B3B3; /* Gris plata: EL SECRETO PARA LEER BIEN EN FONDO NEGRO */
+    line-height: 1.8; /* Espacio entre líneas para dar "aire" a la lectura */
 }
         /* ============================= */
 /* PRODUCTOS GRID PROFESIONAL */
