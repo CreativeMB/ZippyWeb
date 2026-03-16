@@ -380,6 +380,14 @@ body {
     transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
+.link-copy:hover { 
+    background: #4a5568 !important; 
+    border-color: #4a5568 !important; 
+}
+/* Asegura que el icono de la cadena se vea blanco */
+.icono-red i {
+    color: white !important;
+}
 
 /* Colores de marca al pasar el mouse */
 .facebook:hover { background: #1877F2; border-color: #1877F2; }
@@ -463,8 +471,7 @@ body {
     <div id="eslogan" class="eslogan"></div>
     
     <div class="compartir-contenedor">
-        <p class="texto-compartir">Recomienda esta tienda:</p>
-        <div class="redes-header">
+    <div class="redes-header">
             <a href="#" id="shareFB" target="_blank" class="icono-red facebook">
                 <i class="fab fa-facebook-f"></i>
             </a>
