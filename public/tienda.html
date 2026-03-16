@@ -793,9 +793,9 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             fechaRegistro: new Date().toLocaleDateString(),
             horaRegistro: new Date().toLocaleTimeString(),
             notificado: false,
-            color: "#C8E6C9", // Puedes dejarlo fijo o dinámico
-            correo: "nandram@hotmail.com" // O capturarlo de un input si lo prefieres
-        };
+            color: "", 
+            correo: ""
+            };
 
         set(nuevoRef, pedidoObj).then(() => {
             alert("✅ Pedido enviado correctamente continuamos por WhatsApp");
