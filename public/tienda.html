@@ -57,48 +57,56 @@
     margin-bottom: 25px;
     text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
 }
-/* CONTENEDOR DE PUBLICIDAD (INFO DESTACADA) */
+/* CONTENEDOR DE PUBLICIDAD */
 .banner-informativo {
     display: flex;
     align-items: center;
     justify-content: center;
     perspective: 1000px;
     width: 100%;
-    
-    /* CAMBIOS CLAVE: */
-    height: auto;           /* Permite que crezca según el texto */
-    min-height: 30px;       /* Un mínimo pequeño para que no desaparezca */
-    padding: 10px 0;        /* Margen interno pequeño arriba y abajo */
-    overflow: hidden;       /* Evita desbordes si el texto es muy grande */
+    height: auto;
+    min-height: 40px; /* Aumentado un poco para dar espacio al movimiento */
+    padding: 5px 0;
+    margin: 0;
+    /* Quitamos overflow: hidden temporalmente si la letra desaparece al subir */
 }
-/* TEXTO ANIMADO - IMPACTANTE PERO CLARO */
+
+/* TEXTO ANIMADO */
 .texto-destacado {
+    display: inline-block; /* CRUCIAL: Las animaciones de transformación requieren esto */
     font-family: 'Montserrat', sans-serif;
-    color: #000000; /* Oro clásico elegante */
+    color: #000000;
     font-weight: 900;
     text-transform: uppercase;
     font-size: 20px;
     letter-spacing: 2px;
     text-align: center;
-    
-    /* Sombra profesional */
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
 
+    /* Asegúrate que el nombre coincida con el @keyframes */
     animation: drop-3d-header 6s ease-in-out infinite;
+    
+    /* Propiedades para fluidez */
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform-style: preserve-3d;
+    will-change: transform, opacity; /* Ayuda al navegador a preparar la animación */
 }
 
-/* ANIMACIÓN (Suavizada para verse más natural) */
+/* ANIMACIÓN REVISADA */
 @keyframes drop-3d-header {
-    0% { opacity: 0; transform: translateY(-20px) rotateX(-45deg); }
-    10% { opacity: 1; transform: translateY(0) rotateX(0deg); }
-    15% { transform: translateY(-3px); }
-    20% { transform: translateY(0); }
-    85% { opacity: 1; transform: translateY(0) scale(1.05); }
-    95% { opacity: 0; transform: translateY(15px) rotateX(30deg); }
-    100% { opacity: 0; }
+    0% { 
+        opacity: 0; 
+        transform: translateY(-15px) rotateX(-45deg); 
+    }
+    10%, 85% { 
+        opacity: 1; 
+        transform: translateY(0) rotateX(0deg); 
+    }
+    95%, 100% { 
+        opacity: 0; 
+        transform: translateY(15px) rotateX(45deg); 
+    }
 }
 
 /* ========================================= */
