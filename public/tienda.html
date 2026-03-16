@@ -38,13 +38,13 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 4px;
-    color: #52a85e;
+    color: #ffffff;
     
     /* Efecto 3D sutil y moderno (sin verse exagerado) */
     text-shadow: 
-        2px 2px 0px #00ff4c,
-        4px 4px 10px rgba(0, 0, 0, 0.4),
-        0px 0px 20px rgba(255, 255, 255, 0.1);
+        2px 2px 0px #15a841,
+        4px 4px 10px rgba(65, 55, 55, 0.4),
+        0px 0px 20px rgba(26, 25, 25, 0.1);
 }
 
 /* ESLOGAN - LEGIBLE, MODERNO Y AMIGABLE */
@@ -52,7 +52,7 @@
     font-family: 'Poppins', sans-serif; /* Tipografía limpia y moderna */
     font-weight: 300; /* Letra delgada para contrastar con el título */
     font-size: 22px; 
-    color: #4ea36b; /* Oro Champaña moderno */
+    color: #4ea36b; 
     letter-spacing: 1px;
     margin-top: 5px;
     margin-bottom: 25px;
@@ -61,14 +61,18 @@
 
 /* CONTENEDOR DE PUBLICIDAD (INFO DESTACADA) */
 .banner-informativo {
-    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
     perspective: 1000px;
     width: 100%;
+    
+    /* CAMBIOS CLAVE: */
+    height: auto;           /* Permite que crezca según el texto */
+    min-height: 30px;       /* Un mínimo pequeño para que no desaparezca */
+    padding: 10px 0;        /* Margen interno pequeño arriba y abajo */
+    overflow: hidden;       /* Evita desbordes si el texto es muy grande */
 }
-
 /* TEXTO ANIMADO - IMPACTANTE PERO CLARO */
 .texto-destacado {
     font-family: 'Montserrat', sans-serif;
