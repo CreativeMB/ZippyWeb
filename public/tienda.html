@@ -826,15 +826,37 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
     }
 });
 
-// Función para copiar el link
 function copiarLink(e) {
     e.preventDefault();
     const urlActual = window.location.href;
-    navigator.clipboard.writeText(urlActual).then(() => {
-        alert("✅ Enlace de la tienda copiado.");
-    }).catch(err => {
-        console.error('Error al copiar: ', err);
-    });
+
+    // Intento 1: Método moderno
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(urlActual).then(() => {
+            alert("✅ Enlace copiado. ¡Pégalo en tu Instagram!");
+        }).catch(err => {
+            metodoAntiguo(urlActual);
+        });
+    } else {
+        // Intento 2: Método para navegadores viejos o sitios sin HTTPS
+        metodoAntiguo(urlActual);
+    }
+}
+
+function metodoAntiguo(texto) {
+    const inputTemporal = document.createElement("input");
+    inputTemporal.value = texto;
+    document.body.appendChild(inputTemporal);
+    inputTemporal.select();
+    inputTemporal.setSelectionRange(0, 99999); // Para móviles
+
+    try {
+        document.execCommand("copy");
+        alert("✅ Enlace copiado. ¡Pégalo en tu Instagram!");
+    } catch (err) {
+        console.error("No se pudo copiar", err);
+    }
+    document.body.removeChild(inputTemporal);
 }
     </script>
 </body>
