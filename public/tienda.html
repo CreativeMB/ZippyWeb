@@ -142,8 +142,16 @@
     border-top: 1px solid #222 !important;
 }
  /* ============================= */
-/* TARJETA DE PRODUCTO OPTIMIZADA */
+/* GRID DE PRODUCTOS RESPONSIVO  */
 /* ============================= */
+.productos {
+    display: grid;
+    /* Esto hace que las tarjetas se acomoden solas en varias filas */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+    gap: 20px;
+    padding: 20px;
+}
+
 .producto {
     background: #ffffff;
     border-radius: 12px;
@@ -152,69 +160,64 @@
     text-align: center;
     position: relative;
     overflow: hidden;
-    /* Bloqueamos el ancho de la tarjeta para que no varíe */
-    width: 260px; 
-    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
 }
 
-/* CONTENEDOR DE LA IMAGEN CON MEDIDAS FIJAS */
+/* IMAGEN QUE SE AJUSTA AL CONTENEDOR */
 .producto img {
-    /* AQUÍ ASIGNAMOS EL TAMAÑO FIJO QUE SOLICITASTE */
-    width: 260px;   /* Mismo ancho que la tarjeta */
-    height: 380px;  /* Altura tipo retrato fija */
+    width: 100%; /* Ocupa todo el ancho de la tarjeta */
     
-    /* 'fill' obliga a la imagen a ocupar todo el cuadro */
-    /* Si la foto no es retrato, se estirará para encajar */
+    /* BLOQUEO DE PROPORCIÓN: Más alta que ancha (Retrato) */
+    aspect-ratio: 3 / 4; 
+    
+    /* Ajusta la imagen al tamaño sin dejar huecos */
     object-fit: fill; 
     
     display: block;
-    border: none;
     margin: 0;
 }
 
+/* ETIQUETAS INTEGRADAS A LOS BORDES */
+.etiquetaPromo { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    background: #e53935; 
+    color: white; 
+    font-size: 11px; 
+    font-weight: bold;
+    padding: 8px 15px; 
+    border-radius: 0 0 12px 0; 
+    z-index: 5;
+}
 
-/* TEXTOS SIN MARGENES LATERALES PERO CON RESPIRACIÓN ABAJO */
+.etiquetaAgotado { 
+    position: absolute; 
+    top: 0;
+    right: 0;
+    background: rgba(0,0,0,0.7); 
+    color: white; 
+    font-size: 11px; 
+    padding: 8px 15px; 
+    border-radius: 0 0 0 12px;
+    z-index: 5;
+}
+
+/* TEXTO SIN MARGENES LATERALES PARA MÁXIMO ESPACIO */
 .nombre { 
     font-family: 'Montserrat', sans-serif;
     font-weight: 700; 
     font-size: 16px; 
     color: #333;
-    margin: 15px 5px 5px 5px; /* Un poco de margen superior tras la foto */
+    margin: 12px 5px 2px 5px; /* Pegado a la imagen */
 }
 
 .precio { 
     color: #111; 
-    font-size: 24px; 
+    font-size: 22px; 
     font-weight: 800; 
-    margin: 0 0 20px 0; /* Espacio final de la tarjeta */
-}
-
-/* ETIQUETAS (PROMO Y AGOTADO) */
-.etiquetaPromo { 
-    position: absolute; 
-    top: 15px; 
-    left: 15px; 
-    background: #e53935; 
-    color: white; 
-    font-size: 11px; 
-    font-weight: bold;
-    padding: 5px 12px; 
-    border-radius: 50px; /* Estilo píldora */
-    z-index: 10;
-    box-shadow: 0 4px 8px rgba(229, 57, 53, 0.3);
-}
-
-.etiquetaAgotado { 
-    position: absolute; 
-    top: 15px; 
-    right: 15px; 
-    background: rgba(0,0,0,0.7); 
-    backdrop-filter: blur(5px); /* Efecto cristal traslúcido */
-    color: white; 
-    font-size: 11px; 
-    padding: 5px 12px; 
-    border-radius: 50px;
-    z-index: 10;
+    margin: 0 0 15px 0; /* Espacio al final para que respire la tarjeta */
 }
 
 /* BOTÓN DE WHATSAPP */
