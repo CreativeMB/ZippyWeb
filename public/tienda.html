@@ -133,49 +133,127 @@
     opacity: 0.9;
 }
         /* ============================= */
-        /* PRODUCTOS GRID */
-        /* ============================= */
-        .productos {
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 18px;
-            min-height: 400px;
-        }
+/* PRODUCTOS GRID PROFESIONAL */
+/* ============================= */
+.productos {
+    padding: 30px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); /* Un poco más anchas para que luzcan */
+    gap: 25px; /* Más espacio entre tarjetas */
+    min-height: 400px;
+}
 
-        .producto {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-            padding: 10px;
-            text-align: center;
-            transition: .25s;
-            opacity: 0;
-            transform: translateY(20px);
-        }
+.producto {
+    background: #ffffff;
+    border-radius: 20px; /* Bordes más redondeados y modernos */
+    border: 1px solid rgba(0,0,0,0.05); /* Un borde casi invisible */
+    padding: 15px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animación suave */
+    opacity: 0;
+    transform: translateY(30px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+}
 
-        .producto.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+/* EFECTO AL PASAR EL MOUSE (HOVER) */
+.producto:hover {
+    transform: translateY(-10px); /* La tarjeta sube */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.12); /* Sombra más profunda */
+    border-color: #fbbf24; /* El borde se pone dorado */
+}
 
-        .producto img {
-            width: 100%;
-            height: 230px;
-            object-fit: contain;
-            border-radius: 10px;
-        }
+.producto.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 
-        .nombre { font-weight: 600; margin-top: 8px; font-size: 15px; }
-        .precio { color: #16a34a; font-size: 20px; font-weight: bold; }
-        .precioViejo { text-decoration: line-through; color: #999; font-size: 14px; }
+/* IMAGEN DEL PRODUCTO */
+.producto img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover; /* Cambiado a cover para que las flores llenen el espacio */
+    border-radius: 15px;
+    transition: transform 0.5s ease;
+}
 
-        .img-container { position: relative; }
-        .etiquetaPromo { position: absolute; top: 8px; left: 8px; background: #e53935; color: white; font-size: 12px; padding: 4px 8px; border-radius: 6px; }
-        .etiquetaAgotado { position: absolute; top: 8px; right: 8px; background: #424242; color: white; font-size: 12px; padding: 4px 8px; border-radius: 6px; }
+.producto:hover img {
+    transform: scale(1.05); /* La foto hace un pequeño zoom */
+}
 
-        .btn { display: inline-block; margin-top: 8px; background: #25D366; color: white; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 14px; cursor: pointer; }
+/* TEXTOS DENTRO DE LA TARJETA */
+.nombre { 
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700; 
+    margin-top: 15px; 
+    font-size: 16px; 
+    color: #333;
+    text-transform: capitalize;
+}
 
+.precio { 
+    color: #16a34a; 
+    font-size: 22px; 
+    font-weight: 800; 
+    margin: 8px 0;
+}
+
+.precioViejo { 
+    text-decoration: line-through; 
+    color: #a0a0a0; 
+    font-size: 14px; 
+    font-weight: 400;
+}
+
+/* ETIQUETAS (PROMO Y AGOTADO) */
+.etiquetaPromo { 
+    position: absolute; 
+    top: 15px; 
+    left: 15px; 
+    background: #e53935; 
+    color: white; 
+    font-size: 11px; 
+    font-weight: bold;
+    padding: 5px 12px; 
+    border-radius: 50px; /* Estilo píldora */
+    z-index: 10;
+    box-shadow: 0 4px 8px rgba(229, 57, 53, 0.3);
+}
+
+.etiquetaAgotado { 
+    position: absolute; 
+    top: 15px; 
+    right: 15px; 
+    background: rgba(0,0,0,0.7); 
+    backdrop-filter: blur(5px); /* Efecto cristal traslúcido */
+    color: white; 
+    font-size: 11px; 
+    padding: 5px 12px; 
+    border-radius: 50px;
+    z-index: 10;
+}
+
+/* BOTÓN DE WHATSAPP */
+.btn { 
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px; 
+    background: #25D366; 
+    color: white; 
+    padding: 12px; 
+    border-radius: 12px; 
+    text-decoration: none; 
+    font-weight: bold;
+    font-size: 14px; 
+    transition: background 0.3s;
+}
+
+.btn:hover {
+    background: #1da851;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+}
         /* ============================= */
         /* LOADER - BLOQUEO TOTAL */
         /* ============================= */
@@ -195,7 +273,7 @@
         .spinner {
             width: 50px; height: 50px;
             border: 5px solid #eee;
-            border-top: 5px solid #4f46e5;
+            border-top: 5px solid #242424;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
