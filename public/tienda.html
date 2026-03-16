@@ -382,10 +382,7 @@ body {
     transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
-.link-copy:hover { 
-    background: #4a5568 !important; 
-    border-color: #4a5568 !important; 
-}
+
 /* Asegura que el icono de la cadena se vea blanco */
 .icono-red i {
     color: white !important;
@@ -479,9 +476,6 @@ body {
             </a>
             <a href="#" id="shareWA" target="_blank" class="icono-red whatsapp-share">
                 <i class="fab fa-whatsapp"></i>
-            </a>
-            <a href="#" onclick="copiarLink(event)" class="icono-red link-copy">
-                <i class="fas fa-link"></i>
             </a>
         </div>
     </div>
@@ -843,21 +837,6 @@ function copiarLink(e) {
     }
 }
 
-function metodoAntiguo(texto) {
-    const inputTemporal = document.createElement("input");
-    inputTemporal.value = texto;
-    document.body.appendChild(inputTemporal);
-    inputTemporal.select();
-    inputTemporal.setSelectionRange(0, 99999); // Para móviles
-
-    try {
-        document.execCommand("copy");
-        alert("✅ Enlace copiado. ¡Pégalo en tu Instagram!");
-    } catch (err) {
-        console.error("No se pudo copiar", err);
-    }
-    document.body.removeChild(inputTemporal);
-}
     </script>
 </body>
 </html>
