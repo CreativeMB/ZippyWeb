@@ -232,13 +232,13 @@
         <p style="margin-top:15px; font-weight:bold; color:#4f46e5;">Cargando tienda...</p>
     </div>
 
-    <div class="header">
-        <h1 id="nombreEmpresa"></h1>
-        <div id="eslogan" class="eslogan"></div>
-        <div class="publicidad-integrada">
-        <div id="publicidad" class="publicidad-texto"></div>
+ <div class="header">
+    <h1 id="nombreEmpresa"></h1>
+    <div id="eslogan" class="eslogan"></div>
+    <div class="banner-informativo">
+        <div id="info-destacada" class="texto-destacado"></div>
     </div>
-    </div>
+</div>
 
     <div id="productos" class="productos"></div>
 
@@ -356,20 +356,15 @@
 document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
 document.getElementById("eslogan").innerText = perfil.eslogan;
 
-// FIX PARA PUBLICIDAD EN NAVEGADOR PC
-const campoPub = document.getElementById("publicidad");
-if (campoPub) {
-    // Primero asignamos el valor normal
-    campoPub.innerText = perfil.publicidad || "";
-    
-    // Forzamos al navegador a "despertar" el elemento tras 500ms
-    setTimeout(() => {
-        if (perfil.publicidad) {
-            campoPub.innerText = perfil.publicidad;
-            console.log("Publicidad forzada en PC:", perfil.publicidad);
-        }
-    }, 500);
+// Cambio de ID para evitar bloqueadores de anuncios en PC
+const campoInfo = document.getElementById("info-destacada");
+if (campoInfo) {
+    // Usamos exactamente 'publicidad' que es como está en tu Firebase
+    campoInfo.innerText = perfil.publicidad || ""; 
+    console.log("Dato de Firebase:", perfil.publicidad);
 }
+
+document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
 
 document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
 document.getElementById("direccion").innerText = "Dirección: " + perfil.direccion;
