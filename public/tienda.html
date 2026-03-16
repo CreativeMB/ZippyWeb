@@ -17,25 +17,86 @@
             color: #333;
         }
 
-        /* ============================= */
-        /* HEADER */
-        /* ============================= */
-        .header {
-            text-align: center;
-            padding: 30px 20px;
-            background: linear-gradient(135deg, #4f46e5, #6366f1);
-            color: white;
-        }
+       /* ============================= */
+/* HEADER CON PUBLICIDAD INTEGRADA */
+/* ============================= */
+.header {
+    text-align: center;
+    padding: 25px 20px;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
 
-        .header h1 {
-            margin: 0;
-            font-size: 28px;
-        }
+.header h1 {
+    margin: 0;
+    font-size: 28px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
 
-        .eslogan {
-            opacity: .9;
-            margin-top: 6px;
-        }
+.eslogan {
+    opacity: .8;
+    margin-top: 4px;
+    font-size: 14px;
+    margin-bottom: 15px; /* Espacio para la publicidad */
+}
+
+/* Contenedor interno de la publicidad */
+.publicidad-integrada {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+}
+
+.publicidad-texto {
+    color: #fbbf24; /* Dorado para que resalte sobre el azul */
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 18px;
+    letter-spacing: 2px;
+    width: 100%;
+    
+    /* EFECTO 3D AJUSTADO PARA FONDO AZUL */
+    text-shadow: 
+        0 1px 0 #b48608,
+        0 2px 0 #8d6906,
+        0 4px 8px rgba(0,0,0,0.4);
+
+    animation: drop-3d-header 6s ease-in-out infinite;
+    backface-visibility: hidden;
+}
+
+@keyframes drop-3d-header {
+    0% {
+        opacity: 0;
+        transform: translateY(-30px) rotateX(-90deg);
+    }
+    10% {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg);
+    }
+    15% {
+        transform: translateY(-5px); /* Pequeño rebote */
+    }
+    20% {
+        transform: translateY(0);
+    }
+    85% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    95% {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    100% {
+        opacity: 0;
+    }
+}
 
    /* ============================= */
 /* PUBLICIDAD - CORREGIDA (PC Y MÓVIL) */
@@ -232,6 +293,9 @@
     <div class="header">
         <h1 id="nombreEmpresa"></h1>
         <div id="eslogan" class="eslogan"></div>
+        <div class="publicidad-integrada">
+        <div id="publicidad" class="publicidad-texto"></div>
+    </div>
     </div>
 
     <div class="publicidad-container">
