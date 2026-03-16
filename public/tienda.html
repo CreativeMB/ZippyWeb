@@ -99,6 +99,7 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
     gap: 20px;
     padding: 20px;
+    
 }
 
 .producto {
@@ -111,6 +112,12 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    /* === ESTO CREA EL EFECTO DE ELEVACIÓN === */
+    /* Desplazamiento x=0, y=5px, desenfoque=15px, color=negro muy transparente */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); 
+    
+    /* (Opcional) Prepara la tarjeta para una animación suave en PC */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .producto img {
