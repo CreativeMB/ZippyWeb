@@ -189,12 +189,12 @@
     font-weight: 700; 
     margin-top: 15px; 
     font-size: 16px; 
-    color: #333;
+    color: #4e4e4e;
     text-transform: capitalize;
 }
 
 .precio { 
-    color: #16a34a; 
+    color: #222222; 
     font-size: 22px; 
     font-weight: 800; 
     margin: 8px 0;
@@ -361,7 +361,7 @@
 
             <div class="formulario">
                 <div class="fila2">
-                    <input id="productoAdicional" placeholder="Producto adicional (Opcional)">
+                    <input id="productoAdicional" placeholder="Vino, Chocolates, Globo, Peluches etc..">
                     <select id="medioPago">
                         <option value="">Medio de pago</option>
                          <option>Bre-Be</option>
@@ -376,15 +376,15 @@
                     <input id="celularComprador" placeholder="Celular comprador">
                 </div>
                 <div class="fila2">
-                    <input id="nombreDestinatario" placeholder="Nombre destinatario">
-                    <input id="celularDestinatario" placeholder="Celular destinatario">
+                    <input id="nombreDestinatario" placeholder="Nombre Quien Recibe">
+                    <input id="celularDestinatario" placeholder="Celular de quien recibe">
                 </div>
-                <input id="direccionEntrega" placeholder="Dirección entrega">
-                <textarea id="notasPedido" placeholder="Notas dirección"></textarea>
-                <textarea id="mensajeTarjeta" placeholder="Mensaje tarjeta"></textarea>
+                <input id="direccionEntrega" placeholder="Direccion de entrega Exacta Ejemplo, Calle 140a#132-21">
+                <textarea id="notasPedido" placeholder="Casa primer piso, torre 5 Apartamen 201, Conjunto, Productos adicionales, Peluche, Chocolates "></textarea>
+                <textarea id="mensajeTarjeta" placeholder="Mensaje que va impreso enla tarjeta del producto"></textarea>
                 <div class="fila2">
-                    <input id="deTarjeta" placeholder="De">
-                    <input id="paraTarjeta" placeholder="Para">
+                    <input id="deTarjeta" placeholder="Persona que Envia el Regalo">
+                    <input id="paraTarjeta" placeholder="Persona que recibe el Regalo">
                 </div>
                 <div class="fila2">
                     <input type="date" id="fechaEntrega">
@@ -395,6 +395,7 @@
                         <option>2PM-4PM</option>
                         <option>4PM-6PM</option>
                         <option>6PM-8PM</option>
+                         <option>8PM-10PM</option>
                     </select>
                 </div>
                 <button id="enviarPedidoBtn" onclick="enviarPedido()">Enviar pedido</button>
