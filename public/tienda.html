@@ -346,6 +346,38 @@
     line-height: 1;
 
 }
+/* ========================================= */
+/* DISEÑO PARA MÓVIL (PANTALLAS PEQUEÑAS)    */
+/* ========================================= */
+
+@media (max-width: 767px) {
+    .productos {
+        /* 2 Columnas exactas en móviles */
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .producto img {
+        /* AQUÍ LO PEDIDO: Imagen más alta en móvil */
+        aspect-ratio: 3 / 4; 
+        object-fit: cover;
+    }
+
+    .nombre {
+        font-size: 14px; /* Un poco más pequeño para el móvil */
+        margin: 6px 0 2px 0;
+    }
+
+    .precio {
+        font-size: 17px; /* Ajuste de precio para que no rompa el diseño */
+    }
+
+    .etiquetaPromo, .etiquetaAgotado {
+        font-size: 9px; /* Etiquetas más discretas */
+        padding: 5px 10px;
+    }
+}
 /* BOTÓN DE WHATSAPP */
 .btn { 
     display: flex; 
