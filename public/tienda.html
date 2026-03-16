@@ -18,102 +18,125 @@
         }
 
  /* ============================= */
-/* HEADER COMPACTO Y OPTIMIZADO  */
+/* HEADER MODERNO Y ELEGANTE - TIENDA DE REGALOS */
 /* ============================= */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap');
 .header {
     text-align: center;
-    /* Reducimos el padding superior a 20px para que el nombre suba */
-    padding: 20px 20px 30px 20px; 
+    padding: 50px 20px;
+    /* Dirección vertical: de arriba hacia abajo */
     background: linear-gradient(180deg, #000000 0%, #13b0bb 50%, #ffffff 100%);
     color: white;
     position: relative;
     overflow: hidden;
 }
-
-/* NOMBRE DE LA EMPRESA - MÁS PEGADO AL INICIO */
+/* NOMBRE DE LA EMPRESA - ESTILO PREMIUM Y PROFESIONAL */
 .header h1 {
-    margin: 0; /* Eliminamos cualquier margen externo */
+    margin: 0;
     font-family: 'Montserrat', sans-serif;
     font-size: 42px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 4px;
     color: #34c274;
-    line-height: 1; /* Ajustamos la altura de línea para quitar aire arriba/abajo */
-    text-shadow: 2px 2px 0px #10dd32, 4px 4px 10px rgba(65, 55, 55, 0.4);
+    /* Efecto 3D sutil y moderno (sin verse exagerado) */
+    text-shadow: 
+        2px 2px 0px #10dd32,
+        4px 4px 10px rgba(65, 55, 55, 0.4),
+        0px 0px 20px rgba(26, 25, 25, 0.1);
 }
 
-/* ESLOGAN - PEGADO AL NOMBRE */
+/* ESLOGAN - LEGIBLE, MODERNO Y AMIGABLE */
 .eslogan {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 300;
+    font-family: 'Poppins', sans-serif; /* Tipografía limpia y moderna */
+    font-weight: 300; /* Letra delgada para contrastar con el título */
     font-size: 22px; 
     color: #535353; 
     letter-spacing: 1px;
-    /* Bajamos el margen superior a casi 0 para pegarlo al H1 */
-    margin-top: 2px; 
-    /* Reducimos el margen inferior para pegarlo al banner */
-    margin-bottom: 10px; 
+    margin-top: 5px;
+    margin-bottom: 25px;
     text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
 }
-
-/* CONTENEDOR DE PUBLICIDAD - SIN MÁRGENES EXCESIVOS */
+/* CONTENEDOR DE PUBLICIDAD (INFO DESTACADA) */
 .banner-informativo {
     display: flex;
     align-items: center;
     justify-content: center;
     perspective: 1000px;
     width: 100%;
-    height: auto;
-    min-height: 20px; /* Reducido */
-    padding: 5px 0;   /* Padding mínimo para que no ocupe espacio de más */
-    margin: 0;        /* Sin márgenes externos */
+    
+    /* CAMBIOS CLAVE: */
+    height: auto;           /* Permite que crezca según el texto */
+    min-height: 30px;       /* Un mínimo pequeño para que no desaparezca */
+    padding: 10px 0;        /* Margen interno pequeño arriba y abajo */
+    overflow: hidden;       /* Evita desbordes si el texto es muy grande */
 }
-
-/* TEXTO ANIMADO */
+/* TEXTO ANIMADO - IMPACTANTE PERO CLARO */
 .texto-destacado {
     font-family: 'Montserrat', sans-serif;
-    color: #000000;
+    color: #000000; /* Oro clásico elegante */
     font-weight: 900;
     text-transform: uppercase;
     font-size: 20px;
     letter-spacing: 2px;
     text-align: center;
-    margin: 0; /* Aseguramos que el texto no empuje el contenedor */
-    line-height: 1.2;
+    
+    /* Sombra profesional */
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+
     animation: drop-3d-header 6s ease-in-out infinite;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
 }
 
-/* ============================= */
-/* ESTILO ELEGANTE PARA EL FOOTER */
-/* ============================= */
+/* ANIMACIÓN (Suavizada para verse más natural) */
+@keyframes drop-3d-header {
+    0% { opacity: 0; transform: translateY(-20px) rotateX(-45deg); }
+    10% { opacity: 1; transform: translateY(0) rotateX(0deg); }
+    15% { transform: translateY(-3px); }
+    20% { transform: translateY(0); }
+    85% { opacity: 1; transform: translateY(0) scale(1.05); }
+    95% { opacity: 0; transform: translateY(15px) rotateX(30deg); }
+    100% { opacity: 0; }
+}
+
+/* ========================================= */
+/* FOOTER COMPACTO Y PROFESIONAL             */
+/* ========================================= */
 .footer {
-    background: #151515; /* Un negro un poco más suave */
+    background: #000000; /* Fondo negro puro */
     color: white;
-    padding: 50px 20px;
+    padding: 15px 20px; /* Padding muy reducido arriba y abajo */
     text-align: center;
-    border-top: 2px solid #E5C07B; /* Línea decorativa dorada */
+    border-top: 2px solid #34c274; /* Combinando con tu color verde del header */
+    font-family: 'Poppins', sans-serif;
 }
 
+/* Info general del footer */
 .info-footer-elegante {
-    font-family: 'Poppins', sans-serif; /* Sin cursiva, muy fácil de leer */
-    font-weight: 400;
-    color: #E5C07B; 
-    font-size: 16px; /* Tamaño perfecto para pantallas pequeñas */
-    margin: 12px 0;
-    letter-spacing: 0.5px;
-    line-height: 1.6;
+    margin: 2px 0; /* Margen casi nulo entre líneas para ahorrar espacio */
+    font-size: 14px; /* Tamaño normal para datos de contacto */
+    color: #ffffff;
+    line-height: 1.2;
 }
-/* Ajuste especial para la descripción si es muy larga */
+
+/* DESCRIPCIÓN PEQUEÑA Y DISCRETA */
 #descripcion.info-footer-elegante {
-    font-size: 15px;
+    font-size: 12px; /* Letra más pequeña para la descripción */
+    color: #b3b3b3; /* Gris claro para que no distraiga tanto */
+    max-width: 600px;
+    margin: 0 auto 10px auto; /* Un poco de espacio solo abajo de la descripción */
+    line-height: 1.4;
     font-weight: 300;
-    color: #cccccc; /* Gris claro para diferenciar la descripción del título */
-    max-width: 700px;
-    margin: 0 auto 20px auto;
 }
 
-
+/* CRÉDITOS FINALES */
+.footer p[style*="margin-top:25px"] {
+    margin-top: 10px !important; /* Forzamos a que suba más */
+    padding-top: 10px !important;
+    border-top: 1px solid #222 !important;
+}
         /* ============================= */
 /* PRODUCTOS GRID PROFESIONAL */
 /* ============================= */
