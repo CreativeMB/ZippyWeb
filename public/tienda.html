@@ -245,7 +245,40 @@
     margin: 2px 0 0 0; /* Casi pegado al precio tachado */
     line-height: 1;
 }
+/* AJUSTES EXCLUSIVOS PARA CELULAR */
+@media (max-width: 480px) {
+    .productos {
+        /* Mantenemos 2 columnas para que no se vea gigante */
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 8px; /* Espacio mínimo entre tarjetas */
+        padding: 8px;
+    }
 
+    .producto img {
+        /* ESTO ESTIRA LA FOTO HACIA ABAJO */
+        /* Cambiamos de 3/4 a 2/3 para que sea mucho más alta */
+        aspect-ratio: 2 / 3; 
+        
+        /* 'fill' asegura que la imagen cubra todo el nuevo espacio alto */
+        object-fit: fill; 
+    }
+
+    /* Compactamos aún más el texto para que la foto sea la protagonista */
+    .nombre {
+        font-size: 13px;
+        margin: 5px 0 2px 0;
+        padding: 0 2px;
+    }
+
+    .precio {
+        font-size: 17px;
+        margin-bottom: 8px;
+    }
+
+    .precioViejo {
+        font-size: 11px;
+    }
+}
 /* BOTÓN DE WHATSAPP */
 .btn { 
     display: flex; 
