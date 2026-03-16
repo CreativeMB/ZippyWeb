@@ -346,46 +346,57 @@ body {
 }
 
 /* ========================================= */
-/* 8. DISEÑO RESPONSIVO (MÓVIL)              */
+/* 8 DISEÑO PARA MÓVIL (PANTALLAS PEQUEÑAS)    */
 /* ========================================= */
+
 @media screen and (max-width: 767px) {
     .productos {
-        grid-template-columns: repeat(2, 1fr) !important; 
-        gap: 10px !important;
-        padding: 10px !important;
+        grid-template-columns: repeat(2, 1fr) !important; /* Dos columnas */
+        gap: 15px !important; /* Más espacio entre tarjetas para que no choquen */
+        padding: 15px !important;
+        background-color: #f8f9fa; /* Un fondo ligeramente distinto para resaltar la tarjeta blanca */
+    }
+
+    .producto {
+        border: none !important; /* Quitamos el borde gris para que la sombra sea la protagonista */
+        border-radius: 15px !important; /* Bordes más redondeados se ven más modernos */
+        
+        /* SOMBRA MÁS ATRACTIVA PARA MÓVIL */
+        /* Un poco más profunda (8px) para que se note la elevación en pantallas pequeñas */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important; 
+        
+        background: #ffffff;
+        margin-bottom: 5px;
     }
 
     .producto img {
-        aspect-ratio: 3 / 4 !important; /* IMAGEN ALTA EN MÓVIL */
-        object-fit: fill !important;
-        height: auto !important;
-        display: block !important;
+        aspect-ratio: 3 / 4 !important; /* Menos alta como pediste */
+        border-radius: 15px 15px 0 0; /* Redondeamos solo las esquinas de arriba de la foto */
+        object-fit: cover !important;
     }
 
     .nombre {
         font-size: 13px !important;
-        margin: 5px 0 !important;
-        padding: 0 4px !important;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        color: #2c3e50; /* Un gris muy oscuro, más elegante que el negro puro */
+        margin: 10px 0 5px 0 !important;
+        font-weight: 600 !important; /* Letra un poco más gruesa */
+        padding: 0 8px !important;
     }
 
     .precio {
         font-size: 16px !important;
+        color: #111;
+        margin-bottom: 10px !important;
     }
 
+    /* BOTÓN MÁS ESTILIZADO */
     .btn {
-        margin: 10px 5px !important;
-        padding: 8px !important;
-        font-size: 12px !important;
-        border-radius: 8px !important;
-    }
-
-    .etiquetaPromo, .etiquetaAgotado {
-        font-size: 9px !important;
-        padding: 5px 10px !important;
+        margin: 0 10px 15px 10px !important; /* Espaciado interno para que no toque los bordes */
+        padding: 10px !important;
+        font-size: 11px !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 10px !important;
     }
 }
 
