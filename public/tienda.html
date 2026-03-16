@@ -675,6 +675,21 @@
     margin-bottom: 10px;
     border-radius: 4px;
 }
+#productoDescripcion {
+    /* 1. La más importante: respeta saltos de línea y ajusta el texto al ancho */
+    white-space: pre-wrap; 
+    
+    /* 2. Evita que palabras muy largas (o links) se salgan del modal */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+
+    /* 3. Mejora la lectura en pantallas pequeñas */
+    line-height: 1.5;
+    display: block;
+    
+    /* 4. Opcional: un margen para que no pegue con lo de abajo */
+    margin-bottom: 15px; 
+}
     </style>
 </head>
 
