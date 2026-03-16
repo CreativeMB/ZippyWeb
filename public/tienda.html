@@ -38,18 +38,18 @@
         }
 
    /* ============================= */
-/* PUBLICIDAD - ESTILO 3D MEJORADO */
+/* PUBLICIDAD - CORREGIDA (PC Y MÓVIL) */
 /* ============================= */
 .publicidad-container {
     width: 100%;
-    background: #000000; /* Fondo negro puro para máximo contraste */
-    height: 60px; /* Un poco más alto para el 3D */
+    background: #000000; 
+    height: 60px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center; /* Esto asegura que el texto esté al centro en PC */
     overflow: hidden;
     perspective: 1000px;
-    box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.2); /* Resplandor dorado tenue */
+    box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.2);
     border-bottom: 2px solid #fbbf24;
 }
 
@@ -59,10 +59,11 @@
     text-transform: uppercase;
     font-size: 20px;
     letter-spacing: 3px;
-    position: relative;
     text-align: center;
+    width: 100%; /* Obliga al navegador a renderizar el texto en su espacio */
+    display: block;
     
-    /* EFECTO TEXTO 3D REALISTA */
+    /* EFECTO TEXTO 3D */
     text-shadow: 
         0 1px 0 #b48608,
         0 2px 0 #8d6906,
@@ -70,21 +71,22 @@
         0 4px 0 #4d3903,
         0 6px 10px rgba(0,0,0,0.8);
 
-    /* ANIMACIÓN DE CAÍDA FIJA AL CENTRO */
+    /* ANIMACIÓN */
     animation: drop-3d-fixed 6s ease-in-out infinite;
+    backface-visibility: hidden; /* Ayuda a la fluidez en navegadores de PC */
 }
 
 @keyframes drop-3d-fixed {
     0% {
         opacity: 0;
-        transform: translateY(-60px) rotateX(-90deg);
+        transform: translateY(-50px) rotateX(-90deg);
     }
     10% {
         opacity: 1;
         transform: translateY(0) rotateX(0deg);
     }
     15% {
-        transform: translateY(-8px); /* Rebote */
+        transform: translateY(-8px);
     }
     20% {
         transform: translateY(0);
@@ -93,9 +95,9 @@
         opacity: 1;
         transform: translateY(0) scale(1);
     }
-    90% {
+    95% {
         opacity: 0;
-        transform: translateY(30px) scale(0.5);
+        transform: translateY(20px) scale(0.8);
     }
     100% {
         opacity: 0;
