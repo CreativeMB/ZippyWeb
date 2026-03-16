@@ -142,31 +142,22 @@
     border-top: 1px solid #222 !important;
 }
  /* ============================= */
-/* GRID RESPONSIVO PARA CELULAR  */
+/* GRID DE PRODUCTOS RESPONSIVO  */
 /* ============================= */
 .productos {
     display: grid;
-    /* En PC: tarjetas de mínimo 220px. En Celular: se ajustan solas */
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-    gap: 15px; /* Espacio entre tarjetas un poco más pequeño en celular */
-    padding: 15px;
+    /* Esto hace que las tarjetas se acomoden solas en varias filas */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+    gap: 20px;
+    padding: 20px;
 }
 
-/* Ajuste específico para pantallas muy pequeñas (celulares) */
-@media (max-width: 480px) {
-    .productos {
-        /* Obligamos a que salgan 2 columnas exactas para que no se vea una sola gigante */
-        grid-template-columns: repeat(2, 1fr); 
-        gap: 10px;
-        padding: 10px;
-    }
-}
 
 .producto {
     background: #ffffff;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid rgba(0,0,0,0.1);
-    padding: 0;
+    padding: 0; 
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -174,46 +165,60 @@
     flex-direction: column;
 }
 
-/* IMAGEN TIPO RETRATO (PROPORCIÓN FIJA) */
+/* IMAGEN QUE SE AJUSTA AL CONTENEDOR */
 .producto img {
-    width: 100%;
-    /* Relación 3:4 (Retrato profesional) */
+    width: 100%; /* Ocupa todo el ancho de la tarjeta */
+    
+    /* BLOQUEO DE PROPORCIÓN: Más alta que ancha (Retrato) */
     aspect-ratio: 3 / 4; 
+    
+    /* Ajusta la imagen al tamaño sin dejar huecos */
     object-fit: fill; 
+    
     display: block;
+    margin: 0;
 }
 
-/* ETIQUETAS PEQUEÑAS PARA CELULAR */
+/* ETIQUETAS INTEGRADAS A LOS BORDES */
 .etiquetaPromo { 
     position: absolute; 
-    top: 0; left: 0; 
+    top: 0; 
+    left: 0; 
     background: #e53935; 
     color: white; 
-    font-size: 10px; /* Un poco más pequeña para el móvil */
+    font-size: 11px; 
     font-weight: bold;
-    padding: 5px 10px; 
-    border-radius: 0 0 10px 0; 
+    padding: 8px 15px; 
+    border-radius: 0 0 12px 0; 
     z-index: 5;
 }
 
-/* TEXTOS AJUSTADOS PARA QUE NO SE DESBORDEN */
+.etiquetaAgotado { 
+    position: absolute; 
+    top: 0;
+    right: 0;
+    background: rgba(0,0,0,0.7); 
+    color: white; 
+    font-size: 11px; 
+    padding: 8px 15px; 
+    border-radius: 0 0 0 12px;
+    z-index: 5;
+}
+
+/* TEXTO SIN MARGENES LATERALES PARA MÁXIMO ESPACIO */
 .nombre { 
     font-family: 'Montserrat', sans-serif;
     font-weight: 700; 
-    font-size: 14px; /* Un punto menos para que quepa en el móvil */
+    font-size: 16px; 
     color: #333;
-    margin: 10px 5px 2px 5px;
-    /* Si el nombre es muy largo, pone puntos suspensivos */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin: 12px 5px 2px 5px; /* Pegado a la imagen */
 }
 
 .precio { 
     color: #111; 
-    font-size: 18px; 
+    font-size: 22px; 
     font-weight: 800; 
-    margin: 0 0 12px 0;
+    margin: 0 0 15px 0; /* Espacio al final para que respire la tarjeta */
 }
 
 /* BOTÓN DE WHATSAPP */
