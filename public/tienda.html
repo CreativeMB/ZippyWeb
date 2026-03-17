@@ -706,88 +706,80 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             });
         }
 
-      function escucharCambios(id) {
-    const productosRef = ref(db, id + "/productos");
-    onValue(productosRef, (snapshot) => {
-        productosRealtime = {};
-        mapaNormalizado = {};
+        function escucharCambios(id) {
+            const productosRef = ref(db, id + "/productos");
+            onValue(productosRef, (snapshot) => {
+                productosRealtime = {};
+                snapshot.forEach((child) => {
+                    const p = child.val();
+                    productosRealtime[p.referencia] = p;
+                });
+                render();
+            });
+        }
 
-        snapshot.forEach((child) => {
-            const p = child.val();
-
-            productosRealtime[p.referencia] = p;
-
-            // 🔥 CLAVE OPTIMIZADA
-            mapaNormalizado[normalizar(p.referencia)] = p;
-        });
-
-        render();
-    });
-}
-
-function normalizar(texto) {
-    return texto
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "") // tildes
-        .replace(/\bx\s*\d+\s*[a-z]*\b/g, "") // 🔥 elimina "x 100 g"
-        .replace(/\b(gramos|g|kg|ml|l)\b/g, "") // unidades
-        .replace(/\s+/g, "") 
-        .replace(/[^a-z0-9]/g, "");
-}
-function buscarProductoRealtime(nombreJson) {
-    return mapaNormalizado[normalizar(nombreJson)] || null;
-}
        function render() {
     const contenedor = document.getElementById("productos");
     contenedor.innerHTML = "";
 
-    let contador = 0; // 🔥 contar productos pintados
-
     for (const refP in productosJson) {
-
-        if (!refP || refP.toLowerCase() === "images") continue;
-
         const imgUrl = productosJson[refP];
-        const real = buscarProductoRealtime(refP);
-
-        if (!real) {
-            console.warn("No encontrado:", refP);
-            continue;
-        }
-
-        contador++; // 🔥 sí encontró producto
+        const real = productosRealtime[refP];
+        
+        if (!real) continue;
 
         const card = document.createElement("div");
         card.className = `producto ${real.agotado ? 'agotado' : ''}`;
-
+        
         const precioFinal = real.promocion ? real.valorPromocion : real.valor;
-        const precioTexto = formatearPrecio(precioFinal);
+        const precioTexto = formatearPrecio(precioFinal); // Guardamos el precio formateado ($10.000)
+        
+        const precioHTML = real.promocion ? 
+            `<div class="precio">${precioTexto}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>` : 
+            `<div class="precio">${precioTexto}</div>`;
+
+        // LÓGICA DEL BOTÓN Y WHATSAPP CON REFERENCIA Y PRECIO
+        let botonHTML = "";
+        if (real.agotado) {
+            botonHTML = `<div class="btn" style="background:#b2bec3; cursor:not-allowed;">Agotado</div>`;
+        } else {
+            // MENSAJE PERSONALIZADO: Incluye Nombre y Precio
+            const mensajeWa = encodeURIComponent(`Hola, me interesa este producto:\n📌 *Referencia:* ${refP}\n💰 *Precio:* ${precioTexto}\n\n¿Nesesito Informacion?`);
+            const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
+            
+            botonHTML = `<a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none;">Pedir por WhatsApp</a>`;
+        }
 
         card.innerHTML = `
             <div class="img-container">
-                <img src="${normalizarImagen(imgUrl)}">
+                ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+                <img src="${normalizarImagen(imgUrl)}" 
+                     ${real.agotado ? "" : `onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')"`} 
+                     style="${real.agotado ? 'filter: grayscale(100%); opacity: 0.7; cursor:default;' : 'cursor:pointer;'}">
             </div>
             <div class="nombre">${refP}</div>
-            <div class="precio">${precioTexto}</div>
+            ${precioHTML}
+            ${botonHTML}
         `;
-
         contenedor.appendChild(card);
     }
 
-    console.log("TOTAL PINTADOS:", contador);
-
-    // 🔥 OCULTAR LOADER SIEMPRE
-    const ld = document.getElementById("loader");
-    if (ld) {
-        ld.style.display = "none";
-    }
-
-    // 🔥 SI NO HAY PRODUCTOS, MOSTRAR MENSAJE
-    if (contador === 0) {
-        contenedor.innerHTML = "<p style='text-align:center;'>No hay productos disponibles</p>";
-    }
+    // Control del Loader para que se quite solo cuando todo está listo
+    setTimeout(() => {
+        document.querySelectorAll(".producto").forEach((el, i) => {
+            setTimeout(() => el.classList.add("visible"), i * 50);
+        });
+        
+        const ld = document.getElementById("loader");
+        if(ld){
+            ld.style.opacity = "0";
+            setTimeout(() => {
+                ld.style.display = "none";
+            }, 500);
+        }
+    }, 800);
 }
+
         function abrirProducto(nombre, imagen, precio, descripcion) {
             productoSeleccionado = nombre;
             imagenProducto = normalizarImagen(imagen);
