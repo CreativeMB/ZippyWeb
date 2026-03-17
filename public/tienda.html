@@ -699,12 +699,27 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             });
         });
 
-        function cargarProductosJSON(url) {
-            fetch(url).then(res => res.json()).then(data => {
-                productosJson = data;
-                render();
-            });
-        }
+      function cargarProductosJSON(contenido) {
+    if (!contenido) {
+        console.warn("⚠️ No hay datos de productos (json_datos) en el perfil.");
+        productosJson = {};
+        render();
+        return;
+    }
+
+    try {
+        // Si el contenido ya es un objeto (porque Firebase lo parseó), lo usamos.
+        // Si es un String (lo más probable), usamos JSON.parse.
+        productosJson = typeof contenido === 'string' ? JSON.parse(contenido) : contenido;
+        
+        console.log('✅ Catálogo cargado con éxito');
+        render();
+    } catch (e) {
+        console.error('❌ Error al procesar el JSON de productos:', e);
+        productosJson = {};
+        render();
+    }
+}
 
       function escucharCambios(id) {
     const productosRef = ref(db, id + "/productos");
