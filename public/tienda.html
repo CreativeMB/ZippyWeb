@@ -454,6 +454,70 @@ body {
         border-radius: 10px !important;
     }
 }
+/* ========================================= */
+/* 9. BUSCADOR FLOTANTE                      */
+/* ========================================= */
+.search-flotante {
+    position: fixed;
+    bottom: 90px; /* Lo ubicamos justo arriba del botón de WhatsApp */
+    right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 999;
+}
+
+.search-input {
+    width: 0;
+    opacity: 0;
+    padding: 0;
+    border: none;
+    border-radius: 30px;
+    background: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,.15);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.4s ease;
+    height: 45px;
+    pointer-events: none; /* Evita clics cuando está oculto */
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Estado activo: cuando el buscador se expande */
+.search-flotante.activo .search-input {
+    width: 220px; 
+    opacity: 1;
+    padding: 0 15px;
+    margin-right: 10px;
+    pointer-events: auto;
+}
+
+.search-btn {
+    background: #000000; /* Color oscuro y elegante */
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,.3);
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    font-size: 22px; 
+}
+
+.search-btn:hover {
+    background: #333333;
+    transform: scale(1.05); /* Pequeño efecto al pasar el mouse */
+}
+
+/* Ajuste sutil para celulares */
+@media screen and (max-width: 767px) {
+    .search-flotante.activo .search-input {
+        width: 180px; /* Un poco más corto para que no choque en pantallas pequeñas */
+    }
+}
 
     </style>
 </head>
@@ -556,7 +620,12 @@ body {
             </div>
         </div>
     </div>
-
+<div class="search-flotante" id="contenedorBusqueda">
+        <input type="text" id="inputBusqueda" class="search-input" placeholder="Buscar producto...">
+        <div class="search-btn" id="btnBusqueda">
+            <i class="fas fa-search"></i>
+        </div>
+    </div>
  <div class="footer">
     <p id="descripcion" class="info-footer-elegante"></p>
     <p id="direccion" class="info-footer-elegante"></p>
@@ -850,7 +919,43 @@ function copiarLink(e) {
         // Intento 2: Método para navegadores viejos o sitios sin HTTPS
         metodoAntiguo(urlActual);
     }
-}
+}// ==========================================
+        // LÓGICA DEL BUSCADOR FLOTANTE
+        // ==========================================
+        const btnBusqueda = document.getElementById('btnBusqueda');
+        const contenedorBusqueda = document.getElementById('contenedorBusqueda');
+        const inputBusqueda = document.getElementById('inputBusqueda');
+
+        // Abre y cierra el buscador al hacer clic en la lupa
+        btnBusqueda.addEventListener('click', () => {
+            contenedorBusqueda.classList.toggle('activo');
+            if(contenedorBusqueda.classList.contains('activo')){
+                inputBusqueda.focus(); // Enfoca automáticamente el teclado
+            } else {
+                inputBusqueda.value = ""; // Limpia la búsqueda si lo cierras
+                filtrarProductos(""); // Muestra todos los productos de nuevo
+            }
+        });
+
+        // Filtra los productos a medida que escribes
+        inputBusqueda.addEventListener('input', (e) => {
+            filtrarProductos(e.target.value.toLowerCase());
+        });
+
+        function filtrarProductos(texto) {
+            const productosCards = document.querySelectorAll('.producto');
+            productosCards.forEach(card => {
+                // Buscamos el nombre del producto dentro de la tarjeta
+                const nombreProducto = card.querySelector('.nombre').innerText.toLowerCase();
+                
+                // Si el nombre incluye el texto escrito, lo mostramos, si no, lo ocultamos
+                if(nombreProducto.includes(texto)){
+                    card.style.display = 'flex'; // Usamos flex porque así está tu diseño
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
 
     </script>
 </body>
