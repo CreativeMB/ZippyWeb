@@ -1,87 +1,141 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ZippyWeb</title>
-  <link rel="stylesheet" href="css/styles.css">
-
-  <!-- Firebase SDK compat (solo CDN) -->
-  <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-auth-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-database-compat.js"></script>
-
-  <!-- Inicialización y login -->
-  <script defer src="js/init.js"></script>
-  <script defer src="js/login.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zippy - Panel de Administración</title>
+    <style>
+        :root { --primary: #6200ee; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h1 { color: var(--primary); margin: 0; font-size: 1.5rem; }
+        
+        .btn-logout { background: #ff4757; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 800px) { .container { grid-template-columns: 1fr; } }
+        
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        h2 { border-bottom: 2px solid var(--bg); padding-bottom: 10px; font-size: 1.2rem; color: #333; }
+        
+        textarea { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-family: monospace; box-sizing: border-box; margin-bottom: 10px; }
+        .btn-save { background: var(--primary); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+        .product-info { display: flex; align-items: center; gap: 10px; }
+        .product-img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+    </style>
 </head>
 <body>
-  <div class="container" id="container">
-    <div class="card" id="cardLogin">
-      <img src="img/icono.png" alt="Logo Zippy" class="logo">
-      <h1 class="nombreEmpresa">Todo en un solo lugar</h1>
-      <h2 class="signInText">Zippy Administra tus finanzas</h2>
-      <p class="subTitle">Toca la tarjeta para continuar</p>
-      <button id="btnGoogle">Iniciar sesión con Google</button>
-      <div id="error-message" style="color: red; margin-top: 10px;"></div>
+
+    <div class="header">
+        <h1>Zippy Admin</h1>
+        <button class="btn-logout" id="btnCerrarSesion">Cerrar Sesión</button>
     </div>
-  </div>
 
-  <script>
-  document.addEventListener('DOMContentLoaded', function() {
+    <div class="container">
+        <div class="card">
+            <h2>Catálogo Maestro (JSON)</h2>
+            <p style="font-size: 0.85rem; color: #666;">Pega aquí el JSON con Referencias y URLs de Drive.</p>
+            <textarea id="jsonInput" placeholder='{"REF001": "https://drive.google.com/..."}'></textarea>
+            <button class="btn-save" id="btnGuardarJson">Actualizar Catálogo</button>
+        </div>
 
-    function esDispositivoMovil() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
+        <div class="card">
+            <h2>Productos con Precio/Stock</h2>
+            <div id="listaProductos">
+                <p>Cargando productos...</p>
+            </div>
+        </div>
+    </div>
 
-    const container = document.getElementById('container');
-    const card = document.getElementById('cardLogin');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // Aquí pondrás tu lógica real para saber si el usuario tiene empresa
-    const usuarioTieneEmpresa = false; // Cambiar según tu lógica real
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "zippy-727d5.firebaseapp.com",
+            databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
+            projectId: "zippy-727d5"
+        };
 
-    if (esDispositivoMovil()) {
-      // Ocultar tarjeta y mostrar aviso de descarga en móvil
-      card.style.display = 'none';
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
 
-      const avisoMovil = document.createElement('div');
-      avisoMovil.style.marginTop = '50px';
-      avisoMovil.style.padding = '20px';
-      avisoMovil.style.backgroundColor = '#e0f7fa';
-      avisoMovil.style.color = '#00796b';
-      avisoMovil.style.border = '1px solid #00796b';
-      avisoMovil.style.borderRadius = '10px';
-      avisoMovil.style.textAlign = 'center';
-      avisoMovil.style.fontWeight = 'bold';
-      avisoMovil.style.fontSize = '18px';
-      avisoMovil.innerHTML = `
-        <p>Estás en un dispositivo móvil.</p>
-        <p>Para continuar, descarga nuestra app:</p>
-        <a href="https://zipy.carrd.co/" target="_blank" style="color: blue; text-decoration: underline; font-size: 18px;">Descarga la app aquí</a>
-      `;
+        let empresaId = "";
 
-      container.appendChild(avisoMovil);
+        // --- 1. GUARDIÁN DE SESIÓN ---
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "/login";
+            } else {
+                empresaId = user.uid;
+                cargarDatosIniciales();
+                escucharProductos();
+            }
+        });
 
-    } else if (!usuarioTieneEmpresa) {
-      // En desktop, mostrar mensaje debajo de la tarjeta solo si no tiene empresa
-      const avisoDesktop = document.createElement('div');
-      avisoDesktop.style.marginTop = '20px';
-      avisoDesktop.style.padding = '15px';
-      avisoDesktop.style.backgroundColor = '#e0f7fa';
-      avisoDesktop.style.color = '#00796b';
-      avisoDesktop.style.border = '1px solid #00796b';
-      avisoDesktop.style.borderRadius = '8px';
-      avisoDesktop.style.textAlign = 'center';
-      avisoDesktop.style.fontWeight = 'bold';
-      avisoDesktop.innerHTML = `
-        <p>No tienes empresa registrada. Para crear una empresa y continuar, descarga nuestra app:</p>
-        <a href="https://zipy.carrd.co/" target="_blank" style="color: blue; text-decoration: underline; font-weight: bold;">Descarga la app aquí</a>
-      `;
+        // --- 2. CERRAR SESIÓN ---
+        document.getElementById("btnCerrarSesion").onclick = () => {
+            if(confirm("¿Seguro que desea salir?")) {
+                signOut(auth).then(() => window.location.href = "/login");
+            }
+        };
 
-      container.appendChild(avisoDesktop);
-    }
+        // --- 3. CARGAR JSON ACTUAL ---
+        async function cargarDatosIniciales() {
+            const snapshot = await get(ref(db, `${empresaId}/perfilempresa/json_datos`));
+            if (snapshot.exists()) {
+                document.getElementById("jsonInput").value = snapshot.val();
+            }
+        }
 
-  });
-  </script>
+        // --- 4. GUARDAR JSON ---
+        document.getElementById("btnGuardarJson").onclick = async () => {
+            const rawJson = document.getElementById("jsonInput").value;
+            try {
+                // Validamos que sea un JSON real antes de subir
+                JSON.parse(rawJson); 
+                await set(ref(db, `${empresaId}/perfilempresa/json_datos`), rawJson);
+                alert("Catálogo actualizado correctamente ✅");
+            } catch (e) {
+                alert("Error: El formato del JSON es inválido ❌");
+            }
+        };
+
+        // --- 5. LISTAR PRODUCTOS (REALTIME) ---
+        function escucharProductos() {
+            const prodRef = ref(db, `${empresaId}/productos`);
+            onValue(prodRef, (snapshot) => {
+                const contenedor = document.getElementById("listaProductos");
+                contenedor.innerHTML = "";
+                
+                if (!snapshot.exists()) {
+                    contenedor.innerHTML = "<p>No hay productos con precio aún.</p>";
+                    return;
+                }
+
+                snapshot.forEach((child) => {
+                    const p = child.val();
+                    const item = document.createElement("div");
+                    item.className = "product-item";
+                    item.innerHTML = `
+                        <div class="product-info">
+                            <img src="${p.imagenUrl}" class="product-img" onerror="this.src='https://via.placeholder.com/40'">
+                            <div>
+                                <strong>${p.referencia}</strong><br>
+                                <span style="color:green">$${p.valor}</span>
+                            </div>
+                        </div>
+                        <button onclick="alert('Usa la App Android para editar detalles específicos')" style="font-size: 0.7rem;">Info</button>
+                    `;
+                    contenedor.appendChild(item);
+                });
+            });
+        }
+    </script>
 </body>
 </html>
