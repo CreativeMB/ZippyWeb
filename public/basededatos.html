@@ -1330,22 +1330,24 @@ document.addEventListener('click', (e)=>{
 
 // --- CARGAR REFERENCIAS DE IMAGEN ---
 async function cargarReferenciasDesdeFirebase() {
+    // 1. Cambiamos urljason por json_datos
+    const snap = await db.ref(`${idEmpresa}/perfilempresa/json_datos`).once('value');
+    const contenidoJSON = snap.val();
 
-    const snap = await db.ref(`${idEmpresa}/perfilempresa/urljason`).once('value');
-    const urlJSON = snap.val();
-
-    if (!urlJSON) {
-        console.warn('⚠️ No hay urljason configurado');
+    if (!contenidoJSON) {
+        console.warn('⚠️ No hay catálogo (json_datos) en Firebase');
         referenciasDrive = {};
         return;
     }
 
     try {
-        const resp = await fetch(urlJSON);
-        referenciasDrive = await resp.json() || {};
-        console.log('✅ JSON Drive cargado', referenciasDrive);
+        // 2. Convertimos el texto directamente a objeto
+        // Si ya es un objeto, lo usamos; si no, lo parseamos.
+        referenciasDrive = typeof contenidoJSON === 'string' ? JSON.parse(contenidoJSON) : contenidoJSON;
+        
+        console.log('✅ Referencias de imágenes cargadas desde Realtime', referenciasDrive);
     } catch (e) {
-        console.error('❌ Error cargando JSON Drive', e);
+        console.error('❌ Error procesando el JSON de referencias', e);
         referenciasDrive = {};
     }
 }
@@ -1398,25 +1400,27 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 function obtenerImagenPedido(p){
     let url = '';
 
-    // 1️⃣ Usar imagen existente en el pedido
     if(p.imagenUrl && p.imagenUrl.trim() !== ''){
         url = p.imagenUrl;
     } 
-    // 2️⃣ Si no hay, usar la referencia del JSON
-    else if(p.referencia && referenciasDrive[p.referencia]){
-        url = referenciasDrive[p.referencia];
-    }
-
-    // 3️⃣ Normalizar URLs de Drive
-    if(url.includes('drive.google.com')){
-        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-        if(match && match[1]){
-            // URL directa para web/Android
-            return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+    else if(p.referencia){
+        // Buscamos la referencia ignorando mayúsculas/minúsculas
+        const refLimpia = p.referencia.trim().toLowerCase();
+        
+        // Buscamos en las llaves del JSON que cargamos
+        const llaveEncontrada = Object.keys(referenciasDrive).find(k => k.toLowerCase() === refLimpia);
+        
+        if(llaveEncontrada){
+            url = referenciasDrive[llaveEncontrada];
         }
     }
+    
+    // ... (el resto de tu lógica de normalización de Drive se queda igual)
+    if(url.includes('drive.google.com')){
+        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        if(match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+    }
 
-    // 4️⃣ Si no es Drive, devolver tal cual
     return url;
 }
 
