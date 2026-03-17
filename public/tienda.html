@@ -736,31 +736,42 @@ function render() {
     contenedor.innerHTML = "";
 
     for (const refP in productosJson) {
-        // Ignoramos la clave "images" que viene en tu JSON
         if (refP === "images") continue;
 
         const imgUrl = productosJson[refP];
-        
-        // Limpiamos la clave del JSON para buscarla en los datos de Firebase
         const claveBusqueda = refP.trim().toLowerCase();
-        const real = productosRealtime[claveBusqueda];
         
-        if (!real) {
-            console.warn("⚠️ No se encontró en Firebase:", refP);
-            continue;
+        // Intentamos obtener datos de Firebase, pero si no existen, creamos un objeto vacío
+        const real = productosRealtime[claveBusqueda] || { 
+            valor: 0, 
+            agotado: false, 
+            promocion: false,
+            referenciaReal: refP 
+        };
+
+        // Si no está en Firebase, no mostramos el warning como error crítico, 
+        // simplemente dejamos que el render siga.
+        if (!productosRealtime[claveBusqueda]) {
+            console.log("ℹ️ Producto del JSON sin datos en Firebase aún:", refP);
         }
 
         const card = document.createElement("div");
+        // Si no existe en Firebase, por defecto no estará agotado
         card.className = `producto ${real.agotado ? 'agotado' : ''}`;
         
+        // Lógica de precios: si no hay precio en Firebase, mostramos "Consultar" o $0
         const precioFinal = real.promocion ? real.valorPromocion : real.valor;
-        const precioTexto = formatearPrecio(precioFinal);
+        const precioTexto = precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar precio";
         
-        const precioHTML = real.promocion ? 
-            `<div class="precio">${precioTexto}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>` : 
-            `<div class="precio">${precioTexto}</div>`;
+        let precioHTML = "";
+        if (precioFinal > 0) {
+            precioHTML = real.promocion ? 
+                `<div class="precio">${precioTexto}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>` : 
+                `<div class="precio">${precioTexto}</div>`;
+        } else {
+            precioHTML = `<div class="precio">${precioTexto}</div>`;
+        }
 
-        // Usamos la referencia original para el mensaje de WhatsApp
         const nombreMostrar = real.referenciaReal || refP;
         const mensajeWa = encodeURIComponent(`Hola, me interesa este producto:\n📌 *Referencia:* ${nombreMostrar}\n💰 *Precio:* ${precioTexto}\n\n¿Necesito Información?`);
         const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
@@ -783,7 +794,7 @@ function render() {
         contenedor.appendChild(card);
     }
 
-    // Animación de entrada
+    // --- (Tu código de animación y loader se mantiene igual) ---
     setTimeout(() => {
         document.querySelectorAll(".producto").forEach((el, i) => {
             setTimeout(() => el.classList.add("visible"), i * 30);
