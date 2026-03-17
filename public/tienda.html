@@ -742,86 +742,51 @@ function buscarProductoRealtime(nombreJson) {
     const contenedor = document.getElementById("productos");
     contenedor.innerHTML = "";
 
+    let contador = 0; // 🔥 contar productos pintados
+
     for (const refP in productosJson) {
 
-        // 🔥 Ignorar claves que no son productos
         if (!refP || refP.toLowerCase() === "images") continue;
 
         const imgUrl = productosJson[refP];
-
-        // 🔥 Buscar producto en realtime
         const real = buscarProductoRealtime(refP);
 
-        // 🔥 Si no existe en realtime, lo saltamos
         if (!real) {
             console.warn("No encontrado:", refP);
             continue;
         }
 
+        contador++; // 🔥 sí encontró producto
+
         const card = document.createElement("div");
         card.className = `producto ${real.agotado ? 'agotado' : ''}`;
 
-        // 🔥 Precio
         const precioFinal = real.promocion ? real.valorPromocion : real.valor;
         const precioTexto = formatearPrecio(precioFinal);
 
-        const precioHTML = real.promocion
-            ? `<div class="precio">${precioTexto}</div>
-               <div class="precioViejo">${formatearPrecio(real.valor)}</div>`
-            : `<div class="precio">${precioTexto}</div>`;
-
-        // 🔥 BOTÓN WHATSAPP
-        let botonHTML = "";
-        if (real.agotado) {
-            botonHTML = `<div class="btn" style="background:#b2bec3; cursor:not-allowed;">Agotado</div>`;
-        } else {
-            const mensajeWa = encodeURIComponent(
-                `Hola, me interesa este producto:\n📌 *Referencia:* ${refP}\n💰 *Precio:* ${precioTexto}\n\n¿Necesito información?`
-            );
-
-            const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
-
-            botonHTML = `
-                <a href="${linkWa}" target="_blank" class="btn"
-                   style="background:#25D366; text-decoration:none;">
-                   Pedir por WhatsApp
-                </a>`;
-        }
-
-        // 🔥 HTML DEL CARD
         card.innerHTML = `
             <div class="img-container">
-                ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-
-                <img src="${normalizarImagen(imgUrl)}"
-                     ${real.agotado ? "" : `onclick="abrirProducto('${refP}','${imgUrl}','${precioFinal}','${real.descripcion || ""}')"`} 
-                     style="${real.agotado 
-                        ? 'filter: grayscale(100%); opacity: 0.7; cursor:default;' 
-                        : 'cursor:pointer;'}">
+                <img src="${normalizarImagen(imgUrl)}">
             </div>
-
             <div class="nombre">${refP}</div>
-            ${precioHTML}
-            ${botonHTML}
+            <div class="precio">${precioTexto}</div>
         `;
 
         contenedor.appendChild(card);
     }
 
-    // 🔥 ANIMACIÓN + LOADER
-    setTimeout(() => {
-        document.querySelectorAll(".producto").forEach((el, i) => {
-            setTimeout(() => el.classList.add("visible"), i * 50);
-        });
+    console.log("TOTAL PINTADOS:", contador);
 
-        const ld = document.getElementById("loader");
-        if (ld) {
-            ld.style.opacity = "0";
-            setTimeout(() => {
-                ld.style.display = "none";
-            }, 500);
-        }
-    }, 500);
+    // 🔥 OCULTAR LOADER SIEMPRE
+    const ld = document.getElementById("loader");
+    if (ld) {
+        ld.style.display = "none";
+    }
+
+    // 🔥 SI NO HAY PRODUCTOS, MOSTRAR MENSAJE
+    if (contador === 0) {
+        contenedor.innerHTML = "<p style='text-align:center;'>No hay productos disponibles</p>";
+    }
 }
         function abrirProducto(nombre, imagen, precio, descripcion) {
             productoSeleccionado = nombre;
