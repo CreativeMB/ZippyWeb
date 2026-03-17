@@ -706,17 +706,24 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             });
         }
 
-        function escucharCambios(id) {
-            const productosRef = ref(db, id + "/productos");
-            onValue(productosRef, (snapshot) => {
-                productosRealtime = {};
-                snapshot.forEach((child) => {
-                    const p = child.val();
-                    productosRealtime[p.referencia] = p;
-                });
-                render();
-            });
-        }
+      function escucharCambios(id) {
+    const productosRef = ref(db, id + "/productos");
+    onValue(productosRef, (snapshot) => {
+        productosRealtime = {};
+        mapaNormalizado = {};
+
+        snapshot.forEach((child) => {
+            const p = child.val();
+
+            productosRealtime[p.referencia] = p;
+
+            // 🔥 CLAVE OPTIMIZADA
+            mapaNormalizado[normalizar(p.referencia)] = p;
+        });
+
+        render();
+    });
+}
 
 function normalizar(texto) {
     return texto
@@ -725,6 +732,9 @@ function normalizar(texto) {
         .replace(/[\u0300-\u036f]/g, "") // elimina tildes
         .replace(/\s+/g, "")             // quita espacios
         .replace(/[^a-z0-9]/g, "");      // quita símbolos
+}
+function buscarProductoRealtime(nombreJson) {
+    return mapaNormalizado[normalizar(nombreJson)] || null;
 }
        function render() {
     const contenedor = document.getElementById("productos");
