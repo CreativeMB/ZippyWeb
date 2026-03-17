@@ -718,13 +718,32 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
             });
         }
 
+function normalizar(texto) {
+    return texto.toLowerCase()
+        .replace(/\s+/g, "")       // quita espacios
+        .replace(/[^a-z0-9]/g, ""); // quita símbolos
+}
+
+function buscarProductoRealtime(nombreJson) {
+    const nombreBuscado = normalizar(nombreJson);
+
+    for (const key in productosRealtime) {
+        const keyNormal = normalizar(key);
+
+        if (keyNormal === nombreBuscado) {
+            return productosRealtime[key];
+        }
+    }
+
+    return null;
+}
        function render() {
     const contenedor = document.getElementById("productos");
     contenedor.innerHTML = "";
 
     for (const refP in productosJson) {
         const imgUrl = productosJson[refP];
-        const real = productosRealtime[refP];
+       const real = buscarProductoRealtime(refP);
         
         if (!real) continue;
 
