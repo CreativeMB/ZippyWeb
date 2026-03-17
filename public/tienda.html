@@ -756,39 +756,43 @@ function render() {
         const imgUrl = productosJson[refP];
         const claveBusqueda = refP.trim().toLowerCase();
         
-        // Intentamos obtener datos de Firebase, pero si no existen, creamos un objeto vacío
+        // Datos de Firebase
         const real = productosRealtime[claveBusqueda] || { 
             valor: 0, 
+            valorPromocion: 0, // Añadido para evitar errores
             agotado: false, 
             promocion: false,
             referenciaReal: refP 
         };
 
-        // Si no está en Firebase, no mostramos el warning como error crítico, 
-        // simplemente dejamos que el render siga.
-        if (!productosRealtime[claveBusqueda]) {
-            console.log("ℹ️ Producto del JSON sin datos en Firebase aún:", refP);
-        }
-
         const card = document.createElement("div");
-        // Si no existe en Firebase, por defecto no estará agotado
         card.className = `producto ${real.agotado ? 'agotado' : ''}`;
         
-        // Lógica de precios: si no hay precio en Firebase, mostramos "Consultar" o $0
-        const precioFinal = real.promocion ? real.valorPromocion : real.valor;
-        const precioTexto = precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar precio";
-        
+        // --- LÓGICA DE PRECIOS CORREGIDA ---
         let precioHTML = "";
-        if (precioFinal > 0) {
-            precioHTML = real.promocion ? 
-                `<div class="precio">${precioTexto}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>` : 
-                `<div class="precio">${precioTexto}</div>`;
+        let precioFinalParaWhatsApp = 0;
+
+        if (real.promocion && real.valorPromocion > 0) {
+            // Caso: Hay promoción activa
+            precioFinalParaWhatsApp = real.valorPromocion;
+            precioHTML = `
+                <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
+                <div class="precioViejo">${formatearPrecio(real.valor)}</div>
+            `;
+        } else if (real.valor > 0) {
+            // Caso: Precio normal
+            precioFinalParaWhatsApp = real.valor;
+            precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
         } else {
-            precioHTML = `<div class="precio">${precioTexto}</div>`;
+            // Caso: Sin precio definido
+            precioHTML = `<div class="precio">Consultar precio</div>`;
         }
 
+        const precioTextoWhatsApp = precioFinalParaWhatsApp > 0 ? formatearPrecio(precioFinalParaWhatsApp) : "Consultar";
+        // ----------------------------------
+
         const nombreMostrar = real.referenciaReal || refP;
-        const mensajeWa = encodeURIComponent(`Hola, me interesa este producto:\n📌 *Referencia:* ${nombreMostrar}\n💰 *Precio:* ${precioTexto}\n\n¿Necesito Información?`);
+        const mensajeWa = encodeURIComponent(`Hola, me interesa este producto:\n📌 *Referencia:* ${nombreMostrar}\n💰 *Precio:* ${precioTextoWhatsApp}\n\n¿Necesito Información?`);
         const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
 
         let botonHTML = real.agotado ? 
@@ -799,7 +803,7 @@ function render() {
             <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
                 <img src="${normalizarImagen(imgUrl)}" 
-                     ${real.agotado ? "" : `onclick="abrirProducto('${nombreMostrar.replace(/'/g, "\\'")}','${imgUrl}','${precioFinal}','${(real.descripcion || "").replace(/'/g, "\\'")}')"`} 
+                     ${real.agotado ? "" : `onclick="abrirProducto('${nombreMostrar.replace(/'/g, "\\'")}','${imgUrl}','${precioFinalParaWhatsApp}','${(real.descripcion || "").replace(/'/g, "\\'")}')"`} 
                      style="${real.agotado ? 'filter: grayscale(100%); opacity: 0.7; cursor:default;' : 'cursor:pointer;'}">
             </div>
             <div class="nombre">${nombreMostrar}</div>
@@ -809,7 +813,7 @@ function render() {
         contenedor.appendChild(card);
     }
 
-    // --- (Tu código de animación y loader se mantiene igual) ---
+    // Animaciones (se mantiene igual)
     setTimeout(() => {
         document.querySelectorAll(".producto").forEach((el, i) => {
             setTimeout(() => el.classList.add("visible"), i * 30);
