@@ -693,7 +693,7 @@ document.getElementById("correo").innerText = "✉️ " + perfil.correo;
 document.getElementById("info-destacada").innerText = perfil.publicidad;
 document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
 
-                    cargarProductosJSON(perfil.urljason);
+                    cargarProductosJSON(perfil.json_datos);
                     escucharCambios(empresaId);
                 }
             });
