@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zippy - Iniciar Sesión</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 350px; text-align: center; }
+        h2 { color: #6200ee; margin-bottom: 1.5rem; }
+        input { width: 100%; padding: 12px; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #6200ee; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background 0.3s; }
+        button:hover { background: #3700b3; }
+        .error { color: #e91e63; font-size: 0.9rem; margin-bottom: 1rem; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>Zippy Catalogo</h2>
+    <p id="error-msg" class="error">Usuario o contraseña incorrectos</p>
+    
+    <input type="email" id="email" placeholder="Correo electrónico" required>
+    <input type="password" id="password" placeholder="Contraseña" required>
+    
+    <button id="btnLogin">Entrar</button>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // Tu configuración (Cópiala de tu archivo index o base de datos)
+    const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "zippy-727d5.firebaseapp.com",
+        databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
+        projectId: "zippy-727d5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const btnLogin = document.getElementById("btnLogin");
+    const emailInput = document.getElementById("email");
+    const passInput = document.getElementById("password");
+    const errorMsg = document.getElementById("error-msg");
+
+    // 1. Lógica de inicio de sesión
+    btnLogin.onclick = async () => {
+        const email = emailInput.value.trim();
+        const password = passInput.value.trim();
+
+        if(!email || !password) return alert("Por favor llene todos los campos");
+
+        btnLogin.innerText = "Cargando...";
+        btnLogin.disabled = true;
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            // Si tiene éxito, onAuthStateChanged se encargará de redirigir
+        } catch (error) {
+            console.error(error);
+            errorMsg.style.display = "block";
+            btnLogin.innerText = "Entrar";
+            btnLogin.disabled = false;
+        }
+    };
+
+    // 2. Redirección automática si ya está logueado
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Aquí lo mandas a tu página principal (index.html o home.html)
+            window.location.href = "index.html"; 
+        }
+    });
+</script>
+
+</body>
+</html>
