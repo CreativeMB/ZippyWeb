@@ -710,13 +710,21 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
     const productosRef = ref(db, id + "/productos");
     onValue(productosRef, (snapshot) => {
         productosRealtime = {};
+        
         snapshot.forEach((child) => {
             const p = child.val();
             
-            // NORMALIZACIÓN: Pasamos a minúsculas y quitamos espacios al inicio/final
-            if(p.referencia) {
-                const refLimpia = String(p.referencia).trim().toLowerCase();
-                productosRealtime[refLimpia] = p;
+            // Buscamos el valor de la referencia sin importar si empieza con R o r
+            const refOriginal = p.referencia || p.Referencia || p.nombre || "";
+            
+            if (refOriginal) {
+                // Guardamos en el objeto usando una clave "limpia" (minúsculas y sin espacios)
+                const claveLimpia = String(refOriginal).trim().toLowerCase();
+                productosRealtime[claveLimpia] = p;
+                
+                // IMPORTANTE: Guardamos la referencia original dentro del objeto 
+                // para que no se pierdan las mayúsculas al mostrar el nombre
+                productosRealtime[claveLimpia].referenciaReal = refOriginal;
             }
         });
         render();
@@ -724,20 +732,21 @@ document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
 }
 function render() {
     const contenedor = document.getElementById("productos");
+    if (!contenedor) return;
     contenedor.innerHTML = "";
 
     for (const refP in productosJson) {
+        // Ignoramos la clave "images" que viene en tu JSON
+        if (refP === "images") continue;
+
         const imgUrl = productosJson[refP];
         
-        // NORMALIZACIÓN: Decodificamos (por si hay un %20), minúsculas y sin espacios extra
-        const refBuscada = decodeURIComponent(refP).trim().toLowerCase();
-        
-        // Buscamos usando la referencia limpia
-        const real = productosRealtime[refBuscada];
+        // Limpiamos la clave del JSON para buscarla en los datos de Firebase
+        const claveBusqueda = refP.trim().toLowerCase();
+        const real = productosRealtime[claveBusqueda];
         
         if (!real) {
-            // Agrego esto para que, si falla, puedas ver en la consola (F12) qué producto exacto no cruzó
-            console.warn("⚠️ No se encontró en Firebase la referencia:", refP); 
+            console.warn("⚠️ No se encontró en Firebase:", refP);
             continue;
         }
 
@@ -745,51 +754,47 @@ function render() {
         card.className = `producto ${real.agotado ? 'agotado' : ''}`;
         
         const precioFinal = real.promocion ? real.valorPromocion : real.valor;
-        const precioTexto = formatearPrecio(precioFinal); 
+        const precioTexto = formatearPrecio(precioFinal);
         
         const precioHTML = real.promocion ? 
             `<div class="precio">${precioTexto}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>` : 
             `<div class="precio">${precioTexto}</div>`;
 
-        let botonHTML = "";
-        if (real.agotado) {
-            botonHTML = `<div class="btn" style="background:#b2bec3; cursor:not-allowed;">Agotado</div>`;
-        } else {
-            // Usamos real.referencia para mantener el formato original de Firebase en el mensaje
-            const mensajeWa = encodeURIComponent(`Hola, me interesa este producto:\n📌 *Referencia:* ${real.referencia}\n💰 *Precio:* ${precioTexto}\n\n¿Necesito Información?`);
-            const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
-            
-            botonHTML = `<a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none;">Pedir por WhatsApp</a>`;
-        }
+        // Usamos la referencia original para el mensaje de WhatsApp
+        const nombreMostrar = real.referenciaReal || refP;
+        const mensajeWa = encodeURIComponent(`Hola, me interesa este producto:\n📌 *Referencia:* ${nombreMostrar}\n💰 *Precio:* ${precioTexto}\n\n¿Necesito Información?`);
+        const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
+
+        let botonHTML = real.agotado ? 
+            `<div class="btn" style="background:#b2bec3; cursor:not-allowed;">Agotado</div>` :
+            `<a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none;">Pedir por WhatsApp</a>`;
 
         card.innerHTML = `
             <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
                 <img src="${normalizarImagen(imgUrl)}" 
-                     ${real.agotado ? "" : `onclick="abrirProducto('${real.referencia}','${imgUrl}','${precioFinal}','${(real.descripcion || "").replace(/'/g, "\\'")}')"`} 
+                     ${real.agotado ? "" : `onclick="abrirProducto('${nombreMostrar.replace(/'/g, "\\'")}','${imgUrl}','${precioFinal}','${(real.descripcion || "").replace(/'/g, "\\'")}')"`} 
                      style="${real.agotado ? 'filter: grayscale(100%); opacity: 0.7; cursor:default;' : 'cursor:pointer;'}">
             </div>
-            <div class="nombre">${real.referencia}</div>
+            <div class="nombre">${nombreMostrar}</div>
             ${precioHTML}
             ${botonHTML}
         `;
         contenedor.appendChild(card);
     }
 
-    // Control del Loader
+    // Animación de entrada
     setTimeout(() => {
         document.querySelectorAll(".producto").forEach((el, i) => {
-            setTimeout(() => el.classList.add("visible"), i * 50);
+            setTimeout(() => el.classList.add("visible"), i * 30);
         });
         
         const ld = document.getElementById("loader");
-        if(ld){
+        if(ld) {
             ld.style.opacity = "0";
-            setTimeout(() => {
-                ld.style.display = "none";
-            }, 500);
+            setTimeout(() => ld.style.display = "none", 500);
         }
-    }, 800);
+    }, 500);
 }
         function abrirProducto(nombre, imagen, precio, descripcion) {
             productoSeleccionado = nombre;
