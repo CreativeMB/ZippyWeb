@@ -39,14 +39,13 @@ body {
 }
 
 .header h1 {
-    /* Fuente elegante para multiempresa */
-    font-family: 'Montserrat', sans-serif; 
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin-bottom: 5px;
+    /* Nombre de la empresa en Blanco Hueso para que sea legible */
+    color: #F8F9FA; 
+    font-size: 2.2rem;
+    font-weight: bold;
     text-transform: uppercase;
+    margin-bottom: 8px;
 }
-
 .header p {
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
@@ -54,15 +53,13 @@ body {
     opacity: 0.9;
 }
 
-.eslogan {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 300;
-    font-size: 14px;
-    color: #f8f8f8;
+.header .slogan {
+    /* El slogan en Dorado Champán para dar el toque de "Regalo/Detalle" */
+    color: #E5C453; 
+    font-family: 'Cormorant Garamond', serif; /* Una fuente tipo cursiva/elegante */
+    font-style: italic;
+    font-size: 1.2rem;
     letter-spacing: 1px;
-    margin-top: 5px;
-    margin-bottom: 25px;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
 }
 
 /* ========================================= */
@@ -79,21 +76,14 @@ body {
     margin: 0;
 }
 
-.texto-destacado {
+.header .destacado {
+    /* Para frases importantes como "Flores Amarillas: Símbolo de Amor" */
+    color: #FFFFFF;
+    background-color: rgba(229, 196, 83, 0.2); /* Un fondo suave dorado */
+    padding: 5px 15px;
+    border-radius: 20px;
     display: inline-block;
-    font-family: 'Cormorant Garamond', serif;
-    color: #000000;
-    font-weight: 900;
-    text-transform: capitalize;
-    font-size: 30px;
-    letter-spacing: 2px;
-    text-align: center;
-    text-shadow: 2px 2px 5px rgb(255, 255, 255);
-    animation: drop-3d-header 6s ease-in-out infinite;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform-style: preserve-3d;
-    will-change: transform, opacity;
+    margin-top: 10px;
 }
 
 @keyframes drop-3d-header {
