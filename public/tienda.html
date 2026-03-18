@@ -27,40 +27,48 @@ body {
 /* ========================================= */
 .header {
     text-align: center;
-    padding: 20px 15px;
-    background: #000000;
+    padding: 20px 15px; /* Margen pequeño para barra delgada */
+    background: #000000; /* Fondo negro sólido solicitado */
     perspective: 1000px;
     overflow: hidden;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* TÍTULO (Usando el ID nombreEmpresa) */
-#nombreEmpresa {
+/* TÍTULO: EFECTO REBOTE 3D */
+.header h1 {
     font-family: 'Montserrat', sans-serif;
     font-size: clamp(1.8rem, 6vw, 2.8rem);
     font-weight: 900;
     margin: 0;
-    text-transform: none; /* Respeta lo que pongas en el JS/Base de datos */
+    /* CAMBIO: Quitamos uppercase para respetar tu escritura */
+    text-transform: none; 
     color: #F8F9FA;
-    text-shadow: 0 1px 0 #bdc3c7, 0 2px 0 #95a5a6, 0 5px 10px rgba(0,0,0,0.8);
+    text-shadow: 
+        0 1px 0 #bdc3c7, 
+        0 2px 0 #95a5a6, 
+        0 5px 10px rgba(0,0,0,0.8);
+    
     display: inline-block;
-    animation: bouncePro 2s ease infinite;
+    /* Aseguramos que la animación esté vinculada */
+    animation: bouncePro 2s ease infinite; 
 }
 
-/* ESLOGAN (Cambiado de .slogan a .eslogan para que coincida con tu HTML) */
-.eslogan {
+/* SLOGAN: APARECE Y DESAPARECE */
+.header .slogan {
     font-family: 'Cormorant Garamond', serif;
     display: block;
     font-size: 1.3rem;
     font-style: italic;
-    color: #E5C453;
+    color: #E5C453; 
     margin-top: 5px;
     font-weight: 500;
+    /* CAMBIO: Quitamos cualquier transformación */
     text-transform: none; 
+    /* Esta línea activa la animación de desvanecimiento */
     animation: fadeSlogan 4s ease-in-out infinite !important;
 }
 
-/* BANNER INFORMATIVO (Cambiado de .destacado a .texto-destacado) */
+/* PUBLICIDAD: LATIDO PRO */
 .texto-destacado {
     margin-top: 15px;
     display: inline-block;
@@ -72,26 +80,16 @@ body {
     text-transform: none; 
     letter-spacing: 1px;
     
-    background: linear-gradient(45deg, #d4af37, #f1c40f);
+    /* CAMBIO: Degradado de Naranja Profundo a Dorado Quemado */
+    background: linear-gradient(45deg, #a67c00, #bf9b30); 
+    
     border-radius: 30px;
-    box-shadow: 0 0 15px rgba(229, 196, 83, 0.5);
+    /* Sombra más sutil para que no "brille" tanto */
+    box-shadow: 0 4px 15px rgba(166, 124, 0, 0.3);
     
     animation: pulseAd 1.5s ease-in-out infinite !important;
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Toque de luz en el borde */
 }
-
-/* Estilo para los iconos de redes sociales (Para que no se vean simples) */
-.redes-header {
-    margin-top: 10px;
-}
-.icono-red {
-    color: white;
-    font-size: 1.2rem;
-    margin: 0 10px;
-    text-decoration: none;
-    transition: 0.3s;
-}
-.whatsapp-share:hover { color: #25D366; }
-.facebook:hover { color: #1877F2; }
 
 /* ========================================= */
 /* 3. DEFINICIÓN DE ANIMACIONES "PRO"        */
