@@ -908,7 +908,17 @@ function render() {
         // ----------------------------------
 
         const nombreMostrar = real.referenciaReal || refP;
-        const mensajeWa = encodeURIComponent(`Hola, me interesa este producto:\n📌 *Referencia:* ${nombreMostrar}\n💰 *Precio:* ${precioTextoWhatsApp}\n\n¿Necesito Información?`);
+  // Validamos que exista la descripción. Si está vacía, evitamos el "undefined"
+const descripcionMostrar = real.descripcion || "Sin descripción detallada"; 
+
+// Agregamos la descripción al mensaje usando los saltos de línea (\n)
+const mensajeWa = encodeURIComponent(
+    `Hola, me interesa este producto:\n` +
+    `📌 *Referencia:* ${nombreMostrar}\n` +
+    `📝 *Descripción:* ${descripcionMostrar}\n` +
+    `💰 *Precio:* ${precioTextoWhatsApp}\n\n` +
+    `¿Necesito Información?`
+);
         const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
 
         let botonHTML = real.agotado ? 
