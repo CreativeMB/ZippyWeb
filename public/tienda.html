@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <img id="logoEmpresa" src="" alt="" class="logo-estilo" referrerpolicy="no-referrer">
 <meta property="og:title" content="¡Mira esta tienda! Muchos productos, entra ya...">
 <meta property="og:description" content="Haz tu pedido por WhatsApp de forma fácil y rápida.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1067,31 +1068,41 @@ function copiarLink(e) {
     
 }
 // ==========================================
-// CARGA DE LOGO DEFINITIVA (AJUSTE DE TIEMPOS)
+// CARGA DE LOGO (VERSIÓN FINAL ANTI-BLOQUEO)
 // ==========================================
-const rawLogoURL = snapshot.val().urlLogo; 
-const imgElement = document.getElementById('logoEmpresa');
+function cargarLogoEmpresa(url) {
+    const imgElement = document.getElementById('logoEmpresa');
+    if (!imgElement || !url) return;
 
-if (rawLogoURL && rawLogoURL.trim() !== "") {
-    const urlLimpia = normalizarURL(rawLogoURL);
+    const urlLimpia = normalizarURL(url);
 
-    // No mostramos nada todavía
+    // 1. Forzamos la limpieza del src anterior
+    imgElement.src = ""; 
+    
+    // 2. Configuramos atributos de seguridad para saltar bloqueos de Drive
+    imgElement.setAttribute('referrerpolicy', 'no-referrer');
+
+    // 3. Asignamos la URL
     imgElement.src = urlLimpia;
 
+    // 4. Forzamos la aparición
     imgElement.onload = function() {
-        // SOLO cuando la imagen ya bajó de internet, la hacemos aparecer
         imgElement.style.display = 'inline-block';
-        imgElement.style.opacity = '1'; 
-        console.log("✅ Logo visualizado con éxito");
+        imgElement.style.opacity = '1';
+        imgElement.style.visibility = 'visible';
+        console.log("✅ Logo de Drive renderizado correctamente");
     };
 
     imgElement.onerror = function() {
-        console.error("❌ Fallo crítico en URL de Drive. ¿Es pública?");
-        imgElement.style.display = 'none'; 
+        console.warn("⚠️ Drive bloqueó el acceso directo. Usando Proxy de respaldo...");
+        imgElement.src = "https://images.weserv.nl/?url=" + encodeURIComponent(urlLimpia);
     };
-} else {
-    imgElement.style.display = 'none';
 }
+
+// LLAMADA DENTRO DE TU ONVALUE DE FIREBASE:
+const rawLogoURL = snapshot.val().urlLogo;
+cargarLogoEmpresa(rawLogoURL);
+
 function normalizarURL(url) {
     if (!url) return "";
     
