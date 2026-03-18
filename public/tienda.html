@@ -774,6 +774,23 @@ body {
                     empresaId = child.key;
                     const perfil = data.perfilempresa;
                     telefonoEmpresa = perfil.WhatsApp.replace("+", "");
+                    // --- LÓGICA DEL LOGO (UBICADA CORRECTAMENTE) ---
+            const imgElement = document.getElementById('logoEmpresa');
+            if (perfil.urlLogo && perfil.urlLogo.trim() !== "") {
+                const urlFinal = obtenerLinkDirecto(perfil.urlLogo);
+                imgElement.setAttribute('referrerpolicy', 'no-referrer');
+                imgElement.src = urlFinal;
+                imgElement.onload = () => {
+                    imgElement.style.display = 'inline-block';
+                    imgElement.style.opacity = '1';
+                };
+                imgElement.onerror = () => {
+                    imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`;
+                };
+            } else {
+                imgElement.style.display = 'none';
+            }
+            // ----------------------------------------------
 
                     // Asignar primer domiciliario (Ruta corregida a 'Domiciliarios' con D mayúscula)
                     if (data.Domiciliarios) {
