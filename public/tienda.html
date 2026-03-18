@@ -1070,29 +1070,43 @@ function copiarLink(e) {
 // ==========================================
 // CARGA DE LOGO DINÁMICO (MULTIEMPRESA)
 // ==========================================
-const logoURL = snapshot.val().urlLogo; 
+const rawLogoURL = snapshot.val().urlLogo; 
 const imgElement = document.getElementById('logoEmpresa');
 
-if (logoURL && logoURL.trim() !== "") {
-    // Esto pasa la imagen por un servidor intermedio que salta el bloqueo
-imgElement.src = "https://images.weserv.nl/?url=" + encodeURIComponent(logoURL);
+if (rawLogoURL && rawLogoURL.trim() !== "") {
+    
+    // 1. Normalizamos la URL (por si viene de Drive o es link directo)
+    const urlLimpia = normalizarURL(rawLogoURL);
+
+    // 2. Usamos el proxy para evitar bloqueos de CORS y optimizar carga
+    imgElement.src = "https://images.weserv.nl/?url=" + encodeURIComponent(urlLimpia);
 
     // Si la imagen carga bien
     imgElement.onload = function() {
         imgElement.style.display = 'inline-block';
-        console.log("✅ Logo cargado con éxito");
+        console.log("✅ Logo normalizado y cargado con éxito");
     };
 
-    // Si la URL está rota, bloqueada por CORS o el servidor no responde
+    // Si hay error (Link privado, ID borrado, etc.)
     imgElement.onerror = function() {
-        console.warn("⚠️ Error al cargar el logo externo. Ocultando contenedor.");
+        console.warn("⚠️ No se pudo cargar el logo. Verifique que el archivo en Drive sea PÚBLICO.");
         imgElement.style.display = 'none'; 
-        // Opcional: Podrías poner un logo por defecto aquí
-        // imgElement.src = 'assets/img/default-logo.png';
     };
+
 } else {
     // Si el campo en Firebase está vacío
     imgElement.style.display = 'none';
+}
+function normalizarURL(url) {
+    if (!url) return "";
+    // Si es un link de Google Drive (view, open, o uc)
+    if (url.includes('drive.google.com')) {
+        const id = url.match(/[-\w]{25,}/); // Extrae el ID largo de Drive
+        if (id) {
+            return `https://drive.google.com/uc?export=view&id=${id[0]}`;
+        }
+    }
+    return url; // Si no es Drive, devuelve la URL original
 }
 // ==========================================
         // LÓGICA DEL BUSCADOR FLOTANTE
