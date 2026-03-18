@@ -114,29 +114,98 @@ body {
 }
 
 /* ========================================= */
-/* 5. ANIMACIONES DE ALTO NIVEL              */
+/* 2. HEADER COMPACTO Y MODERNO (SLIM)       */
 /* ========================================= */
-
-/* Flotación física para el banner */
-@keyframes floating3D {
-    0%, 100% { transform: translateY(0) rotateY(0deg); }
-    50% { transform: translateY(-12px) rotateY(5deg); }
+.header {
+    text-align: center;
+    /* Reducimos el padding de 60px a 25px para que la barra sea delgada */
+    padding: 25px 15px; 
+    background: radial-gradient(circle at center, #2c2c2c 0%, #121212 100%);
+    perspective: 1200px;
+    border-bottom: 1px solid rgba(229, 196, 83, 0.3);
+    /* Sombra externa para que el header flote sobre los productos */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
-/* Animación de entrada con zoom y desenfoque */
+.header h1 {
+    font-family: 'Montserrat', sans-serif;
+    /* Tamaño un poco más controlado para no ocupar tanto espacio vertical */
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 900;
+    margin: 0; /* Quitamos márgenes para compactar */
+    line-height: 1.1;
+    
+    /* EFECTO 3D EXTRUIDO SUTIL (No plano) */
+    color: #F8F9FA;
+    text-shadow: 
+        0 1px 0 #d9d9d9,
+        0 2px 0 #b3b3b3,
+        0 5px 10px rgba(0,0,0,0.5);
+    
+    letter-spacing: -1px;
+    text-transform: uppercase; /* El nombre de la empresa se ve más pro en Mayúsculas */
+}
+
+/* ========================================= */
+/* 3. SLOGAN COMPACTO (Mayúsculas/Minúsculas)*/
+/* ========================================= */
+.header .slogan {
+    font-family: 'Cormorant Garamond', serif;
+    display: block;
+    font-size: 1.2rem; /* Un poco más pequeño */
+    font-style: italic;
+    font-weight: 500;
+    text-transform: none; /* May/Min para elegancia moderna */
+    color: #E5C453; 
+    margin-top: 4px; /* Pegado al título */
+    opacity: 0.9;
+}
+
+/* ========================================= */
+/* 4. BANNER 3D "SLIM" (ESTILO CINTA)        */
+/* ========================================= */
+.header .destacado {
+    margin-top: 12px; /* Reducimos distancia con el slogan */
+    display: inline-block;
+    padding: 6px 20px; /* Padding reducido para que no sea una burbuja gorda */
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: none;
+    color: #ffffff;
+
+    /* EFECTO CRISTAL 3D */
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px; /* Menos redondeado = más moderno y serio */
+    
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    
+    transition: all 0.3s ease;
+}
+
+.header .destacado:hover {
+    transform: scale(1.03) translateY(-2px);
+    background: rgba(221, 196, 115, 0.15);
+}
+
+/* ========================================= */
+/* 5. ANIMACIÓN DE ENTRADA SUAVE             */
+/* ========================================= */
 .header h1, .header .slogan, .header .destacado {
-    animation: entrancePro 1.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation: slideUpSlim 1s cubic-bezier(0.2, 1, 0.3, 1) backwards;
 }
 
-@keyframes entrancePro {
+@keyframes slideUpSlim {
     0% { 
         opacity: 0; 
-        transform: scale(0.8) translateY(30px); 
-        filter: blur(15px);
+        transform: translateY(10px); 
+        filter: blur(5px);
     }
     100% { 
         opacity: 1; 
-        transform: scale(1) translateY(0); 
+        transform: translateY(0); 
         filter: blur(0);
     }
 }
