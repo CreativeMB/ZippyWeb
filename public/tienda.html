@@ -21,54 +21,44 @@ body {
     background: #f5f6fa;
     color: #333;
 }
-
 /* ========================================= */
 /* 2. HEADER COMPACTO Y DINÁMICO             */
 /* ========================================= */
 .header {
     text-align: center;
-    padding: 20px 15px; /* Margen pequeño para barra delgada */
-    background: #000000; /* Fondo negro sólido solicitado */
+    padding: 20px 15px;
+    background: #000000;
     perspective: 1000px;
     overflow: hidden;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* TÍTULO: EFECTO REBOTE 3D */
-.header h1 {
+/* TÍTULO (Usando el ID nombreEmpresa) */
+#nombreEmpresa {
     font-family: 'Montserrat', sans-serif;
     font-size: clamp(1.8rem, 6vw, 2.8rem);
     font-weight: 900;
     margin: 0;
-    /* CAMBIO: Quitamos uppercase para respetar tu escritura */
-    text-transform: none; 
+    text-transform: none; /* Respeta lo que pongas en el JS/Base de datos */
     color: #F8F9FA;
-    text-shadow: 
-        0 1px 0 #bdc3c7, 
-        0 2px 0 #95a5a6, 
-        0 5px 10px rgba(0,0,0,0.8);
-    
+    text-shadow: 0 1px 0 #bdc3c7, 0 2px 0 #95a5a6, 0 5px 10px rgba(0,0,0,0.8);
     display: inline-block;
-    /* Aseguramos que la animación esté vinculada */
-    animation: bouncePro 2s ease infinite; 
+    animation: bouncePro 2s ease infinite;
 }
 
-/* SLOGAN: APARECE Y DESAPARECE */
-.header .slogan {
+/* ESLOGAN (Cambiado de .slogan a .eslogan para que coincida con tu HTML) */
+.eslogan {
     font-family: 'Cormorant Garamond', serif;
     display: block;
     font-size: 1.3rem;
     font-style: italic;
-    color: #E5C453; 
+    color: #E5C453;
     margin-top: 5px;
     font-weight: 500;
-    /* CAMBIO: Quitamos cualquier transformación */
     text-transform: none; 
-    /* Esta línea activa la animación de desvanecimiento */
     animation: fadeSlogan 4s ease-in-out infinite !important;
 }
 
-/* PUBLICIDAD: LATIDO PRO */
 .texto-destacado {
     margin-top: 15px;
     display: inline-block;
@@ -91,6 +81,21 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1); /* Toque de luz en el borde */
 }
 
+/* Estilo para los iconos de redes sociales (Para que no se vean simples) */
+.redes-header {
+    margin-top: 10px;
+}
+.icono-red {
+    color: white;
+    font-size: 1.2rem;
+    margin: 0 10px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.whatsapp-share:hover { color: #25D366; }
+.facebook:hover { color: #1877F2; }
+
+/* RECUERDA MANTENER LAS @KEYFRAMES (bouncePro, fadeSlogan, pulseAd) QUE TE DI ANTES */
 /* ========================================= */
 /* 3. DEFINICIÓN DE ANIMACIONES "PRO"        */
 /* ========================================= */
