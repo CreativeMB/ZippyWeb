@@ -23,117 +23,110 @@ body {
 }
 
 /* ========================================= */
-/* 2. HEADER CON EFECTO PROFUNDIDAD          */
+/* 2. HEADER: PROFUNDIDAD Y MODERNISMO       */
 /* ========================================= */
 .header {
     text-align: center;
-    padding: 50px 20px; 
-    /* Degradado con un toque de profundidad 3D */
-    background: radial-gradient(circle at top, #333333 0%, #1a1a1a 100%);
-    color: #ffffff;
-    position: relative;
-    overflow: hidden;
-    border-bottom: 2px solid rgba(229, 196, 83, 0.2);
+    padding: 60px 20px;
+    background: radial-gradient(circle at center, #2c2c2c 0%, #121212 100%);
+    perspective: 1000px; /* Habilita el entorno 3D para los hijos */
 }
 
 .header h1 {
-    /* Tipografía: Montserrat es perfecta para legibilidad y elegancia */
     font-family: 'Montserrat', sans-serif;
-    font-size: clamp(2rem, 6vw, 3rem);
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 4px;
+    font-size: clamp(2.2rem, 7vw, 3.5rem);
+    font-weight: 800;
     margin-bottom: 10px;
     
-    /* EFECTO 3D REAL EN TEXTO */
-    color: #F8F9FA;
-    text-shadow: 
-        0 1px 0 #ccc, 
-        0 2px 0 #c9c9c9, 
-        0 3px 0 #bbb, 
-        0 4px 0 #b9b9b9, 
-        0 5px 0 #aaa, 
-        0 6px 1px rgba(0,0,0,.1), 
-        0 0 5px rgba(0,0,0,.1), 
-        0 1px 3px rgba(0,0,0,.3), 
-        0 3px 5px rgba(0,0,0,.2), 
-        0 5px 10px rgba(0,0,0,.25);
+    /* EFECTO PRO: Gradiente metálico en el texto */
+    background: linear-gradient(to bottom, #ffffff 30%, #b3b3b3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     
-    animation: floating 3s ease-in-out infinite;
+    /* 3D SOFISTICADO: No es un borde, es profundidad */
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+    transform: rotateX(10deg); /* Inclinación 3D sutil */
+    
+    letter-spacing: -1px; /* Letras más juntas = más moderno */
+    transition: transform 0.5s ease;
 }
 
-.header .slogan {
-    /* Estilo "Cormorant" para ese toque de alta costura/floristería fina */
-    font-family: 'Cormorant Garamond', serif;
-    color: #E5C453; 
-    font-style: italic;
-    font-size: 1.4rem;
-    letter-spacing: 2px;
-    margin-top: 5px;
-    display: block;
-    opacity: 0;
-    animation: fadeInSlide 1.5s ease-out forwards 0.5s;
+.header h1:hover {
+    transform: rotateX(0deg) scale(1.02);
 }
 
 /* ========================================= */
-/* 3. ETIQUETAS DESTACADAS (EFECTO CRISTAL)  */
+/* 3. SLOGAN: ELEGANCIA MULTIEMPRESA         */
+/* ========================================= */
+.header .slogan {
+    font-family: 'Cormorant Garamond', serif;
+    display: block;
+    font-size: 1.4rem;
+    font-style: italic;
+    font-weight: 400;
+    /* Respetamos mayúsculas/minúsculas para que sea legible y "chic" */
+    color: #E5C453; 
+    
+    /* Iluminación tipo Neón suave */
+    text-shadow: 0 0 8px rgba(229, 196, 83, 0.4);
+    margin-top: 5px;
+    letter-spacing: 0.5px;
+}
+
+/* ========================================= */
+/* 4. LETREROS Y BANNERS (3D DINÁMICO)       */
 /* ========================================= */
 .header .destacado {
-    margin-top: 25px;
-    padding: 8px 25px;
-    font-size: 0.9rem;
+    margin-top: 30px;
+    display: inline-block;
+    padding: 10px 30px;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 600;
-    text-transform: uppercase;
+    font-size: 0.9rem;
+    text-transform: none; /* Mantiene minúsculas para un look Pro */
+    
+    /* EFECTO GLASSMORFISMO 3D */
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    
+    /* Sombra proyectada para que parezca que flota */
+    box-shadow: 
+        0 4px 6px rgba(0,0,0,0.2),
+        0 15px 35px rgba(0,0,0,0.3),
+        inset 0 1px 1px rgba(255,255,255,0.1);
+        
     color: #ffffff;
-    letter-spacing: 1px;
-    
-    /* Efecto Glassmorphism 3D */
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    
-    transition: all 0.3s ease;
     cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .header .destacado:hover {
-    transform: scale(1.05);
-    background: rgba(229, 196, 83, 0.2);
-    border-color: #E5C453;
+    transform: translateY(-5px) rotateY(10deg);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
 /* ========================================= */
-/* 4. ANIMACIONES PERSONALIZADAS             */
+/* 5. ANIMACIÓN DE ENTRADA "THE ZIPPY DROP"  */
 /* ========================================= */
-
-/* Elevación suave 3D para el título principal */
-@keyframes floating {
-    0% { transform: translateY(0px) rotateX(0deg); }
-    50% { transform: translateY(-10px) rotateX(5deg); }
-    100% { transform: translateY(0px) rotateX(0deg); }
+@keyframes zippyDrop {
+    0% { 
+        opacity: 0; 
+        transform: translateZ(100px) scale(1.2); 
+        filter: blur(10px);
+    }
+    100% { 
+        opacity: 1; 
+        transform: translateZ(0) scale(1); 
+        filter: blur(0);
+    }
 }
 
-/* Entrada elegante para el slogan */
-@keyframes fadeInSlide {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+.header h1, .header .slogan {
+    animation: zippyDrop 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
-
-/* Animación 3D para banners de texto (reutilizable) */
-.texto-animado-3d {
-    display: inline-block;
-    animation: flip3D 6s infinite;
-    transform-style: preserve-3d;
-}
-
-@keyframes flip3D {
-    0%, 20% { transform: rotateX(90deg); opacity: 0; }
-    30%, 70% { transform: rotateX(0deg); opacity: 1; }
-    80%, 100% { transform: rotateX(-90deg); opacity: 0; }
-}
-
 /* ========================================= */
 /* 4. GRID DE PRODUCTOS (VISTA PC)           */
 /* ========================================= */
