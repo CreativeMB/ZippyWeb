@@ -1068,18 +1068,31 @@ function copiarLink(e) {
     
 }
 // ==========================================
-// LOGO EMPRESA (Extraído de Firebase)
+// CARGA DE LOGO DINÁMICO (MULTIEMPRESA)
 // ==========================================
 const logoURL = snapshot.val().urlLogo; 
 const imgElement = document.getElementById('logoEmpresa');
 
 if (logoURL && logoURL.trim() !== "") {
+    // Intentamos cargar la URL de internet
     imgElement.src = logoURL;
-    // Usamos 'inline-block' para que respete el alineamiento Flex con el texto
-    imgElement.style.display = 'inline-block'; 
+
+    // Si la imagen carga bien
+    imgElement.onload = function() {
+        imgElement.style.display = 'inline-block';
+        console.log("✅ Logo cargado con éxito");
+    };
+
+    // Si la URL está rota, bloqueada por CORS o el servidor no responde
+    imgElement.onerror = function() {
+        console.warn("⚠️ Error al cargar el logo externo. Ocultando contenedor.");
+        imgElement.style.display = 'none'; 
+        // Opcional: Podrías poner un logo por defecto aquí
+        // imgElement.src = 'assets/img/default-logo.png';
+    };
 } else {
-    // Si no hay logo, lo ocultamos para que el título se centre solo
-    imgElement.style.display = 'none'; 
+    // Si el campo en Firebase está vacío
+    imgElement.style.display = 'none';
 }
 // ==========================================
         // LÓGICA DEL BUSCADOR FLOTANTE
