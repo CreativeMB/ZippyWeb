@@ -1067,34 +1067,30 @@ function copiarLink(e) {
     
 }
 // ==========================================
-// CARGA DE LOGO DINÁMICO (OPTIMIZADO)
+// PRUEBA DE FUERZA BRUTA (LOGO DIRECTO)
 // ==========================================
-const rawLogoURL = snapshot.val().urlLogo; 
 const imgElement = document.getElementById('logoEmpresa');
+const urlPrueba = "https://drive.google.com/uc?export=view&id=19YYbkiw-5lNOB9zTm3PAxK6SGmLP7BtE";
 
-if (rawLogoURL && rawLogoURL.trim() !== "") {
-    // 1. Normalizamos la URL de Drive
-    const urlDirecta = normalizarURL(rawLogoURL);
+// Forzamos estilos al máximo
+imgElement.style.display = 'inline-block';
+imgElement.style.visibility = 'visible';
+imgElement.style.opacity = '1';
+imgElement.style.minWidth = '40px'; // Le damos un tamaño mínimo para que no sea invisible
+imgElement.style.minHeight = '40px';
+imgElement.style.border = "2px solid red"; // Borde rojo para "encontrarlo" en la web
 
-    // 2. IMPORTANTE: Forzamos la visibilidad ANTES de asignar el src
-    imgElement.style.display = 'inline-block';
-    imgElement.style.opacity = '1'; 
+// Asignamos la URL
+imgElement.src = urlPrueba;
 
-    // 3. Asignamos la URL directa de Drive (sin weserv)
-    imgElement.src = urlDirecta;
+imgElement.onload = function() {
+    console.log("🚀 PRUEBA: Logo de Drive cargado con éxito");
+};
 
-    imgElement.onload = function() {
-        console.log("✅ Logo de Drive cargado correctamente:", urlDirecta);
-    };
-
-    imgElement.onerror = function() {
-        console.warn("⚠️ Falló la URL directa. Reintentando con Proxy...");
-        // Si falla la directa, intentamos el proxy como último recurso
-        imgElement.src = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_92x30dp.png";
-    };
-} else {
-    imgElement.style.display = 'none';
-}
+imgElement.onerror = function() {
+    console.error("❌ PRUEBA: Falló el logo de Drive. Intentando con una imagen de Google...");
+    imgElement.src = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_92x30dp.png";
+};
 
 function normalizarURL(url) {
     if (!url) return "";
