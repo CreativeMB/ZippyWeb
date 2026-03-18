@@ -1074,8 +1074,8 @@ const logoURL = snapshot.val().urlLogo;
 const imgElement = document.getElementById('logoEmpresa');
 
 if (logoURL && logoURL.trim() !== "") {
-    // Intentamos cargar la URL de internet
-    imgElement.src = logoURL;
+    // Esto pasa la imagen por un servidor intermedio que salta el bloqueo
+imgElement.src = "https://images.weserv.nl/?url=" + encodeURIComponent(logoURL);
 
     // Si la imagen carga bien
     imgElement.onload = function() {
