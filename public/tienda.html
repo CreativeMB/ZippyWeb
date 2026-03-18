@@ -22,42 +22,121 @@ body {
     color: #333;
 }
 /* ========================================= */
-/* 2. HEADER COMPACTO Y DINÁMICO             */
+/* 1. CONFIGURACIÓN DE FUENTES Y BODY        */
+/* ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Montserrat:wght@700;900&display=swap');
+
+body {
+    margin: 0;
+    background: #f5f6fa;
+    color: #333;
+}
+
+/* ========================================= */
+/* 2. CONTENEDOR HEADER (FONDO NEGRO)        */
 /* ========================================= */
 .header {
     text-align: center;
-    padding: 20px 15px;
-    background: #000000;
+    padding: 20px 15px; 
+    background: #000000; 
     perspective: 1000px;
     overflow: hidden;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* TÍTULO: EFECTO REVELADO DE SEDA */
+/* ========================================= */
+/* 3. TÍTULO: EFECTO REVELADO DE SEDA        */
+/* ========================================= */
 #nombreEmpresa {
     font-family: 'Montserrat', sans-serif;
     font-size: clamp(1.8rem, 6vw, 2.8rem);
     font-weight: 900;
     margin: 0;
-    text-transform: none;
+    text-transform: none; /* Respeta mayúsculas/minúsculas del usuario */
     color: #F8F9FA;
     display: inline-block;
     
-    /* Animación de entrada: Desliza desde abajo y aparece */
-    animation: revealText 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
-    
-    /* Efecto de máscara para que parezca que sale de "la nada" */
+    /* Máscara de recorte para efecto de emergencia */
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
     
-    /* Un brillo sutil que recorre las letras */
+    /* Degradado de brillo metálico */
     background: linear-gradient(to right, #ffffff 20%, #E5C453 50%, #ffffff 80%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    
+    /* Animaciones: Entrada + Brillo constante */
     animation: revealText 1.5s ease forwards, shineSweep 4s linear infinite;
 }
 
-/* Animación de aparición suave */
+/* ========================================= */
+/* 4. ESLOGAN: ELEGANTE Y FLOTANTE           */
+/* ========================================= */
+.eslogan {
+    font-family: 'Cormorant Garamond', serif;
+    display: block;
+    font-size: 1.3rem;
+    font-style: italic;
+    color: #E5C453;
+    margin-top: 5px;
+    font-weight: 500;
+    text-transform: none; 
+    animation: fadeSlogan 4s ease-in-out infinite !important;
+}
+
+/* ========================================= */
+/* 5. BANNER INFORMATIVO (DIFUMINADO)        */
+/* ========================================= */
+.texto-destacado {
+    margin-top: 15px;
+    display: inline-block;
+    padding: 12px 40px; 
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #ffffff;
+    text-transform: none; 
+    letter-spacing: 1.5px;
+    
+    /* Efecto de degradado que desaparece a los lados */
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(125, 94, 0, 0.8) 20%, 
+        rgba(166, 138, 61, 1) 50%, 
+        rgba(125, 94, 0, 0.8) 80%, 
+        transparent 100%); 
+    
+    border: none;
+    border-top: 1px solid rgba(191, 155, 48, 0.2);
+    border-bottom: 1px solid rgba(191, 155, 48, 0.2);
+    
+    animation: pulseElegant 4s ease-in-out infinite !important;
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* ========================================= */
+/* 6. REDES SOCIALES                         */
+/* ========================================= */
+.redes-header {
+    margin-top: 10px;
+}
+
+.icono-red {
+    color: white;
+    font-size: 1.2rem;
+    margin: 0 10px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.whatsapp-share:hover { color: #25D366; }
+.facebook:hover { color: #1877F2; }
+
+/* ========================================= */
+/* 7. DEFINICIÓN DE TODAS LAS ANIMACIONES    */
+/* ========================================= */
+
+/* Revelado de Título */
 @keyframes revealText {
     0% {
         opacity: 0;
@@ -71,89 +150,24 @@ body {
     }
 }
 
-/* Animación de brillo metálico constante */
+/* Brillo Metálico del Título */
 @keyframes shineSweep {
-    to {
-        background-position: 200% center;
-    }
-}
-/* ESLOGAN (Cambiado de .slogan a .eslogan para que coincida con tu HTML) */
-.eslogan {
-    font-family: 'Cormorant Garamond', serif;
-    display: block;
-    font-size: 1.3rem;
-    font-style: italic;
-    color: #E5C453;
-    margin-top: 5px;
-    font-weight: 500;
-    text-transform: none; 
-    animation: fadeSlogan 4s ease-in-out infinite !important;
+    to { background-position: 200% center; }
 }
 
-.texto-destacado {
-    margin-top: 15px;
-    display: inline-block;
-    padding: 12px 40px; /* Más padding lateral para que el desvanecimiento luzca */
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 0.85rem;
-    color: #ffffff;
-    text-transform: none; 
-    letter-spacing: 1.5px;
-    
-    /* EFECTO: El color nace en el centro y muere en las orillas */
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(125, 94, 0, 0.8) 20%, 
-        rgba(166, 138, 61, 1) 50%, 
-        rgba(125, 94, 0, 0.8) 80%, 
-        transparent 100%); 
-    
-    /* Quitamos bordes y redondeados para que no parezca una caja */
-    border-radius: 0; 
-    border: none;
-    border-top: 1px solid rgba(191, 155, 48, 0.2); /* Una línea de luz muy fina arriba */
-    border-bottom: 1px solid rgba(191, 155, 48, 0.2); /* Una línea de luz muy fina abajo */
-    
-    /* Quitamos la sombra de caja pesada */
-    box-shadow: none; 
-    
-    /* Mantenemos el pulso pero aplicado a la opacidad para que sea sutil */
-    animation: pulseElegant 4s ease-in-out infinite !important;
-    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-/* Animación de pulso de luz (No de tamaño) */
-@keyframes pulseElegant {
-    0%, 100% { opacity: 0.8; filter: brightness(0.9); }
-    50% { opacity: 1; filter: brightness(1.2); }
-}
-
-/* Estilo para los iconos de redes sociales (Para que no se vean simples) */
-.redes-header {
-    margin-top: 10px;
-}
-.icono-red {
-    color: white;
-    font-size: 1.2rem;
-    margin: 0 10px;
-    text-decoration: none;
-    transition: 0.3s;
-}
-.whatsapp-share:hover { color: #25D366; }
-.facebook:hover { color: #1877F2; }
-
-/* RECUERDA MANTENER LAS @KEYFRAMES (bouncePro, fadeSlogan, pulseAd) QUE TE DI ANTES */
-/* ========================================= */
-/* 3. DEFINICIÓN DE ANIMACIONES "PRO"        */
-/* ========================================= */
-/* Aparecer y desaparecer para el Slogan */
+/* Aparición del Slogan */
 @keyframes fadeSlogan {
     0%, 100% { opacity: 0; transform: scale(0.9); }
     50% { opacity: 1; transform: scale(1); }
 }
 
-/* Ajuste en la animación para que el movimiento sea suave y no brusco */
+/* Pulso de luz para el Banner Informativo */
+@keyframes pulseElegant {
+    0%, 100% { opacity: 0.8; filter: brightness(0.9); }
+    50% { opacity: 1; filter: brightness(1.2); }
+}
+
+/* Pulso de escala (opcional por si lo usas en otro lado) */
 @keyframes pulseAd {
     0% { transform: scale(1); opacity: 0.9; }
     50% { transform: scale(1.03); opacity: 1; }
