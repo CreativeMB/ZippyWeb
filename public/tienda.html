@@ -1067,7 +1067,7 @@ function copiarLink(e) {
     
 }
 // ==========================================
-// CARGA DE LOGO DEFINITIVA
+// CARGA DE LOGO DEFINITIVA (AJUSTE DE TIEMPOS)
 // ==========================================
 const rawLogoURL = snapshot.val().urlLogo; 
 const imgElement = document.getElementById('logoEmpresa');
@@ -1075,19 +1075,18 @@ const imgElement = document.getElementById('logoEmpresa');
 if (rawLogoURL && rawLogoURL.trim() !== "") {
     const urlLimpia = normalizarURL(rawLogoURL);
 
-    // Quitamos el borde de prueba y aseguramos visibilidad
-    imgElement.style.border = "none"; 
-    imgElement.style.display = 'inline-block';
-    imgElement.style.opacity = '1'; 
-
+    // No mostramos nada todavía
     imgElement.src = urlLimpia;
 
     imgElement.onload = function() {
-        console.log("✅ Logo de la empresa cargado con éxito.");
+        // SOLO cuando la imagen ya bajó de internet, la hacemos aparecer
+        imgElement.style.display = 'inline-block';
+        imgElement.style.opacity = '1'; 
+        console.log("✅ Logo visualizado con éxito");
     };
 
     imgElement.onerror = function() {
-        console.error("❌ El logo sigue fallando. Revisa los permisos de Drive.");
+        console.error("❌ Fallo crítico en URL de Drive. ¿Es pública?");
         imgElement.style.display = 'none'; 
     };
 } else {
