@@ -23,73 +23,115 @@ body {
 }
 
 /* ========================================= */
-/* 2. HEADER Y ELEMENTOS DE MARCA            */
+/* 2. HEADER CON EFECTO PROFUNDIDAD          */
 /* ========================================= */
 .header {
     text-align: center;
-    /* Un padding más generoso hace que la marca se vea más importante */
-    padding: 30px 15px; 
-    /* Degradado de Gris Oxford a Carbón Suave */
-    background: linear-gradient(180deg, #1c1c1c 0%, #2d2d2d 100%);
+    padding: 50px 20px; 
+    /* Degradado con un toque de profundidad 3D */
+    background: radial-gradient(circle at top, #333333 0%, #1a1a1a 100%);
     color: #ffffff;
     position: relative;
     overflow: hidden;
-    /* Una línea sutil abajo para separar del contenido blanco */
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 2px solid rgba(229, 196, 83, 0.2);
 }
 
 .header h1 {
-    /* Nombre de la empresa en Blanco Hueso para que sea legible */
-    color: #F8F9FA; 
-    font-size: 2.2rem;
-    font-weight: bold;
+    /* Tipografía: Montserrat es perfecta para legibilidad y elegancia */
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 900;
     text-transform: uppercase;
-    margin-bottom: 8px;
-}
-.header p {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 1.1rem;
-    opacity: 0.9;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+    
+    /* EFECTO 3D REAL EN TEXTO */
+    color: #F8F9FA;
+    text-shadow: 
+        0 1px 0 #ccc, 
+        0 2px 0 #c9c9c9, 
+        0 3px 0 #bbb, 
+        0 4px 0 #b9b9b9, 
+        0 5px 0 #aaa, 
+        0 6px 1px rgba(0,0,0,.1), 
+        0 0 5px rgba(0,0,0,.1), 
+        0 1px 3px rgba(0,0,0,.3), 
+        0 3px 5px rgba(0,0,0,.2), 
+        0 5px 10px rgba(0,0,0,.25);
+    
+    animation: floating 3s ease-in-out infinite;
 }
 
 .header .slogan {
-    /* El slogan en Dorado Champán para dar el toque de "Regalo/Detalle" */
+    /* Estilo "Cormorant" para ese toque de alta costura/floristería fina */
+    font-family: 'Cormorant Garamond', serif;
     color: #E5C453; 
-    font-family: 'Cormorant Garamond', serif; /* Una fuente tipo cursiva/elegante */
     font-style: italic;
-    font-size: 1.2rem;
-    letter-spacing: 1px;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    margin-top: 5px;
+    display: block;
+    opacity: 0;
+    animation: fadeInSlide 1.5s ease-out forwards 0.5s;
 }
 
 /* ========================================= */
-/* 3. BANNER INFORMATIVO ANIMADO             */
+/* 3. ETIQUETAS DESTACADAS (EFECTO CRISTAL)  */
 /* ========================================= */
-.banner-informativo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 1000px;
-    width: 100%;
-    min-height: 40px;
-    padding: 5px 0;
-    margin: 0;
-}
-
 .header .destacado {
-    /* Para frases importantes como "Flores Amarillas: Símbolo de Amor" */
-    color: #FFFFFF;
-    background-color: rgba(229, 196, 83, 0.2); /* Un fondo suave dorado */
-    padding: 5px 15px;
-    border-radius: 20px;
-    display: inline-block;
-    margin-top: 10px;
+    margin-top: 25px;
+    padding: 8px 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #ffffff;
+    letter-spacing: 1px;
+    
+    /* Efecto Glassmorphism 3D */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-@keyframes drop-3d-header {
-    0% { opacity: 0; transform: translateY(-15px) rotateX(-45deg); }
-    10%, 85% { opacity: 1; transform: translateY(0) rotateX(0deg); }
-    95%, 100% { opacity: 0; transform: translateY(15px) rotateX(45deg); }
+.header .destacado:hover {
+    transform: scale(1.05);
+    background: rgba(229, 196, 83, 0.2);
+    border-color: #E5C453;
+}
+
+/* ========================================= */
+/* 4. ANIMACIONES PERSONALIZADAS             */
+/* ========================================= */
+
+/* Elevación suave 3D para el título principal */
+@keyframes floating {
+    0% { transform: translateY(0px) rotateX(0deg); }
+    50% { transform: translateY(-10px) rotateX(5deg); }
+    100% { transform: translateY(0px) rotateX(0deg); }
+}
+
+/* Entrada elegante para el slogan */
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animación 3D para banners de texto (reutilizable) */
+.texto-animado-3d {
+    display: inline-block;
+    animation: flip3D 6s infinite;
+    transform-style: preserve-3d;
+}
+
+@keyframes flip3D {
+    0%, 20% { transform: rotateX(90deg); opacity: 0; }
+    30%, 70% { transform: rotateX(0deg); opacity: 1; }
+    80%, 100% { transform: rotateX(-90deg); opacity: 0; }
 }
 
 /* ========================================= */
