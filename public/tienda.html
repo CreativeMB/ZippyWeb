@@ -1066,49 +1066,47 @@ function copiarLink(e) {
     }
     
 }
-// ==========================================
-// CARGA DE LOGO POR ID DE DRIVE
-// ==========================================
-const logoID = snapshot.val().urlLogo; 
+// 1. La función "Cerebro" que entiende IDs y Links
+function obtenerLinkDirecto(entrada) {
+    if (!entrada) return "";
+    
+    // Si es un ID de Drive (no tiene puntos ni 'http' y es largo)
+    if (!entrada.includes('http') && entrada.length >= 25) {
+        return `https://drive.google.com/uc?export=view&id=${entrada.trim()}`;
+    }
+
+    // Si el usuario pegó el link completo, extraemos el ID
+    if (entrada.includes('drive.google.com')) {
+        const match = entrada.match(/\/d\/([-\w]{25,})/) || entrada.match(/id=([-\w]{25,})/);
+        if (match && match[1]) {
+            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+        }
+    }
+    return entrada; // Si no es Drive, devuelve la URL tal cual
+}
+
+// 2. La lógica de carga en el Header
+const datoLogo = snapshot.val().urlLogo; 
 const imgElement = document.getElementById('logoEmpresa');
 
-if (logoID && logoID.trim() !== "") {
-    
-    // Construimos la URL directa usando el ID de Firebase
-    const urlDirecta = `https://drive.google.com/uc?export=view&id=${logoID.trim()}`;
+if (datoLogo && datoLogo.trim() !== "") {
+    const urlFinal = obtenerLinkDirecto(datoLogo);
 
-    // Configuramos atributos de seguridad y visibilidad
     imgElement.setAttribute('referrerpolicy', 'no-referrer');
-    imgElement.src = urlDirecta;
+    imgElement.src = urlFinal;
 
     imgElement.onload = function() {
         imgElement.style.display = 'inline-block';
         imgElement.style.opacity = '1';
-        console.log("✅ Logo cargado mediante ID de Drive");
+        console.log("✅ Logo de Zippy cargado");
     };
 
     imgElement.onerror = function() {
-        console.warn("⚠️ El ID de Drive no es válido o el archivo no es PÚBLICO.");
-        // Intento de rescate con Proxy si falla la conexión directa
-        imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlDirecta)}`;
+        // Si falla (por permisos de Drive), intentamos el proxy weserv
+        imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`;
     };
-
 } else {
     imgElement.style.display = 'none';
-}
-function normalizarURL(url) {
-    if (!url) return "";
-    
-    // Si es un link de Google Drive
-    if (url.includes('drive.google.com')) {
-        // Esta expresión regular extrae el ID de cualquier formato de link de Drive
-        const match = url.match(/\/d\/([-\w]{25,})/) || url.match(/id=([-\w]{25,})/);
-        if (match && match[1]) {
-            // Retorna el formato "uc" que es el que permite visualización directa
-            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-        }
-    }
-    return url;
 }
 // ==========================================
         // LÓGICA DEL BUSCADOR FLOTANTE
