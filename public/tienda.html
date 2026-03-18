@@ -57,10 +57,8 @@ body {
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
-    animation: fadeInLogo 1.5s ease-out forwards;
-    /* CAMBIO: En lugar de none, usamos opacity 0 para que el espacio exista pero sea invisible */
-    opacity: 0; 
-    display: none; /* Lo seguiremos controlando con JS */
+    /* Eliminamos el display: none de aquí para que el JS tenga control total */
+    vertical-align: middle; 
 }
 /* ========================================= */
 /* 3. TÍTULO: EFECTO REVELADO DE SEDA        */
@@ -1069,28 +1067,30 @@ function copiarLink(e) {
     
 }
 // ==========================================
-// CARGA DE LOGO DINÁMICO (MULTIEMPRESA)
+// CARGA DE LOGO DINÁMICO (OPTIMIZADO)
 // ==========================================
 const rawLogoURL = snapshot.val().urlLogo; 
 const imgElement = document.getElementById('logoEmpresa');
 
 if (rawLogoURL && rawLogoURL.trim() !== "") {
-    const urlLimpia = normalizarURL(rawLogoURL);
+    // 1. Normalizamos la URL de Drive
+    const urlDirecta = normalizarURL(rawLogoURL);
 
-    // IMPORTANTE: Antes de asignar el src, preparamos el elemento
-    imgElement.style.display = 'inline-block'; 
-    
-    // Usamos el proxy
-    imgElement.src = "https://images.weserv.nl/?url=" + encodeURIComponent(urlLimpia);
+    // 2. IMPORTANTE: Forzamos la visibilidad ANTES de asignar el src
+    imgElement.style.display = 'inline-block';
+    imgElement.style.opacity = '1'; 
+
+    // 3. Asignamos la URL directa de Drive (sin weserv)
+    imgElement.src = urlDirecta;
 
     imgElement.onload = function() {
-        imgElement.style.opacity = '1'; // Asegura que se vea tras la animación
-        console.log("✅ Logo cargado con éxito");
+        console.log("✅ Logo de Drive cargado correctamente:", urlDirecta);
     };
 
     imgElement.onerror = function() {
-        console.warn("⚠️ Error en el logo. Ocultando.");
-        imgElement.style.display = 'none'; 
+        console.warn("⚠️ Falló la URL directa. Reintentando con Proxy...");
+        // Si falla la directa, intentamos el proxy como último recurso
+        imgElement.src = "https://images.weserv.nl/?url=" + encodeURIComponent(urlDirecta);
     };
 } else {
     imgElement.style.display = 'none';
