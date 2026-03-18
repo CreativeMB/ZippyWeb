@@ -56,10 +56,11 @@ body {
     height: 40px; 
     width: auto;
     object-fit: contain;
-    /* Un brillo suave para que el logo resalte en el fondo negro */
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
     animation: fadeInLogo 1.5s ease-out forwards;
-    display: none; /* Se activa con document.getElementById('logoEmpresa').style.display='block' */
+    /* CAMBIO: En lugar de none, usamos opacity 0 para que el espacio exista pero sea invisible */
+    opacity: 0; 
+    display: none; /* Lo seguiremos controlando con JS */
 }
 /* ========================================= */
 /* 3. TÍTULO: EFECTO REVELADO DE SEDA        */
@@ -1074,29 +1075,27 @@ const rawLogoURL = snapshot.val().urlLogo;
 const imgElement = document.getElementById('logoEmpresa');
 
 if (rawLogoURL && rawLogoURL.trim() !== "") {
-    
-    // 1. Normalizamos la URL (por si viene de Drive o es link directo)
     const urlLimpia = normalizarURL(rawLogoURL);
 
-    // 2. Usamos el proxy para evitar bloqueos de CORS y optimizar carga
+    // IMPORTANTE: Antes de asignar el src, preparamos el elemento
+    imgElement.style.display = 'inline-block'; 
+    
+    // Usamos el proxy
     imgElement.src = "https://images.weserv.nl/?url=" + encodeURIComponent(urlLimpia);
 
-    // Si la imagen carga bien
     imgElement.onload = function() {
-        imgElement.style.display = 'inline-block';
-        console.log("✅ Logo normalizado y cargado con éxito");
+        imgElement.style.opacity = '1'; // Asegura que se vea tras la animación
+        console.log("✅ Logo cargado con éxito");
     };
 
-    // Si hay error (Link privado, ID borrado, etc.)
     imgElement.onerror = function() {
-        console.warn("⚠️ No se pudo cargar el logo. Verifique que el archivo en Drive sea PÚBLICO.");
+        console.warn("⚠️ Error en el logo. Ocultando.");
         imgElement.style.display = 'none'; 
     };
-
 } else {
-    // Si el campo en Firebase está vacío
     imgElement.style.display = 'none';
 }
+
 function normalizarURL(url) {
     if (!url) return "";
     // Si es un link de Google Drive (view, open, o uc)
