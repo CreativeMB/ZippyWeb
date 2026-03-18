@@ -1090,7 +1090,7 @@ if (rawLogoURL && rawLogoURL.trim() !== "") {
     imgElement.onerror = function() {
         console.warn("⚠️ Falló la URL directa. Reintentando con Proxy...");
         // Si falla la directa, intentamos el proxy como último recurso
-        imgElement.src = "https://images.weserv.nl/?url=" + encodeURIComponent(urlDirecta);
+        imgElement.src = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_92x30dp.png";
     };
 } else {
     imgElement.style.display = 'none';
