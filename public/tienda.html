@@ -33,31 +33,33 @@ body {
 }
 
 /* ========================================= */
-/* 2. CONTENEDOR HEADER (FONDO NEGRO)        */
+/* 2. HEADER Y MARCA (LOGO + NOMBRE)         */
 /* ========================================= */
 .header {
     text-align: center;
-    padding: 20px 15px; 
+    padding: 20px 15px; /* Barra delgada/Slim */
     background: #000000; 
     perspective: 1000px;
     overflow: hidden;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .marca-principal {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px; /* Espacio entre logo y texto */
+    gap: 12px; 
     margin-bottom: 5px;
 }
 
 .logo-estilo {
-    height: 40px; /* Tamaño compacto para barra slim */
+    height: 40px; 
     width: auto;
     object-fit: contain;
+    /* Un brillo suave para que el logo resalte en el fondo negro */
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
     animation: fadeInLogo 1.5s ease-out forwards;
-    display: none; /* Se activa desde JS cuando cargue urlLogo */
+    display: none; /* Se activa con document.getElementById('logoEmpresa').style.display='block' */
 }
 /* ========================================= */
 /* 3. TÍTULO: EFECTO REVELADO DE SEDA        */
@@ -1063,7 +1065,23 @@ function copiarLink(e) {
         // Intento 2: Método para navegadores viejos o sitios sin HTTPS
         metodoAntiguo(urlActual);
     }
-}// ==========================================
+    
+}
+// ==========================================
+// LOGO EMPRESA (Extraído de Firebase)
+// ==========================================
+const logoURL = snapshot.val().urlLogo; 
+const imgElement = document.getElementById('logoEmpresa');
+
+if (logoURL && logoURL.trim() !== "") {
+    imgElement.src = logoURL;
+    // Usamos 'inline-block' para que respete el alineamiento Flex con el texto
+    imgElement.style.display = 'inline-block'; 
+} else {
+    // Si no hay logo, lo ocultamos para que el título se centre solo
+    imgElement.style.display = 'none'; 
+}
+// ==========================================
         // LÓGICA DEL BUSCADOR FLOTANTE
         // ==========================================
         const btnBusqueda = document.getElementById('btnBusqueda');
@@ -1085,14 +1103,6 @@ function copiarLink(e) {
         inputBusqueda.addEventListener('input', (e) => {
             filtrarProductos(e.target.value.toLowerCase());
         });
-        // Variable que traes de tu Realtime Database
-const logoURL = snapshot.val().urlLogo; 
-const imgElement = document.getElementById('logoEmpresa');
-
-if (logoURL) {
-    imgElement.src = logoURL;
-    imgElement.style.display = 'block'; // Solo se muestra si existe la URL
-}
 
         function filtrarProductos(texto) {
             const productosCards = document.querySelectorAll('.producto');
