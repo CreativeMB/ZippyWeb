@@ -27,105 +27,118 @@ body {
 /* ========================================= */
 .header {
     text-align: center;
-    padding: 60px 20px;
+    padding: 65px 25px;
     background: radial-gradient(circle at center, #2c2c2c 0%, #121212 100%);
-    perspective: 1000px; /* Habilita el entorno 3D para los hijos */
+    perspective: 1200px; /* Habilita el espacio 3D real */
 }
 
 .header h1 {
     font-family: 'Montserrat', sans-serif;
-    font-size: clamp(2.2rem, 7vw, 3.5rem);
-    font-weight: 800;
-    margin-bottom: 10px;
+    font-size: clamp(2.5rem, 8vw, 3.8rem);
+    font-weight: 900;
+    margin-bottom: 15px;
     
-    /* EFECTO PRO: Gradiente metálico en el texto */
-    background: linear-gradient(to bottom, #ffffff 30%, #b3b3b3 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    /* EFECTO 3D EXTRUIDO (No plano) */
+    color: #F8F9FA;
+    text-shadow: 
+        0 1px 0 #d9d9d9,
+        0 2px 0 #cccccc,
+        0 3px 0 #b3b3b3,
+        0 4px 0 #999999,
+        0 10px 20px rgba(0,0,0,0.5); /* Sombra de caída */
     
-    /* 3D SOFISTICADO: No es un borde, es profundidad */
-    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
-    transform: rotateX(10deg); /* Inclinación 3D sutil */
-    
-    letter-spacing: -1px; /* Letras más juntas = más moderno */
-    transition: transform 0.5s ease;
+    letter-spacing: -2px; 
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: default;
 }
 
 .header h1:hover {
-    transform: rotateX(0deg) scale(1.02);
+    transform: translateZ(50px) rotateX(10deg);
+    text-shadow: 
+        0 1px 0 #d9d9d9,
+        0 5px 15px rgba(229, 196, 83, 0.3); /* Brillo dorado al pasar el mouse */
 }
 
 /* ========================================= */
-/* 3. SLOGAN: ELEGANCIA MULTIEMPRESA         */
+/* 3. SLOGAN: MODERNISMO MIXTO (May/Min)     */
 /* ========================================= */
 .header .slogan {
     font-family: 'Cormorant Garamond', serif;
     display: block;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-style: italic;
-    font-weight: 400;
-    /* Respetamos mayúsculas/minúsculas para que sea legible y "chic" */
+    font-weight: 500;
+    text-transform: none; /* RESPETA MAYÚSCULAS Y MINÚSCULAS PROFESIONALES */
     color: #E5C453; 
     
-    /* Iluminación tipo Neón suave */
-    text-shadow: 0 0 8px rgba(229, 196, 83, 0.4);
-    margin-top: 5px;
-    letter-spacing: 0.5px;
+    /* Efecto de iluminación suave */
+    filter: drop-shadow(0 0 5px rgba(229, 196, 83, 0.3));
+    margin-top: 10px;
+    letter-spacing: 1px;
+    opacity: 0.9;
 }
 
 /* ========================================= */
-/* 4. LETREROS Y BANNERS (3D DINÁMICO)       */
+/* 4. BANNER 3D FLOTANTE (CRISTAL)           */
 /* ========================================= */
 .header .destacado {
-    margin-top: 30px;
+    margin-top: 35px;
     display: inline-block;
-    padding: 10px 30px;
+    padding: 12px 35px;
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
-    font-size: 0.9rem;
-    text-transform: none; /* Mantiene minúsculas para un look Pro */
-    
-    /* EFECTO GLASSMORFISMO 3D */
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    
-    /* Sombra proyectada para que parezca que flota */
-    box-shadow: 
-        0 4px 6px rgba(0,0,0,0.2),
-        0 15px 35px rgba(0,0,0,0.3),
-        inset 0 1px 1px rgba(255,255,255,0.1);
-        
+    font-size: 1rem;
+    text-transform: none; /* Estilo moderno mixto */
     color: #ffffff;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    /* EFECTO GLASSMORFISMO 3D AVANZADO */
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    
+    /* Sombra de objeto físico flotando */
+    box-shadow: 
+        0 10px 25px rgba(0,0,0,0.4),
+        inset 0 1px 1px rgba(255,255,255,0.2);
+        
+    transition: all 0.4s ease;
+    animation: floating3D 4s ease-in-out infinite;
 }
 
 .header .destacado:hover {
-    transform: translateY(-5px) rotateY(10deg);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #E5C453;
+    transform: translateY(-8px) scale(1.05);
 }
 
 /* ========================================= */
-/* 5. ANIMACIÓN DE ENTRADA "THE ZIPPY DROP"  */
+/* 5. ANIMACIONES DE ALTO NIVEL              */
 /* ========================================= */
-@keyframes zippyDrop {
+
+/* Flotación física para el banner */
+@keyframes floating3D {
+    0%, 100% { transform: translateY(0) rotateY(0deg); }
+    50% { transform: translateY(-12px) rotateY(5deg); }
+}
+
+/* Animación de entrada con zoom y desenfoque */
+.header h1, .header .slogan, .header .destacado {
+    animation: entrancePro 1.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes entrancePro {
     0% { 
         opacity: 0; 
-        transform: translateZ(100px) scale(1.2); 
-        filter: blur(10px);
+        transform: scale(0.8) translateY(30px); 
+        filter: blur(15px);
     }
     100% { 
         opacity: 1; 
-        transform: translateZ(0) scale(1); 
+        transform: scale(1) translateY(0); 
         filter: blur(0);
     }
-}
-
-.header h1, .header .slogan {
-    animation: zippyDrop 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 /* ========================================= */
 /* 4. GRID DE PRODUCTOS (VISTA PC)           */
