@@ -62,24 +62,31 @@ body {
 .texto-destacado {
     margin-top: 15px;
     display: inline-block;
-    padding: 8px 25px;
+    padding: 10px 28px;
     font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    font-size: 0.9rem;
+    font-weight: 700;
+    font-size: 0.85rem;
     color: #ffffff;
     text-transform: none; 
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
     
-    /* CAMBIO: Degradado de Naranja Profundo a Dorado Quemado */
-    background: linear-gradient(45deg, #a67c00, #bf9b30); 
+    /* CAMBIO: Degradado de Bronce a Oro Mate (Mucho más sobrio) */
+    background: linear-gradient(135deg, #7d5e00 0%, #a68a3d 100%); 
     
-    border-radius: 30px;
-    /* Sombra más sutil para que no "brille" tanto */
-    box-shadow: 0 4px 15px rgba(166, 124, 0, 0.3);
+    border-radius: 8px; /* Menos redondo = más serio/corporativo */
     
-    animation: pulseAd 1.5s ease-in-out infinite !important;
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Toque de luz en el borde */
+    /* Sombra muy profunda y sutil, nada de brillos neón */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    
+    /* Animación de pulso más lenta para que sea elegante, no ansiosa */
+    animation: pulseAd 3s ease-in-out infinite !important;
+    
+    border: 1px solid rgba(191, 155, 48, 0.4);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
+
+
 
 /* Estilo para los iconos de redes sociales (Para que no se vean simples) */
 .redes-header {
@@ -113,11 +120,11 @@ body {
     50% { opacity: 1; transform: scale(1); }
 }
 
-/* Crecer y achicar para la Publicidad (Call to Action) */
+/* Ajuste en la animación para que el movimiento sea suave y no brusco */
 @keyframes pulseAd {
-    0% { transform: scale(1); box-shadow: 0 0 10px rgba(229, 196, 83, 0.4); }
-    50% { transform: scale(1.1); box-shadow: 0 0 25px rgba(229, 196, 83, 0.7); }
-    100% { transform: scale(1); box-shadow: 0 0 10px rgba(229, 196, 83, 0.4); }
+    0% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.03); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.9; }
 }
 /* ========================================= */
 /* 4. GRID DE PRODUCTOS (VISTA PC)           */
