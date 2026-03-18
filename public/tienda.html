@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-    <img id="logoEmpresa" src="" alt="" class="logo-estilo" referrerpolicy="no-referrer">
 <meta property="og:title" content="¡Mira esta tienda! Muchos productos, entra ya...">
 <meta property="og:description" content="Haz tu pedido por WhatsApp de forma fácil y rápida.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1068,41 +1067,35 @@ function copiarLink(e) {
     
 }
 // ==========================================
-// CARGA DE LOGO (VERSIÓN FINAL ANTI-BLOQUEO)
+// CARGA DE LOGO POR ID DE DRIVE
 // ==========================================
-function cargarLogoEmpresa(url) {
-    const imgElement = document.getElementById('logoEmpresa');
-    if (!imgElement || !url) return;
+const logoID = snapshot.val().urlLogo; 
+const imgElement = document.getElementById('logoEmpresa');
 
-    const urlLimpia = normalizarURL(url);
-
-    // 1. Forzamos la limpieza del src anterior
-    imgElement.src = ""; 
+if (logoID && logoID.trim() !== "") {
     
-    // 2. Configuramos atributos de seguridad para saltar bloqueos de Drive
+    // Construimos la URL directa usando el ID de Firebase
+    const urlDirecta = `https://drive.google.com/uc?export=view&id=${logoID.trim()}`;
+
+    // Configuramos atributos de seguridad y visibilidad
     imgElement.setAttribute('referrerpolicy', 'no-referrer');
+    imgElement.src = urlDirecta;
 
-    // 3. Asignamos la URL
-    imgElement.src = urlLimpia;
-
-    // 4. Forzamos la aparición
     imgElement.onload = function() {
         imgElement.style.display = 'inline-block';
         imgElement.style.opacity = '1';
-        imgElement.style.visibility = 'visible';
-        console.log("✅ Logo de Drive renderizado correctamente");
+        console.log("✅ Logo cargado mediante ID de Drive");
     };
 
     imgElement.onerror = function() {
-        console.warn("⚠️ Drive bloqueó el acceso directo. Usando Proxy de respaldo...");
-        imgElement.src = "https://images.weserv.nl/?url=" + encodeURIComponent(urlLimpia);
+        console.warn("⚠️ El ID de Drive no es válido o el archivo no es PÚBLICO.");
+        // Intento de rescate con Proxy si falla la conexión directa
+        imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlDirecta)}`;
     };
+
+} else {
+    imgElement.style.display = 'none';
 }
-
-// LLAMADA DENTRO DE TU ONVALUE DE FIREBASE:
-const rawLogoURL = snapshot.val().urlLogo;
-cargarLogoEmpresa(rawLogoURL);
-
 function normalizarURL(url) {
     if (!url) return "";
     
