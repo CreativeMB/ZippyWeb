@@ -1067,41 +1067,45 @@ function copiarLink(e) {
     
 }
 // ==========================================
-// PRUEBA DE FUERZA BRUTA (LOGO DIRECTO)
+// CARGA DE LOGO DEFINITIVA
 // ==========================================
+const rawLogoURL = snapshot.val().urlLogo; 
 const imgElement = document.getElementById('logoEmpresa');
-const urlPrueba = "https://drive.google.com/uc?export=view&id=19YYbkiw-5lNOB9zTm3PAxK6SGmLP7BtE";
 
-// Forzamos estilos al máximo
-imgElement.style.display = 'inline-block';
-imgElement.style.visibility = 'visible';
-imgElement.style.opacity = '1';
-imgElement.style.minWidth = '40px'; // Le damos un tamaño mínimo para que no sea invisible
-imgElement.style.minHeight = '40px';
-imgElement.style.border = "2px solid red"; // Borde rojo para "encontrarlo" en la web
+if (rawLogoURL && rawLogoURL.trim() !== "") {
+    const urlLimpia = normalizarURL(rawLogoURL);
 
-// Asignamos la URL
-imgElement.src = urlPrueba;
+    // Quitamos el borde de prueba y aseguramos visibilidad
+    imgElement.style.border = "none"; 
+    imgElement.style.display = 'inline-block';
+    imgElement.style.opacity = '1'; 
 
-imgElement.onload = function() {
-    console.log("🚀 PRUEBA: Logo de Drive cargado con éxito");
-};
+    imgElement.src = urlLimpia;
 
-imgElement.onerror = function() {
-    console.error("❌ PRUEBA: Falló el logo de Drive. Intentando con una imagen de Google...");
-    imgElement.src = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_92x30dp.png";
-};
+    imgElement.onload = function() {
+        console.log("✅ Logo de la empresa cargado con éxito.");
+    };
 
+    imgElement.onerror = function() {
+        console.error("❌ El logo sigue fallando. Revisa los permisos de Drive.");
+        imgElement.style.display = 'none'; 
+    };
+} else {
+    imgElement.style.display = 'none';
+}
 function normalizarURL(url) {
     if (!url) return "";
-    // Si es un link de Google Drive (view, open, o uc)
+    
+    // Si es un link de Google Drive
     if (url.includes('drive.google.com')) {
-        const id = url.match(/[-\w]{25,}/); // Extrae el ID largo de Drive
-        if (id) {
-            return `https://drive.google.com/uc?export=view&id=${id[0]}`;
+        // Esta expresión regular extrae el ID de cualquier formato de link de Drive
+        const match = url.match(/\/d\/([-\w]{25,})/) || url.match(/id=([-\w]{25,})/);
+        if (match && match[1]) {
+            // Retorna el formato "uc" que es el que permite visualización directa
+            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
         }
     }
-    return url; // Si no es Drive, devuelve la URL original
+    return url;
 }
 // ==========================================
         // LÓGICA DEL BUSCADOR FLOTANTE
