@@ -876,31 +876,43 @@
                     empresaId = child.key;
                     const perfil = data.perfilempresa;
 
-                    // --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
-                    if (perfil.fechaExpiracion) {
-                        const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
-                        const [dia, mes, anio] = fechaPart.split("/");
-                        const [hora, min, seg] = horaPart.split(":");
-                        const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
+                   // --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
+if (perfil.fechaExpiracion) {
+    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
+    const [dia, mes, anio] = fechaPart.split("/");
+    const [hora, min, seg] = horaPart.split(":");
+    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
 
-                        const offsetRef = ref(db, ".info/serverTimeOffset");
-                        onValue(offsetRef, (offsetSnapshot) => {
-                            const offset = offsetSnapshot.val() || 0;
-                            const horaRealServidor = Date.now() + offset;
+    const offsetRef = ref(db, ".info/serverTimeOffset");
+    onValue(offsetRef, (offsetSnapshot) => {
+        const offset = offsetSnapshot.val() || 0;
+        const horaRealServidor = Date.now() + offset;
 
-                            if (horaRealServidor > tiempoExpiracion) {
-                                console.log("🛑 ACCESO EXPIRADO. Redirigiendo a mantenimiento...");
-                                setTimeout(() => {
-                                    window.location.replace("mantenimiento.html");
-                                }, 100);
-                                return;
-                            } else {
-                                continuarCarga(perfil, data);
-                            }
-                        }, { onlyOnce: true });
-                    } else {
-                        continuarCarga(perfil, data);
-                    }
+        if (horaRealServidor > tiempoExpiracion) {
+            bloqueoActivo = true; // Variable global para detener otros scripts
+            console.log("🛑 ACCESO EXPIRADO.");
+
+            // 1. Limpieza radical inmediata (Esto mata el explorador de la tienda visualmente)
+            document.documentElement.innerHTML = `
+                <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh; overflow:hidden;">
+                    <div style="text-align:center; font-family:sans-serif;">
+                        <p style="color:#64748b; font-size:18px;">Redirigiendo...</p>
+                    </div>
+                </body>`;
+
+            // 2. SALIDA FORZADA DEL "SLUG"
+            // Usamos la ruta absoluta con "/" al principio. 
+            // Esto le dice al navegador: "Vete a la raíz del dominio, no te quedes en /t/"
+            window.location.replace("/mantenimiento.html"); 
+            
+            return; 
+        } else {
+            continuarCarga(perfil, data);
+        }
+    }, { onlyOnce: true });
+} else {
+    continuarCarga(perfil, data);
+}
                 }
             });
         });
