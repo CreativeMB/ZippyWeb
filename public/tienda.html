@@ -780,45 +780,42 @@ onValue(empresasRef, (snapshot) => {
             const perfil = data.perfilempresa;
 
             // --- VALIDACIÓN DE EXPIRACIÓN ---
-            if (perfil.fechaExpiracion) {
-                const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
-                const [dia, mes, anio] = fechaPart.split("/");
-                const [hora, min, seg] = horaPart.split(":");
-                const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
+           // --- VALIDACIÓN DE EXPIRACIÓN ---
+if (perfil.fechaExpiracion) {
+    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
+    const [dia, mes, anio] = fechaPart.split("/");
+    const [hora, min, seg] = horaPart.split(":");
+    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
 
-                const offsetRef = ref(db, ".info/serverTimeOffset");
-                onValue(offsetRef, (offsetSnapshot) => {
-                    const offset = offsetSnapshot.val() || 0;
-                    const horaRealServidor = Date.now() + offset;
+    const offsetRef = ref(db, ".info/serverTimeOffset");
+    onValue(offsetRef, (offsetSnapshot) => {
+        const offset = offsetSnapshot.val() || 0;
+        const horaRealServidor = Date.now() + offset;
 
-                    if (horaRealServidor > tiempoExpiracion) {
-                        bloqueoActivo = true; // Activamos el bloqueo
-                        console.log("🛑 ACCESO EXPIRADO.");
+        if (horaRealServidor > tiempoExpiracion) {
+            bloqueoActivo = true; // Bloqueamos el render
+            console.log("🛑 ACCESO EXPIRADO.");
 
-                        // 1. ELIMINAR LOADER INMEDIATAMENTE
-                        const loader = document.getElementById('loader');
-                        if (loader) loader.remove();
+            // 1. ELIMINAR CUALQUIER RASTRO VISUAL (Incluyendo Loader)
+            document.body.innerHTML = `
+                <div style="margin:0; padding:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh; width:100vw; position:fixed; top:0; left:0; z-index:99999;">
+                    <p style="font-family:sans-serif; color:#64748b; font-size:18px;">Verificando suscripción...</p>
+                </div>`;
 
-                        // 2. LIMPIAR TODO EL BODY
-                        document.body.innerHTML = `
-                            <div style="margin:0; padding:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; width:100vw; position:fixed; top:0; left:0; z-index:9999;">
-                                <div style="text-align:center;">
-                                    <p style="color:#64748b; font-size:18px;">Verificando estado de la cuenta...</p>
-                                </div>
-                            </div>`;
-
-                        // 3. REDIRECCIÓN
-                        setTimeout(() => {
-                            window.location.replace("mantenimiento.html");
-                        }, 100);
-                        return; 
-                    } else {
-                        continuarCarga(perfil, data);
-                    }
-                }, { onlyOnce: true });
-            } else {
-                continuarCarga(perfil, data);
-            }
+            // 2. FORZAR SALIDA A LA RAÍZ (Importante el "/" antes de mantenimiento)
+            setTimeout(() => {
+                window.location.replace("/mantenimiento.html");
+            }, 100);
+            
+            return; // Detenemos la ejecución aquí
+        } else {
+            continuarCarga(perfil, data);
+        }
+    }, { onlyOnce: true });
+} else {
+    continuarCarga(perfil, data);
+}
+            
         }
     });
 });
