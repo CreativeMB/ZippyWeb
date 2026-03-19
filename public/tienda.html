@@ -765,65 +765,60 @@ body {
 
     const slug = window.location.pathname.split("/").pop();
 
-    // 1. NÚCLEO DE CARGA Y VALIDACIÓN
-    const empresasRef = ref(db);
-    onValue(empresasRef, (snapshot) => {
-        snapshot.forEach((child) => {
-            const data = child.val();
-            if (data.perfilempresa?.slug === slug) {
-                empresaId = child.key;
-                const perfil = data.perfilempresa;
+   // --- NÚCLEO DE CARGA Y VALIDACIÓN ---
+let bloqueoActivo = false; // Variable de control global
 
-                       // --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
-if (perfil.fechaExpiracion) {
-    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
-    const [dia, mes, anio] = fechaPart.split("/");
-    const [hora, min, seg] = horaPart.split(":");
-    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
+const empresasRef = ref(db);
+onValue(empresasRef, (snapshot) => {
+    snapshot.forEach((child) => {
+        const data = child.val();
+        if (data.perfilempresa?.slug === slug) {
+            empresaId = child.key;
+            const perfil = data.perfilempresa;
 
-    const offsetRef = ref(db, ".info/serverTimeOffset");
-    onValue(offsetRef, (offsetSnapshot) => {
-        const offset = offsetSnapshot.val() || 0;
-        const horaRealServidor = Date.now() + offset;
+            // --- VALIDACIÓN DE EXPIRACIÓN ---
+            if (perfil.fechaExpiracion) {
+                const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
+                const [dia, mes, anio] = fechaPart.split("/");
+                const [hora, min, seg] = horaPart.split(":");
+                const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
 
-        if (horaRealServidor > tiempoExpiracion) {
-            console.log("🛑 ACCESO EXPIRADO. Redirigiendo a mantenimiento...");
+                const offsetRef = ref(db, ".info/serverTimeOffset");
+                onValue(offsetRef, (offsetSnapshot) => {
+                    const offset = offsetSnapshot.val() || 0;
+                    const horaRealServidor = Date.now() + offset;
 
-            // --- CANCELAR EL LOADER ---
-            // Buscamos el loader por ID o clase y lo removemos
-            const loader = document.getElementById('loader') || document.querySelector('.loader-container');
-            if (loader) {
-                loader.style.display = 'none'; // Lo ocultamos de inmediato
-                loader.remove();               // Lo eliminamos para estar seguros
+                    if (horaRealServidor > tiempoExpiracion) {
+                        bloqueoActivo = true; // Activamos el bloqueo
+                        console.log("🛑 ACCESO EXPIRADO.");
+
+                        // 1. ELIMINAR LOADER INMEDIATAMENTE
+                        const loader = document.getElementById('loader');
+                        if (loader) loader.remove();
+
+                        // 2. LIMPIAR TODO EL BODY
+                        document.body.innerHTML = `
+                            <div style="margin:0; padding:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; width:100vw; position:fixed; top:0; left:0; z-index:9999;">
+                                <div style="text-align:center;">
+                                    <p style="color:#64748b; font-size:18px;">Verificando estado de la cuenta...</p>
+                                </div>
+                            </div>`;
+
+                        // 3. REDIRECCIÓN
+                        setTimeout(() => {
+                            window.location.replace("mantenimiento.html");
+                        }, 100);
+                        return; 
+                    } else {
+                        continuarCarga(perfil, data);
+                    }
+                }, { onlyOnce: true });
+            } else {
+                continuarCarga(perfil, data);
             }
-
-            // 1. DESTRUCCIÓN TOTAL DEL CONTENIDO (MAZO DE HIERRO)
-            // Cambiamos el fondo para que no se vea el "salto" blanco
-            document.documentElement.innerHTML = `
-                <body style="margin:0; padding:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh; font-family:sans-serif;">
-                    <div style="text-align:center;">
-                        <p style="color:#64748b;">Verificando suscripción...</p>
-                    </div>
-                </body>`;
-
-            // 2. REDIRECCIÓN FORZADA
-            // Usamos un pequeño delay para asegurar que el DOM se limpió
-            setTimeout(() => {
-                window.location.replace("mantenimiento.html"); // .replace es mejor para que no puedan volver atrás
-            }, 50);
-            
-            return; 
-        } else {
-            continuarCarga(perfil, data);
         }
-    }, { onlyOnce: true });
-} else {
-    continuarCarga(perfil, data);
-}
-
-            }
-        });
     });
+});
 
     function continuarCarga(perfil, data) {
         telefonoEmpresa = perfil.WhatsApp.replace("+", "");
@@ -887,6 +882,7 @@ if (perfil.fechaExpiracion) {
     }
 
     function render() {
+        if (bloqueoActivo) return;
         const contenedor = document.getElementById("productos");
         if (!contenedor) return;
         contenedor.innerHTML = "";
