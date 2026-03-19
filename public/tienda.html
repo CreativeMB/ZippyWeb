@@ -765,7 +765,7 @@ body {
 
         const slug = window.location.pathname.split("/").pop();
 
-        // 1. BUSCAR EMPRESA Y DOMICILIARIO
+       // 1. BUSCAR EMPRESA Y DOMICILIARIO
         const empresasRef = ref(db);
         onValue(empresasRef, (snapshot) => {
             snapshot.forEach((child) => {
@@ -774,7 +774,43 @@ body {
                     empresaId = child.key;
                     const perfil = data.perfilempresa;
                     telefonoEmpresa = perfil.WhatsApp.replace("+", "");
-                    // --- LÓGICA DEL LOGO (UBICADA CORRECTAMENTE) ---
+
+                    // ==========================================
+                    // VALIDACIÓN DE FECHA CON SERVIDOR FIREBASE
+                    // ==========================================
+                    if (perfil.fechaExpiracion) {
+                        const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
+                        const [dia, mes, anio] = fechaPart.split("/");
+                        const [hora, min, seg] = horaPart.split(":");
+                        const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
+
+                        const offsetRef = ref(db, ".info/serverTimeOffset");
+                        onValue(offsetRef, (offsetSnapshot) => {
+                            const offset = offsetSnapshot.val() || 0;
+                            const horaRealServidor = Date.now() + offset;
+
+                            if (horaRealServidor > tiempoExpiracion) {
+                                // Redirigir a la publicidad si expiró
+                                window.location.replace("https://tu-dominio.com/publicidad.html"); // ¡Recuerda cambiar este link!
+                                return; 
+                            } else {
+                                // Si está vigente, llamamos a la función que carga la vista
+                                cargarDatosDeLaEmpresa(perfil, child.key, data);
+                            }
+                        }, { onlyOnce: true });
+                    } else {
+                        // Si no hay fecha de expiración registrada, lo dejamos pasar normal
+                        cargarDatosDeLaEmpresa(perfil, child.key, data);
+                    }
+                    // ==========================================
+                }
+            });
+        });
+
+        // 2. FUNCIÓN PARA CARGAR LA VISTA (AQUÍ VA TU CÓDIGO)
+        function cargarDatosDeLaEmpresa(perfil, empresaId, data) {
+            
+            // --- LÓGICA DEL LOGO (UBICADA CORRECTAMENTE) ---
             const imgElement = document.getElementById('logoEmpresa');
             if (perfil.urlLogo && perfil.urlLogo.trim() !== "") {
                 const urlFinal = obtenerLinkDirecto(perfil.urlLogo);
@@ -792,29 +828,32 @@ body {
             }
             // ----------------------------------------------
 
-                    // Asignar primer domiciliario (Ruta corregida a 'Domiciliarios' con D mayúscula)
-                    if (data.Domiciliarios) {
-                        idDomiciliarioAsignado = Object.keys(data.Domiciliarios)[0];
-                    }
+            // Asignar primer domiciliario
+            if (data.Domiciliarios) {
+                idDomiciliarioAsignado = Object.keys(data.Domiciliarios)[0];
+            }
 
-                   // Asignación con verificaciones (Safe Assignment)
-// Dentro de tu función de carga de Firebase
-document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
-document.getElementById("eslogan").innerText = perfil.eslogan;
-document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
-document.getElementById("direccion").innerText = "📍 " + perfil.direccion;
-document.getElementById("ciudad").innerText = perfil.ciudad;
-document.getElementById("telefono").innerText = "📞 " + perfil.WhatsApp;
-document.getElementById("correo").innerText = "✉️ " + perfil.correo;
-document.getElementById("info-destacada").innerText = perfil.publicidad;
-document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
+            // Asignación de textos a la vista
+            document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
+            document.getElementById("eslogan").innerText = perfil.eslogan;
+            document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
+            document.getElementById("direccion").innerText = "📍 " + perfil.direccion;
+            document.getElementById("ciudad").innerText = perfil.ciudad;
+            document.getElementById("telefono").innerText = "📞 " + perfil.WhatsApp;
+            document.getElementById("correo").innerText = "✉️ " + perfil.correo;
+            document.getElementById("info-destacada").innerText = perfil.publicidad;
+            document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
 
-                    cargarProductosJSON(perfil.json_datos);
-                    escucharCambios(empresaId);
-                }
-            });
-        });
+            // Llamadas a tus métodos de carga de productos
+            cargarProductosJSON(perfil.json_datos);
+            escucharCambios(empresaId);
+        }
 
+if (horaRealServidor > tiempoExpiracion) {
+    // Redirigir a la página que acabamos de crear
+    window.location.replace("mantenimiento.html"); 
+    return; 
+}
       function cargarProductosJSON(contenido) {
     if (!contenido) {
         console.warn("⚠️ No hay datos de productos (json_datos) en el perfil.");
