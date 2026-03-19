@@ -866,7 +866,7 @@
         let imagenProducto = "";
 
         const slug = window.location.pathname.split("/").pop();
-
+let bloqueoActivo = false;
         // 1. NÚCLEO DE CARGA Y VALIDACIÓN
         const empresasRef = ref(db);
         onValue(empresasRef, (snapshot) => {
@@ -918,6 +918,7 @@ if (perfil.fechaExpiracion) {
         });
 
         function continuarCarga(perfil, data) {
+            if (bloqueoActivo) return;
             telefonoEmpresa = perfil.WhatsApp.replace("+", "");
 
             // Lógica del Logo
@@ -954,6 +955,7 @@ if (perfil.fechaExpiracion) {
 
         // 2. GESTIÓN DE PRODUCTOS
         function cargarProductosJSON(contenido) {
+            if (bloqueoActivo) return;
             if (!contenido) { productosJson = {}; render(); return; }
             try {
                 productosJson = typeof contenido === 'string' ? JSON.parse(contenido) : contenido;
@@ -962,8 +964,10 @@ if (perfil.fechaExpiracion) {
         }
 
         function escucharCambios(id) {
+            if (bloqueoActivo) return;
             const productosRef = ref(db, id + "/productos");
             onValue(productosRef, (snapshot) => {
+                if (bloqueoActivo) return;
                 productosRealtime = {};
                 snapshot.forEach((child) => {
                     const p = child.val();
@@ -979,6 +983,7 @@ if (perfil.fechaExpiracion) {
         }
 
         function render() {
+            if (bloqueoActivo) return;
             const contenedor = document.getElementById("productos");
             if (!contenedor) return;
             contenedor.innerHTML = "";
@@ -1022,6 +1027,7 @@ if (perfil.fechaExpiracion) {
 
             // Quitar Loader
             setTimeout(() => {
+                if (bloqueoActivo) return;
                 document.querySelectorAll(".producto").forEach((el, i) => setTimeout(() => el.classList.add("visible"), i * 30));
                 const ld = document.getElementById("loader");
                 if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
