@@ -1009,8 +1009,18 @@ if (perfil.fechaExpiracion) {
                 const card = document.createElement("div");
                 card.className = `producto ${real.agotado ? 'agotado' : ''}`;
 
-                const mensajeWa = encodeURIComponent(`Hola, me interesa:\n📌 *Ref:* ${real.referenciaReal || refP}\n💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`);
-                const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
+               // Extraemos la descripción, si no existe ponemos un texto vacío o "Sin descripción"
+const descripcionProducto = real.descripcion || "";
+
+// Construimos el mensaje incluyendo la nueva línea para la descripción
+const mensajeWa = encodeURIComponent(
+    `Hola, me interesa:\n` +
+    `📌 *Ref:* ${real.referenciaReal || refP}\n` +
+    `📝 *Descripción:* ${descripcionProducto}\n` + // <--- Nueva línea
+    `💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`
+);
+
+const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
 
                 card.innerHTML = `
                 <div class="img-container">
