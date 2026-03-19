@@ -3,177 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo en Actualización | Zippy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <title>Crea tu Tienda con Zippy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --blanco: #ffffff;
-            --gris-fondo: #f8fafc;
-            --texto-principal: #1e293b;
-            --texto-secundario: #64748b;
-            --zippy-accento: #ff9f43; /* Un naranja vibrante para el CTA */
-            --negro-mate: #2d3436;
+            --zippy-blue: #2563eb;
+            --zippy-orange: #ff9f43;
+            --dark: #0f172a;
+            --text-light: #64748b;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--gris-fondo);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: var(--texto-principal);
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
         }
 
-        .container {
-            background: var(--blanco);
-            width: 90%;
-            max-width: 550px;
-            padding: 60px 40px;
-            border-radius: 40px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.04);
+        .card {
+            background: white;
+            width: 90%; max-width: 450px;
+            padding: 40px 25px;
+            border-radius: 35px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
             text-align: center;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid #f1f5f9;
         }
 
-        /* Marca de agua decorativa */
-        .watermark {
-            position: absolute;
-            top: -50px;
-            right: -50px;
-            font-size: 150px;
-            font-weight: 800;
-            color: rgba(0,0,0,0.02);
-            user-select: none;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            background-color: #f1f5f9;
-            color: var(--texto-secundario);
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 30px;
-        }
-
-        .status-badge::before {
-            content: "";
-            width: 8px;
-            height: 8px;
-            background-color: #cbd5e1;
-            border-radius: 50%;
-            margin-right: 10px;
+        /* Badge de la tienda actual */
+        .status {
+            font-size: 12px; color: var(--text-light);
+            background: #f1f5f9; padding: 5px 15px;
+            border-radius: 20px; display: inline-block; margin-bottom: 20px;
         }
 
         h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            letter-spacing: -1px;
+            font-size: 28px; font-weight: 800; color: var(--dark);
+            line-height: 1.2; margin-bottom: 15px;
         }
 
-        .info-text {
-            font-size: 16px;
-            line-height: 1.8;
-            color: var(--texto-secundario);
-            margin-bottom: 50px;
-            font-weight: 300;
+        .highlight { color: var(--zippy-blue); }
+
+        /* Lista de beneficios sin código */
+        .features {
+            text-align: left; margin: 25px 0;
+            padding: 0; list-style: none;
         }
 
-        /* Sección de Publicidad Zippy */
-        .promo-section {
-            background: linear-gradient(145deg, #2d3436, #000000);
-            color: white;
-            padding: 40px;
-            border-radius: 25px;
-            margin-top: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        .features li {
+            margin-bottom: 12px; font-size: 14px;
+            color: var(--text-light); display: flex; align-items: center;
         }
 
-        .promo-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 15px;
+        .features li::before {
+            content: '✅'; margin-right: 10px; font-size: 16px;
         }
 
-        .promo-text {
-            font-size: 14px;
-            line-height: 1.7;
-            color: #b2bec3;
-            margin-bottom: 30px;
-            font-weight: 300;
+        /* Caja de oferta especial */
+        .offer-box {
+            background: linear-gradient(135deg, var(--dark) 0%, #1e293b 100%);
+            color: white; padding: 25px;
+            border-radius: 25px; margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
         }
 
-        .btn-zippy {
-            display: inline-block;
-            background-color: var(--zippy-accento);
-            color: var(--negro-mate);
-            padding: 18px 40px;
-            text-decoration: none;
-            border-radius: 15px;
-            font-weight: 700;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(255, 159, 67, 0.2);
+        .offer-title { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+        .offer-sub { font-size: 13px; opacity: 0.8; margin-bottom: 20px; display: block; }
+
+        .btn-main {
+            display: block;
+            background: var(--zippy-orange);
+            color: #000; text-decoration: none;
+            padding: 16px; border-radius: 15px;
+            font-weight: 800; font-size: 16px;
+            transition: transform 0.2s;
         }
 
-        .btn-zippy:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 30px rgba(255, 159, 67, 0.3);
-            background-color: #ffb167;
-        }
+        .btn-main:hover { transform: scale(1.05); }
 
-        .footer-link {
-            margin-top: 40px;
-            font-size: 12px;
-            color: #cbd5e1;
-        }
-
-        .footer-link a {
-            color: #94a3b8;
-            text-decoration: none;
-            font-weight: 600;
+        .no-pc {
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; margin-top: 15px; color: #94a3b8; font-weight: 600;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="watermark">Z</div>
+    <div class="card">
+        <div class="status">Esta tienda está en mantenimiento</div>
         
-        <div class="status-badge">Aviso Importante</div>
+        <h1>¿Vendes por WhatsApp? <br><span class="highlight">Hazlo Profesional.</span></h1>
+        
+        <ul class="features">
+            <li><strong>Sin PC:</strong> Todo desde tu celular.</li>
+            <li><strong>Sin códigos:</strong> Solo regístrate y listo.</li>
+            <li><strong>Sin Hosting:</strong> Nosotros nos encargamos.</li>
+            <li><strong>En minutos:</strong> Tu catálogo online hoy mismo.</li>
+        </ul>
 
-        <h1>Plataforma en Optimización</h1>
-        <p class="info-text">
-            Estamos actualizando este catálogo para mejorar tu experiencia. 
-            Te invitamos a regresar pronto para descubrir las novedades.
-        </p>
-
-        <div class="promo-section">
-            <div class="promo-title">¿Impulsar su negocio?</div>
-            <p class="promo-text">
-                Únase a Zippy y transforme sus ventas. Cree su catálogo profesional en línea, 
-                gestione pedidos y aumente su alcance de forma sencilla y eficiente.
-            </p>
-            <a href="https://wa.me/573150725566" class="btn-zippy">
-                Afíliese con Nosotros
+        <div class="offer-box">
+            <span class="offer-title">¡Lanza tu tienda hoy!</span>
+            <span class="offer-sub">Regístrate y recibe <b>1 MES GRATIS</b> para que veas cómo aumentan tus ventas.</span>
+            
+            <a href="https://zipy.carrd.co/" class="btn-main">
+                ¡OBTENER MI MES GRATIS!
             </a>
-        </div>
 
-        <div class="footer-link">
-            Más información en <a href="https://zipy.carrd.co/" target="_blank">zipy.carrd.co</a>
-        }
+            <div class="no-pc">
+                📱 100% compatible con tu celular
+            </div>
+        </div>
     </div>
 
 </body>
