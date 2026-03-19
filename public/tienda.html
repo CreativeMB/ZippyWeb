@@ -741,477 +741,277 @@ body {
         <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png">
     </a>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+ <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "zippy-727d5.firebaseapp.com",
-            databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
-            projectId: "zippy-727d5"
-        };
+    const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "zippy-727d5.firebaseapp.com",
+        databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
+        projectId: "zippy-727d5"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-        let productosJson = {};
-        let productosRealtime = {};
-        let telefonoEmpresa = "";
-        let empresaId = "";
-        let idDomiciliarioAsignado = "";
-        let productoSeleccionado = "";
-        let imagenProducto = "";
+    let productosJson = {};
+    let productosRealtime = {};
+    let telefonoEmpresa = "";
+    let empresaId = "";
+    let idDomiciliarioAsignado = "";
+    let productoSeleccionado = "";
+    let imagenProducto = "";
 
-        const slug = window.location.pathname.split("/").pop();
+    const slug = window.location.pathname.split("/").pop();
 
-       // 1. BUSCAR EMPRESA Y DOMICILIARIO
-        const empresasRef = ref(db);
-        onValue(empresasRef, (snapshot) => {
-            snapshot.forEach((child) => {
-                const data = child.val();
-                if (data.perfilempresa?.slug === slug) {
-                    empresaId = child.key;
-                    const perfil = data.perfilempresa;
-                    telefonoEmpresa = perfil.WhatsApp.replace("+", "");
-
-                    // ==========================================
-                    // VALIDACIÓN DE FECHA CON SERVIDOR FIREBASE
-                    // ==========================================
-                    if (perfil.fechaExpiracion) {
-                        const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
-                        const [dia, mes, anio] = fechaPart.split("/");
-                        const [hora, min, seg] = horaPart.split(":");
-                        const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
-
-                        const offsetRef = ref(db, ".info/serverTimeOffset");
-                        onValue(offsetRef, (offsetSnapshot) => {
-                            const offset = offsetSnapshot.val() || 0;
-                            const horaRealServidor = Date.now() + offset;
-
-                            if (horaRealServidor > tiempoExpiracion) {
-                                // Redirigir a la publicidad si expiró
-                                window.location.replace("https://tu-dominio.com/publicidad.html"); // ¡Recuerda cambiar este link!
-                                return; 
-                            } else {
-                                // Si está vigente, llamamos a la función que carga la vista
-                                cargarDatosDeLaEmpresa(perfil, child.key, data);
-                            }
-                        }, { onlyOnce: true });
-                    } else {
-                        // Si no hay fecha de expiración registrada, lo dejamos pasar normal
-                        cargarDatosDeLaEmpresa(perfil, child.key, data);
-                    }
-                    // ==========================================
-                }
-            });
-        });
-
-        // 2. FUNCIÓN PARA CARGAR LA VISTA (AQUÍ VA TU CÓDIGO)
-        function cargarDatosDeLaEmpresa(perfil, empresaId, data) {
-            
-            // --- LÓGICA DEL LOGO (UBICADA CORRECTAMENTE) ---
-            const imgElement = document.getElementById('logoEmpresa');
-            if (perfil.urlLogo && perfil.urlLogo.trim() !== "") {
-                const urlFinal = obtenerLinkDirecto(perfil.urlLogo);
-                imgElement.setAttribute('referrerpolicy', 'no-referrer');
-                imgElement.src = urlFinal;
-                imgElement.onload = () => {
-                    imgElement.style.display = 'inline-block';
-                    imgElement.style.opacity = '1';
-                };
-                imgElement.onerror = () => {
-                    imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`;
-                };
-            } else {
-                imgElement.style.display = 'none';
-            }
-            // ----------------------------------------------
-
-            // Asignar primer domiciliario
-            if (data.Domiciliarios) {
-                idDomiciliarioAsignado = Object.keys(data.Domiciliarios)[0];
-            }
-
-            // Asignación de textos a la vista
-            document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
-            document.getElementById("eslogan").innerText = perfil.eslogan;
-            document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
-            document.getElementById("direccion").innerText = "📍 " + perfil.direccion;
-            document.getElementById("ciudad").innerText = perfil.ciudad;
-            document.getElementById("telefono").innerText = "📞 " + perfil.WhatsApp;
-            document.getElementById("correo").innerText = "✉️ " + perfil.correo;
-            document.getElementById("info-destacada").innerText = perfil.publicidad;
-            document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
-
-            // Llamadas a tus métodos de carga de productos
-            cargarProductosJSON(perfil.json_datos);
-            escucharCambios(empresaId);
-        }
-
-if (horaRealServidor > tiempoExpiracion) {
-    // Redirigir a la página que acabamos de crear
-    window.location.replace("mantenimiento.html"); 
-    return; 
-}
-      function cargarProductosJSON(contenido) {
-    if (!contenido) {
-        console.warn("⚠️ No hay datos de productos (json_datos) en el perfil.");
-        productosJson = {};
-        render();
-        return;
-    }
-
-    try {
-        // Si el contenido ya es un objeto (porque Firebase lo parseó), lo usamos.
-        // Si es un String (lo más probable), usamos JSON.parse.
-        productosJson = typeof contenido === 'string' ? JSON.parse(contenido) : contenido;
-        
-        console.log('✅ Catálogo cargado con éxito');
-        render();
-    } catch (e) {
-        console.error('❌ Error al procesar el JSON de productos:', e);
-        productosJson = {};
-        render();
-    }
-}
-
-      function escucharCambios(id) {
-    const productosRef = ref(db, id + "/productos");
-    onValue(productosRef, (snapshot) => {
-        productosRealtime = {};
-        
+    // 1. NÚCLEO DE CARGA Y VALIDACIÓN
+    const empresasRef = ref(db);
+    onValue(empresasRef, (snapshot) => {
         snapshot.forEach((child) => {
-            const p = child.val();
-            
-            // Buscamos el valor de la referencia sin importar si empieza con R o r
-            const refOriginal = p.referencia || p.Referencia || p.nombre || "";
-            
-            if (refOriginal) {
-                // Guardamos en el objeto usando una clave "limpia" (minúsculas y sin espacios)
-                const claveLimpia = String(refOriginal).trim().toLowerCase();
-                productosRealtime[claveLimpia] = p;
-                
-                // IMPORTANTE: Guardamos la referencia original dentro del objeto 
-                // para que no se pierdan las mayúsculas al mostrar el nombre
-                productosRealtime[claveLimpia].referenciaReal = refOriginal;
-            }
-        });
-        render();
-    });
-}
-function render() {
-    const contenedor = document.getElementById("productos");
-    if (!contenedor) return;
-    contenedor.innerHTML = "";
+            const data = child.val();
+            if (data.perfilempresa?.slug === slug) {
+                empresaId = child.key;
+                const perfil = data.perfilempresa;
 
-    for (const refP in productosJson) {
-        if (refP === "images") continue;
+                // --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
+                if (perfil.fechaExpiracion) {
+                    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
+                    const [dia, mes, anio] = fechaPart.split("/");
+                    const [hora, min, seg] = horaPart.split(":");
+                    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
 
-        const imgUrl = productosJson[refP];
-        const claveBusqueda = refP.trim().toLowerCase();
-        
-        // Datos de Firebase
-        const real = productosRealtime[claveBusqueda] || { 
-            valor: 0, 
-            valorPromocion: 0, // Añadido para evitar errores
-            agotado: false, 
-            promocion: false,
-            referenciaReal: refP 
-        };
+                    const offsetRef = ref(db, ".info/serverTimeOffset");
+                    onValue(offsetRef, (offsetSnapshot) => {
+                        const offset = offsetSnapshot.val() || 0;
+                        const horaRealServidor = Date.now() + offset;
 
-        const card = document.createElement("div");
-        card.className = `producto ${real.agotado ? 'agotado' : ''}`;
-        
-        // --- LÓGICA DE PRECIOS CORREGIDA ---
-        let precioHTML = "";
-        let precioFinalParaWhatsApp = 0;
-
-        if (real.promocion && real.valorPromocion > 0) {
-            // Caso: Hay promoción activa
-            precioFinalParaWhatsApp = real.valorPromocion;
-            precioHTML = `
-                <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
-                <div class="precioViejo">${formatearPrecio(real.valor)}</div>
-            `;
-        } else if (real.valor > 0) {
-            // Caso: Precio normal
-            precioFinalParaWhatsApp = real.valor;
-            precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
-        } else {
-            // Caso: Sin precio definido
-            precioHTML = `<div class="precio">Consultar precio</div>`;
-        }
-
-        const precioTextoWhatsApp = precioFinalParaWhatsApp > 0 ? formatearPrecio(precioFinalParaWhatsApp) : "Consultar";
-        // ----------------------------------
-
-        const nombreMostrar = real.referenciaReal || refP;
-  // Validamos que exista la descripción. Si está vacía, evitamos el "undefined"
-const descripcionMostrar = real.descripcion || "Sin descripción detallada"; 
-
-// Agregamos la descripción al mensaje usando los saltos de línea (\n)
-const mensajeWa = encodeURIComponent(
-    `Hola, me interesa este producto:\n` +
-    `📌 *Referencia:* ${nombreMostrar}\n` +
-    `📝 *Descripción:* ${descripcionMostrar}\n` +
-    `💰 *Precio:* ${precioTextoWhatsApp}\n\n` +
-    `¿Necesito Información?`
-);
-        const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
-
-        let botonHTML = real.agotado ? 
-            `<div class="btn" style="background:#b2bec3; cursor:not-allowed;">Agotado</div>` :
-            `<a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none;">Pedir por WhatsApp</a>`;
-
-        card.innerHTML = `
-            <div class="img-container">
-                ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-                <img src="${normalizarImagen(imgUrl)}" 
-                     ${real.agotado ? "" : `onclick="abrirProducto('${nombreMostrar.replace(/'/g, "\\'")}','${imgUrl}','${precioFinalParaWhatsApp}','${(real.descripcion || "").replace(/'/g, "\\'")}')"`} 
-                     style="${real.agotado ? 'filter: grayscale(100%); opacity: 0.7; cursor:default;' : 'cursor:pointer;'}">
-            </div>
-            <div class="nombre">${nombreMostrar}</div>
-            ${precioHTML}
-            ${botonHTML}
-        `;
-        contenedor.appendChild(card);
-    }
-
-    // Animaciones (se mantiene igual)
-    setTimeout(() => {
-        document.querySelectorAll(".producto").forEach((el, i) => {
-            setTimeout(() => el.classList.add("visible"), i * 30);
-        });
-        
-        const ld = document.getElementById("loader");
-        if(ld) {
-            ld.style.opacity = "0";
-            setTimeout(() => ld.style.display = "none", 500);
-        }
-    }, 500);
-}
-        function abrirProducto(nombre, imagen, precio, descripcion) {
-            productoSeleccionado = nombre;
-            imagenProducto = normalizarImagen(imagen);
-            document.getElementById("productoTitulo").innerText = nombre;
-            document.getElementById("productoDescripcion").innerText = descripcion;
-            document.getElementById("productoImagen").src = imagenProducto;
-            document.getElementById("productoPrecio").innerText = formatearPrecio(precio);
-            document.getElementById("modalPedido").style.display = "flex";
-        }
-
-      function enviarPedido() {
-    const btn = document.getElementById("enviarPedidoBtn");
-
-    // --- LÓGICA PARA FORMATEAR LA FECHA ---
-    const fechaOriginal = document.getElementById("fechaEntrega").value; 
-    let fechaFormateada = "";
-    
-    if (fechaOriginal) {
-        const partes = fechaOriginal.split("-"); 
-        fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`; 
-    }
-
-    const campos = {
-        medioPago: document.getElementById("medioPago").value,
-        nombreComprador: document.getElementById("nombreComprador").value,
-        celularComprador: document.getElementById("celularComprador").value,
-        nombreDestinatario: document.getElementById("nombreDestinatario").value,
-        celularDestinatario: document.getElementById("celularDestinatario").value,
-        direccionEntrega: document.getElementById("direccionEntrega").value,
-        notasPedido: document.getElementById("notasPedido").value,
-        mensajeTarjeta: document.getElementById("mensajeTarjeta").value,
-        deTarjeta: document.getElementById("deTarjeta").value,
-        paraTarjeta: document.getElementById("paraTarjeta").value,
-        fechaEntrega: fechaFormateada,
-        horaEntrega: document.getElementById("horaEntrega").value
-    };
-
-    if (Object.values(campos).some(v => !v.trim())) {
-        alert("⚠️ Por favor completa todos los campos.");
-        return;
-    }
-
-    if (!idDomiciliarioAsignado) {
-        alert("❌ Error: No hay domiciliarios en el sistema.");
-        return;
-    }
-
-    btn.disabled = true;
-    btn.innerText = "Enviando...";
-
-    const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
-    
-    onValue(pedidosRef, (snapshot) => {
-        let maxPos = 0;
-        snapshot.forEach(c => { if(c.val().posicion > maxPos) maxPos = c.val().posicion; });
-
-        const nuevoRef = push(pedidosRef);
-        
-        // --- OBJETO ACTUALIZADO CON TODOS LOS CAMPOS ---
-        const pedidoObj = {
-            idPedido: nuevoRef.key,
-            idEmpresa: empresaId,                   // <--- Agregado
-            idDomiciliario: idDomiciliarioAsignado, // <--- Agregado
-            direccion: campos.direccionEntrega,
-            imagenUrl: imagenProducto,
-            cliente: campos.celularComprador,
-            nombreCliente: campos.nombreComprador,
-            referencia: productoSeleccionado,
-            adicional: document.getElementById("productoAdicional").value,
-            banco: campos.medioPago,
-            destinatario: campos.celularDestinatario,
-            nombreDestinatario: campos.nombreDestinatario,
-            de: campos.deTarjeta,
-            para: campos.paraTarjeta,
-            diaEntrega: campos.fechaEntrega,
-            horaEntrega: campos.horaEntrega,
-            mensaje: campos.mensajeTarjeta,
-            notas: campos.notasPedido,
-            posicion: maxPos + 1,
-            fechaRegistro: new Date().toLocaleDateString(),
-            horaRegistro: new Date().toLocaleTimeString(),
-            notificado: false,
-            color: "", 
-            correo: ""
-            };
-
-        set(nuevoRef, pedidoObj).then(() => {
-            alert("✅ Pedido enviado correctamente continuamos por WhatsApp");
-            location.reload();
-        });
-    }, { onlyOnce: true });
-}
-
-        // Utilidades
-        window.cerrarModal = () => document.getElementById("modalPedido").style.display = "none";
-        window.abrirProducto = abrirProducto;
-        window.enviarPedido = enviarPedido;
-        const formatearPrecio = (v) => "$" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        const normalizarImagen = (url) => {
-            if (url?.includes("drive.google.com")) {
-                const id = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-                return id ? `https://drive.google.com/thumbnail?id=${id[1]}&sz=w1000` : url;
-            }
-            return url || "";
-        };
-        // Detectamos la URL actual de la barra del navegador
-   document.addEventListener("DOMContentLoaded", function() {
-    // Detectamos la URL real del navegador
-    const urlActual = window.location.href;
-    const mensaje = "Mira esta tienda, ¡te la recomiendo!: ";
-
-    // Configurar Facebook
-    const btnFB = document.getElementById('shareFB');
-    if(btnFB) {
-        btnFB.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlActual)}`;
-    }
-
-    // Configurar WhatsApp (Formato universal para móvil y PC)
-    const btnWA = document.getElementById('shareWA');
-    if(btnWA) {
-        btnWA.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje + urlActual)}`;
-    }
-});
-
-function copiarLink(e) {
-    e.preventDefault();
-    const urlActual = window.location.href;
-
-    // Intento 1: Método moderno
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(urlActual).then(() => {
-            alert("✅ Enlace copiado. ¡Pégalo en tu Instagram!");
-        }).catch(err => {
-            metodoAntiguo(urlActual);
-        });
-    } else {
-        // Intento 2: Método para navegadores viejos o sitios sin HTTPS
-        metodoAntiguo(urlActual);
-    }
-    
-}
-// 1. La función "Cerebro" que entiende IDs y Links
-function obtenerLinkDirecto(entrada) {
-    if (!entrada) return "";
-    
-    // Si es un ID de Drive (no tiene puntos ni 'http' y es largo)
-    if (!entrada.includes('http') && entrada.length >= 25) {
-        return `https://drive.google.com/uc?export=view&id=${entrada.trim()}`;
-    }
-
-    // Si el usuario pegó el link completo, extraemos el ID
-    if (entrada.includes('drive.google.com')) {
-        const match = entrada.match(/\/d\/([-\w]{25,})/) || entrada.match(/id=([-\w]{25,})/);
-        if (match && match[1]) {
-            return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-        }
-    }
-    return entrada; // Si no es Drive, devuelve la URL tal cual
-}
-
-// 2. La lógica de carga en el Header
-const datoLogo = snapshot.val().urlLogo; 
-const imgElement = document.getElementById('logoEmpresa');
-
-if (datoLogo && datoLogo.trim() !== "") {
-    const urlFinal = obtenerLinkDirecto(datoLogo);
-
-    imgElement.setAttribute('referrerpolicy', 'no-referrer');
-    imgElement.src = urlFinal;
-
-    imgElement.onload = function() {
-        imgElement.style.display = 'inline-block';
-        imgElement.style.opacity = '1';
-        console.log("✅ Logo de Zippy cargado");
-    };
-
-    imgElement.onerror = function() {
-        // Si falla (por permisos de Drive), intentamos el proxy weserv
-        imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`;
-    };
-} else {
-    imgElement.style.display = 'none';
-}
-// ==========================================
-        // LÓGICA DEL BUSCADOR FLOTANTE
-        // ==========================================
-        const btnBusqueda = document.getElementById('btnBusqueda');
-        const contenedorBusqueda = document.getElementById('contenedorBusqueda');
-        const inputBusqueda = document.getElementById('inputBusqueda');
-
-        // Abre y cierra el buscador al hacer clic en la lupa
-        btnBusqueda.addEventListener('click', () => {
-            contenedorBusqueda.classList.toggle('activo');
-            if(contenedorBusqueda.classList.contains('activo')){
-                inputBusqueda.focus(); // Enfoca automáticamente el teclado
-            } else {
-                inputBusqueda.value = ""; // Limpia la búsqueda si lo cierras
-                filtrarProductos(""); // Muestra todos los productos de nuevo
-            }
-        });
-
-        // Filtra los productos a medida que escribes
-        inputBusqueda.addEventListener('input', (e) => {
-            filtrarProductos(e.target.value.toLowerCase());
-        });
-
-        function filtrarProductos(texto) {
-            const productosCards = document.querySelectorAll('.producto');
-            productosCards.forEach(card => {
-                // Buscamos el nombre del producto dentro de la tarjeta
-                const nombreProducto = card.querySelector('.nombre').innerText.toLowerCase();
-                
-                // Si el nombre incluye el texto escrito, lo mostramos, si no, lo ocultamos
-                if(nombreProducto.includes(texto)){
-                    card.style.display = 'flex'; // Usamos flex porque así está tu diseño
+                        if (horaRealServidor > tiempoExpiracion) {
+                            window.location.replace("mantenimiento.html");
+                            return; 
+                        } else {
+                            continuarCarga(perfil, data);
+                        }
+                    }, { onlyOnce: true });
                 } else {
-                    card.style.display = 'none';
+                    continuarCarga(perfil, data);
+                }
+            }
+        });
+    });
+
+    function continuarCarga(perfil, data) {
+        telefonoEmpresa = perfil.WhatsApp.replace("+", "");
+        
+        // Lógica del Logo
+        const imgElement = document.getElementById('logoEmpresa');
+        if (perfil.urlLogo && perfil.urlLogo.trim() !== "") {
+            const urlFinal = obtenerLinkDirecto(perfil.urlLogo);
+            imgElement.setAttribute('referrerpolicy', 'no-referrer');
+            imgElement.src = urlFinal;
+            imgElement.onload = () => { imgElement.style.display = 'inline-block'; imgElement.style.opacity = '1'; };
+            imgElement.onerror = () => { imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`; };
+        } else {
+            imgElement.style.display = 'none';
+        }
+
+        // Asignar Domiciliario
+        if (data.Domiciliarios) {
+            idDomiciliarioAsignado = Object.keys(data.Domiciliarios)[0];
+        }
+
+        // Textos de Interfaz
+        document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
+        document.getElementById("eslogan").innerText = perfil.eslogan;
+        document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
+        document.getElementById("direccion").innerText = "📍 " + perfil.direccion;
+        document.getElementById("ciudad").innerText = perfil.ciudad;
+        document.getElementById("telefono").innerText = "📞 " + perfil.WhatsApp;
+        document.getElementById("correo").innerText = "✉️ " + perfil.correo;
+        document.getElementById("info-destacada").innerText = perfil.publicidad;
+        document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
+
+        cargarProductosJSON(perfil.json_datos);
+        escucharCambios(empresaId);
+    }
+
+    // 2. GESTIÓN DE PRODUCTOS
+    function cargarProductosJSON(contenido) {
+        if (!contenido) { productosJson = {}; render(); return; }
+        try {
+            productosJson = typeof contenido === 'string' ? JSON.parse(contenido) : contenido;
+            render();
+        } catch (e) { productosJson = {}; render(); }
+    }
+
+    function escucharCambios(id) {
+        const productosRef = ref(db, id + "/productos");
+        onValue(productosRef, (snapshot) => {
+            productosRealtime = {};
+            snapshot.forEach((child) => {
+                const p = child.val();
+                const refOriginal = p.referencia || p.Referencia || p.nombre || "";
+                if (refOriginal) {
+                    const claveLimpia = String(refOriginal).trim().toLowerCase();
+                    productosRealtime[claveLimpia] = p;
+                    productosRealtime[claveLimpia].referenciaReal = refOriginal;
                 }
             });
+            render();
+        });
+    }
+
+    function render() {
+        const contenedor = document.getElementById("productos");
+        if (!contenedor) return;
+        contenedor.innerHTML = "";
+
+        for (const refP in productosJson) {
+            if (refP === "images") continue;
+            const imgUrl = productosJson[refP];
+            const claveBusqueda = refP.trim().toLowerCase();
+            const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
+
+            let precioHTML = "";
+            let precioFinal = 0;
+            if (real.promocion && real.valorPromocion > 0) {
+                precioFinal = real.valorPromocion;
+                precioHTML = `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>`;
+            } else if (real.valor > 0) {
+                precioFinal = real.valor;
+                precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
+            } else {
+                precioHTML = `<div class="precio">Consultar precio</div>`;
+            }
+
+            const card = document.createElement("div");
+            card.className = `producto ${real.agotado ? 'agotado' : ''}`;
+            
+            const mensajeWa = encodeURIComponent(`Hola, me interesa:\n📌 *Ref:* ${real.referenciaReal || refP}\n💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`);
+            const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
+
+            card.innerHTML = `
+                <div class="img-container">
+                    ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+                    <img src="${normalizarImagen(imgUrl)}" 
+                         onclick="${real.agotado ? '' : `abrirProducto('${(real.referenciaReal || refP).replace(/'/g, "\\'")}','${imgUrl}','${precioFinal}','${(real.descripcion || "").replace(/'/g, "\\'")}')`}">
+                </div>
+                <div class="nombre">${real.referenciaReal || refP}</div>
+                ${precioHTML}
+                <a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none;">Pedir por WhatsApp</a>
+            `;
+            contenedor.appendChild(card);
         }
 
-    </script>
+        // Quitar Loader
+        setTimeout(() => {
+            document.querySelectorAll(".producto").forEach((el, i) => setTimeout(() => el.classList.add("visible"), i * 30));
+            const ld = document.getElementById("loader");
+            if(ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
+        }, 500);
+    }
+
+    // 3. SISTEMA DE PEDIDOS
+    function enviarPedido() {
+        const btn = document.getElementById("enviarPedidoBtn");
+        const fechaOriginal = document.getElementById("fechaEntrega").value; 
+        let fechaFormateada = "";
+        if (fechaOriginal) {
+            const partes = fechaOriginal.split("-"); 
+            fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`; 
+        }
+
+        const campos = {
+            medioPago: document.getElementById("medioPago").value,
+            nombreComprador: document.getElementById("nombreComprador").value,
+            direccionEntrega: document.getElementById("direccionEntrega").value,
+            fechaEntrega: fechaFormateada,
+            horaEntrega: document.getElementById("horaEntrega").value
+        };
+
+        if (Object.values(campos).some(v => !v.trim())) { alert("⚠️ Completa los campos obligatorios."); return; }
+        
+        btn.disabled = true; btn.innerText = "Enviando...";
+
+        const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
+        onValue(pedidosRef, (snapshot) => {
+            let maxPos = 0;
+            snapshot.forEach(c => { if(c.val().posicion > maxPos) maxPos = c.val().posicion; });
+            const nuevoRef = push(pedidosRef);
+            
+            set(nuevoRef, {
+                idPedido: nuevoRef.key,
+                idEmpresa: empresaId,
+                idDomiciliario: idDomiciliarioAsignado,
+                direccion: campos.direccionEntrega,
+                imagenUrl: imagenProducto,
+                nombreCliente: campos.nombreComprador,
+                referencia: productoSeleccionado,
+                banco: campos.medioPago,
+                diaEntrega: campos.fechaEntrega,
+                horaEntrega: campos.horaEntrega,
+                posicion: maxPos + 1,
+                fechaRegistro: new Date().toLocaleDateString(),
+                notificado: false
+            }).then(() => { alert("✅ Pedido enviado."); location.reload(); });
+        }, { onlyOnce: true });
+    }
+
+    // 4. UTILIDADES Y REDES
+    function obtenerLinkDirecto(entrada) {
+        if (!entrada) return "";
+        if (!entrada.includes('http') && entrada.length >= 25) return `https://drive.google.com/uc?export=view&id=${entrada.trim()}`;
+        if (entrada.includes('drive.google.com')) {
+            const match = entrada.match(/\/d\/([-\w]{25,})/) || entrada.match(/id=([-\w]{25,})/);
+            if (match) return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+        }
+        return entrada;
+    }
+
+    const normalizarImagen = (url) => {
+        if (url?.includes("drive.google.com")) {
+            const id = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            return id ? `https://drive.google.com/thumbnail?id=${id[1]}&sz=w1000` : url;
+        }
+        return url || "";
+    };
+
+    const formatearPrecio = (v) => "$" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    window.abrirProducto = (nombre, imagen, precio, descripcion) => {
+        productoSeleccionado = nombre; imagenProducto = normalizarImagen(imagen);
+        document.getElementById("productoTitulo").innerText = nombre;
+        document.getElementById("productoDescripcion").innerText = descripcion;
+        document.getElementById("productoImagen").src = imagenProducto;
+        document.getElementById("productoPrecio").innerText = formatearPrecio(precio);
+        document.getElementById("modalPedido").style.display = "flex";
+    };
+
+    window.enviarPedido = enviarPedido;
+    window.cerrarModal = () => document.getElementById("modalPedido").style.display = "none";
+
+    // Compartir
+    document.addEventListener("DOMContentLoaded", () => {
+        const url = window.location.href;
+        const msg = encodeURIComponent("¡Mira esta tienda!: " + url);
+        if(document.getElementById('shareFB')) document.getElementById('shareFB').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        if(document.getElementById('shareWA')) document.getElementById('shareWA').href = `https://api.whatsapp.com/send?text=${msg}`;
+    });
+
+    // Buscador
+    document.getElementById('btnBusqueda').addEventListener('click', () => {
+        const cont = document.getElementById('contenedorBusqueda');
+        cont.classList.toggle('activo');
+        if(cont.classList.contains('activo')) document.getElementById('inputBusqueda').focus();
+    });
+
+    document.getElementById('inputBusqueda').addEventListener('input', (e) => {
+        const texto = e.target.value.toLowerCase();
+        document.querySelectorAll('.producto').forEach(card => {
+            const nombre = card.querySelector('.nombre').innerText.toLowerCase();
+            card.style.display = nombre.includes(texto) ? 'flex' : 'none';
+        });
+    });
+</script>
 </body>
 </html>
