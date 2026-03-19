@@ -801,10 +801,19 @@ if (perfil.fechaExpiracion) {
                                                                                                                                                                                                             // 2. REDIRECCIÓN FORZADA
                                                                                                                                                                                                                         // Usamos location.href en lugar de replace para forzar un refresco total del historial
                                                                                                                                                                                                                                     setTimeout(() => {
-                                                                                                                                                                                                                                                    window.location.href = "mantenimiento.html";
-                                                                                                                                                                                                                                                                }, 100);
-                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                        return; 
+                                                                                                                                                                                                                                                   window.location.replace("mantenimiento.html");
+                        }, 100);
+                        return; 
+                    } else {
+                        continuarCarga(perfil, data);
+                    }
+                }, { onlyOnce: true });
+            } else {
+                continuarCarga(perfil, data);
+            }
+        }
+    });
+}); 
 
     function continuarCarga(perfil, data) {
         telefonoEmpresa = perfil.WhatsApp.replace("+", "");
