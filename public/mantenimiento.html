@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo en Actualización | Zippy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&family=Cormorant+Garamond:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --claro: #ffffff;
+            --gris-suave: #f4f7f6;
+            --texto: #2d3436;
+            --dorado-suave: #b2bec3; /* Un tono neutro y elegante */
+            --wa-color: #25D366;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--gris-suave);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: var(--texto);
+        }
+
+        .card {
+            background: var(--claro);
+            width: 90%;
+            max-width: 500px;
+            padding: 50px 30px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Línea decorativa superior */
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #dfe6e9, #636e72, #dfe6e9);
+        }
+
+        .logo-placeholder {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 42px;
+            font-style: italic;
+            margin-bottom: 20px;
+            color: #2d3436;
+        }
+
+        .status-icon {
+            width: 80px;
+            height: 80px;
+            background: #f1f2f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.1); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(0, 0, 0, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #636e72;
+            margin-bottom: 35px;
+            font-weight: 300;
+        }
+
+        .btn-wa {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--texto); /* Negro mate para que se vea premium */
+            color: white;
+            padding: 16px 35px;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .btn-wa:hover {
+            transform: translateY(-3px);
+            background-color: #000;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+        }
+
+        .ad-space {
+            margin-top: 40px;
+            padding: 20px;
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #b2bec3;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="logo-placeholder">Zippy</div>
+        
+        <div class="status-icon">✨</div>
+
+        <h1>Catálogo en Optimización</h1>
+        <p>
+            Estamos actualizando nuestra plataforma para ofrecerte una mejor experiencia de compra. 
+            Por el momento, los pedidos se gestionan directamente a través de nuestra línea de atención personalizada.
+        </p>
+
+        <a href="https://wa.me/573150725566" class="btn-wa">
+            Contactar con un Asesor
+        </a>
+
+        <div class="ad-space">
+            Espacio Publicitario Disponible
+        </div>
+    </div>
+
+</body>
+</html>
