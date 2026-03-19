@@ -774,28 +774,32 @@ body {
                 empresaId = child.key;
                 const perfil = data.perfilempresa;
 
-                // --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
-                if (perfil.fechaExpiracion) {
-                    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
-                    const [dia, mes, anio] = fechaPart.split("/");
-                    const [hora, min, seg] = horaPart.split(":");
-                    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
+                           // --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
+if (perfil.fechaExpiracion) {
+    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
+    const [dia, mes, anio] = fechaPart.split("/");
+    const [hora, min, seg] = horaPart.split(":");
+    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
 
-                    const offsetRef = ref(db, ".info/serverTimeOffset");
-                    onValue(offsetRef, (offsetSnapshot) => {
-                        const offset = offsetSnapshot.val() || 0;
-                        const horaRealServidor = Date.now() + offset;
+    const offsetRef = ref(db, ".info/serverTimeOffset");
+    onValue(offsetRef, (offsetSnapshot) => {
+        const offset = offsetSnapshot.val() || 0;
+        const horaRealServidor = Date.now() + offset;
 
-                        if (horaRealServidor > tiempoExpiracion) {
-                            window.location.replace("mantenimiento.html");
-                            return; 
-                        } else {
-                            continuarCarga(perfil, data);
-                        }
-                    }, { onlyOnce: true });
-                } else {
-                    continuarCarga(perfil, data);
-                }
+        if (horaRealServidor > tiempoExpiracion) {
+            // --- AQUÍ ESTÁ LA SOLUCIÓN ---
+            const ld = document.getElementById("loader");
+            if(ld) ld.style.display = "none"; // Quitamos el loader inmediatamente
+            
+            window.location.replace("mantenimiento.html");
+            return; 
+        } else {
+            continuarCarga(perfil, data);
+        }
+    }, { onlyOnce: true });
+} else {
+    continuarCarga(perfil, data);
+}
             }
         });
     });
