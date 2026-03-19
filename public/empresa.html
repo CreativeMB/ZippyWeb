@@ -3,92 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zippy | Centro de Ayuda y Gestión</title>
+    <title>Zippy Empresas | Control Total desde tu Móvil | Ecosistema Digital</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --zippy-blue: #2563eb;
+            --zippy-blue: #3b82f6;
             --zippy-orange: #ff9f43;
-            --dark: #0f172a;
+            --zippy-orange-dark: #e68a2e;
+            --bg-dark: #0f172a; /* Negro azulado muy oscuro */
+            --bg-card: #1e293b; /* Gris oscuro para tarjetas */
+            --bg-input: #111827;
+            --text-main: #f1f5f9; /* Blanco grisáceo */
+            --text-muted: #94a3b8; /* Gris para textos secundarios */
             --white: #ffffff;
-            --bg: #f8fafc;
+            --black-pure: #000000;
         }
 
         * { box-sizing: border-box; scroll-behavior: smooth; }
-        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #334155; line-height: 1.6; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg-dark); color: var(--text-main); line-height: 1.6; }
 
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        .text-center { text-align: center; }
+        .highlight { color: var(--zippy-orange); font-weight: 700; }
         
         /* --- NAVEGACIÓN --- */
         header {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px 0;
+            background: rgba(15, 23, 42, 0.95);
+            padding: 10px 0;
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .nav-container { display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 24px; font-weight: 800; color: var(--dark); text-decoration: none; }
+        .logo { font-size: 26px; font-weight: 800; color: var(--white); text-decoration: none; }
         .logo span { color: var(--zippy-orange); }
 
         /* --- HERO --- */
-        .hero { padding: 140px 0 60px; text-align: center; background: white; }
-        .hero h1 { font-size: 40px; font-weight: 800; color: var(--dark); margin-bottom: 20px; }
+        .hero { padding: 160px 0 80px; text-align: center; background: radial-gradient(circle, #1e293b 0%, #0f172a 100%); position: relative;}
+        .hero h1 { font-size: 48px; font-weight: 800; color: var(--white); margin-bottom: 15px; line-height: 1.1; }
+        .hero p { font-size: 18px; max-width: 800px; margin: 0 auto 30px; color: var(--text-muted); }
+        .hero::after { content:''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--zippy-orange), transparent); }
+
+        /* --- BOTONES --- */
+        .btn { display: inline-block; padding: 14px 30px; border-radius: 10px; font-weight: 800; text-decoration: none; transition: 0.3s; cursor: pointer; border: none; text-align: center; font-size: 14px;}
+        .btn-blue { background: var(--zippy-blue); color: var(--white); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-blue:hover { background: #2563eb; transform: translateY(-2px); }
+        .btn-orange { background: var(--zippy-orange); color: var(--black-pure); box-shadow: 0 4px 15px rgba(255, 159, 67, 0.3); }
+        .btn-orange:hover { background: var(--zippy-orange-dark); transform: translateY(-2px); }
+        .btn-red { background: #ef4444; color: var(--white); }
+
+        /* --- BANNER PERSUASIVO --- */
+        .venta-banner { background: var(--white); color: var(--black-pure); padding: 50px 0; margin: 60px 0; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .venta-banner h2 { font-size: 32px; font-weight: 800; margin-bottom: 15px; color: var(--dark); }
+        .venta-banner p { max-width: 700px; margin: 0 auto 30px; font-size: 16px; opacity: 0.9; }
 
         /* --- ACORDEONES (PESTAÑAS OCULTAS) --- */
-        .manual-section { padding: 40px 0; }
+        .manual-section { padding: 60px 0; }
         details {
-            background: white;
-            margin-bottom: 15px;
+            background: var(--bg-card);
+            margin-bottom: 20px;
             border-radius: 15px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
             transition: 0.3s;
         }
         details[open] {
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            border-color: var(--zippy-blue);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.1);
         }
         summary {
-            padding: 20px;
+            padding: 25px;
             font-weight: 700;
             cursor: pointer;
             list-style: none;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 18px;
-            color: var(--dark);
+            font-size: 20px;
+            color: var(--white);
         }
         summary::after {
-            content: '▼';
-            font-size: 12px;
-            color: var(--zippy-blue);
+            content: '+';
+            font-size: 24px;
+            color: var(--zippy-orange);
             transition: 0.3s;
         }
         details[open] summary::after {
+            content: '-';
             transform: rotate(180deg);
         }
         .content {
-            padding: 0 20px 20px;
-            border-top: 1px solid #f1f5f9;
+            padding: 0 25px 30px;
+            border-top: 1px solid rgba(255,255,255,0.05);
             font-size: 14px;
+            color: var(--text-muted);
         }
-        .content h4 { color: var(--zippy-blue); margin-top: 20px; }
+        .content h4 { color: var(--white); margin-top: 25px; margin-bottom: 10px; font-size: 16px;}
+        .content p { margin-bottom: 15px; }
+        .content ul { padding-left: 20px; margin-bottom: 15px; }
+        .content li { margin-bottom: 8px; }
+        .content b { color: var(--white); }
+        
+        /* Reglas Catálogo */
+        .req-box { background: rgba(255, 159, 67, 0.1); padding: 20px; border-radius: 10px; border-left: 5px solid var(--zippy-orange); color: var(--white); margin-top: 20px; font-size: 14px; }
+        .example { background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 5px; font-family: monospace; color: var(--zippy-orange); }
 
-        /* --- BOTONES --- */
-        .btn { display: inline-block; padding: 12px 25px; border-radius: 10px; font-weight: 800; text-decoration: none; transition: 0.3s; text-align: center; border: none; }
-        .btn-blue { background: var(--zippy-blue); color: white; }
-        .btn-orange { background: var(--zippy-orange); color: var(--dark); }
-        .btn-red { background: #ff0000; color: white; }
+        /* --- DESCARGAS (FRANJA NEGRA) --- */
+        .descargas-franja { background: var(--black-pure); color: var(--white); padding: 100px 0; position: relative; }
+        .descargas-franja h2 { text-align: center; font-size: 36px; margin-bottom: 10px; font-weight: 800; }
+        .descargas-franja::before { content:''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
 
-        .download-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 30px; }
-        .dl-card { background: var(--dark); color: white; padding: 20px; border-radius: 20px; text-align: center; }
+        .download-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 50px; }
+        .dl-card { background: rgba(255,255,255,0.03); padding: 35px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .dl-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+        .dl-card i { font-size: 40px; color: var(--zippy-orange); display: block; margin-bottom: 15px; }
+        .dl-card h4 { margin: 10px 0; font-size: 18px; color: var(--white); }
+        .dl-card p { font-size: 12px; color: var(--text-muted); margin-bottom: 25px; min-height: 40px;}
 
-        footer { text-align: center; padding: 40px 0; font-size: 13px; opacity: 0.7; }
+        /* --- FOOTER --- */
+        footer { padding: 60px 0; text-align: center; font-size: 13px; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
@@ -96,114 +132,196 @@
     <header>
         <div class="container nav-container">
             <a href="#" class="logo">Zippy<span>🚀</span></a>
-            <div style="display: flex; gap: 10px;">
-                <a href="#descargas" class="btn btn-orange" style="font-size: 12px;">DESCARGAS</a>
-                <a href="https://www.youtube.com/@Zippyempresas" target="_blank" class="btn btn-red" style="font-size: 12px;">YOUTUBE</a>
-            </div>
+            <nav style="display: flex; gap: 15px;">
+                <a href="#descargas" class="btn btn-blue" style="font-size: 12px; padding: 10px 20px;">DESCARGAS</a>
+                <a href="https://www.youtube.com/@Zippyempresas" target="_blank" class="btn btn-red" style="font-size: 12px; padding: 10px 20px;">TUTORIALES</a>
+            </nav>
         </div>
     </header>
 
     <section class="hero">
         <div class="container">
-            <h1>Centro de Ayuda <span style="color: var(--zippy-blue);">Zippy</span></h1>
-            <p>Todo lo que necesitas saber para llevar tu negocio al siguiente nivel. Haz clic en cada manual para ver los detalles.</p>
+            <h1>Ecosistema Digital <span class="highlight">Zippy</span></h1>
+            <p>Toma el control total de tu negocio desde tu móvil. Vende más, gestiona pedidos, contabilidad y domicilios con facilidad. Sin trámites engorrosos.</p>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <a href="#afiliacion" class="btn btn-blue">¿CÓMO EMPEZAR?</a>
+                <a href="#descargas" class="btn btn-orange">DESCARGAR APPS</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="afiliacion" class="container">
+        <div class="venta-banner">
+            <div class="container">
+                <span style="color: var(--zippy-blue); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">Olvídate de lo complicado</span>
+                <h2>Vender Online Nunca Fue <span style="color: var(--zippy-blue);">Tan Sencillo</span></h2>
+                <p>En cuestión de minutos, tu negocio tendrá una tienda online automática sincronizada con tu inventario. Sin códigos, sin hosting, sin esperar días. <b>Solo regístrate y empieza a vender profesionalmente.</b></p>
+                <p><span class="highlight">🎁 ¡Incluye 1 MES GRATIS para nuevas empresas!</span></p>
+                <a href="#descargas" class="btn btn-blue">DESCARGAR AHORA</a>
+            </div>
         </div>
     </section>
 
     <section class="manual-section container">
+        <h2 class="text-center" style="font-size: 32px; margin-bottom: 50px;">📘 Manuales Completos de Usuario</h2>
+
+        <details open>
+            <summary>🚀 Guía Rápida de Afiliación (Empezar Aquí)</summary>
+            <div class="content">
+                <p>Bienvenido a Zippy. Hemos diseñado el proceso para que sea rápido y sin fricción, permitiéndote tener tu negocio operativo en internet hoy mismo.</p>
+                
+                <h4>1. Requisitos Básicos</h4>
+                <ul>
+                    <li>✔️ Cuenta de Google activa.</li>
+                    <li>✔️ Catálogo de productos en imágenes JPG.</li>
+                </ul>
+
+                <div class="req-box">
+                    <b>Reglas del Catálogo (MUY IMPORTANTE):</b>
+                    <ul>
+                        <li>Ponle a la foto el <b>nombre normal del producto</b> de forma natural.</li>
+                        <li>Ejemplo: <span class="example">Ramo de Rosas Rojas.jpg</span> o <span class="example">Desayuno Sorpresa Grande.jpg</span>.</li>
+                        <li>Intenta evitar tildes, símbolos o muchos espacios seguidos si es posible, pero úsalo de forma natural.</li>
+                    </ul>
+                </div>
+
+                <h4>2. Paso a Paso para Iniciar</h4>
+                <p><b>📩 Paso 1: Contacto y Activación:</b> Envía tu catálogo cumpliendo los requisitos a <span class="highlight">zippyempresas@gmail.com</span>. Zippy realiza la activación inicial de tu ID de Catálogo.</p>
+                <p><b>📝 Paso 2: Registro en Zippy:</b> Descarga la app principal, regístrate con tu cuenta de Google y solicita tu ID de Catálogo activado.</p>
+                <p><b>🏢 Paso 3: Registro de la Empresa:</b> Ingresa datos reales y correctos (Nombre, NIT, Dirección, WhatsApp de atención). <i>Nota: Si no tienes página web propia, deja el espacio en blanco para que el sistema use tu tienda automática de Zippy.</i></p>
+            </div>
+        </details>
 
         <details>
-            <summary>📘 Tutorial de Afiliación (Empezar Aquí)</summary>
+            <summary>🌐 Ventajas y Uso de tu Tienda en Línea</summary>
             <div class="content">
-                <h4>Requisitos básicos</h4>
+                <p>Con Zippy, tu presencia en Internet es automática, segura y profesional. Desde el momento del registro, obtienes una web tipo e-commerce lista para vender.</p>
+                
+                <h4>Ventajas Principales</h4>
+                <ul>
+                    <li>🛍️ <b>Vende más productos:</b> Muestra tu catálogo completo de forma organizada.</li>
+                    <li>🌎 <b>Mayor Alcance:</b> Llega a clientes de cualquier lugar, no solo los físicos.</li>
+                    <li>⏰ <b>Abierto 24/7:</b> Tu tienda nunca cierra, recibe pedidos en cualquier momento.</li>
+                    <li>📱 <b>Comparte Fácilmente:</b> Envía el enlace por WhatsApp, Instagram, Facebook o correo.</li>
+                    <li>📦 <b>Todo Organizado:</b> Tus productos en una página web profesional tipo e-commerce.</li>
+                    <li>💬 <b>Pedidos Rápidos:</b> Los clientes eligen productos y te contactan o piden directamente.</li>
+                </ul>
+
+                <h4>Cómo Usarla</h4>
+                <p>En la aplicación encontrarás la opción “Tienda en línea”. Esta te llevará directamente al sitio web de tu negocio. Cópialo y compártelo con tus clientes en todas tus redes sociales.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>💻 Manual Completo: Zippy Web (Panel PC)</summary>
+            <div class="content">
+                <p>Zippy Web es la versión para navegador diseñada para gestionar tu negocio desde la comodidad de una PC, con herramientas adicionales y enfoque administrativo.</p>
+                
+                <h4>Requisitos y Acceso</h4>
+                <ul>
+                    <li>Tener una cuenta de Google registrada previamente en la app móvil Zippy.</li>
+                    <li>Ingresar con <span class="highlight">la misma cuenta de Google</span>, ya que allí está asociada tu empresa.</li>
+                    <li>Conexión a internet estable y navegador actualizado.</li>
+                </ul>
+
+                <h4>Funciones Exclusivas de Zippy Web</h4>
+                <ul>
+                    <li>📊 <b>Gestión de Bases de Datos:</b> Ventas, Gastos y registros internos del negocio.</li>
+                    <li>📦 <b>Gestión de Pedidos Avanzada:</b> Ver detalles en tiempo real, cambiar estados y <b>Marcar pedidos en ruta</b> de forma masiva.</li>
+                    <li>🚴 <b>Asignación de Domiciliarios:</b> Ver domiciliarios registrados y asignar pedidos eficientemente.</li>
+                    <li>🖨️ <b>Impresión de Tarjetas:</b> Herramienta optimizada para PC para imprimir tarjetas de regalo que acompañan los detalles y arreglos florales.</li>
+                </ul>
+            </div>
+        </details>
+
+        <details>
+            <summary>🚴 Manual: ZippyEntregas (App Domiciliario)</summary>
+            <div class="content">
+                <p>ZippyEntregas es el aplicativo exclusivo para domiciliarios, diseñado para facilitar la gestión y entrega de pedidos en tiempo real.</p>
+                
+                <h4>Requisitos del Domiciliario</h4>
                 <ul>
                     <li>Cuenta de Google activa.</li>
-                    <li>Catálogo de productos en imágenes JPG.</li>
+                    <li>Número de WhatsApp activo y Nombre Completo.</li>
                 </ul>
-                <div style="background: #fff3e6; padding: 15px; border-radius: 10px; border-left: 5px solid var(--zippy-orange);">
-                    <b>REGLA DEL CATÁLOGO:</b> Ponle a cada foto el nombre normal del producto (Ej: Ramo Rosas Rojas.jpg). Úsalo de forma natural.
+
+                <h4>Paso a Paso del Registro</h4>
+                <p>1. <b>Descarga:</b> Baja la app <b>ZippyEntregas</b> (enlace abajo). <i>Nota: Se puede descargar directamente desde la aplicación principal Zippy.</i></p>
+                <p>2. <b>Registro:</b> Regístrate usando tu cuenta de Google.</p>
+                <p>3. <b>Datos:</b> Completa tu Nombre Completo y Número de WhatsApp.</p>
+                <div style="background: rgba(239, 68, 68, 0.1); padding: 15px; border-radius: 10px; border-left: 5px solid #ef4444; color: var(--white); margin-top: 15px;">
+                    <b>⚠️ Muy importante:</b>
+                    En el campo Empresa, debes seleccionar correctamente la empresa para la cual realizarás las entregas. Si seleccionas una empresa incorrecta, no te aparecerán los pedidos asignados.
                 </div>
-                <h4>Pasos para iniciar:</h4>
-                <p>1. <b>Contacto:</b> Envía tu catálogo a zippyempresas@gmail.com para activar tu ID.</p>
-                <p>2. <b>Registro:</b> Entra a la App Zippy con Google, pon los datos de tu empresa y guarda. ¡Tendrás tu tienda lista en minutos!</p>
+
+                <h4>Gestión de Pedidos</h4>
+                <p>Los pedidos se asignan al domiciliario de preferencia. El repartidor recibe pedidos en tiempo real, rutas de entrega, contacto con el cliente y confirma la entrega directamente en la app.</p>
             </div>
         </details>
 
         <details>
-            <summary>🌐 Ventajas de tu Tienda en Línea</summary>
+            <summary>📟 Manual: ZippyCatálogo (Tablet Punto Físico)</summary>
             <div class="content">
-                <p>Al registrarte, Zippy crea automáticamente tu e-commerce profesional.</p>
-                <ul>
-                    <li><b>Vende 24/7:</b> Tu tienda nunca cierra, tus clientes piden en cualquier momento.</li>
-                    <li><b>Más Ingresos:</b> Un catálogo organizado motiva a comprar más.</li>
-                    <li><b>Presencia Profesional:</b> Genera confianza compartiendo tu link por WhatsApp y redes sociales.</li>
-                </ul>
-            </div>
-        </details>
+                <p>ZippyCatálogo es el aplicativo diseñado para tablets en el punto físico, permitiendo que los clientes exploren productos y realicen pedidos de forma autónoma e intuitiva.</p>
+                
+                <h4>¿Para qué sirve?</h4>
+                <p>Permite mostrar el catálogo de productos de forma visual y ordenada, facilita la toma de pedidos autónoma reduciendo errores, y conecta automáticamente los pedidos con la gestión interna, domiciliarios y entregas.</p>
 
-        <details>
-            <summary>💻 Zippy Web (Gestión desde PC)</summary>
-            <div class="content">
-                <p>Usa la plataforma desde tu navegador para tareas administrativas avanzadas.</p>
-                <h4>¿Qué puedes hacer?</h4>
-                <ul>
-                    <li>Gestionar bases de datos de ventas y gastos.</li>
-                    <li><b>Imprimir tarjetas de regalo</b> para los pedidos de detalles.</li>
-                    <li>Asignar domiciliarios y marcar pedidos en ruta de forma masiva.</li>
-                </ul>
-                <p><i>Nota: Debes usar la misma cuenta de Google que en la App móvil.</i></p>
-                <a href="https://zippy-727d5.web.app/login.html" target="_blank" class="btn btn-blue" style="margin-top: 10px; font-size: 12px;">Abrir Zippy Web</a>
-            </div>
-        </details>
-
-        <details>
-            <summary>🚴 Zippy Entregas (Para Domiciliarios)</summary>
-            <div class="content">
-                <p>App exclusiva para organizar a tu equipo de reparto.</p>
-                <h4>Para el domiciliario:</h4>
-                <ul>
-                    <li>Registro con Google y número de WhatsApp.</li>
-                    <li><b>Importante:</b> Debe seleccionar la empresa correcta al registrarse para ver los pedidos asignados.</li>
-                    <li>Podrá ver rutas en tiempo real y confirmar la entrega al cliente.</li>
-                </ul>
-            </div>
-        </details>
-
-        <details>
-            <summary>📟 Zippy Catálogo (Punto Físico)</summary>
-            <div class="content">
-                <p>Convierte una Tablet en un vendedor autónomo en tu local físico.</p>
-                <h4>Beneficios:</h4>
-                <ul>
-                    <li>El cliente navega por el catálogo y pide solo.</li>
-                    <li>Reduce errores humanos al tomar el pedido.</li>
-                    <li>Todo se conecta automáticamente con la gestión de la empresa y domiciliarios.</li>
-                </ul>
+                <h4>Activación y Configuración (Paso a Paso)</h4>
+                <p>1. <b>Activación en Zippy App:</b> Ingresa a la app principal, dirígete a Perfil de la Empresa, allí encontrarás los campos de activación del catálogo físico. Ingresa la información solicitada y guarda.</p>
+                <p>2. <b>Configuración en la Tablet:</b> Instala <b>ZippyCatálogo</b>, ábrelo, ingresa los datos solicitados según la información configurada en el perfil de la empresa y conecta la tablet al catálogo.</p>
+                
+                <h4>Uso en Local</h4>
+                <p>El cliente navega por imágenes y referencias, selecciona productos fácilmente y realiza pedidos directamente desde la tablet. Cada pedido se registra automáticamente en Zippy y queda disponible para su gestión.</p>
             </div>
         </details>
 
     </section>
 
-    <section id="descargas" class="container" style="padding-bottom: 100px;">
-        <h2 style="text-align: center;">Descarga las Aplicaciones</h2>
-        <div class="download-grid">
-            <div class="dl-card">
-                <p>Zippy App</p>
-                <a href="https://github.com/CreativeMB/center/releases/download/apk/zippy-debug.apk" class="btn btn-blue" style="font-size: 11px; width: 100%;">DESCARGAR APK</a>
-            </div>
-            <div class="dl-card">
-                <p>Zippy Entregas</p>
-                <a href="https://github.com/CreativeMB/center/releases/download/apk/zippyentregas-debug.apk" class="btn btn-orange" style="font-size: 11px; width: 100%;">DESCARGAR APK</a>
-            </div>
-            <div class="dl-card">
-                <p>Zippy Catálogo</p>
-                <a href="https://github.com/CreativeMB/center/releases/download/apk/catalogo-debug.apk" class="btn btn-blue" style="font-size: 11px; width: 100%;">DESCARGAR APK</a>
+    <section id="descargas" class="descargas-franja">
+        <div class="container">
+            <h2>Centro de Descargas Zippy</h2>
+            <p class="text-center highlight" style="font-size: 16px; font-weight: 600;">Descarga las aplicaciones oficiales del ecosistema digital.</p>
+            
+            <div class="download-grid">
+                
+                <div class="dl-card">
+                    <i>📱</i>
+                    <h4>Zippy App (Principal)</h4>
+                    <p>Gestión completa de tu negocio, inventario, ventas y tienda online automática.</p>
+                    <a href="https://github.com/CreativeMB/center/releases/download/apk/zippy-debug.apk" class="btn btn-blue btn-sm btn-full">DESCARGAR APK</a>
+                </div>
+
+                <div class="dl-card" style="border-color: rgba(255, 159, 67, 0.2);">
+                    <i>🚴</i>
+                    <h4>Zippy Entregas</h4>
+                    <p>Aplicativo exclusivo para domiciliarios. Gestión de rutas en tiempo real.</p>
+                    <a href="https://github.com/CreativeMB/center/releases/download/apk/zippyentregas-debug.apk" class="btn btn-orange btn-sm btn-full">DESCARGAR APK</a>
+                </div>
+
+                <div class="dl-card">
+                    <i>📟</i>
+                    <h4>Zippy Catálogo</h4>
+                    <p>Aplicativo para tablet en punto físico. Toma de pedidos autónoma.</p>
+                    <a href="https://github.com/CreativeMB/center/releases/download/apk/catalogo-debug.apk" class="btn btn-blue btn-sm btn-full">DESCARGAR APK</a>
+                </div>
+
+                <div class="dl-card" style="background: rgba(59, 130, 246, 0.05);">
+                    <i>💻</i>
+                    <h4>Zippy Web (PC)</h4>
+                    <p>Acceso administrativo avanzado y contabilidad desde tu navegador de PC.</p>
+                    <a href="https://zippy-727d5.web.app/login.html" target="_blank" class="btn btn-orange btn-sm btn-full">ABRIR PANEL WEB</a>
+                </div>
+
             </div>
         </div>
     </section>
 
     <footer>
-        <p>Zippy 2026 | zippyempresas@gmail.com | Tu negocio, en todas partes.</p>
+        <div class="container">
+            <p>Zippy &copy; 2026 | Centro de Ayuda y Ecosistema Digital.</p>
+            <p style="margin-top: 10px; font-size: 11px;">Soporte: zippyempresas@gmail.com | Tu negocio, bajo control total.</p>
+        </div>
     </footer>
 
 </body>
