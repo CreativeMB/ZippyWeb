@@ -775,6 +775,7 @@ body {
                 const perfil = data.perfilempresa;
 
                            // --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
+// --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
 if (perfil.fechaExpiracion) {
     const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
     const [dia, mes, anio] = fechaPart.split("/");
@@ -787,10 +788,20 @@ if (perfil.fechaExpiracion) {
         const horaRealServidor = Date.now() + offset;
 
         if (horaRealServidor > tiempoExpiracion) {
-            // --- AQUÍ ESTÁ LA SOLUCIÓN ---
+            console.log("⚠️ Fecha vencida. Redirigiendo...");
+
+            // 1. FORZAR DESAPARICIÓN DEL LOADER
             const ld = document.getElementById("loader");
-            if(ld) ld.style.display = "none"; // Quitamos el loader inmediatamente
-            
+            if (ld) {
+                ld.style.opacity = "0";
+                ld.style.display = "none";
+                ld.remove(); // Lo eliminamos físicamente del código
+            }
+
+            // 2. LIMPIAR EL BODY (Evita que el loader se quede pegado en la memoria)
+            document.body.innerHTML = "<div style='background:#f8fafc; height:100vh; width:100vw; display:flex; align-items:center; justify-content:center; font-family:Montserrat,sans-serif; color:#64748b;'>Cargando actualización...</div>";
+
+            // 3. REDIRECCIÓN
             window.location.replace("mantenimiento.html");
             return; 
         } else {
