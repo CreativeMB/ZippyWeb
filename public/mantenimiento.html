@@ -3,116 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crea tu Tienda con Zippy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Zippy | El Ecosistema para tu Negocio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --zippy-blue: #2563eb;
             --zippy-orange: #ff9f43;
             --dark: #0f172a;
-            --text-light: #64748b;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
         }
 
+        * { box-sizing: border-box; }
         body {
-            margin: 0; padding: 0;
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8fafc;
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh;
+            margin: 0; font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light); color: var(--dark);
+            line-height: 1.6;
         }
 
-        .card {
-            background: white;
-            width: 90%; max-width: 450px;
-            padding: 40px 25px;
-            border-radius: 35px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            text-align: center;
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+
+        /* Header / Mantenimiento */
+        .header {
+            text-align: center; padding: 40px 20px;
+            background: var(--white); border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 25px;
+        }
+        .badge {
+            background: #fee2e2; color: #ef4444;
+            padding: 5px 15px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
         }
 
-        /* Badge de la tienda actual */
-        .status {
-            font-size: 12px; color: var(--text-light);
-            background: #f1f5f9; padding: 5px 15px;
-            border-radius: 20px; display: inline-block; margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 28px; font-weight: 800; color: var(--dark);
-            line-height: 1.2; margin-bottom: 15px;
-        }
-
+        h1 { font-size: 28px; font-weight: 800; margin: 20px 0 10px; line-height: 1.2; }
         .highlight { color: var(--zippy-blue); }
 
-        /* Lista de beneficios sin código */
-        .features {
-            text-align: left; margin: 25px 0;
-            padding: 0; list-style: none;
+        /* Sección Ecosistema */
+        .section-title {
+            text-align: center; font-size: 18px; font-weight: 700;
+            margin: 40px 0 20px; color: var(--zippy-blue);
         }
 
-        .features li {
-            margin-bottom: 12px; font-size: 14px;
-            color: var(--text-light); display: flex; align-items: center;
-        }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
-        .features li::before {
-            content: '✅'; margin-right: 10px; font-size: 16px;
+        .card {
+            background: var(--white); padding: 20px; border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;
+            transition: transform 0.3s;
         }
+        .card:hover { transform: translateY(-5px); }
+        .card i { font-size: 24px; margin-bottom: 10px; display: block; }
+        .card h3 { font-size: 14px; margin: 0 0 5px; font-weight: 700; }
+        .card p { font-size: 12px; color: #64748b; margin: 0; }
 
-        /* Caja de oferta especial */
-        .offer-box {
+        /* Banner Oferta */
+        .cta-banner {
             background: linear-gradient(135deg, var(--dark) 0%, #1e293b 100%);
-            color: white; padding: 25px;
-            border-radius: 25px; margin-top: 20px;
-            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
+            color: var(--white); padding: 35px 25px; border-radius: 30px;
+            text-align: center; margin-top: 30px; position: relative;
+            overflow: hidden;
+        }
+        .cta-banner::after {
+            content: 'ZIPPY'; position: absolute; top: -20px; right: -20px;
+            font-size: 80px; font-weight: 800; opacity: 0.05;
         }
 
-        .offer-title { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
-        .offer-sub { font-size: 13px; opacity: 0.8; margin-bottom: 20px; display: block; }
-
-        .btn-main {
-            display: block;
-            background: var(--zippy-orange);
-            color: #000; text-decoration: none;
-            padding: 16px; border-radius: 15px;
-            font-weight: 800; font-size: 16px;
-            transition: transform 0.2s;
+        .price-tag {
+            background: var(--zippy-orange); color: #000;
+            padding: 5px 15px; border-radius: 10px;
+            font-weight: 800; font-size: 14px; display: inline-block;
+            margin-bottom: 15px;
         }
 
-        .btn-main:hover { transform: scale(1.05); }
-
-        .no-pc {
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; margin-top: 15px; color: #94a3b8; font-weight: 600;
+        .btn-primary {
+            display: block; background: var(--zippy-orange);
+            color: #000; text-decoration: none; padding: 18px;
+            border-radius: 15px; font-weight: 800; font-size: 16px;
+            margin-top: 20px; box-shadow: 0 10px 20px rgba(255, 159, 67, 0.3);
         }
+
+        .no-tech {
+            font-size: 11px; margin-top: 15px; opacity: 0.7;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+
+        footer { text-align: center; padding: 30px; font-size: 12px; color: #94a3b8; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="status">Esta tienda está en mantenimiento</div>
-        
-        <h1>¿Vendes por WhatsApp? <br><span class="highlight">Hazlo Profesional.</span></h1>
-        
-        <ul class="features">
-            <li><strong>Sin PC:</strong> Todo desde tu celular.</li>
-            <li><strong>Sin códigos:</strong> Solo regístrate y listo.</li>
-            <li><strong>Sin Hosting:</strong> Nosotros nos encargamos.</li>
-            <li><strong>En minutos:</strong> Tu catálogo online hoy mismo.</li>
-        </ul>
+    <div class="container">
+        <div class="header">
+            <span class="badge">Tienda en Mantenimiento</span>
+            <h1>¡Estamos <span class="highlight">mejorando</span> para ti!</h1>
+            <p style="color: #64748b; font-size: 14px;">Esta tienda está actualizando su catálogo. Regresa en un momento.</p>
+        </div>
 
-        <div class="offer-box">
-            <span class="offer-title">¡Lanza tu tienda hoy!</span>
-            <span class="offer-sub">Regístrate y recibe <b>1 MES GRATIS</b> para que veas cómo aumentan tus ventas.</span>
-            
-            <a href="https://zipy.carrd.co/" class="btn-main">
-                ¡OBTENER MI MES GRATIS!
-            </a>
+        <div class="section-title">¿Vendes? Conoce el Ecosistema Zippy</div>
 
-            <div class="no-pc">
-                📱 100% compatible con tu celular
+        <div class="grid">
+            <div class="card">
+                <i>🌐</i>
+                <h3>Tienda Online</h3>
+                <p>Tu catálogo web tipo e-commerce automático.</p>
+            </div>
+            <div class="card">
+                <i>📱</i>
+                <h3>App Gestión</h3>
+                <p>Controla ventas y gastos desde tu celular.</p>
+            </div>
+            <div class="card">
+                <i>🚚</i>
+                <h3>Zippy Entregas</h3>
+                <p>App para tus domiciliarios con rutas en tiempo real.</p>
+            </div>
+            <div class="card">
+                <i>🖨️</i>
+                <h3>Zippy Web</h3>
+                <p>Imprime tarjetas y gestiona desde tu PC.</p>
             </div>
         </div>
+
+        <div class="cta-banner">
+            <span class="price-tag">🎁 1 MES TOTALMENTE GRATIS</span>
+            <h2 style="margin: 0 0 10px; font-size: 22px;">Potencia tu negocio hoy</h2>
+            <p style="font-size: 14px; opacity: 0.9; margin-bottom: 20px;">
+                Sin instalaciones complicadas, sin saber de programación. 
+                Registra tu empresa y empieza a vender profesionalmente en minutos.
+            </p>
+            
+            <a href="https://zipy.carrd.co/" class="btn-main btn-primary">
+                ¡CREAR MI TIENDA AHORA!
+            </a>
+
+            <div class="no-tech">
+                <span>⚡ Sin Hosting</span> • <span>📱 100% Móvil</span> • <span>🚀 En Minutos</span>
+            </div>
+        </div>
+
+        <footer>
+            Potenciado por Zippy &copy; 2026<br>
+            <a href="https://zipy.carrd.co/" style="color: var(--zippy-blue); text-decoration: none;">www.zipy.carrd.co</a>
+        </footer>
     </div>
 
 </body>
