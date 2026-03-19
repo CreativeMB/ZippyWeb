@@ -926,6 +926,7 @@ onValue(empresasRef, (snapshot) => {
 
         // Quitar Loader
         setTimeout(() => {
+            if (bloqueoActivo) return;
             document.querySelectorAll(".producto").forEach((el, i) => setTimeout(() => el.classList.add("visible"), i * 30));
             const ld = document.getElementById("loader");
             if(ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
