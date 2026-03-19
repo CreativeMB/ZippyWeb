@@ -739,6 +739,12 @@ body {
     </a>
 
  <script type="module">
+    // FORZAR EL CIERRE DEL LOADER PARA PRUEBAS
+    const loaderPrueba = document.getElementById("loader");
+    if(loaderPrueba) {
+        loaderPrueba.style.display = "none"; 
+        loaderPrueba.remove();
+    }
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
