@@ -125,23 +125,6 @@
 
         /* --- FOOTER --- */
         footer { padding: 60px 0; text-align: center; font-size: 13px; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
-         @media (max-width: 768px) {
-        /* En móviles, quitar el efecto de escala para que no se corte */
-        .zippy-card-enterprise {
-            transform: scale(1) !important;
-            margin-top: 20px; /* Espacio extra arriba por la etiqueta naranja */
-        }
-        
-        /* Asegurar que las tarjetas ocupen buen ancho en móvil */
-        .zippy-card {
-            min-width: 100% !important;
-        }
-        
-        /* Ajustar tamaño de fuente del encabezado principal */
-        h2 {
-            font-size: 2em !important;
-        }
-    }
     </style>
 </head>
 <body>
@@ -404,99 +387,80 @@
             </div>
         </details>
     </section>
-<div style="width: 100%; background-color: #f8fafc; padding: 80px 0; font-family: 'Segoe UI', Roboto, sans-serif;">
+<div style="width: 100%; background-color: #0f172a; padding: 40px 0; font-family: 'Segoe UI', Roboto, sans-serif;">
     
     <section style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
         
-        <div style="text-align: center; margin-bottom: 60px;">
-            <h2 style="color: #0f172a; font-size: 2.5em; margin-bottom: 15px; letter-spacing: -1px; font-weight: 800;">Ecosistema de Suscripciones Zippy</h2>
-            <p style="color: #64748b; font-size: 1.2em; max-width: 700px; margin: 0 auto; line-height: 1.6;">
-                Desbloquea un mundo de posibilidades para tu marca. Infraestructura robusta, elegante y diseñada para escalar tus ventas sin complicaciones técnicas.
+        <div style="text-align: center; margin-bottom: 35px;">
+            <h2 style="color: #ffffff; font-size: 2.2em; margin-bottom: 10px; letter-spacing: -1px; font-weight: 800;">Ecosistema de Suscripciones Zippy</h2>
+            <p style="color: #94a3b8; font-size: 1.1em; max-width: 700px; margin: 0 auto; line-height: 1.5;">
+                Infraestructura robusta diseñada para escalar tus ventas sin complicaciones técnicas.
             </p>
         </div>
 
-        <div class="zippy-cards-container" style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; align-items: stretch;">
+        <div class="zippy-grid" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: stretch;">
             
-            <div class="zippy-card" style="flex: 1; min-width: 300px; max-width: 360px; background: #797979; padding: 10px 30px; border-radius: 20px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                <span style="color: #64748b; font-size: 0.85em; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px;">Experiencia Inicial</span>
-                <h4 style="margin: 10px 0; color: #1e293b; font-size: 1.6em; font-weight: 700;">Mes de Cortesía</h4>
-                <div style="margin: 25px 0;">
-                    <span style="font-size: 3.2em; font-weight: 800; color: #0f172a; line-height: 1;">$0</span>
-                    <span style="color: #94a3b8; font-size: 1.2em;">/30 días</span>
+            <div class="z-card" style="flex: 1; min-width: 280px; max-width: 350px; background: #ffffff; padding: 30px 25px; border-radius: 16px; border: 1px solid #1e293b; display: flex; flex-direction: column; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);">
+                <span style="color: #64748b; font-size: 0.75em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Experiencia Inicial</span>
+                <h4 style="margin: 8px 0; color: #1e293b; font-size: 1.4em; font-weight: 700;">Mes de Cortesía</h4>
+                <div style="margin: 15px 0;">
+                    <span style="font-size: 2.5em; font-weight: 800; color: #0f172a;">$0</span>
+                    <span style="color: #94a3b8; font-size: 1em;">/30 días</span>
                 </div>
-                <p style="font-size: 0.95em; color: #10b981; font-weight: 600; margin-bottom: 25px;">✓ Riesgo cero, acceso total</p>
-                <ul style="text-align: left; font-size: 1em; padding: 0; list-style: none; margin: 0 0 35px 0; color: #475569; flex-grow: 1; line-height: 1.6;">
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #3b82f6; font-weight: bold;">✓</span> <span>Despliegue de tienda inmediata</span>
-                    </li>
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #3b82f6; font-weight: bold;">✓</span> <span>Catálogo digital corporativo</span>
-                    </li>
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #3b82f6; font-weight: bold;">✓</span> <span>Panel de gestión administrativa</span>
-                    </li>
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #3b82f6; font-weight: bold;">✓</span> <span>100% funciones desbloqueadas</span>
-                    </li>
+                <ul style="text-align: left; font-size: 0.9em; padding: 0; list-style: none; margin: 0 0 25px 0; color: #475569; flex-grow: 1; line-height: 1.4;">
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Despliegue de tienda inmediata</li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Catálogo digital corporativo</li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Panel de gestión administrativa</li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> 100% funciones desbloqueadas</li>
                 </ul>
-                <a href="#descargas" style="text-decoration: none; text-align: center; padding: 16px; border: 2px solid #e2e8f0; color: #1e293b; border-radius: 10px; font-weight: bold; transition: all 0.3s; font-size: 1.1em;">Empezar Prueba</a>
+                <a href="#descargas" style="text-decoration: none; text-align: center; padding: 12px; border: 2px solid #e2e8f0; color: #1e293b; border-radius: 8px; font-weight: bold; font-size: 0.95em;">Empezar Prueba</a>
             </div>
 
-            <div class="zippy-card zippy-card-featured" style="flex: 1; min-width: 300px; max-width: 360px; background: #ffffff; padding: 40px 30px; border-radius: 20px; border: 2px solid #3b82f6; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.1); position: relative;">
-                <span style="color: #3b82f6; font-size: 0.85em; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px;">Crecimiento Ágil</span>
-                <h4 style="margin: 10px 0; color: #1e293b; font-size: 1.6em; font-weight: 700;">Suscripción Mensual</h4>
-                <div style="margin: 25px 0;">
-                    <span style="font-size: 3.2em; font-weight: 800; color: #0f172a; line-height: 1;">$30k</span>
-                    <span style="color: #94a3b8; font-size: 1.2em;">/mes</span>
+            <div class="z-card" style="flex: 1; min-width: 280px; max-width: 350px; background: #ffffff; padding: 30px 25px; border-radius: 16px; border: 2px solid #3b82f6; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4); position: relative;">
+                <span style="color: #3b82f6; font-size: 0.75em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Crecimiento Ágil</span>
+                <h4 style="margin: 8px 0; color: #1e293b; font-size: 1.4em; font-weight: 700;">Mensual</h4>
+                <div style="margin: 15px 0;">
+                    <span style="font-size: 2.5em; font-weight: 800; color: #0f172a;">$30k</span>
+                    <span style="color: #94a3b8; font-size: 1em;">/mes</span>
                 </div>
-                <p style="font-size: 0.95em; color: #10b981; font-weight: 600; margin-bottom: 25px;">⚡ Solo $1.000 COP por día</p>
-                <ul style="text-align: left; font-size: 1em; padding: 0; list-style: none; margin: 0 0 35px 0; color: #475569; flex-grow: 1; line-height: 1.6;">
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #3b82f6; font-weight: bold;">✓</span> <span>Continuidad operativa 24/7</span>
-                    </li>
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #3b82f6; font-weight: bold;">✓</span> <span>Pedidos ilimitados vía WhatsApp</span>
-                    </li>
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #3b82f6; font-weight: bold;">✓</span> <span>Actualizaciones de sistema</span>
-                    </li>
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #3b82f6; font-weight: bold;">✓</span> <span>Soporte técnico especializado</span>
-                    </li>
+                <p style="font-size: 0.85em; color: #10b981; font-weight: 600; margin-bottom: 15px;">⚡ Solo $1.000 COP por día</p>
+                <ul style="text-align: left; font-size: 0.9em; padding: 0; list-style: none; margin: 0 0 25px 0; color: #475569; flex-grow: 1; line-height: 1.4;">
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Continuidad operativa 24/7</li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Pedidos vía WhatsApp</li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Actualizaciones de sistema</li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Soporte especializado</li>
                 </ul>
-                <a href="#descargas" style="text-decoration: none; text-align: center; padding: 16px; background: #3b82f6; color: white; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); font-size: 1.1em;">Seleccionar Plan</a>
+                <a href="#descargas" style="text-decoration: none; text-align: center; padding: 12px; background: #3b82f6; color: white; border-radius: 8px; font-weight: bold; font-size: 0.95em;">Seleccionar Plan</a>
             </div>
 
-            <div class="zippy-card zippy-card-enterprise" style="flex: 1; min-width: 300px; max-width: 360px; background: #1e293b; padding: 40px 30px; border-radius: 20px; border: none; display: flex; flex-direction: column; position: relative; color: white; transform: scale(1.05); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-                <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #f97316; color: white; padding: 6px 25px; border-radius: 20px; font-size: 0.8em; font-weight: bold; letter-spacing: 1px; white-space: nowrap; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);">OFERTA: AHORRAS $60.000</div>
-                <span style="color: #94a3b8; font-size: 0.85em; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px;">Visión a Largo Plazo</span>
-                <h4 style="margin: 10px 0; color: white; font-size: 1.6em; font-weight: 700;">Suscripción Anual</h4>
-                <div style="margin: 25px 0;">
-                    <span style="font-size: 3.2em; font-weight: 800; color: white; line-height: 1;">$300k</span>
-                    <span style="color: #94a3b8; font-size: 1.2em;">/año</span>
+            <div class="z-card-annual" style="flex: 1; min-width: 280px; max-width: 350px; background: #1e293b; padding: 30px 25px; border-radius: 16px; border: 1px solid #334155; display: flex; flex-direction: column; position: relative; color: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #f97316; color: white; padding: 4px 15px; border-radius: 20px; font-size: 0.7em; font-weight: bold; letter-spacing: 1px; white-space: nowrap;">AHORRAS $60.000</div>
+                <span style="color: #94a3b8; font-size: 0.75em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Visión a Largo Plazo</span>
+                <h4 style="margin: 8px 0; color: white; font-size: 1.4em; font-weight: 700;">Anual</h4>
+                <div style="margin: 15px 0;">
+                    <span style="font-size: 2.5em; font-weight: 800; color: white;">$300k</span>
+                    <span style="color: #94a3b8; font-size: 1em;">/año</span>
                 </div>
-                <p style="font-size: 0.95em; color: #fb923c; font-weight: 600; margin-bottom: 25px;">🏆 La inversión más inteligente</p>
-                <ul style="text-align: left; font-size: 1em; padding: 0; list-style: none; margin: 0 0 35px 0; color: #cbd5e1; flex-grow: 1; line-height: 1.6;">
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #f97316; font-weight: bold;">✓</span> <span>Prioridad en infraestructura</span>
-                    </li>
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #f97316; font-weight: bold;">✓</span> <span>Garantía de precio anual</span>
-                    </li>
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #f97316; font-weight: bold;">✓</span> <span>Acceso anticipado a funciones</span>
-                    </li>
-                    <li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                        <span style="color: #f97316; font-weight: bold;">✓</span> <span>Identidad de marca consolidada</span>
-                    </li>
+                <p style="font-size: 0.85em; color: #fb923c; font-weight: 600; margin-bottom: 15px;">🏆 La inversión más inteligente</p>
+                <ul style="text-align: left; font-size: 0.9em; padding: 0; list-style: none; margin: 0 0 25px 0; color: #cbd5e1; flex-grow: 1; line-height: 1.4;">
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Prioridad en infraestructura</li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Garantía de precio anual</li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Acceso anticipado a funciones</li>
+                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Marca consolidada</li>
                 </ul>
-                <a href="#descargas" style="text-decoration: none; text-align: center; padding: 16px; background: #f97316; color: white; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4); font-size: 1.1em;">Adquirir Plan Anual</a>
+                <a href="#descargas" style="text-decoration: none; text-align: center; padding: 12px; background: #f97316; color: white; border-radius: 8px; font-weight: bold; font-size: 0.95em;">Adquirir Anual</a>
             </div>
 
         </div>
     </section>
 </div>
 
+<style>
+    @media (max-width: 768px) {
+        .z-card, .z-card-annual { min-width: 100% !important; margin-bottom: 10px; }
+        h2 { font-size: 1.8em !important; }
+    }
+</style>
     <section id="descargas" class="descargas-franja">
         <div class="container">
             <h2>Centro de Descargas Zippy</h2>
