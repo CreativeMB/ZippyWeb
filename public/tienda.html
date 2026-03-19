@@ -776,6 +776,7 @@ body {
 
                            // --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
 // --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
+// --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
 if (perfil.fechaExpiracion) {
     const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
     const [dia, mes, anio] = fechaPart.split("/");
@@ -788,21 +789,23 @@ if (perfil.fechaExpiracion) {
         const horaRealServidor = Date.now() + offset;
 
         if (horaRealServidor > tiempoExpiracion) {
-            console.log("⚠️ Fecha vencida. Redirigiendo...");
+            console.log("🛑 ACCESO EXPIRADO. Redirigiendo a mantenimiento...");
 
-            // 1. FORZAR DESAPARICIÓN DEL LOADER
-            const ld = document.getElementById("loader");
-            if (ld) {
-                ld.style.opacity = "0";
-                ld.style.display = "none";
-                ld.remove(); // Lo eliminamos físicamente del código
-            }
+            // 1. DESTRUCCIÓN TOTAL DEL CONTENIDO (MAZO DE HIERRO)
+            // Esto borra absolutamente TODO el HTML actual para que no haya nada que tapar
+            document.documentElement.innerHTML = `
+                <body style="margin:0; padding:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh; font-family:sans-serif;">
+                    <div style="text-align:center;">
+                        <p style="color:#64748b;">Cargando plataforma...</p>
+                    </div>
+                </body>`;
 
-            // 2. LIMPIAR EL BODY (Evita que el loader se quede pegado en la memoria)
-            document.body.innerHTML = "<div style='background:#f8fafc; height:100vh; width:100vw; display:flex; align-items:center; justify-content:center; font-family:Montserrat,sans-serif; color:#64748b;'>Cargando actualización...</div>";
-
-            // 3. REDIRECCIÓN
-            window.location.replace("mantenimiento.html");
+            // 2. REDIRECCIÓN FORZADA
+            // Usamos location.href en lugar de replace para forzar un refresco total del historial
+            setTimeout(() => {
+                window.location.href = "mantenimiento.html";
+            }, 100);
+            
             return; 
         } else {
             continuarCarga(perfil, data);
