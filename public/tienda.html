@@ -1048,7 +1048,7 @@ const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
        function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
     
-    // Formateo de fecha
+    // 1. Formateo de fecha
     const fechaOriginal = document.getElementById("fechaEntrega").value;
     let fechaFormateada = "";
     if (fechaOriginal) {
@@ -1056,58 +1056,55 @@ const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
         fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
     }
 
-    // Captura de todos los campos (basado en tu lógica de Kotlin)
+    // 2. Captura de campos usando los IDs EXACTOS de tu HTML
     const campos = {
         direccion: document.getElementById("direccionEntrega").value.trim(),
-        cliente: document.getElementById("clienteInput").value.trim(), // Teléfono o ID cliente
-        nombreCliente: document.getElementById("nombreComprador").value.trim(),
-        referencia: document.getElementById("referencia").value.trim(),
-        notas: document.getElementById("notas").value.trim(),
-        adicional: document.getElementById("adicional").value.trim(),
+        cliente: document.getElementById("celularComprador").value.trim(), // ID corregido
+        nombreCliente: document.getElementById("nombreComprador").value.trim(), // ID corregido
+        referencia: productoSeleccionado || "Sin referencia", 
+        notas: document.getElementById("notasPedido").value.trim(), // ID corregido
+        adicional: document.getElementById("productoAdicional").value.trim(), // ID corregido
         banco: document.getElementById("medioPago").value.trim(),
-        nombreRemitente: document.getElementById("nombreRemitente").value.trim(),
-        remitente: document.getElementById("remitente").value.trim(), // Teléfono remitente
-        de: document.getElementById("deInput").value.trim(),
-        para: document.getElementById("paraInput").value.trim(),
+        nombreRemitente: document.getElementById("nombreComprador").value.trim(), // Usamos el comprador como remitente
+        remitente: document.getElementById("celularComprador").value.trim(), 
+        de: document.getElementById("deTarjeta").value.trim(), // ID corregido
+        para: document.getElementById("paraTarjeta").value.trim(), // ID corregido
         diaEntrega: fechaFormateada,
         horaEntrega: document.getElementById("horaEntrega").value.trim(),
-        mensaje: document.getElementById("mensaje").value.trim()
+        mensaje: document.getElementById("mensajeTarjeta").value.trim() // ID corregido
     };
 
-    // Validación de obligatorios (excepto adicional e imagenUrl)
-    const obligatorios = ["direccion", "cliente", "nombreCliente", "referencia", "nombreRemitente", "remitente", "de", "para", "diaEntrega", "mensaje"];
-    const faltanCampos = obligatorios.some(key => !campos[key]);
-
-    if (faltanCampos) {
-        alert("⚠️ Por favor, complete todos los campos obligatorios.");
+    // 3. Validación de campos obligatorios para evitar envíos vacíos
+    if (!campos.direccion || !campos.nombreCliente || !campos.diaEntrega) {
+        alert("⚠️ Por favor, complete los campos básicos: Nombre, Dirección y Fecha.");
         return;
     }
 
     btn.disabled = true;
     btn.innerText = "Enviando...";
 
-    // Referencia a Firebase
+    // 4. Referencia y Guardado en Firebase
+    // Importante: Asegúrate de importar 'get' de firebase-database al inicio de tu script
+    const { get } = Array.from(arguments).find(arg => arg?.get) || { get: window.get }; // Intento de recuperación si no está global
+
     const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
 
-    // Obtener la posición máxima actual (solo una vez)
-    get(pedidosRef).then((snapshot) => {
+    // Usamos la lógica de tu primer script que funcionaba (onValue con onlyOnce)
+    onValue(pedidosRef, (snapshot) => {
         let maxPos = 0;
-        if (snapshot.exists()) {
-            snapshot.forEach(c => {
-                const pos = c.val().posicion;
-                if (pos > maxPos) maxPos = pos;
-            });
-        }
+        snapshot.forEach(c => {
+            const pos = c.val().posicion;
+            if (pos > maxPos) maxPos = pos;
+        });
 
         const nuevoRef = push(pedidosRef);
         const hoy = new Date();
 
-        // Estructura idéntica a la clase Pedidos.Pedido de Kotlin
         const nuevoPedido = {
             idPedido: nuevoRef.key,
             direccion: campos.direccion,
-            imagenUrl: typeof imagenProducto !== 'undefined' ? imagenProducto : "", 
-            nombreDomiciliario: nombreDomiciliarioSeleccionado || "", // Variable que guarde el nombre
+            imagenUrl: imagenProducto || "", 
+            nombreDomiciliario: "", // Se llena en la App
             idDomiciliario: idDomiciliarioAsignado,
             idEmpresa: empresaId,
             posicion: maxPos + 1,
@@ -1117,34 +1114,32 @@ const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
             nombreCliente: campos.nombreCliente,
             adicional: campos.adicional,
             banco: campos.banco,
-            destinatario: campos.remitente, // En tu Kotlin pusiste destinatario = remitente
-            nombreDestinatario: campos.nombreRemitente,
+            destinatario: document.getElementById("celularDestinatario").value.trim(),
+            nombreDestinatario: document.getElementById("nombreDestinatario").value.trim(),
             de: campos.de,
             para: campos.para,
             diaEntrega: campos.diaEntrega,
             horaEntrega: campos.horaEntrega,
             mensaje: campos.mensaje,
             color: "",
-            fechaRegistro: hoy.toLocaleDateString('en-GB').replace(/\//g, '-'), // DD-MM-YYYY
+            fechaRegistro: hoy.toLocaleDateString('es-CO').replace(/\//g, '-'),
             horaRegistro: hoy.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             notas: campos.notas,
             referencia: campos.referencia
         };
 
-        return set(nuevoRef, nuevoPedido);
-    })
-    .then(() => {
-        alert("✅ Pedido realizado con éxito");
-        location.reload();
-    })
-    .catch((error) => {
-        console.error(error);
-        alert("Error al enviar: " + error.message);
-        btn.disabled = false;
-        btn.innerText = "Enviar Pedido";
-    });
+        set(nuevoRef, nuevoPedido)
+            .then(() => {
+                alert("✅ Pedido realizado con éxito");
+                location.reload();
+            })
+            .catch((error) => {
+                alert("Error: " + error.message);
+                btn.disabled = false;
+                btn.innerText = "Enviar pedido";
+            });
+    }, { onlyOnce: true });
 }
-
         // 4. UTILIDADES Y REDES
         function obtenerLinkDirecto(entrada) {
             if (!entrada) return "";
