@@ -1061,57 +1061,59 @@ if (perfil.fechaExpiracion) {
 }
 
         // 3. SISTEMA DE PEDIDOS
-     function enviarPedido() {
+    function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
     
-    // 1. Formato diaEntrega: DD-MM-YYYY (con guiones)
+    // 🔹 VALIDACIÓN CRÍTICA: ¿Hay un domiciliario asignado?
+    // Asumo que 'idDomiciliarioAsignado' es una variable global o previa
+    if (!idDomiciliarioAsignado) {
+        alert("❌ Error: No hay un domiciliario disponible o asignado para este pedido. No se puede enviar.");
+        return; // Detenemos la ejecución aquí
+    }
+
+    // 1. Formato diaEntrega: DD-MM-YYYY
     const fechaOriginal = document.getElementById("fechaEntrega").value;
     let fechaFormateada = "";
     if (fechaOriginal) {
-        const partes = fechaOriginal.split("-"); // El input date da YYYY-MM-DD
+        const partes = fechaOriginal.split("-"); 
         fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
     }
 
-    // 2. Captura de campos del formulario
+    // 2. Captura de campos obligatorios
     const direccion = document.getElementById("direccionEntrega").value.trim();
     const nombreComprador = document.getElementById("nombreComprador").value.trim();
-    const celularComprador = document.getElementById("celularComprador").value.trim();
 
     if (!direccion || !nombreComprador || !fechaFormateada) {
         alert("⚠️ Por favor, complete Dirección, Nombre y Fecha.");
         return;
     }
 
+    // Bloquear botón para evitar doble envío
     btn.disabled = true;
     btn.innerText = "Enviando...";
 
+    // Referencia a la base de datos usando el ID del domiciliario validado
     const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
 
     onValue(pedidosRef, (snapshot) => {
         let maxPos = 0;
-        snapshot.forEach(c => {
-            const pos = parseInt(c.val().posicion) || 0;
-            if (pos > maxPos) maxPos = pos;
-        });
+        if (snapshot.exists()) {
+            snapshot.forEach(c => {
+                const pos = parseInt(c.val().posicion) || 0;
+                if (pos > maxPos) maxPos = pos;
+            });
+        }
 
         const nuevoRef = push(pedidosRef);
         const hoy = new Date();
 
-        // 3. Formato fechaRegistro: DD/MM/YYYY (con barras y ceros)
-        // Ejemplo Kotlin: "18/03/2026"
+        // Formateo de Fecha y Hora (Estilo Kotlin)
         const fechaRegistro = hoy.toLocaleDateString('es-CO', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        }).replace(/\-/g, '/'); // Aseguramos que use barras
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        }).replace(/\-/g, '/');
 
-        // 4. Formato horaRegistro: hh:mm:ss a. m./p. m.
-        // Ejemplo Kotlin: "08:21:57 p. m."
         const horaRegistro = hoy.toLocaleTimeString('es-CO', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
+            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
         });
 
         const pedidoData = {
@@ -1136,8 +1138,8 @@ if (perfil.fechaExpiracion) {
             posicion: maxPos + 1,
             notificado: false,
             timestampEntrega: null,
-            color: "#BBDEFB", // Color por defecto según tu ejemplo de Kotlin
-            nombreDomiciliario: "",
+            color: "#BBDEFB",
+            nombreDomiciliario: "", // Puedes llenar esto si tienes el nombre a mano
             fechaRegistro: fechaRegistro,
             horaRegistro: horaRegistro
         };
