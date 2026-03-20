@@ -1045,18 +1045,18 @@ const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
         }
 
         // 3. SISTEMA DE PEDIDOS
-      function enviarPedido() {
+     function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
     
-    // 1. Formato diaEntrega (DD-MM-YYYY)
+    // 1. Formato diaEntrega: DD-MM-YYYY (con guiones)
     const fechaOriginal = document.getElementById("fechaEntrega").value;
     let fechaFormateada = "";
     if (fechaOriginal) {
-        const partes = fechaOriginal.split("-"); // Input date da YYYY-MM-DD
+        const partes = fechaOriginal.split("-"); // El input date da YYYY-MM-DD
         fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
     }
 
-    // 2. Captura de campos (IDs de tu HTML)
+    // 2. Captura de campos del formulario
     const direccion = document.getElementById("direccionEntrega").value.trim();
     const nombreComprador = document.getElementById("nombreComprador").value.trim();
     const celularComprador = document.getElementById("celularComprador").value.trim();
@@ -1081,18 +1081,22 @@ const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
         const nuevoRef = push(pedidosRef);
         const hoy = new Date();
 
-        // 3. Formato fechaRegistro: D-M-YYYY (Sin ceros a la izquierda en día/mes si es necesario)
-        // Según tu ejemplo: "19-3-2026"
-        const dia = hoy.getDate();
-        const mes = hoy.getMonth() + 1;
-        const anio = hoy.getFullYear();
-        const fechaRegistro = `${dia}-${mes}-${anio}`;
+        // 3. Formato fechaRegistro: DD/MM/YYYY (con barras y ceros)
+        // Ejemplo Kotlin: "18/03/2026"
+        const fechaRegistro = hoy.toLocaleDateString('es-CO', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        }).replace(/\-/g, '/'); // Aseguramos que use barras
 
-        // 4. Formato horaRegistro: HH:mm (24 horas)
-        // Según tu ejemplo: "21:01"
-        const horas = hoy.getHours().toString().padStart(2, '0');
-        const minutos = hoy.getMinutes().toString().padStart(2, '0');
-        const horaRegistro = `${horas}:${minutos}`;
+        // 4. Formato horaRegistro: hh:mm:ss a. m./p. m.
+        // Ejemplo Kotlin: "08:21:57 p. m."
+        const horaRegistro = hoy.toLocaleTimeString('es-CO', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
 
         const pedidoData = {
             idPedido: nuevoRef.key,
@@ -1107,7 +1111,7 @@ const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
             referencia: productoSeleccionado || "Pedido Web",
             adicional: document.getElementById("productoAdicional").value.trim(),
             banco: document.getElementById("medioPago").value,
-            diaEntrega: fechaFormateada, // "20-03-2026"
+            diaEntrega: fechaFormateada,
             horaEntrega: document.getElementById("horaEntrega").value,
             notas: document.getElementById("notasPedido").value.trim(),
             mensaje: document.getElementById("mensajeTarjeta").value.trim(),
@@ -1116,10 +1120,10 @@ const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
             posicion: maxPos + 1,
             notificado: false,
             timestampEntrega: null,
-            color: "",
+            color: "#BBDEFB", // Color por defecto según tu ejemplo de Kotlin
             nombreDomiciliario: "",
-            fechaRegistro: fechaRegistro, // "19-3-2026"
-            horaRegistro: horaRegistro    // "21:01"
+            fechaRegistro: fechaRegistro,
+            horaRegistro: horaRegistro
         };
 
         set(nuevoRef, pedidoData)
