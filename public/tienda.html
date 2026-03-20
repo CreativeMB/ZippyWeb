@@ -982,67 +982,83 @@ if (perfil.fechaExpiracion) {
             });
         }
 
-        function render() {
-            if (bloqueoActivo) return;
-            const contenedor = document.getElementById("productos");
-            if (!contenedor) return;
-            contenedor.innerHTML = "";
+       function render() {
+    if (bloqueoActivo) return;
+    const contenedor = document.getElementById("productos");
+    if (!contenedor) return;
+    contenedor.innerHTML = "";
 
-            for (const refP in productosJson) {
-                if (refP === "images") continue;
-                const imgUrl = productosJson[refP];
-                const claveBusqueda = refP.trim().toLowerCase();
-                const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
+    for (const refP in productosJson) {
+        if (refP === "images") continue;
+        const imgUrl = productosJson[refP];
+        const claveBusqueda = refP.trim().toLowerCase();
+        const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
 
-                let precioHTML = "";
-                let precioFinal = 0;
-                if (real.promocion && real.valorPromocion > 0) {
-                    precioFinal = real.valorPromocion;
-                    precioHTML = `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>`;
-                } else if (real.valor > 0) {
-                    precioFinal = real.valor;
-                    precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
-                } else {
-                    precioHTML = `<div class="precio">Consultar precio</div>`;
-                }
-
-                const card = document.createElement("div");
-                card.className = `producto ${real.agotado ? 'agotado' : ''}`;
-
-               // Extraemos la descripción, si no existe ponemos un texto vacío o "Sin descripción"
-const descripcionProducto = real.descripcion || "";
-
-// Construimos el mensaje incluyendo la nueva línea para la descripción
-const mensajeWa = encodeURIComponent(
-    `Hola, me interesa:\n` +
-    `📌 *Ref:* ${real.referenciaReal || refP}\n` +
-    `📝 *Descripción:* ${descripcionProducto}\n` + // <--- Nueva línea
-    `💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`
-);
-
-const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
-
-                card.innerHTML = `
-                <div class="img-container">
-                    ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-                    <img src="${normalizarImagen(imgUrl)}" 
-                         onclick="${real.agotado ? '' : `abrirProducto('${(real.referenciaReal || refP).replace(/'/g, "\\'")}','${imgUrl}','${precioFinal}','${(real.descripcion || "").replace(/'/g, "\\'")}')`}">
-                </div>
-                <div class="nombre">${real.referenciaReal || refP}</div>
-                ${precioHTML}
-                <a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none;">Pedir por WhatsApp</a>
-            `;
-                contenedor.appendChild(card);
-            }
-
-            // Quitar Loader
-            setTimeout(() => {
-                if (bloqueoActivo) return;
-                document.querySelectorAll(".producto").forEach((el, i) => setTimeout(() => el.classList.add("visible"), i * 30));
-                const ld = document.getElementById("loader");
-                if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
-            }, 500);
+        let precioHTML = "";
+        let precioFinal = 0;
+        
+        if (real.promocion && real.valorPromocion > 0) {
+            precioFinal = real.valorPromocion;
+            precioHTML = `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>`;
+        } else if (real.valor > 0) {
+            precioFinal = real.valor;
+            precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
+        } else {
+            precioHTML = `<div class="precio">Consultar precio</div>`;
         }
+
+        const card = document.createElement("div");
+        card.className = `producto ${real.agotado ? 'agotado' : ''}`;
+
+        // Extraemos la descripción
+        const descripcionProducto = real.descripcion || "";
+
+        // Construimos el mensaje de WhatsApp
+        const mensajeWa = encodeURIComponent(
+            `Hola, me interesa:\n` +
+            `📌 *Ref:* ${real.referenciaReal || refP}\n` +
+            `📝 *Descripción:* ${descripcionProducto}\n` +
+            `💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`
+        );
+        const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
+
+        // --- LÓGICA DE AGOTADO ---
+        // 1. Definimos qué botón mostrar
+        let botonAccion = "";
+        if (real.agotado) {
+            // Botón gris, con cursor de bloqueo y deshabilitado (no hace nada)
+            botonAccion = `<button class="btn" style="background:#888; color:white; cursor:not-allowed; border:none; text-decoration:none;" disabled>Agotado</button>`;
+        } else {
+            // Botón normal de WhatsApp
+            botonAccion = `<a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none;">Pedir por WhatsApp</a>`;
+        }
+
+        // 2. Definimos si la imagen va en blanco y negro
+        const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '';
+
+        card.innerHTML = `
+        <div class="img-container">
+            ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+            <img src="${normalizarImagen(imgUrl)}" 
+                 style="${estiloImagen}" 
+                 onclick="${real.agotado ? '' : `abrirProducto('${(real.referenciaReal || refP).replace(/'/g, "\\'")}','${imgUrl}','${precioFinal}','${(real.descripcion || "").replace(/'/g, "\\'")}')`}">
+        </div>
+        <div class="nombre">${real.referenciaReal || refP}</div>
+        ${precioHTML}
+        ${botonAccion}
+        `;
+        
+        contenedor.appendChild(card);
+    }
+
+    // Quitar Loader
+    setTimeout(() => {
+        if (bloqueoActivo) return;
+        document.querySelectorAll(".producto").forEach((el, i) => setTimeout(() => el.classList.add("visible"), i * 30));
+        const ld = document.getElementById("loader");
+        if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
+    }, 500);
+}
 
         // 3. SISTEMA DE PEDIDOS
      function enviarPedido() {
