@@ -878,61 +878,41 @@ async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase();
     const path = window.location.pathname;
     
-    // Normalizamos el host para comparar con y sin www
+    // Normalizamos el host para las comparaciones
     const hostSinWww = host.replace("www.", "");
     const hostConWww = "www." + hostSinWww;
 
     console.log("🔍 Analizando host:", host);
 
     // --- CASO 1: DOMINIO PERSONALIZADO (Ej: floristerialoslirios.com.co) ---
-    // Si NO es el dominio base de la App ni localhost, es un cliente externo
     if (hostSinWww !== "zippy-727d5.web.app" && hostSinWww !== "localhost") {
         try {
-            console.log("📡 Consultando base de datos para dominio:", hostSinWww);
-            
-            // Buscamos en la colección 'perfilempresa' el campo 'dominio'
+            // Buscamos en Firestore que el dominio sea igual a la versión con o sin www
             const q = query(
                 collection(dbFirestore, "perfilempresa"),
                 where("dominio", "in", [hostSinWww, hostConWww])
             );
-            
             const querySnapshot = await getDocs(q);
 
             if (!querySnapshot.empty) {
                 const empresaDoc = querySnapshot.docs[0].data();
-                slug = empresaDoc.slug; // Asignamos el slug a la variable global
+                slug = empresaDoc.slug; // Asignamos el slug global
                 
-                console.log("✅ Tienda Premium identificada:", slug);
-                
-                // Si el usuario escribió /t/algomas por error en este dominio, lo limpiamos
-                if (path.includes("/t/")) {
-                    const slugEnUrl = path.split("/t/")[1].split('/')[0];
-                    if (slugEnUrl !== slug) {
-                        console.warn("🔄 Corrigiendo ruta para dominio premium...");
-                        window.location.replace(`https://${host}/t/${slug}`);
-                        return;
-                    }
-                }
-
-                // CARGA DE DATOS DE LA TIENDA
+                console.log("✅ Tienda Premium detectada:", slug);
                 iniciarCargaBase(slug);
-                return; // Detenemos aquí, todo salió bien.
-
+                return; // Éxito, detenemos la ejecución aquí
             } else {
-                // El dominio apunta a Zippy pero no está registrado en la base de datos
-                console.error("❌ El dominio no está asociado a ninguna tienda activa.");
-                mostrarPantallaCargaYSalir();
+                console.error("❌ El dominio no está asociado a ninguna tienda en la base de datos.");
+                window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
                 return;
             }
         } catch (error) {
-            console.error("❌ Error crítico en la consulta de Firestore:", error);
-            mostrarPantallaCargaYSalir();
+            console.error("❌ Error consultando Firestore:", error);
             return;
         }
     }
 
-    // --- CASO 2: ACCESO POR SUB-RUTA (zippy-727d5.web.app/t/nombre-tienda) ---
-    // Esto es para cuando acceden desde el dominio base de Zippy
+    // --- CASO 2: DOMINIO BASE DE ZIPPY (zippy-727d5.web.app/t/slug) ---
     if (path.includes("/t/")) {
         const partes = path.split("/t/");
         if (partes[1]) {
@@ -942,38 +922,18 @@ async function detectarEmpresaPorDominio() {
             return;
         }
     }
-
-    // --- CASO FINAL: Si llega aquí es porque no hay tienda ni dominio válido ---
-    console.warn("⚠️ No se detectó ninguna configuración de tienda.");
-    // Opcional: Si quieres que en el dominio base de Zippy cargue el login:
-    // window.location.href = "/login"; 
 }
-
-/**
- * Muestra una pantalla de carga profesional y redirige a mantenimiento
- * para evitar que el usuario vea errores o el panel de administración.
- */
+// Función auxiliar para mantener tu estilo de "Entorno seguro"
 function mostrarPantallaCargaYSalir() {
-    // Reemplazamos el contenido visual para que sea elegante
     document.documentElement.innerHTML = `
-        <head>
-            <title>Cargando... | Zippy</title>
-        </head>
-        <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh; font-family: sans-serif;">
-            <div style="text-align:center;">
-                <div style="width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid #6200ee; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-                <p style="color:#64748b; font-size:18px; font-weight: 500;">Cargando entorno seguro...</p>
+        <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh;">
+            <div style="text-align:center; font-family:sans-serif;">
+                <p style="color:#64748b; font-size:18px;">Cargando entorno seguro...</p>
             </div>
-            <style>
-                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-            </style>
         </body>`;
-    
-    // Redirigimos después de un breve delay para que la pantalla sea visible
-    setTimeout(() => {
-        window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
-    }, 1500);
+    window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
 }
+
 function iniciarCargaBase(slugBusqueda) {
     if (!slugBusqueda) return;
     
