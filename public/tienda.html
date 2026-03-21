@@ -862,7 +862,7 @@
         let telefonoEmpresa = "";
         let empresaId = "";
         let idDomiciliarioAsignado = "";
-        
+        let nombreDomiciliarioAsignado = "";
         let productoSeleccionado = "";
         let imagenProducto = "";
 
@@ -1121,6 +1121,7 @@ const  cliente= document.getElementById("celularComprador").value.trim();
             idPedido: nuevoRef.key,
             idEmpresa: empresaId,
             idDomiciliario: idDomiciliarioAsignado,
+            nombreDomiciliario: nombreDomiciliarioAsignado,
             direccion: direccion,
             imagenUrl: imagenProducto || "",
             nombreCliente: nombreComprador,
@@ -1157,6 +1158,13 @@ const  cliente= document.getElementById("celularComprador").value.trim();
             });
 
     }, { onlyOnce: true });
+}
+
+// Ejemplo de cómo capturas los datos del objeto que mostraste:
+function vincularDomiciliario(datosObjeto) {
+    idDomiciliarioAsignado = datosObjeto.idDomiciliario; // vFlNTcYFOcd3bkpS6JcPMqTD4YL2
+    nombreDomiciliarioAsignado = datosObjeto.nombre;    // "Soy Mucho Masrapido"
+    console.log("Vinculado a: " + nombreDomiciliarioAsignado);
 }
         // 4. UTILIDADES Y REDES
         function obtenerLinkDirecto(entrada) {
