@@ -875,11 +875,15 @@
     detectarEmpresaPorDominio();
 
  // --- 3. TU FUNCIÓN DE DETECCIÓN (La que me pasaste, con un pequeño ajuste) ---
+// --- 3. DETECTOR DE TIENDA (Solo en tienda.html) ---
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase();
     const path = window.location.pathname;
     const hostLimpio = host.replace("www.", "");
 
+    console.log("🏪 Iniciando detección de tienda para:", hostLimpio);
+
+    // CASO A: Dominio Propio (ej: floristerialoslirios.com.co)
     if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
         try {
             const q = query(
@@ -890,45 +894,42 @@ async function detectarEmpresaPorDominio() {
 
             if (!querySnapshot.empty) {
                 const empresaDoc = querySnapshot.docs[0].data();
-                const slugOficial = empresaDoc.slug;
+                slug = empresaDoc.slug; // Asignamos el slug de la DB
                 
-                // Si está en /t/slug-equivocado, lo llevamos al correcto
-                if (path.includes("/t/")) {
-                    const slugEnUrl = path.split("/t/")[1].split('/')[0];
-                    if (slugEnUrl !== slugOficial) {
-                        window.location.replace(`https://${host}/t/${slugOficial}`);
-                        return;
-                    }
-                }
+                console.log("✅ Tienda detectada por dominio:", slug);
                 
-                slug = slugOficial;
-                document.getElementById("loaderTienda").style.display = "none";
+                // Finalizamos la carga
+                if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
                 iniciarCargaBase(slug); 
                 return;
             } else {
+                console.warn("❌ Este dominio no está registrado en Zippy.");
                 mostrarPantallaCargaYSalir();
                 return;
             }
         } catch (error) {
-            console.error("❌ Error:", error);
+            console.error("❌ Error consultando Firestore:", error);
             window.location.replace("/mantenimiento.html");
             return;
         }
     }
 
-    // Prioridad 2: Ruta /t/ (Para los que NO tienen dominio propio)
+    // CASO B: Por ruta /t/ (ej: zippy.web.app/t/misuper)
     if (path.includes("/t/")) {
         const partes = path.split("/t/");
         if (partes[1]) {
             slug = partes[1].split('/')[0];
-            document.getElementById("loaderTienda").style.display = "none";
+            console.log("📂 Cargando por ruta:", slug);
+            
+            if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
             iniciarCargaBase(slug);
             return;
         }
     }
 
-    // Si nada coincide, fuera.
-    mostrarPantallaCargaYSalir();
+    // CASO C: Si no hay dominio ni ruta /t/, mandamos al portal principal
+    console.log("🏠 No se detectó tienda, enviando al inicio.");
+    window.location.replace("https://zippy-727d5.web.app");
 }
 
 // Función auxiliar para mantener tu estilo de "Entorno seguro"

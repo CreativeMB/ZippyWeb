@@ -66,42 +66,37 @@
         const db = getDatabase(app);
 
         let empresaId = "";
-
-      // --- 1. GUARDIÁN ESTRATÉGICO (Al principio de tu onAuthStateChanged) ---
-onAuthStateChanged(auth, async (user) => {
+// --- 1. GUARDIÁN DEL ADMINISTRADOR (Solo en index.html) ---
+onAuthStateChanged(auth, (user) => {
     const host = window.location.hostname.toLowerCase();
-    const path = window.location.pathname;
     const hostLimpio = host.replace("www.", "");
 
-    // Identificamos si es un cliente (Dominio propio o ruta /t/)
-    const esDominioPersonalizado = (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost");
-    const esRutaSubtienda = path.includes("/t/");
+    // 🚩 FILTRO DE SEGURIDAD: ¿Estamos en el dominio de administración?
+    const esDominioZippy = (hostLimpio === "zippy-727d5.web.app" || hostLimpio === "localhost");
 
-    if (esDominioPersonalizado || esRutaSubtienda) {
-        // 🛡️ BLOQUEO PARA CLIENTES: No evaluamos login, solo cargamos la tienda
-        console.log("🏪 Modo Multitienda Activo");
-        
-        // Ocultamos el admin por seguridad visual
-        const panelAdmin = document.getElementById("contenedorAdmin");
-        if(panelAdmin) panelAdmin.style.display = "none";
-
-        // Ejecutamos tu función de detección
-        await detectarEmpresaPorDominio();
-        return; // <--- VITAL: Detiene el resto del script (evita el salto al login)
+    if (!esDominioZippy) {
+        // Si entran por floristerialoslirios.com.co al index, los sacamos de aquí
+        console.warn("⚠️ Acceso externo detectado en Admin. Redirigiendo a Tienda...");
+        window.location.replace("/tienda.html"); 
+        return; // Detenemos todo
     }
 
-    // --- 2. LÓGICA DE ADMINISTRADOR (Solo si es el dominio de Zippy) ---
+    // --- LÓGICA NORMAL DEL PANEL ---
     if (!user) {
+        // Si no hay sesión iniciada en Zippy, al login
         window.location.href = "/login";
     } else {
+        // Si hay sesión, cargamos tu panel
         empresaId = user.uid;
-        document.getElementById("loaderTienda").style.display = "none";
-        document.getElementById("contenedorAdmin").style.display = "block";
+        
+        // Quitamos el loader y mostramos el admin
+        if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
+        if(document.getElementById("contenedorAdmin")) document.getElementById("contenedorAdmin").style.display = "block";
+        
         cargarDatosIniciales();
         escucharProductos();
     }
 });
-
         // --- 2. CERRAR SESIÓN ---
         document.getElementById("btnCerrarSesion").onclick = () => {
             if(confirm("¿Seguro que desea salir?")) {
