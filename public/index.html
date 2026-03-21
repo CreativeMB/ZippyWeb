@@ -66,6 +66,20 @@
         const db = getDatabase(app);
 
         let empresaId = "";
+
+        // 🛑 FRENO DE MANO INMEDIATO
+(function() {
+    const host = window.location.hostname.toLowerCase().replace("www.", "");
+    const esDominioZippy = (host === "zippy-727d5.web.app" || host === "localhost");
+
+    if (!esDominioZippy) {
+        console.log("🚫 Dominio externo detectado. Bloqueando Panel de Admin...");
+        // Forzamos el salto a la tienda antes de que cargue el resto del script
+        window.location.replace("/tienda.html" + window.location.search);
+        // Creamos un error intencional para detener la ejecución del resto del archivo
+        throw new Error("Redirigiendo a tienda...");
+    }
+})();
 // --- 1. GUARDIÁN DEL ADMINISTRADOR (Solo en index.html) ---
 onAuthStateChanged(auth, (user) => {
     const host = window.location.hostname.toLowerCase();
