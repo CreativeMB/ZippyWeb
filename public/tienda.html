@@ -882,71 +882,116 @@ async function detectarEmpresaPorDominio() {
     const hostSinWww = host.replace("www.", "");
     const hostConWww = "www." + hostSinWww;
 
+    // Al trabajar en la nube, tu único dominio base nativo es este:
+    const esDominioZippy = (hostSinWww === "zippy-727d5.web.app");
+
     console.log("🔍 Analizando host:", host);
 
-    // --- CASO 1: DOMINIO PERSONALIZADO (Ej: floristerialoslirios.com.co) ---
-    // Si NO es el dominio base de la App ni localhost, es un cliente externo
-    if (hostSinWww !== "zippy-727d5.web.app" && hostSinWww !== "localhost") {
-        try {
-            console.log("📡 Consultando base de datos para dominio:", hostSinWww);
-            
-            // Buscamos en la colección 'perfilempresa' el campo 'dominio'
-            const q = query(
-                collection(dbFirestore, "perfilempresa"),
-                where("dominio", "in", [hostSinWww, hostConWww])
-            );
-            
-            const querySnapshot = await getDocs(q);
+    try {
+        // 🚀 HACEMOS UNA ÚNICA CONSULTA A REALTIME DATABASE
+        const empresasRef = ref(db);
+        const snapshot = await get(empresasRef);
 
-            if (!querySnapshot.empty) {
-                const empresaDoc = querySnapshot.docs[0].data();
-                slug = empresaDoc.slug; // Asignamos el slug a la variable global
-                
-                console.log("✅ Tienda Premium identificada:", slug);
-                
-                // Si el usuario escribió /t/algomas por error en este dominio, lo limpiamos
-                if (path.includes("/t/")) {
-                    const slugEnUrl = path.split("/t/")[1].split('/')[0];
-                    if (slugEnUrl !== slug) {
-                        console.warn("🔄 Corrigiendo ruta para dominio premium...");
-                        window.location.replace(`https://${host}/t/${slug}`);
-                        return;
-                    }
-                }
-
-                // CARGA DE DATOS DE LA TIENDA
-                iniciarCargaBase(slug);
-                return; // Detenemos aquí, todo salió bien.
-
-            } else {
-                // El dominio apunta a Zippy pero no está registrado en la base de datos
-                console.error("❌ El dominio no está asociado a ninguna tienda activa.");
-                mostrarPantallaCargaYSalir();
-                return;
-            }
-        } catch (error) {
-            console.error("❌ Error crítico en la consulta de Firestore:", error);
+        if (!snapshot.exists()) {
+            console.error("❌ No hay tiendas registradas en la base de datos.");
             mostrarPantallaCargaYSalir();
             return;
         }
-    }
 
-    // --- CASO 2: ACCESO POR SUB-RUTA (zippy-727d5.web.app/t/nombre-tienda) ---
-    // Esto es para cuando acceden desde el dominio base de Zippy
-    if (path.includes("/t/")) {
-        const partes = path.split("/t/");
-        if (partes[1]) {
-            slug = partes[1].split('/')[0];
-            console.log("📂 Cargando por sub-ruta en Zippy:", slug);
-            iniciarCargaBase(slug);
-            return;
+        let empresaEncontrada = null;
+        let idEmpresaEncontrada = null;
+        let dataEmpresa = null;
+
+        // =========================================================================
+        // CASO 1: ENTRAN DESDE LA APP ZIPPY USANDO UN SLUG (Ej: /t/floristera-los-lirios)
+        // =========================================================================
+        if (esDominioZippy && path.includes("/t/")) {
+            // Limpiamos parámetros extras como los que pone Facebook (?fbclid=...)
+            const partes = path.split("/t/");
+            const slugExtraido = partes[1].split('/')[0].split('?')[0].split('#')[0];
+
+            if (slugExtraido) {
+                // Buscamos en Realtime Database qué tienda tiene este slug
+                snapshot.forEach((child) => {
+                    const info = child.val();
+                    if (info.perfilempresa && info.perfilempresa.slug === slugExtraido) {
+                        empresaEncontrada = info.perfilempresa;
+                        dataEmpresa = info;
+                        idEmpresaEncontrada = child.key;
+                    }
+                });
+
+                if (empresaEncontrada) {
+                    // 🚨 REGLA CLAVE: ¿Tiene dominio propio? Redirigir obligatoriamente a ese dominio.
+                    if (empresaEncontrada.dominio && empresaEncontrada.dominio.trim() !== "") {
+                        console.log("🚀 Redirigiendo a dominio premium:", empresaEncontrada.dominio);
+                        window.location.replace(`https://${empresaEncontrada.dominio}`);
+                        return;
+                    }
+
+                    // ✅ Si NO tiene dominio, cargamos la tienda web de Zippy
+                    slug = empresaEncontrada.slug;
+                    empresaId = idEmpresaEncontrada;
+                    console.log("✅ Tienda Estándar cargada:", slug);
+                    
+                    // Saltamos directamente a validar y renderizar los datos
+                    validarYContinuar(empresaEncontrada, dataEmpresa);
+                    return;
+
+                } else {
+                    console.error("❌ El slug no pertenece a ninguna tienda activa.");
+                    mostrarPantallaCargaYSalir();
+                    return;
+                }
+            }
         }
-    }
 
-    // --- CASO FINAL: Si llega aquí es porque no hay tienda ni dominio válido ---
-    console.warn("⚠️ No se detectó ninguna configuración de tienda.");
-    // Opcional: Si quieres que en el dominio base de Zippy cargue el login:
-    // window.location.href = "/login"; 
+        // =========================================================================
+        // CASO 2: ENTRAN DESDE UN DOMINIO PERSONALIZADO (Ej: floristerialoslirios.com.co)
+        // =========================================================================
+        else if (!esDominioZippy) {
+            
+            // Buscamos en Realtime Database qué tienda es dueña de este dominio
+            snapshot.forEach((child) => {
+                const info = child.val();
+                if (info.perfilempresa && (info.perfilempresa.dominio === hostSinWww || info.perfilempresa.dominio === hostConWww)) {
+                    empresaEncontrada = info.perfilempresa;
+                    dataEmpresa = info;
+                    idEmpresaEncontrada = child.key;
+                }
+            });
+
+            if (empresaEncontrada) {
+                // Limpiamos la URL si el usuario escribió /t/slug por error dentro de su dominio
+                if (path.includes("/t/")) {
+                    console.warn("🔄 Limpiando URL innecesaria en dominio premium...");
+                    window.location.replace(`https://${host}`);
+                    return;
+                }
+
+                slug = empresaEncontrada.slug;
+                empresaId = idEmpresaEncontrada;
+                console.log("✅ Dominio Premium validado. Cargando tienda:", slug);
+                
+                // Saltamos directamente a validar y renderizar los datos
+                validarYContinuar(empresaEncontrada, dataEmpresa);
+                return;
+
+            } else {
+                console.error("❌ El dominio ingresado no está registrado en la plataforma.");
+                mostrarPantallaCargaYSalir();
+                return;
+            }
+        }
+
+        // Si la URL no tiene "/t/" ni es un dominio premium (Ej: entraron a la raíz de Zippy)
+        console.warn("⚠️ Acceso a la raíz de Zippy o ruta inválida.");
+        // Opcional: window.location.href = "/login.html";
+
+    } catch (error) {
+        console.error("❌ Error conectando con Realtime Database:", error);
+        mostrarPantallaCargaYSalir();
+    }
 }
 
 /**
