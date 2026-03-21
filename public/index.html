@@ -3,48 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zippy - Panel de Administración</title>
+    <title>Zippy</title>
     <style>
         :root { --primary: #6200ee; --bg: #f8f9fa; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        
+        /* OCULTAMOS TODO POR DEFECTO PARA QUE EL CLIENTE NO VEA EL PANEL */
+        #contenedorAdmin { display: none; }
+
         .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         h1 { color: var(--primary); margin: 0; font-size: 1.5rem; }
-        
         .btn-logout { background: #ff4757; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        
         .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media (max-width: 800px) { .container { grid-template-columns: 1fr; } }
-        
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         h2 { border-bottom: 2px solid var(--bg); padding-bottom: 10px; font-size: 1.2rem; color: #333; }
-        
         textarea { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-family: monospace; box-sizing: border-box; margin-bottom: 10px; }
         .btn-save { background: var(--primary); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        
         .product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
         .product-info { display: flex; align-items: center; gap: 10px; }
         .product-img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+        
+        /* Pantalla de carga para clientes mientras se detecta su tienda */
+        #loaderTienda { 
+            display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: white; justify-content: center; align-items: center; z-index: 9999;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Zippy Admin</h1>
-        <button class="btn-logout" id="btnCerrarSesion">Cerrar Sesión</button>
+    <div id="loaderTienda">
+        <p style="color: #666;">Cargando...</p>
     </div>
 
-    <div class="container">
-        <div class="card">
-            <h2>Catálogo Maestro (JSON)</h2>
-            <p style="font-size: 0.85rem; color: #666;">Pega aquí el JSON con Referencias y URLs de Drive.</p>
-            <textarea id="jsonInput" placeholder='{"REF001": "https://drive.google.com/..."}'></textarea>
-            <button class="btn-save" id="btnGuardarJson">Actualizar Catálogo</button>
+    <div id="contenedorAdmin">
+        <div class="header">
+            <h1>Zippy Admin</h1>
+            <button class="btn-logout" id="btnCerrarSesion">Cerrar Sesión</button>
         </div>
 
-        <div class="card">
-            <h2>Productos con Precio/Stock</h2>
-            <div id="listaProductos">
-                <p>Cargando productos...</p>
+        <div class="container">
+            <div class="card">
+                <h2>Catálogo Maestro (JSON)</h2>
+                <p style="font-size: 0.85rem; color: #666;">Pega aquí el JSON con Referencias y URLs de Drive.</p>
+                <textarea id="jsonInput" placeholder='{"REF001": "https://drive.google.com/..."}'></textarea>
+                <button class="btn-save" id="btnGuardarJson">Actualizar Catálogo</button>
+            </div>
+
+            <div class="card">
+                <h2>Productos con Precio/Stock</h2>
+                <div id="listaProductos">
+                    <p>Cargando productos...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -53,6 +64,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        // Importa también tus funciones de Firestore si las usas aquí
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "TU_API_KEY",
@@ -64,51 +78,71 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
+        const dbFirestore = getFirestore(app);
 
         let empresaId = "";
 
-    // --- 1. GUARDIÁN DE SESIÓN ---
-onAuthStateChanged(auth, async (user) => {
-    // Primero revisamos si estamos en un dominio de una tienda
-    const esTienda = await verificarSiEsTienda(); 
+        // --- 1. GUARDIÁN ESTRATÉGICO ---
+        onAuthStateChanged(auth, async (user) => {
+            const host = window.location.hostname.toLowerCase();
+            const path = window.location.pathname;
+            const hostSinWww = host.replace("www.", "");
 
-    if (!user) {
-        // SI NO hay usuario Y NO es una tienda personalizada, mandamos a login
-        if (!esTienda) {
-            console.log("🔒 Acceso administrativo requerido. Redirigiendo...");
-            window.location.href = "/login";
-        } else {
-            console.log("🛍️ Navegación pública detectada (Tienda).");
+            // DETERMINAR SI ES TIENDA O ADMIN
+            const esRutaTienda = path.includes("/t/");
+            const esDominioPropio = (hostSinWww !== "zippy-727d5.web.app" && hostSinWww !== "localhost");
+
+            if (esRutaTienda || esDominioPropio) {
+                // CASO CLIENTE: Ejecutamos la detección de tienda
+                console.log("🏪 Detectando tienda para cliente...");
+                await detectarEmpresaPorDominio(); 
+            } else {
+                // CASO ADMIN: Verificamos sesión
+                document.getElementById("loaderTienda").style.display = "none"; // Quitamos el loader
+                if (!user) {
+                    window.location.href = "/login";
+                } else {
+                    empresaId = user.uid;
+                    document.getElementById("contenedorAdmin").style.display = "block"; // MOSTRAMOS EL PANEL
+                    cargarDatosIniciales();
+                    escucharProductos();
+                }
+            }
+        });
+
+        // --- LA FUNCIÓN QUE CORREGIMOS ANTES ---
+        async function detectarEmpresaPorDominio() {
+            const host = window.location.hostname.toLowerCase();
+            const hostSinWww = host.replace("www.", "");
+            const hostConWww = "www." + hostSinWww;
+
+            try {
+                const q = query(
+                    collection(dbFirestore, "perfilempresa"),
+                    where("dominio", "in", [hostSinWww, hostConWww])
+                );
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const empresaDoc = querySnapshot.docs[0].data();
+                    // Aquí llamarías a la función que pinta la tienda (ej: iniciarCargaBase)
+                    console.log("✅ Cargando tienda:", empresaDoc.slug);
+                    // window.location.href = "/tu-pagina-de-tienda.html?s=" + empresaDoc.slug;
+                } else {
+                    window.location.href = "/login";
+                }
+            } catch (e) {
+                console.error(e);
+            }
         }
-    } else {
-        // Si hay usuario, es el admin
-        empresaId = user.uid;
-        cargarDatosIniciales();
-        escucharProductos();
-    }
-});
 
-// Función auxiliar para que el guardián sepa dónde está parado
-async function verificarSiEsTienda() {
-    const host = window.location.hostname.toLowerCase();
-    const hostSinWww = host.replace("www.", "");
-    
-    // Si es el dominio raíz, no es una tienda directa (a menos que tenga /t/)
-    if (hostSinWww === "zippy-727d5.web.app" || hostSinWww === "localhost") {
-        return window.location.pathname.includes("/t/");
-    }
-    
-    // Si es un dominio externo, asumimos que es tienda (la función detectarEmpresa lo validará después)
-    return true; 
-}
-        // --- 2. CERRAR SESIÓN ---
+        // --- RESTO DE TUS FUNCIONES (Cerrar sesión, Guardar JSON, etc.) ---
         document.getElementById("btnCerrarSesion").onclick = () => {
             if(confirm("¿Seguro que desea salir?")) {
                 signOut(auth).then(() => window.location.href = "/login");
             }
         };
 
-        // --- 3. CARGAR JSON ACTUAL ---
         async function cargarDatosIniciales() {
             const snapshot = await get(ref(db, `${empresaId}/perfilempresa/json_datos`));
             if (snapshot.exists()) {
@@ -116,11 +150,9 @@ async function verificarSiEsTienda() {
             }
         }
 
-        // --- 4. GUARDAR JSON ---
         document.getElementById("btnGuardarJson").onclick = async () => {
             const rawJson = document.getElementById("jsonInput").value;
             try {
-                // Validamos que sea un JSON real antes de subir
                 JSON.parse(rawJson); 
                 await set(ref(db, `${empresaId}/perfilempresa/json_datos`), rawJson);
                 alert("Catálogo actualizado correctamente ✅");
@@ -129,34 +161,24 @@ async function verificarSiEsTienda() {
             }
         };
 
-        // --- 5. LISTAR PRODUCTOS (REALTIME) ---
         function escucharProductos() {
             const prodRef = ref(db, `${empresaId}/productos`);
             onValue(prodRef, (snapshot) => {
                 const contenedor = document.getElementById("listaProductos");
                 contenedor.innerHTML = "";
-                
-                if (!snapshot.exists()) {
-                    contenedor.innerHTML = "<p>No hay productos con precio aún.</p>";
-                    return;
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        const p = child.val();
+                        const item = document.createElement("div");
+                        item.className = "product-item";
+                        item.innerHTML = `
+                            <div class="product-info">
+                                <img src="${p.imagenUrl}" class="product-img" onerror="this.src='https://via.placeholder.com/40'">
+                                <div><strong>${p.referencia}</strong><br><span style="color:green">$${p.valor}</span></div>
+                            </div>`;
+                        contenedor.appendChild(item);
+                    });
                 }
-
-                snapshot.forEach((child) => {
-                    const p = child.val();
-                    const item = document.createElement("div");
-                    item.className = "product-item";
-                    item.innerHTML = `
-                        <div class="product-info">
-                            <img src="${p.imagenUrl}" class="product-img" onerror="this.src='https://via.placeholder.com/40'">
-                            <div>
-                                <strong>${p.referencia}</strong><br>
-                                <span style="color:green">$${p.valor}</span>
-                            </div>
-                        </div>
-                        <button onclick="alert('Usa la App Android para editar detalles específicos')" style="font-size: 0.7rem;">Info</button>
-                    `;
-                    contenedor.appendChild(item);
-                });
             });
         }
     </script>
