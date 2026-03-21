@@ -884,8 +884,12 @@
     try {
         let slugEncontrado = "";
 
-        // CASO A: Dominio Propio (ej: floristerialoslirios.com.co)
+        // CASO A: Dominio Propio
         if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
+            
+            // ALERT DE PRUEBA: Para ver qué dominio está intentando buscar
+            alert("Intentando buscar este dominio en Firestore: [" + hostLimpio + "]");
+
             const q = query(
                 collection(dbFirestore, "perfilempresa"),
                 where("dominio", "==", hostLimpio)
@@ -894,8 +898,10 @@
 
             if (!querySnapshot.empty) {
                 slugEncontrado = querySnapshot.docs[0].data().slug;
+                alert("✅ ¡Éxito! Encontrado slug: " + slugEncontrado);
             } else {
-                console.warn("❌ Dominio no vinculado a ninguna tienda.");
+                // ALERT DE ERROR: Si llega aquí, es porque NO existe el dominio en Firestore
+                alert("❌ ERROR: El dominio '" + hostLimpio + "' no existe en la colección 'perfilempresa'. Revisa que en Firestore esté escrito exactamente así.");
                 irAMantenimiento("Dominio no registrado");
                 return;
             }
@@ -908,30 +914,32 @@
 
         // --- VALIDACIÓN FINAL DEL SLUG ---
         if (slugEncontrado) {
-            slug = slugEncontrado; // Asignamos a la variable global
-            console.log("✅ Slug identificado:", slug);
-            
-            // Antes de cargar, podrías verificar si el slug tiene datos reales
-            // Pero por ahora, procedemos a la carga base
+            slug = slugEncontrado; 
             if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
-            
             iniciarCargaBase(slug); 
         } else {
-            // Si llegamos aquí y no hay slug, es un acceso directo al dominio raíz sin nada
+            // Si no hay slug, mandamos al portal de Zippy, no a la floristería externa
             window.location.replace("https://zippy-727d5.web.app/portal.html");
         }
 
     } catch (error) {
-        console.error("❌ Error crítico en detección:", error);
+        alert("🔥 Error de conexión: " + error.message);
         irAMantenimiento("Error de conexión con la base de datos");
     }
 }
 
-// Función auxiliar para centralizar la salida a mantenimiento
+// CORRECCIÓN: Función de mantenimiento sin redirección externa
 function irAMantenimiento(motivo) {
-    console.log("Redirigiendo a mantenimiento por:", motivo);
-    // Puedes usar una página externa o un modal interno
-    window.location.href = "https://www.floristerialoslirios.com/";
+    console.log("Mantenimiento por:", motivo);
+    // En lugar de window.location.href (que te saca del sitio), 
+    // mostramos un mensaje en la misma página para que no pierdas el dominio
+    document.body.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; text-align:center;">
+            <h1 style="color:#e11d48;">Tienda No Encontrada</h1>
+            <p style="color:#64748b;">El dominio <b>${window.location.hostname}</b> no está vinculado a ninguna tienda activa.</p>
+            <p style="font-size:12px; color:#94a3b8;">Motivo: ${motivo}</p>
+        </div>
+    `;
 }
 // Función auxiliar para mantener tu estilo de "Entorno seguro"
 function mostrarPantallaCargaYSalir() {
