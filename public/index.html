@@ -28,13 +28,17 @@
         #loaderTienda { 
             display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: white; justify-content: center; align-items: center; z-index: 9999;
+            flex-direction: column;
         }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <div id="loaderTienda">
-        <p style="color: #666;">Cargando...</p>
+        <div class="spinner"></div>
+        <p style="color: #666; font-weight: 500;" id="textoLoader">Redirigiendo a un entorno seguro...</p>
     </div>
 
     <div id="contenedorAdmin">
@@ -60,132 +64,161 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Importa también tus funciones de Firestore si las usas aquí
-        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "zippy-727d5.firebaseapp.com",
+        databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
+        projectId: "zippy-727d5"
+    };
 
-        const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "zippy-727d5.firebaseapp.com",
-            databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
-            projectId: "zippy-727d5"
-        };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const dbFirestore = getFirestore(app);
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        const dbFirestore = getFirestore(app);
+    let empresaId = "";
 
-        let empresaId = "";
+    // ==========================================
+    // 1. ENRUTADOR MULTITIENDA
+    // ==========================================
+    async function enrutadorMultitienda() {
+        const host = window.location.hostname.toLowerCase();
+        const path = window.location.pathname;
+        const hostSinWww = host.replace("www.", "");
+        
+        // Verificamos si están entrando desde el dominio nativo de la App
+        const esDominioZippy = (hostSinWww === "zippy-727d5.web.app" || hostSinWww === "localhost");
 
-        // --- 1. GUARDIÁN ESTRATÉGICO ---
-        onAuthStateChanged(auth, async (user) => {
-            const host = window.location.hostname.toLowerCase();
-            const path = window.location.pathname;
-            const hostSinWww = host.replace("www.", "");
+        // --- ESCENARIO 1 y 2: Entran por la ruta de Zippy con un SLUG (/t/mi-tienda) ---
+        if (esDominioZippy && path.includes("/t/")) {
+            const partes = path.split("/t/");
+            const slug = partes[1].split('/')[0];
 
-    if (hostSinWww !== "zippy-727d5.web.app" && hostSinWww !== "localhost") {
-        console.log("⚠️ Host externo detectado en Index. Redirigiendo a lógica de tienda...");
-        await detectarEmpresaPorDominio(); // Ejecuta la detección
-        return; // IMPORTANTE: Detiene el resto del código para que NO evalúe el login
-    }
-            // DETERMINAR SI ES TIENDA O ADMIN
-            const esRutaTienda = path.includes("/t/");
-            const esDominioPropio = (hostSinWww !== "zippy-727d5.web.app" && hostSinWww !== "localhost");
+            if (slug) {
+                try {
+                    const q = query(collection(dbFirestore, "perfilempresa"), where("slug", "==", slug));
+                    const querySnapshot = await getDocs(q);
 
-            if (esRutaTienda || esDominioPropio) {
-                // CASO CLIENTE: Ejecutamos la detección de tienda
-                console.log("🏪 Detectando tienda para cliente...");
-                await detectarEmpresaPorDominio(); 
-            } else {
-                // CASO ADMIN: Verificamos sesión
-                document.getElementById("loaderTienda").style.display = "none"; // Quitamos el loader
-                if (!user) {
-                    window.location.href = "/login";
-                } else {
-                    empresaId = user.uid;
-                    document.getElementById("contenedorAdmin").style.display = "block"; // MOSTRAMOS EL PANEL
-                    cargarDatosIniciales();
-                    escucharProductos();
-                }
+                    if (!querySnapshot.empty) {
+                        const empresaDoc = querySnapshot.docs[0].data();
+                        
+                        // ¿Esta tienda tiene un dominio propio configurado?
+                        if (empresaDoc.dominio && empresaDoc.dominio.trim() !== "") {
+                            // ESCENARIO 2 (TIENE DOMINIO): Lo expulsamos a su dominio propio
+                            document.getElementById("textoLoader").innerText = "Redirigiendo a nuestra web oficial...";
+                            window.location.replace(`https://${empresaDoc.dominio}`);
+                            return;
+                        } else {
+                            // ESCENARIO 1 (NO TIENE DOMINIO): Solo usa el slug.
+                            // Cargamos el archivo de la tienda pasándole el slug por URL
+                            window.location.replace(`/tienda.html?s=${slug}`);
+                            return;
+                        }
+                    } else {
+                        document.getElementById("textoLoader").innerText = "Esta tienda no existe.";
+                        return;
+                    }
+                } catch (e) { console.error(e); }
             }
-        });
+        }
 
-        // --- LA FUNCIÓN QUE CORREGIMOS ANTES ---
-        async function detectarEmpresaPorDominio() {
-            const host = window.location.hostname.toLowerCase();
-            const hostSinWww = host.replace("www.", "");
-            const hostConWww = "www." + hostSinWww;
-
+        // --- ESCENARIO 3: Entran desde un DOMINIO PROPIO (ej: floristerialoslirios.com.co) ---
+        else if (!esDominioZippy) {
             try {
+                const hostConWww = "www." + hostSinWww;
                 const q = query(
                     collection(dbFirestore, "perfilempresa"),
-                    where("dominio", "in", [hostSinWww, hostConWww])
+                    where("dominio", "in",[hostSinWww, hostConWww])
                 );
                 const querySnapshot = await getDocs(q);
 
                 if (!querySnapshot.empty) {
                     const empresaDoc = querySnapshot.docs[0].data();
-                    // Aquí llamarías a la función que pinta la tienda (ej: iniciarCargaBase)
-                    console.log("✅ Cargando tienda:", empresaDoc.slug);
-                    // window.location.href = "/tu-pagina-de-tienda.html?s=" + empresaDoc.slug;
+                    // Encontramos la tienda dueña de este dominio. La redirigimos a la vista de tienda.
+                    window.location.replace(`/tienda.html?s=${empresaDoc.slug}`);
+                    return;
                 } else {
-                    window.location.href = "/login";
+                    document.getElementById("textoLoader").innerText = "Dominio no asociado a ninguna tienda activa.";
+                    return;
                 }
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { console.error(e); }
         }
 
-        // --- RESTO DE TUS FUNCIONES (Cerrar sesión, Guardar JSON, etc.) ---
-        document.getElementById("btnCerrarSesion").onclick = () => {
-            if(confirm("¿Seguro que desea salir?")) {
-                signOut(auth).then(() => window.location.href = "/login");
-            }
-        };
+        // --- ESCENARIO 4: Entran a la raíz de la App (zippy.../) ---
+        else {
+            // No hay /t/ ni dominios externos. Es un Administrador queriendo entrar al panel.
+            iniciarModoAdmin();
+        }
+    }
 
-        async function cargarDatosIniciales() {
-            const snapshot = await get(ref(db, `${empresaId}/perfilempresa/json_datos`));
+    // Ejecutamos el enrutador apenas cargue el script
+    enrutadorMultitienda();
+
+    // ==========================================
+    // 2. LÓGICA DEL PANEL DE ADMINISTRACIÓN
+    // ==========================================
+    function iniciarModoAdmin() {
+        onAuthStateChanged(auth, (user) => {
+            document.getElementById("loaderTienda").style.display = "none";
+            if (!user) {
+                window.location.href = "/login.html"; // Ajusta esto a la ruta de tu login
+            } else {
+                empresaId = user.uid;
+                document.getElementById("contenedorAdmin").style.display = "block";
+                cargarDatosIniciales();
+                escucharProductos();
+            }
+        });
+    }
+
+    document.getElementById("btnCerrarSesion").onclick = () => {
+        if(confirm("¿Seguro que desea salir?")) {
+            signOut(auth).then(() => window.location.href = "/login.html");
+        }
+    };
+
+    async function cargarDatosIniciales() {
+        const snapshot = await get(ref(db, `${empresaId}/perfilempresa/json_datos`));
+        if (snapshot.exists()) { document.getElementById("jsonInput").value = snapshot.val(); }
+    }
+
+    document.getElementById("btnGuardarJson").onclick = async () => {
+        const rawJson = document.getElementById("jsonInput").value;
+        try {
+            JSON.parse(rawJson); 
+            await set(ref(db, `${empresaId}/perfilempresa/json_datos`), rawJson);
+            alert("Catálogo actualizado correctamente ✅");
+        } catch (e) {
+            alert("Error: El formato del JSON es inválido ❌");
+        }
+    };
+
+    function escucharProductos() {
+        const prodRef = ref(db, `${empresaId}/productos`);
+        onValue(prodRef, (snapshot) => {
+            const contenedor = document.getElementById("listaProductos");
+            contenedor.innerHTML = "";
             if (snapshot.exists()) {
-                document.getElementById("jsonInput").value = snapshot.val();
+                snapshot.forEach((child) => {
+                    const p = child.val();
+                    const item = document.createElement("div");
+                    item.className = "product-item";
+                    item.innerHTML = `
+                        <div class="product-info">
+                            <img src="${p.imagenUrl}" class="product-img" onerror="this.src='https://via.placeholder.com/40'">
+                            <div><strong>${p.referencia}</strong><br><span style="color:green">$${p.valor}</span></div>
+                        </div>`;
+                    contenedor.appendChild(item);
+                });
             }
-        }
-
-        document.getElementById("btnGuardarJson").onclick = async () => {
-            const rawJson = document.getElementById("jsonInput").value;
-            try {
-                JSON.parse(rawJson); 
-                await set(ref(db, `${empresaId}/perfilempresa/json_datos`), rawJson);
-                alert("Catálogo actualizado correctamente ✅");
-            } catch (e) {
-                alert("Error: El formato del JSON es inválido ❌");
-            }
-        };
-
-        function escucharProductos() {
-            const prodRef = ref(db, `${empresaId}/productos`);
-            onValue(prodRef, (snapshot) => {
-                const contenedor = document.getElementById("listaProductos");
-                contenedor.innerHTML = "";
-                if (snapshot.exists()) {
-                    snapshot.forEach((child) => {
-                        const p = child.val();
-                        const item = document.createElement("div");
-                        item.className = "product-item";
-                        item.innerHTML = `
-                            <div class="product-info">
-                                <img src="${p.imagenUrl}" class="product-img" onerror="this.src='https://via.placeholder.com/40'">
-                                <div><strong>${p.referencia}</strong><br><span style="color:green">$${p.valor}</span></div>
-                            </div>`;
-                        contenedor.appendChild(item);
-                    });
-                }
-            });
-        }
-    </script>
+        });
+    }
+</script>
 </body>
 </html>
