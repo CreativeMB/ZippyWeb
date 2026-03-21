@@ -843,539 +843,375 @@
         <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png">
     </a>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
- import { getFirestore, collection, query, where, getDocs } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "zippy-727d5.firebaseapp.com",
-            databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
-            projectId: "zippy-727d5"
-        };
+   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-const dbFirestore = getFirestore(app);
-detectarEmpresaPorDominio();
-        let productosJson = {};
-        let productosRealtime = {};
-        let telefonoEmpresa = "";
-        let empresaId = "";
-        let idDomiciliarioAsignado = "";
-        let nombreDomiciliarioAsignado = "";
-        let productoSeleccionado = "";
-        let imagenProducto = "";
-let slug = "";
-    
-let bloqueoActivo = false;
-        // 1. NÚCLEO DE CARGA Y VALIDACIÓN
+    const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "zippy-727d5.firebaseapp.com",
+        databaseURL: "https://zippy-727d5-default-rtdb.firebaseio.com",
+        projectId: "zippy-727d5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbFirestore = getFirestore(app);
+
+    // --- VARIABLES GLOBALES ---
+    let productosJson = {};
+    let productosRealtime = {};
+    let telefonoEmpresa = "";
+    let empresaId = "";
+    let idDomiciliarioAsignado = "";
+    let nombreDomiciliarioAsignado = "";
+    let productoSeleccionado = "";
+    let imagenProducto = "";
+    let slug = "";
+    let bloqueoActivo = false;
+
+    // --- 1. ARRANQUE Y DETECCIÓN ---
+    detectarEmpresaPorDominio();
+
+    async function detectarEmpresaPorDominio() {
+        const host = window.location.hostname;
+        const path = window.location.pathname;
+
+        // Caso A: Por carpeta /t/
+        if (path.startsWith("/t/")) {
+            const slugDetectado = path.split("/t/")[1].split('/')[0];
+            slug = slugDetectado; 
+            iniciarCargaBase(slugDetectado);
+            return;
+        }
+
+        // Caso B: Por Dominio Personalizado
+        try {
+            const q = query(collection(dbFirestore, "perfilempresa"), where("dominio", "==", host));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                const empresa = querySnapshot.docs[0].data();
+                slug = empresa.slug;
+                iniciarCargaBase(slug);
+            } else {
+                console.warn("Dominio no configurado o acceso directo no válido.");
+            }
+        } catch (error) {
+            console.error("Error validando dominio:", error);
+        }
+    }
+
+    function iniciarCargaBase(slugBusqueda) {
         const empresasRef = ref(db);
         onValue(empresasRef, (snapshot) => {
+            let empresaEncontrada = false;
             snapshot.forEach((child) => {
                 const data = child.val();
-                if (data.perfilempresa?.slug === slug) {
+                if (data.perfilempresa?.slug === slugBusqueda) {
                     empresaId = child.key;
-                    const perfil = data.perfilempresa;
-
-                   // --- VALIDACIÓN DE EXPIRACIÓN (BLOQUEO PREVENTIVO) ---
-if (perfil.fechaExpiracion) {
-    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
-    const [dia, mes, anio] = fechaPart.split("/");
-    const [hora, min, seg] = horaPart.split(":");
-    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
-
-    const offsetRef = ref(db, ".info/serverTimeOffset");
-    onValue(offsetRef, (offsetSnapshot) => {
-        const offset = offsetSnapshot.val() || 0;
-        const horaRealServidor = Date.now() + offset;
-
-        if (horaRealServidor > tiempoExpiracion) {
-            bloqueoActivo = true; // Variable global para detener otros scripts
-            console.log("🛑 ACCESO EXPIRADO.");
-
-            // 1. Limpieza radical inmediata (Esto mata el explorador de la tienda visualmente)
-            document.documentElement.innerHTML = `
-                <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh; overflow:hidden;">
-                    <div style="text-align:center; font-family:sans-serif;">
-                        <p style="color:#64748b; font-size:18px;">Redirigiendo...</p>
-                    </div>
-                </body>`;
-
-            // 2. SALIDA FORZADA DEL "SLUG"
-            // Usamos la ruta absoluta con "/" al principio. 
-            // Esto le dice al navegador: "Vete a la raíz del dominio, no te quedes en /t/"
-            window.location.replace("/mantenimiento.html"); 
-            
-            return; 
-        } else {
-            continuarCarga(perfil, data);
-        }
-    }, { onlyOnce: true });
-} else {
-    continuarCarga(perfil, data);
-}
+                    empresaEncontrada = true;
+                    validarYContinuar(data.perfilempresa, data);
                 }
             });
-        });
-
-function validarExpiracion(perfil, data) {
-    if (!perfil.fechaExpiracion) {
-        continuarCarga(perfil, data);
-        return;
+            if (!empresaEncontrada) console.error("No se encontró la empresa con slug:", slugBusqueda);
+        }, { onlyOnce: true });
     }
 
-    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
-    const [dia, mes, anio] = fechaPart.split("/");
-    const [hora, min, seg] = horaPart.split(":");
-    // Mes - 1 porque en JS Enero es 0
-    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
-
-    const offsetRef = ref(db, ".info/serverTimeOffset");
-    onValue(offsetRef, (offsetSnapshot) => {
-        const offset = offsetSnapshot.val() || 0;
-        const horaRealServidor = Date.now() + offset;
-
-        if (horaRealServidor > tiempoExpiracion) {
-            bloqueoActivo = true;
-            console.log("🛑 ACCESO EXPIRADO.");
-
-            // Bloqueo visual total
-            document.documentElement.innerHTML = `
-                <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh; overflow:hidden;">
-                    <div style="text-align:center; font-family:sans-serif;">
-                        <h1 style="color:#1e293b;">Acceso Suspendido</h1>
-                        <p style="color:#64748b; font-size:18px;">Esta tienda se encuentra en mantenimiento técnico.</p>
-                        <p style="color:#94a3b8; font-size:14px;">Redirigiendo...</p>
-                    </div>
-                </body>`;
-
-            // Salida forzada
-            setTimeout(() => {
-                window.location.replace("/mantenimiento.html");
-            }, 2000);
-        } else {
-            // SI TODO ESTÁ BIEN, CARGAMOS LA TIENDA
+    // --- 2. VALIDACIÓN DE EXPIRACIÓN ---
+    function validarYContinuar(perfil, data) {
+        if (!perfil.fechaExpiracion) {
             continuarCarga(perfil, data);
+            return;
         }
-    }, { onlyOnce: true });
-}
 
-function iniciarCarga(slugDetectado) {
-    slug = slugDetectado;
-    const empresasRef = ref(db);
+        const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
+        const [dia, mes, anio] = fechaPart.split("/");
+        const [hora, min, seg] = horaPart.split(":");
+        const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
 
-    onValue(empresasRef, (snapshot) => {
-        snapshot.forEach((child) => {
-            const data = child.val();
-            if (data.perfilempresa?.slug === slug) {
-                empresaId = child.key;
-                const perfil = data.perfilempresa;
+        const offsetRef = ref(db, ".info/serverTimeOffset");
+        onValue(offsetRef, (offsetSnapshot) => {
+            const offset = offsetSnapshot.val() || 0;
+            const horaRealServidor = Date.now() + offset;
 
-                // 🛡️ AQUÍ ACTIVAMOS EL BLOQUEO PREVENTIVO
-                validarExpiracion(perfil, data);
-            }
-        });
-    }, { onlyOnce: true });
-}
-
-        function continuarCarga(perfil, data) {
-            if (bloqueoActivo) return;
-            telefonoEmpresa = perfil.WhatsApp.replace("+", "");
-
-            // Lógica del Logo
-            const imgElement = document.getElementById('logoEmpresa');
-            if (perfil.urlLogo && perfil.urlLogo.trim() !== "") {
-                const urlFinal = obtenerLinkDirecto(perfil.urlLogo);
-                imgElement.setAttribute('referrerpolicy', 'no-referrer');
-                imgElement.src = urlFinal;
-                imgElement.onload = () => { imgElement.style.display = 'inline-block'; imgElement.style.opacity = '1'; };
-                imgElement.onerror = () => { imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`; };
+            if (horaRealServidor > tiempoExpiracion) {
+                bloqueoActivo = true;
+                document.documentElement.innerHTML = `
+                    <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh;">
+                        <div style="text-align:center; font-family:sans-serif;">
+                            <h1 style="color:#1e293b;">Acceso Suspendido</h1>
+                            <p style="color:#64748b; font-size:18px;">Esta tienda se encuentra en mantenimiento técnico.</p>
+                            <p style="color:#94a3b8; font-size:14px;">Redirigiendo...</p>
+                        </div>
+                    </body>`;
+                setTimeout(() => window.location.replace("/mantenimiento.html"), 2000);
             } else {
-                imgElement.style.display = 'none';
+                continuarCarga(perfil, data);
             }
-
-            // Asignar Domiciliario
-// --- DENTRO DE continuarCarga (Asegúrate que esté así) ---
-if (data.Domiciliarios) {
-    const idDom = Object.keys(data.Domiciliarios)[0];
-    const infoDom = data.Domiciliarios[idDom];
-
-    idDomiciliarioAsignado = idDom;
-    // Capturamos el nombre correctamente del objeto
-    nombreDomiciliarioAsignado = infoDom.nombre || "Domiciliario General";
-    console.log("✅ Domiciliario listo:", nombreDomiciliarioAsignado);
-}
-
-            // Textos de Interfaz
-            document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
-            document.getElementById("eslogan").innerText = perfil.eslogan;
-            document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
-            document.getElementById("direccion").innerText = "📍 " + perfil.direccion;
-            document.getElementById("ciudad").innerText = perfil.ciudad;
-            document.getElementById("telefono").innerText = "📞 " + perfil.WhatsApp;
-            document.getElementById("correo").innerText = "✉️ " + perfil.correo;
-            document.getElementById("info-destacada").innerText = perfil.publicidad;
-            document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
-
-            cargarProductosJSON(perfil.json_datos);
-            escucharCambios(empresaId);
-        }
-       
-async function detectarEmpresaPorDominio() {
-    const host = window.location.hostname;
-    const path = window.location.pathname;
-
-    // CASO 1: Acceso por subcarpeta /t/nombre-empresa
-    if (path.startsWith("/t/")) {
-        const slugDetectado = path.split("/t/")[1].split('/')[0]; // Limpiamos posibles slashes extra
-        slug = slugDetectado; 
-        iniciarCargaBase(slugDetectado);
-        return;
+        }, { onlyOnce: true });
     }
 
-    // CASO 2: Dominio personalizado (ej: floristerialoslirios.com.co)
-    try {
-        const q = query(
-            collection(dbFirestore, "perfilempresa"),
-            where("dominio", "==", host)
-        );
-
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-            const empresa = querySnapshot.docs[0].data();
-            slug = empresa.slug; // ✅ Seteamos el slug global
-            
-            // En lugar de redireccionar y perder tiempo, cargamos directamente:
-            iniciarCargaBase(slug);
-        } else {
-            console.warn("Dominio no configurado en Firestore");
-        }
-    } catch (error) {
-        console.error("Error validando dominio:", error);
-    }
-}
-
-function iniciarCargaBase(slugBusqueda) {
-    const empresasRef = ref(db);
-
-    // Solo escuchamos una vez para encontrar la empresa y luego activamos los listeners específicos
-    onValue(empresasRef, (snapshot) => {
-        let empresaEncontrada = false;
-        snapshot.forEach((child) => {
-            const data = child.val();
-            if (data.perfilempresa?.slug === slugBusqueda) {
-                empresaId = child.key; // ID único (ej: "-N...something")
-                empresaEncontrada = true;
-                
-                const perfil = data.perfilempresa;
-                
-                // Ejecutamos validación de expiración y carga de UI
-                validarYContinuar(perfil, data);
-            }
-        });
-        
-        if (!empresaEncontrada) console.error("No se encontró ninguna empresa con el slug:", slugBusqueda);
-    }, { onlyOnce: true });
-}
-
-function validarYContinuar(perfil, data) {
-    // 1. Si no hay fecha de expiración, cargamos normal
-    if (!perfil.fechaExpiracion) {
-        continuarCarga(perfil, data);
-        return;
-    }
-
-    // 2. Procesamos la fecha (Parsing)
-    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
-    const [dia, mes, anio] = fechaPart.split("/");
-    const [hora, min, seg] = horaPart.split(":");
-    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
-
-    // 3. Obtenemos la hora real del servidor para evitar trampas con el reloj local
-    const offsetRef = ref(db, ".info/serverTimeOffset");
-    onValue(offsetRef, (offsetSnapshot) => {
-        const offset = offsetSnapshot.val() || 0;
-        const horaRealServidor = Date.now() + offset;
-
-        // 4. LA COMPARACIÓN CRÍTICA
-        if (horaRealServidor > tiempoExpiracion) {
-            // SI EXPIRÓ: Bloqueo y expulsión
-            bloqueoActivo = true;
-            document.documentElement.innerHTML = `
-                <div style="height:100vh; display:flex; align-items:center; justify-content:center; font-family:sans-serif; background:#f8fafc;">
-                    <div style="text-align:center;">
-                        <h2 style="color:#1e293b;">Acceso en Mantenimiento</h2>
-                        <p style="color:#64748b;">Redirigiendo a la página principal...</p>
-                    </div>
-                </div>`;
-            
-            setTimeout(() => {
-                window.location.replace("/mantenimiento.html");
-            }, 1500);
-        } else {
-            // SI ESTÁ VIGENTE: Cargamos la tienda
-            continuarCarga(perfil, data);
-        }
-    }, { onlyOnce: true });
-}
-        // 2. GESTIÓN DE PRODUCTOS
-        function cargarProductosJSON(contenido) {
-            if (bloqueoActivo) return;
-            if (!contenido) { productosJson = {}; render(); return; }
-            try {
-                productosJson = typeof contenido === 'string' ? JSON.parse(contenido) : contenido;
-                render();
-            } catch (e) { productosJson = {}; render(); }
-        }
-
-        function escucharCambios(id) {
-            if (bloqueoActivo) return;
-            const productosRef = ref(db, id + "/productos");
-            onValue(productosRef, (snapshot) => {
-                if (bloqueoActivo) return;
-                productosRealtime = {};
-                snapshot.forEach((child) => {
-                    const p = child.val();
-                    const refOriginal = p.referencia || p.Referencia || p.nombre || "";
-                    if (refOriginal) {
-                        const claveLimpia = String(refOriginal).trim().toLowerCase();
-                        productosRealtime[claveLimpia] = p;
-                        productosRealtime[claveLimpia].referenciaReal = refOriginal;
-                    }
-                });
-                render();
-            });
-        }
-
-       function render() {
-    if (bloqueoActivo) return;
-    const contenedor = document.getElementById("productos");
-    if (!contenedor) return;
-    contenedor.innerHTML = "";
-
-    for (const refP in productosJson) {
-        if (refP === "images") continue;
-        const imgUrl = productosJson[refP];
-        const claveBusqueda = refP.trim().toLowerCase();
-        const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
-
-        let precioHTML = "";
-        let precioFinal = 0;
-        
-        if (real.promocion && real.valorPromocion > 0) {
-            precioFinal = real.valorPromocion;
-            precioHTML = `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>`;
-        } else if (real.valor > 0) {
-            precioFinal = real.valor;
-            precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
-        } else {
-            precioHTML = `<div class="precio">Consultar precio</div>`;
-        }
-
-        const card = document.createElement("div");
-        card.className = `producto ${real.agotado ? 'agotado' : ''}`;
-
-        // Extraemos la descripción
-        const descripcionProducto = real.descripcion || "";
-
-        // Construimos el mensaje de WhatsApp
-        const mensajeWa = encodeURIComponent(
-            `Hola, me interesa:\n` +
-            `📌 *Ref:* ${real.referenciaReal || refP}\n` +
-            `📝 *Descripción:* ${descripcionProducto}\n` +
-            `💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`
-        );
-        const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
-
-        // --- LÓGICA DE AGOTADO ---
-        // 1. Definimos qué botón mostrar
-        let botonAccion = "";
-        if (real.agotado) {
-            // Botón gris, con cursor de bloqueo y deshabilitado (no hace nada)
-            botonAccion = `<button class="btn" style="background:#888; color:white; cursor:not-allowed; border:none; text-decoration:none;" disabled>Agotado</button>`;
-        } else {
-            // Botón normal de WhatsApp
-            botonAccion = `<a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none;">Pedir por WhatsApp</a>`;
-        }
-
-        // 2. Definimos si la imagen va en blanco y negro
-        const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '';
-
-        card.innerHTML = `
-        <div class="img-container">
-            ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-            <img src="${normalizarImagen(imgUrl)}" 
-                 style="${estiloImagen}" 
-                 onclick="${real.agotado ? '' : `abrirProducto('${(real.referenciaReal || refP).replace(/'/g, "\\'")}','${imgUrl}','${precioFinal}','${(real.descripcion || "").replace(/'/g, "\\'")}')`}">
-        </div>
-        <div class="nombre">${real.referenciaReal || refP}</div>
-        ${precioHTML}
-        ${botonAccion}
-        `;
-        
-        contenedor.appendChild(card);
-    }
-
-    // Quitar Loader
-    setTimeout(() => {
+    // --- 3. CARGA DE INTERFAZ (UI) ---
+    function continuarCarga(perfil, data) {
         if (bloqueoActivo) return;
-        document.querySelectorAll(".producto").forEach((el, i) => setTimeout(() => el.classList.add("visible"), i * 30));
-        const ld = document.getElementById("loader");
-        if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
-    }, 500);
-}
 
-        // 3. SISTEMA DE PEDIDOS
-    function enviarPedido() {
-    const btn = document.getElementById("enviarPedidoBtn");
-    
-    if (!idDomiciliarioAsignado) {
-        alert("📍 ¡Hola! En este momento no contamos con domiciliarios activos para realizar entregas. \n\nPor favor, comunícate directamente con la tienda por WhatsApp para coordinar tu compra. 🙏");
-        return;
-    }
+        telefonoEmpresa = perfil.WhatsApp.replace("+", "");
 
-    const cliente = document.getElementById("celularComprador").value.trim();
-    const direccion = document.getElementById("direccionEntrega").value.trim();
-    const nombreComprador = document.getElementById("nombreComprador").value.trim();
-    const fechaOriginal = document.getElementById("fechaEntrega").value;
-
-    let fechaFormateada = "";
-    if (fechaOriginal) {
-        const partes = fechaOriginal.split("-"); 
-        fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
-    }
-
-    if (!direccion || !nombreComprador || !fechaFormateada || !cliente) {
-        alert("⚠️ Por favor, complete todos los campos obligatorios.");
-        return;
-    }
-
-    btn.disabled = true;
-    btn.innerText = "Enviando...";
-
-    const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
-
- // Usamos get() en lugar de onValue() para evitar bucles al insertar
-   
-    get(pedidosRef).then((snapshot) => {
-        let maxPos = 0;
-        if (snapshot.exists()) {
-            snapshot.forEach(c => {
-                const pos = parseInt(c.val().posicion) || 0;
-                if (pos > maxPos) maxPos = pos;
-            });
+        // Logo
+        const imgElement = document.getElementById('logoEmpresa');
+        if (perfil.urlLogo && perfil.urlLogo.trim() !== "") {
+            const urlFinal = obtenerLinkDirecto(perfil.urlLogo);
+            imgElement.setAttribute('referrerpolicy', 'no-referrer');
+            imgElement.src = urlFinal;
+            imgElement.onload = () => { imgElement.style.display = 'inline-block'; imgElement.style.opacity = '1'; };
+            imgElement.onerror = () => { imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`; };
+        } else {
+            imgElement.style.display = 'none';
         }
-        const nuevoRef = push(pedidosRef);
-        const hoy = new Date();
-        const fechaRegistro = hoy.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\-/g, '/');
-        const horaRegistro = hoy.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
-        const pedidoData = {
-            idPedido: nuevoRef.key,
-            idEmpresa: empresaId,
-            idDomiciliario: idDomiciliarioAsignado,
-            nombreDomiciliario: nombreDomiciliarioAsignado, // ✅ AHORA LLEGARÁ: "Soy Mucho Masrapido"
-            direccion: direccion,
-            imagenUrl: imagenProducto || "",
-            nombreCliente: nombreComprador,
-            cliente: cliente,
-            nombreDestinatario: document.getElementById("nombreDestinatario").value.trim() || nombreComprador,
-            destinatario: document.getElementById("celularDestinatario").value.trim() || cliente,
-            referencia: productoSeleccionado || "Pedido Web",
-            adicional: document.getElementById("productoAdicional").value.trim(),
-            banco: document.getElementById("medioPago").value,
-            diaEntrega: fechaFormateada,
-            horaEntrega: document.getElementById("horaEntrega").value,
-            notas: document.getElementById("notasPedido").value.trim(),
-            mensaje: document.getElementById("mensajeTarjeta").value.trim(),
-            de: document.getElementById("deTarjeta").value.trim(),
-            para: document.getElementById("paraTarjeta").value.trim(),
-            posicion: maxPos + 1,
-            notificado: false,
-            timestampEntrega: null,
-            color: "#BBDEFB",
-            fechaRegistro: fechaRegistro,
-            horaRegistro: horaRegistro
-        };
+        // Domiciliario
+        if (data.Domiciliarios) {
+            const idDom = Object.keys(data.Domiciliarios)[0];
+            idDomiciliarioAsignado = idDom;
+            nombreDomiciliarioAsignado = data.Domiciliarios[idDom].nombre || "Domiciliario General";
+        }
 
-        set(nuevoRef, pedidoData)
-            .then(() => {
+        // Textos
+        document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
+        document.getElementById("eslogan").innerText = perfil.eslogan;
+        document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
+        document.getElementById("direccion").innerText = "📍 " + perfil.direccion;
+        document.getElementById("ciudad").innerText = perfil.ciudad;
+        document.getElementById("telefono").innerText = "📞 " + perfil.WhatsApp;
+        document.getElementById("correo").innerText = "✉️ " + perfil.correo;
+        document.getElementById("info-destacada").innerText = perfil.publicidad;
+        document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
+
+        cargarProductosJSON(perfil.json_datos);
+        escucharCambios(empresaId);
+    }
+
+    // --- 4. GESTIÓN DE PRODUCTOS ---
+    function cargarProductosJSON(contenido) {
+        if (bloqueoActivo) return;
+        if (!contenido) { productosJson = {}; render(); return; }
+        try {
+            productosJson = typeof contenido === 'string' ? JSON.parse(contenido) : contenido;
+            render();
+        } catch (e) { productosJson = {}; render(); }
+    }
+
+    function escucharCambios(id) {
+        if (bloqueoActivo) return;
+        const productosRef = ref(db, id + "/productos");
+        onValue(productosRef, (snapshot) => {
+            if (bloqueoActivo) return;
+            productosRealtime = {};
+            snapshot.forEach((child) => {
+                const p = child.val();
+                const refOriginal = p.referencia || p.Referencia || p.nombre || "";
+                if (refOriginal) {
+                    const claveLimpia = String(refOriginal).trim().toLowerCase();
+                    productosRealtime[claveLimpia] = p;
+                    productosRealtime[claveLimpia].referenciaReal = refOriginal;
+                }
+            });
+            render();
+        });
+    }
+
+    function render() {
+        if (bloqueoActivo) return;
+        const contenedor = document.getElementById("productos");
+        if (!contenedor) return;
+        contenedor.innerHTML = "";
+
+        for (const refP in productosJson) {
+            if (refP === "images") continue;
+            const imgUrl = productosJson[refP];
+            const claveBusqueda = refP.trim().toLowerCase();
+            const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
+
+            let precioHTML = "";
+            let precioFinal = 0;
+            
+            if (real.promocion && real.valorPromocion > 0) {
+                precioFinal = real.valorPromocion;
+                precioHTML = `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>`;
+            } else if (real.valor > 0) {
+                precioFinal = real.valor;
+                precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
+            } else {
+                precioHTML = `<div class="precio">Consultar precio</div>`;
+            }
+
+            const card = document.createElement("div");
+            card.className = `producto ${real.agotado ? 'agotado' : ''}`;
+
+            const descProd = (real.descripcion || "").replace(/'/g, "\\'");
+            const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
+            
+            const mensajeWa = encodeURIComponent(`Hola, me interesa:\n📌 *Ref:* ${real.referenciaReal || refP}\n💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`);
+            const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
+
+            let botonAccion = real.agotado 
+                ? `<button class="btn" style="background:#888; color:white; cursor:not-allowed;" disabled>Agotado</button>`
+                : `<a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none;">Pedir por WhatsApp</a>`;
+
+            const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '';
+
+            card.innerHTML = `
+                <div class="img-container">
+                    ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+                    <img src="${normalizarImagen(imgUrl)}" style="${estiloImagen}" 
+                         onclick="${real.agotado ? '' : `abrirProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')`}">
+                </div>
+                <div class="nombre">${real.referenciaReal || refP}</div>
+                ${precioHTML}
+                ${botonAccion}
+            `;
+            contenedor.appendChild(card);
+        }
+
+        setTimeout(() => {
+            if (bloqueoActivo) return;
+            document.querySelectorAll(".producto").forEach((el, i) => setTimeout(() => el.classList.add("visible"), i * 30));
+            const ld = document.getElementById("loader");
+            if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
+        }, 500);
+    }
+
+    // --- 5. SISTEMA DE PEDIDOS ---
+    function enviarPedido() {
+        const btn = document.getElementById("enviarPedidoBtn");
+        if (!idDomiciliarioAsignado) {
+            alert("📍 No hay domiciliarios activos. Contacta a la tienda directamente.");
+            return;
+        }
+
+        const cliente = document.getElementById("celularComprador").value.trim();
+        const direccion = document.getElementById("direccionEntrega").value.trim();
+        const nombreComprador = document.getElementById("nombreComprador").value.trim();
+        const fechaOriginal = document.getElementById("fechaEntrega").value;
+
+        let fechaFormateada = "";
+        if (fechaOriginal) {
+            const partes = fechaOriginal.split("-"); 
+            fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+        }
+
+        if (!direccion || !nombreComprador || !fechaFormateada || !cliente) {
+            alert("⚠️ Complete todos los campos.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Enviando...";
+
+        const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
+        get(pedidosRef).then((snapshot) => {
+            let maxPos = 0;
+            if (snapshot.exists()) {
+                snapshot.forEach(c => {
+                    const pos = parseInt(c.val().posicion) || 0;
+                    if (pos > maxPos) maxPos = pos;
+                });
+            }
+            const nuevoRef = push(pedidosRef);
+            const hoy = new Date();
+            const fechaReg = hoy.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/-/g, '/');
+            const horaReg = hoy.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+            const pedidoData = {
+                idPedido: nuevoRef.key,
+                idEmpresa: empresaId,
+                idDomiciliario: idDomiciliarioAsignado,
+                nombreDomiciliario: nombreDomiciliarioAsignado,
+                direccion: direccion,
+                imagenUrl: imagenProducto || "",
+                nombreCliente: nombreComprador,
+                cliente: cliente,
+                nombreDestinatario: document.getElementById("nombreDestinatario").value.trim() || nombreComprador,
+                destinatario: document.getElementById("celularDestinatario").value.trim() || cliente,
+                referencia: productoSeleccionado || "Pedido Web",
+                adicional: document.getElementById("productoAdicional").value.trim(),
+                banco: document.getElementById("medioPago").value,
+                diaEntrega: fechaFormateada,
+                horaEntrega: document.getElementById("horaEntrega").value,
+                notas: document.getElementById("notasPedido").value.trim(),
+                mensaje: document.getElementById("mensajeTarjeta").value.trim(),
+                de: document.getElementById("deTarjeta").value.trim(),
+                para: document.getElementById("paraTarjeta").value.trim(),
+                posicion: maxPos + 1,
+                notificado: false,
+                color: "#BBDEFB",
+                fechaRegistro: fechaReg,
+                horaRegistro: horaReg
+            };
+
+            set(nuevoRef, pedidoData).then(() => {
                 alert("✅ Pedido enviado con éxito");
                 location.reload();
-            })
-            .catch((error) => {
-                alert("Error: " + error.message);
-                btn.disabled = false;
-                btn.innerText = "Enviar pedido";
-            });
+            }).catch(err => alert("Error: " + err.message));
+        });
+    }
 
-    }, { onlyOnce: true });
-}
-// Ejemplo de cómo capturas los datos del objeto que mostraste:
-function vincularDomiciliario(datosObjeto) {
-    idDomiciliarioAsignado = datosObjeto.idDomiciliario; // vFlNTcYFOcd3bkpS6JcPMqTD4YL2
-    nombreDomiciliarioAsignado = datosObjeto.nombre;    // "Soy Mucho Masrapido"
-    console.log("Vinculado a: " + nombreDomiciliarioAsignado);
-}
-        // 4. UTILIDADES Y REDES
-        function obtenerLinkDirecto(entrada) {
-            if (!entrada) return "";
-            if (!entrada.includes('http') && entrada.length >= 25) return `https://drive.google.com/uc?export=view&id=${entrada.trim()}`;
-            if (entrada.includes('drive.google.com')) {
-                const match = entrada.match(/\/d\/([-\w]{25,})/) || entrada.match(/id=([-\w]{25,})/);
-                if (match) return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-            }
-            return entrada;
+    // --- 6. UTILIDADES ---
+    function obtenerLinkDirecto(entrada) {
+        if (!entrada) return "";
+        if (!entrada.includes('http') && entrada.length >= 25) return `https://drive.google.com/uc?export=view&id=${entrada.trim()}`;
+        if (entrada.includes('drive.google.com')) {
+            const match = entrada.match(/\/d\/([-\w]{25,})/) || entrada.match(/id=([-\w]{25,})/);
+            if (match) return `https://drive.google.com/uc?export=view&id=${match[1]}`;
         }
+        return entrada;
+    }
 
-        const normalizarImagen = (url) => {
-            if (url?.includes("drive.google.com")) {
-                const id = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                return id ? `https://drive.google.com/thumbnail?id=${id[1]}&sz=w1000` : url;
-            }
-            return url || "";
-        };
+    const normalizarImagen = (url) => {
+        if (url?.includes("drive.google.com")) {
+            const id = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            return id ? `https://drive.google.com/thumbnail?id=${id[1]}&sz=w1000` : url;
+        }
+        return url || "";
+    };
 
-        const formatearPrecio = (v) => "$" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    const formatearPrecio = (v) => "$" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-        window.abrirProducto = (nombre, imagen, precio, descripcion) => {
-            productoSeleccionado = nombre; imagenProducto = normalizarImagen(imagen);
-            document.getElementById("productoTitulo").innerText = nombre;
-            document.getElementById("productoDescripcion").innerText = descripcion;
-            document.getElementById("productoImagen").src = imagenProducto;
-            document.getElementById("productoPrecio").innerText = formatearPrecio(precio);
-            document.getElementById("modalPedido").style.display = "flex";
-        };
+    window.abrirProducto = (nombre, imagen, precio, descripcion) => {
+        productoSeleccionado = nombre; imagenProducto = normalizarImagen(imagen);
+        document.getElementById("productoTitulo").innerText = nombre;
+        document.getElementById("productoDescripcion").innerText = descripcion;
+        document.getElementById("productoImagen").src = imagenProducto;
+        document.getElementById("productoPrecio").innerText = formatearPrecio(precio);
+        document.getElementById("modalPedido").style.display = "flex";
+    };
 
-        window.enviarPedido = enviarPedido;
-        window.cerrarModal = () => document.getElementById("modalPedido").style.display = "none";
+    window.enviarPedido = enviarPedido;
+    window.cerrarModal = () => document.getElementById("modalPedido").style.display = "none";
 
-        // Compartir
-        document.addEventListener("DOMContentLoaded", () => {
-            const url = window.location.href;
-            const msg = encodeURIComponent("¡Mira esta tienda!: " + url);
-            if (document.getElementById('shareFB')) document.getElementById('shareFB').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-            if (document.getElementById('shareWA')) document.getElementById('shareWA').href = `https://api.whatsapp.com/send?text=${msg}`;
+    // Social & Buscador
+    document.addEventListener("DOMContentLoaded", () => {
+        const url = window.location.href;
+        const msg = encodeURIComponent("¡Mira esta tienda!: " + url);
+        if (document.getElementById('shareFB')) document.getElementById('shareFB').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        if (document.getElementById('shareWA')) document.getElementById('shareWA').href = `https://api.whatsapp.com/send?text=${msg}`;
+    });
+
+    document.getElementById('btnBusqueda').addEventListener('click', () => {
+        const cont = document.getElementById('contenedorBusqueda');
+        cont.classList.toggle('activo');
+        if (cont.classList.contains('activo')) document.getElementById('inputBusqueda').focus();
+    });
+
+    document.getElementById('inputBusqueda').addEventListener('input', (e) => {
+        const texto = e.target.value.toLowerCase();
+        document.querySelectorAll('.producto').forEach(card => {
+            const nombre = card.querySelector('.nombre').innerText.toLowerCase();
+            card.style.display = nombre.includes(texto) ? 'flex' : 'none';
         });
-
-        // Buscador
-        document.getElementById('btnBusqueda').addEventListener('click', () => {
-            const cont = document.getElementById('contenedorBusqueda');
-            cont.classList.toggle('activo');
-            if (cont.classList.contains('activo')) document.getElementById('inputBusqueda').focus();
-        });
-
-        document.getElementById('inputBusqueda').addEventListener('input', (e) => {
-            const texto = e.target.value.toLowerCase();
-            document.querySelectorAll('.producto').forEach(card => {
-                const nombre = card.querySelector('.nombre').innerText.toLowerCase();
-                card.style.display = nombre.includes(texto) ? 'flex' : 'none';
-            });
-        });
-    </script>
+    });
+</script>
 </body>
 
 </html>
