@@ -920,8 +920,64 @@ if (perfil.fechaExpiracion) {
             });
         });
 
-       function iniciarCargaPorSlug(slugDetectado) {
+function validarExpiracion(perfil, data) {
+    if (!perfil.fechaExpiracion) {
+        continuarCarga(perfil, data);
+        return;
+    }
+
+    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
+    const [dia, mes, anio] = fechaPart.split("/");
+    const [hora, min, seg] = horaPart.split(":");
+    // Mes - 1 porque en JS Enero es 0
+    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
+
+    const offsetRef = ref(db, ".info/serverTimeOffset");
+    onValue(offsetRef, (offsetSnapshot) => {
+        const offset = offsetSnapshot.val() || 0;
+        const horaRealServidor = Date.now() + offset;
+
+        if (horaRealServidor > tiempoExpiracion) {
+            bloqueoActivo = true;
+            console.log("🛑 ACCESO EXPIRADO.");
+
+            // Bloqueo visual total
+            document.documentElement.innerHTML = `
+                <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh; overflow:hidden;">
+                    <div style="text-align:center; font-family:sans-serif;">
+                        <h1 style="color:#1e293b;">Acceso Suspendido</h1>
+                        <p style="color:#64748b; font-size:18px;">Esta tienda se encuentra en mantenimiento técnico.</p>
+                        <p style="color:#94a3b8; font-size:14px;">Redirigiendo...</p>
+                    </div>
+                </body>`;
+
+            // Salida forzada
+            setTimeout(() => {
+                window.location.replace("/mantenimiento.html");
+            }, 2000);
+        } else {
+            // SI TODO ESTÁ BIEN, CARGAMOS LA TIENDA
+            continuarCarga(perfil, data);
+        }
+    }, { onlyOnce: true });
+}
+
+function iniciarCarga(slugDetectado) {
     slug = slugDetectado;
+    const empresasRef = ref(db);
+
+    onValue(empresasRef, (snapshot) => {
+        snapshot.forEach((child) => {
+            const data = child.val();
+            if (data.perfilempresa?.slug === slug) {
+                empresaId = child.key;
+                const perfil = data.perfilempresa;
+
+                // 🛡️ AQUÍ ACTIVAMOS EL BLOQUEO PREVENTIVO
+                validarExpiracion(perfil, data);
+            }
+        });
+    }, { onlyOnce: true });
 }
 
         function continuarCarga(perfil, data) {
@@ -971,15 +1027,15 @@ async function detectarEmpresaPorDominio() {
     const host = window.location.hostname;
     const path = window.location.pathname;
 
-    // CASO 1: /t/slug
+    // CASO 1: Acceso por subcarpeta /t/nombre-empresa
     if (path.startsWith("/t/")) {
-        const slugDetectado = path.split("/t/")[1];
-        slug = slugDetectado; // ✅ IMPORTANTE
-        iniciarCarga(slugDetectado);
+        const slugDetectado = path.split("/t/")[1].split('/')[0]; // Limpiamos posibles slashes extra
+        slug = slugDetectado; 
+        iniciarCargaBase(slugDetectado);
         return;
     }
 
-    // CASO 2: dominio personalizado
+    // CASO 2: Dominio personalizado (ej: floristerialoslirios.com.co)
     try {
         const q = query(
             collection(dbFirestore, "perfilempresa"),
@@ -990,35 +1046,80 @@ async function detectarEmpresaPorDominio() {
 
         if (!querySnapshot.empty) {
             const empresa = querySnapshot.docs[0].data();
-            const slugDetectado = empresa.slug;
-
-            window.location.replace(`/t/${slugDetectado}`);
+            slug = empresa.slug; // ✅ Seteamos el slug global
+            
+            // En lugar de redireccionar y perder tiempo, cargamos directamente:
+            iniciarCargaBase(slug);
         } else {
-            console.log("Dominio no configurado");
+            console.warn("Dominio no configurado en Firestore");
         }
-
     } catch (error) {
-        console.error("Error dominio:", error);
+        console.error("Error validando dominio:", error);
     }
 }
 
-function iniciarCarga(slugDetectado) {
-    slug = slugDetectado;
-
+function iniciarCargaBase(slugBusqueda) {
     const empresasRef = ref(db);
 
+    // Solo escuchamos una vez para encontrar la empresa y luego activamos los listeners específicos
     onValue(empresasRef, (snapshot) => {
+        let empresaEncontrada = false;
         snapshot.forEach((child) => {
             const data = child.val();
-
-            if (data.perfilempresa?.slug === slug) {
-                empresaId = child.key;
+            if (data.perfilempresa?.slug === slugBusqueda) {
+                empresaId = child.key; // ID único (ej: "-N...something")
+                empresaEncontrada = true;
+                
                 const perfil = data.perfilempresa;
-
-                continuarCarga(perfil, data);
+                
+                // Ejecutamos validación de expiración y carga de UI
+                validarYContinuar(perfil, data);
             }
         });
-    });
+        
+        if (!empresaEncontrada) console.error("No se encontró ninguna empresa con el slug:", slugBusqueda);
+    }, { onlyOnce: true });
+}
+
+function validarYContinuar(perfil, data) {
+    // 1. Si no hay fecha de expiración, cargamos normal
+    if (!perfil.fechaExpiracion) {
+        continuarCarga(perfil, data);
+        return;
+    }
+
+    // 2. Procesamos la fecha (Parsing)
+    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
+    const [dia, mes, anio] = fechaPart.split("/");
+    const [hora, min, seg] = horaPart.split(":");
+    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
+
+    // 3. Obtenemos la hora real del servidor para evitar trampas con el reloj local
+    const offsetRef = ref(db, ".info/serverTimeOffset");
+    onValue(offsetRef, (offsetSnapshot) => {
+        const offset = offsetSnapshot.val() || 0;
+        const horaRealServidor = Date.now() + offset;
+
+        // 4. LA COMPARACIÓN CRÍTICA
+        if (horaRealServidor > tiempoExpiracion) {
+            // SI EXPIRÓ: Bloqueo y expulsión
+            bloqueoActivo = true;
+            document.documentElement.innerHTML = `
+                <div style="height:100vh; display:flex; align-items:center; justify-content:center; font-family:sans-serif; background:#f8fafc;">
+                    <div style="text-align:center;">
+                        <h2 style="color:#1e293b;">Acceso en Mantenimiento</h2>
+                        <p style="color:#64748b;">Redirigiendo a la página principal...</p>
+                    </div>
+                </div>`;
+            
+            setTimeout(() => {
+                window.location.replace("/mantenimiento.html");
+            }, 1500);
+        } else {
+            // SI ESTÁ VIGENTE: Cargamos la tienda
+            continuarCarga(perfil, data);
+        }
+    }, { onlyOnce: true });
 }
         // 2. GESTIÓN DE PRODUCTOS
         function cargarProductosJSON(contenido) {
