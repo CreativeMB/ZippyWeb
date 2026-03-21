@@ -88,11 +88,13 @@
             const path = window.location.pathname;
             const hostSinWww = host.replace("www.", "");
 
+            // 🛑 AGREGAR ESTO AQUÍ:
     if (hostSinWww !== "zippy-727d5.web.app" && hostSinWww !== "localhost") {
         console.log("⚠️ Host externo detectado en Index. Redirigiendo a lógica de tienda...");
         await detectarEmpresaPorDominio(); // Ejecuta la detección
         return; // IMPORTANTE: Detiene el resto del código para que NO evalúe el login
     }
+
             // DETERMINAR SI ES TIENDA O ADMIN
             const esRutaTienda = path.includes("/t/");
             const esDominioPropio = (hostSinWww !== "zippy-727d5.web.app" && hostSinWww !== "localhost");
