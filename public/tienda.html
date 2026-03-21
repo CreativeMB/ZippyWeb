@@ -876,53 +876,66 @@
 
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase();
-    const hostLimpio = host.replace("www.", "").trim(); // .trim() es VITAL
+    const path = window.location.pathname;
+    const hostLimpio = host.replace("www.", "").trim();
 
     console.log("🏪 Iniciando detección para:", hostLimpio);
 
     try {
         let slugEncontrado = "";
 
+        // --- PASO 1: VALIDAR POR DOMINIO ---
         if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
             
-            // 1. Referencia a la colección correcta
-            const q = query(
+            // ALERTA DE RUTA: Aquí verás qué está buscando exactamente
+            alert(`🔍 BUSCANDO EN FIRESTORE:\nColección: perfilempresa\nCampo: dominio\nValor buscado: [${hostLimpio}]`);
+
+            const qDominio = query(
                 collection(dbFirestore, "perfilempresa"),
                 where("dominio", "==", hostLimpio)
             );
-
-            const querySnapshot = await getDocs(q);
+            const querySnapshot = await getDocs(qDominio);
 
             if (!querySnapshot.empty) {
-                // 2. Extraemos el slug del primer documento encontrado
-                const datosEmpresa = querySnapshot.docs[0].data();
-                slugEncontrado = datosEmpresa.slug; 
-                
-                console.log("✅ ¡Éxito! Encontrado slug:", slugEncontrado);
+                slugEncontrado = querySnapshot.docs[0].data().slug;
+                alert("✅ ¡ÉXITO! Dominio encontrado. Slug: " + slugEncontrado);
             } else {
-                // 3. Si llega aquí, es porque Firestore no encontró coincidencia exacta
-                console.error("❌ ERROR: No hay coincidencia para el dominio:", hostLimpio);
-                irAMantenimiento("El dominio '" + hostLimpio + "' no está registrado.");
-                return;
+                console.log("No se encontró por dominio, probando otras opciones...");
             }
-        } 
-        // Caso para desarrollo local o rutas /t/
-        else if (window.location.pathname.includes("/t/")) {
-            const partes = window.location.pathname.split("/t/");
-            slugEncontrado = partes[1].split('/')[0];
         }
 
+        // --- PASO 2: SI NO HAY DOMINIO, VALIDAR POR SLUG EN URL (/t/...) ---
+        if (!slugEncontrado && path.includes("/t/")) {
+            const partes = path.split("/t/");
+            const slugBuscado = partes[1].split('/')[0].trim();
+
+            alert(`🔍 NO SE HALLÓ DOMINIO. BUSCANDO POR SLUG:\nCampo: slug\nValor buscado: [${slugBuscado}]`);
+
+            const qSlug = query(
+                collection(dbFirestore, "perfilempresa"),
+                where("slug", "==", slugBuscado)
+            );
+            const querySlug = await getDocs(qSlug);
+
+            if (!querySlug.empty) {
+                slugEncontrado = querySlug.docs[0].data().slug;
+            }
+        }
+
+        // --- VALIDACIÓN FINAL ---
         if (slugEncontrado) {
             slug = slugEncontrado; 
             if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
             iniciarCargaBase(slug); 
         } else {
+            // ALERTA FINAL DE ERROR
+            alert(`❌ ERROR CRÍTICO:\nEl valor [${hostLimpio}] no coincide con ningún campo 'dominio' en la colección 'perfilempresa'.\n\nVerifica en Firestore que no existan espacios al final.`);
             window.location.replace("https://zippy-727d5.web.app/portal.html");
         }
 
     } catch (error) {
-        console.error("🔥 Error de Firebase:", error);
-        irAMantenimiento("Error de conexión con la base de datos");
+        alert("🔥 Error de conexión Firebase: " + error.message);
+        irAMantenimiento("Error de base de datos");
     }
 }
 // CORRECCIÓN: Función de mantenimiento sin redirección externa
