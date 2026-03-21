@@ -875,97 +875,101 @@
     detectarEmpresaPorDominio();
 
 async function detectarEmpresaPorDominio() {
-    const host = window.location.hostname.toLowerCase();
+    const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
     const path = window.location.pathname;
-    const hostLimpio = host.replace("www.", "");
 
-    console.log("🏪 Iniciando detección para:", hostLimpio);
+    console.log("🌐 Host:", host);
+    console.log("📍 Path:", path);
 
     try {
-        let slugEncontrado = "";
+        let slug = "";
 
         // ==========================================
-        // CASO A: Dominio Propio (No es zippy ni localhost)
+        // CASO 1: DOMINIO PROPIO
         // ==========================================
-        if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
-            
-            // 1. Reemplazar los puntos por guiones bajos para buscar en Realtime Database
-            const dominioRtdb = hostLimpio.replaceAll(".", "_");
-            console.log("🔍 Buscando en Realtime DB el nodo:", dominioRtdb);
+        if (host !== "zippy-727d5.web.app" && host !== "localhost") {
 
-            // 2. Buscar el dominio en el nodo raíz de Realtime Database
-            // Asegúrate de que tu variable de conexión a Realtime se llame 'dbRealtime' o cámbiala según tu código
-            const dominioRef = ref(dbRealtime, dominioRtdb); 
-            const snapshotRtdb = await get(dominioRef);
+            const dominioKey = host.replaceAll(".", "_");
 
-            if (snapshotRtdb.exists()) {
-                const idEmpresa = snapshotRtdb.val(); // Esto extraerá "tc62AVkjwvZfawegqZ5Bs3RGdGk1"
-                console.log("✅ ID de empresa encontrado en Realtime DB:", idEmpresa);
+            console.log("🔎 Buscando dominio en RTDB:", dominioKey);
 
-                // 3. Buscar el 'slug' en Firestore usando el ID de la empresa
-                
-                // Opción A: Intentar buscar directamente por el ID del Documento
-                const docRef = doc(dbFirestore, "perfilempresa", idEmpresa);
-                const docSnap = await getDoc(docRef);
+            const snap = await get(ref(dbRealtime, "dominios/" + dominioKey));
 
-                if (docSnap.exists() && docSnap.data().slug) {
-                    slugEncontrado = docSnap.data().slug;
-                } else {
-                    // Opción B: Si el ID no es el nombre del documento, buscar por un campo dentro del documento
-                    // NOTA: Cambia "uid" por el nombre exacto de la columna en Firestore si se llama distinto (ej. "id_empresa")
-                    const q = query(collection(dbFirestore, "perfilempresa"), where("uid", "==", idEmpresa));
-                    const querySnapshot = await getDocs(q);
+            if (snap.exists()) {
+                const data = snap.val();
 
-                    if (!querySnapshot.empty) {
-                        slugEncontrado = querySnapshot.docs[0].data().slug;
-                    } else {
-                        alert("❌ ERROR: Dominio encontrado, pero el perfil de la empresa no existe en Firestore.");
-                        irAMantenimiento("Perfil de empresa no encontrado");
-                        return;
-                    }
+                console.log("✅ Dominio encontrado en RTDB:", data);
+
+                // PRIORIDAD: usar slug del dominio
+                if (data.slug) {
+                    slug = data.slug;
+                    console.log("🎯 Slug obtenido desde dominio:", slug);
                 }
-                
-                alert("✅ ¡Éxito! Encontrado slug: " + slugEncontrado);
 
-            } else {
-                // El dominio no está guardado en Realtime Database
-                alert("❌ ERROR: El dominio '" + dominioRtdb + "' no existe en Realtime Database.");
-                irAMantenimiento("Dominio no registrado");
-                return;
+                // (Opcional) si quisieras validar con Firestore:
+                // const idEmpresa = data.idEmpresa;
             }
-        } 
+
+            // ==========================================
+            // FALLBACK: SI NO EXISTE DOMINIO
+            // ==========================================
+            if (!slug) {
+                console.log("⚠️ Dominio no encontrado, buscando en Firestore...");
+
+                // Buscar perfil por dominio no aplica, entonces usamos otro criterio
+                // Ejemplo: por slug en Firestore o listado general
+
+                const q = query(collection(dbFirestore, "perfilempresa"));
+                const res = await getDocs(q);
+
+                res.forEach(doc => {
+                    const data = doc.data();
+                    if (data.slug) {
+                        slug = data.slug; // aquí puedes ajustar si tienes lógica de coincidencia
+                    }
+                });
+
+                if (!slug) {
+                    console.error("❌ No se encontró slug en Firestore");
+                    return irAMantenimiento("Perfil no encontrado");
+                }
+            }
+
+        }
+
         // ==========================================
-        // CASO B: Por ruta /t/ (Directorio Zippy)
+        // CASO 2: RUTA /t/slug
         // ==========================================
         else if (path.includes("/t/")) {
-            const partes = path.split("/t/");
-            slugEncontrado = partes[1].split('/')[0];
-            console.log("✅ Detectado por ruta /t/:", slugEncontrado);
+            slug = path.split("/t/")[1]?.split("/")[0] || "";
+            console.log("✅ Slug desde URL:", slug);
         }
 
         // ==========================================
-        // VALIDACIÓN FINAL Y CARGA DE LA TIENDA
+        // VALIDACIÓN FINAL
         // ==========================================
-        if (slugEncontrado) {
-            // Asigna a la variable global (asegúrate de que 'slug' esté declarada de forma global en tu app)
-            window.slug = slugEncontrado; 
-            
-            if(document.getElementById("loaderTienda")) {
-                document.getElementById("loaderTienda").style.display = "none";
-            }
-            iniciarCargaBase(slugEncontrado); 
-        } else {
-            // Si no hay slug y estamos en el dominio base, devolvemos al portal principal
-            window.location.replace("https://zippy-727d5.web.app/portal.html");
+        if (!slug) {
+            console.error("❌ No se pudo determinar el slug");
+            return window.location.replace("https://zippy-727d5.web.app/portal.html");
         }
+
+        // ==========================================
+        // INICIAR TIENDA
+        // ==========================================
+        window.slug = slug;
+
+        const loader = document.getElementById("loaderTienda");
+        if (loader) loader.style.display = "none";
+
+        console.log("🚀 Cargando tienda con slug:", slug);
+
+        iniciarCargaBase(slug);
 
     } catch (error) {
-        console.error("🔥 Error de conexión:", error);
-        alert("🔥 Error de conexión: " + error.message);
-        irAMantenimiento("Error de conexión con las bases de datos");
+        console.error("🔥 Error:", error);
+        irAMantenimiento("Error de conexión");
     }
 }
-
 // Función de mantenimiento sin redirección externa
 function irAMantenimiento(motivo) {
     console.log("Mantenimiento por:", motivo);
