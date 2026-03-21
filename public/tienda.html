@@ -874,22 +874,54 @@
     // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
-   async function detectarEmpresaPorDominio() {
-    const host = window.location.hostname; // Ejemplo: floristerialoslirios.com o localhost
-    const path = window.location.pathname; // Ejemplo: /t/tienda-pepe
+  async function detectarEmpresaPorDominio() {
+    let host = window.location.hostname; // Ejemplo: floristerialoslirios.com.co
+    const path = window.location.pathname;
 
     // --- PRIORIDAD 1: ACCESO POR SLUG (/t/tienda) ---
-    // Si la URL contiene "/t/", ignoramos el dominio y cargamos por el nombre en la ruta.
     if (path.includes("/t/")) {
         const partes = path.split("/t/");
         if (partes[1]) {
-            const slugDetectado = partes[1].split('/')[0];
-            slug = slugDetectado;
-            console.log("📂 Cargando por Ruta (Slug):", slug);
+            slug = partes[1].split('/')[0];
             iniciarCargaBase(slug);
-            return; // Detenemos aquí, no hace falta buscar dominio.
+            return;
         }
     }
+
+    // --- PRIORIDAD 2: DOMINIO PERSONALIZADO ---
+    try {
+        // NORMALIZACIÓN: Si el usuario entró con www, se las quitamos para la búsqueda
+        // Así, "www.floristerialoslirios.com.co" se vuelve "floristerialoslirios.com.co"
+        const hostLimpio = host.startsWith("www.") ? host.replace("www.", "") : host;
+
+        console.log("🌐 Buscando coincidencia para:", hostLimpio);
+        
+        const q = query(
+            collection(dbFirestore, "perfilempresa"),
+            where("dominio", "==", hostLimpio) // Ahora siempre coincidirá con tu texto de Firestore
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const empresaDoc = querySnapshot.docs[0].data();
+            slug = empresaDoc.slug; 
+            console.log("✅ Tienda identificada:", slug);
+            iniciarCargaBase(slug);
+        } else {
+            // Si no es un dominio personalizado, revisamos si es el dominio base de Zippy
+            if (host.includes("zippy-727d5.web.app") || host.includes("localhost")) {
+                console.log("🏠 Estás en el dominio raíz de Zippy.");
+                // Aquí podrías redirigir al login si quieres
+            } else {
+                console.warn("❌ Dominio no registrado en el sistema.");
+                window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
+            }
+        }
+    } catch (error) {
+        console.error("❌ Error en validación:", error);
+    }
+}
     // --- PRIORIDAD 2: DOMINIO PERSONALIZADO ---
     // Si llegamos aquí, es porque no hay "/t/". Buscamos si el host actual es de una tienda.
     try {
