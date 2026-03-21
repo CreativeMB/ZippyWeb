@@ -783,7 +783,7 @@
 
                 <div class="fila2">
                     <input id="nombreComprador" placeholder="Nombre comprador">
-                    <input id="cliente" placeholder="Celular comprador">
+                    <input id="celularComprador" placeholder="Celular comprador">
                 </div>
                 <div class="fila2">
                     <input id="nombreDestinatario" placeholder="Nombre destinatario">
@@ -845,8 +845,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
+ import { get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    
         const firebaseConfig = {
             apiKey: "TU_API_KEY",
             authDomain: "zippy-727d5.firebaseapp.com",
@@ -935,18 +935,15 @@ if (perfil.fechaExpiracion) {
             }
 
             // Asignar Domiciliario
-        
+// --- DENTRO DE continuarCarga (Asegúrate que esté así) ---
 if (data.Domiciliarios) {
-    // Obtenemos el ID (la clave)
     const idDom = Object.keys(data.Domiciliarios)[0];
-    // Obtenemos el objeto completo de ese domiciliario
     const infoDom = data.Domiciliarios[idDom];
 
     idDomiciliarioAsignado = idDom;
-    // Capturamos el nombre desde el campo 'nombre' que me mostraste
+    // Capturamos el nombre correctamente del objeto
     nombreDomiciliarioAsignado = infoDom.nombre || "Domiciliario General";
-
-    console.log("✅ Domiciliario vinculado:", nombreDomiciliarioAsignado);
+    console.log("✅ Domiciliario listo:", nombreDomiciliarioAsignado);
 }
 
             // Textos de Interfaz
@@ -1101,7 +1098,9 @@ if (data.Domiciliarios) {
 
     const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
 
-    onValue(pedidosRef, (snapshot) => {
+ // Usamos get() en lugar de onValue() para evitar bucles al insertar
+   
+    get(pedidosRef).then((snapshot) => {
         let maxPos = 0;
         if (snapshot.exists()) {
             snapshot.forEach(c => {
@@ -1109,7 +1108,6 @@ if (data.Domiciliarios) {
                 if (pos > maxPos) maxPos = pos;
             });
         }
-
         const nuevoRef = push(pedidosRef);
         const hoy = new Date();
         const fechaRegistro = hoy.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\-/g, '/');
