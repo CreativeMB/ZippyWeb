@@ -845,8 +845,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
- import { get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    
+        import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+ 
         const firebaseConfig = {
             apiKey: "TU_API_KEY",
             authDomain: "zippy-727d5.firebaseapp.com",
