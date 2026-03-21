@@ -783,7 +783,7 @@
 
                 <div class="fila2">
                     <input id="nombreComprador" placeholder="Nombre comprador">
-                    <input id="celularComprador" placeholder="Celular comprador">
+                    <input id="cliente" placeholder="Celular comprador">
                 </div>
                 <div class="fila2">
                     <input id="nombreDestinatario" placeholder="Nombre destinatario">
@@ -862,6 +862,7 @@
         let telefonoEmpresa = "";
         let empresaId = "";
         let idDomiciliarioAsignado = "";
+        let nombreDomiciliarioAsignado = "";
         let productoSeleccionado = "";
         let imagenProducto = "";
 
@@ -1059,19 +1060,36 @@ if (perfil.fechaExpiracion) {
         if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
     }, 500);
 }
+// Agrega o busca esta parte en tu código de inicialización
+function buscarDomiciliario() {
+    const domRef = ref(db, empresaId + "/Domiciliarios");
+    get(domRef).then((snapshot) => {
+        if (snapshot.exists()) {
+            // Tomamos el primer domiciliario disponible
+            const keys = Object.keys(snapshot.val());
+            const primerId = keys[0];
+            const datos = snapshot.val()[primerId];
 
+            idDomiciliarioAsignado = primerId;
+            // 🚩 AQUÍ GUARDAMOS EL NOMBRE
+            nombreDomiciliarioAsignado = datos.nombre || "Domiciliario General"; 
+            
+            console.log("Conectado a:", nombreDomiciliarioAsignado);
+        }
+    });
+}
+// Llama a la función al cargar
+buscarDomiciliario();
         // 3. SISTEMA DE PEDIDOS
     function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
     
-    // 🔹 VALIDACIÓN CRÍTICA: ¿Hay un domiciliario asignado?
-    // Asumo que 'idDomiciliarioAsignado' es una variable global o previa
     if (!idDomiciliarioAsignado) {
-        alert("❌ Error: No hay un domiciliario disponible o asignado para este pedido. No se puede enviar.");
-        return; // Detenemos la ejecución aquí
+        alert("❌ Error: No hay un domiciliario asignado.");
+        return;
     }
 
-    // 1. Formato diaEntrega: DD-MM-YYYY
+    const cliente = document.getElementById("celularComprador").value.trim();
     const fechaOriginal = document.getElementById("fechaEntrega").value;
     let fechaFormateada = "";
     if (fechaOriginal) {
@@ -1079,7 +1097,6 @@ if (perfil.fechaExpiracion) {
         fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
     }
 
-    // 2. Captura de campos obligatorios
     const direccion = document.getElementById("direccionEntrega").value.trim();
     const nombreComprador = document.getElementById("nombreComprador").value.trim();
 
@@ -1088,14 +1105,13 @@ if (perfil.fechaExpiracion) {
         return;
     }
 
-    // Bloquear botón para evitar doble envío
     btn.disabled = true;
     btn.innerText = "Enviando...";
 
-    // Referencia a la base de datos usando el ID del domiciliario validado
     const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
 
-    onValue(pedidosRef, (snapshot) => {
+    // Usamos get para obtener la posición una sola vez de forma limpia
+    get(pedidosRef).then((snapshot) => {
         let maxPos = 0;
         if (snapshot.exists()) {
             snapshot.forEach(c => {
@@ -1107,25 +1123,21 @@ if (perfil.fechaExpiracion) {
         const nuevoRef = push(pedidosRef);
         const hoy = new Date();
 
-        // Formateo de Fecha y Hora (Estilo Kotlin)
-        const fechaRegistro = hoy.toLocaleDateString('es-CO', {
-            day: '2-digit', month: '2-digit', year: 'numeric'
-        }).replace(/\-/g, '/');
-
-        const horaRegistro = hoy.toLocaleTimeString('es-CO', {
-            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-        });
+        const fechaRegistro = hoy.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/-/g, '/');
+        const horaRegistro = hoy.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
         const pedidoData = {
             idPedido: nuevoRef.key,
             idEmpresa: empresaId,
             idDomiciliario: idDomiciliarioAsignado,
+            // 🚩 CAMBIO AQUÍ: Ahora usa el nombre que guardamos al inicio
+            nombreDomiciliario: nombreDomiciliarioAsignado, 
             direccion: direccion,
             imagenUrl: imagenProducto || "",
             nombreCliente: nombreComprador,
-            cliente: celularComprador,
+            cliente: cliente,
             nombreDestinatario: document.getElementById("nombreDestinatario").value.trim() || nombreComprador,
-            destinatario: document.getElementById("celularDestinatario").value.trim() || celularComprador,
+            destinatario: document.getElementById("celularDestinatario").value.trim() || cliente,
             referencia: productoSeleccionado || "Pedido Web",
             adicional: document.getElementById("productoAdicional").value.trim(),
             banco: document.getElementById("medioPago").value,
@@ -1139,7 +1151,6 @@ if (perfil.fechaExpiracion) {
             notificado: false,
             timestampEntrega: null,
             color: "#BBDEFB",
-            nombreDomiciliario: "", // Puedes llenar esto si tienes el nombre a mano
             fechaRegistro: fechaRegistro,
             horaRegistro: horaRegistro
         };
@@ -1154,8 +1165,7 @@ if (perfil.fechaExpiracion) {
                 btn.disabled = false;
                 btn.innerText = "Enviar pedido";
             });
-
-    }, { onlyOnce: true });
+    });
 }
         // 4. UTILIDADES Y REDES
         function obtenerLinkDirecto(entrada) {
