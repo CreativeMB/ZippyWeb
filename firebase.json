@@ -19,10 +19,10 @@
         "source": "/t/**",
         "destination": "/tienda.html"
       },
-      {
-        "source": "/",
-        "destination": "/t/floristera-los-lirios"
-      },
+     {
+  "source": "/**",
+  "destination": "/t/floristera-los-lirios"
+},
       {
         "source": "/**",
         "destination": "/index.html"
