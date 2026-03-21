@@ -871,41 +871,45 @@
     let slug = "";
     let bloqueoActivo = false;
 
-    // --- 1. ARRANQUE Y DETECCIÓN ---
-    detectarEmpresaPorDominio();
+// IMPORTANTE: Esperamos a que la función termine antes de seguir
+iniciarApp();
+
+async function iniciarApp() {
+    const datosEmpresa = await detectarEmpresaPorDominio();
+    if (datosEmpresa) {
+        console.log("🚀 Empresa lista, cargando productos...");
+        // Aquí deberías llamar a tu función de cargarProductos(empresaId);
+    }
+}
 
 async function detectarEmpresaPorDominio() {
-   const host = window.location.hostname.toLowerCase();
+    const host = window.location.hostname.toLowerCase();
     const hostLimpio = host.replace("www.", "");
     
-    // Obtenemos el Slug de la URL (lo que va después del /)
+    // Extraer slug: primero intenta de la URL (?tienda=...), luego de la ruta (/nombre-tienda)
     const params = new URLSearchParams(window.location.search);
     const slugUrl = params.get("tienda") || window.location.pathname.split('/')[1];
 
-    console.log("🏪 Iniciando detección. Host:", hostLimpio, "| Slug:", slugUrl);
+    console.log("🏪 Detectando. Host:", hostLimpio, "| Slug:", slugUrl);
 
     try {
-        const db = getDatabase();
-        let empresaEncontrada = null;
-        let idUsuario = null;
+        let idUsuarioFinal = null;
 
-        // --- CASO A: DOMINIO PERSONALIZADO ---
+        // --- CASO A: DOMINIO PERSONALIZADO (Prioridad 1) ---
         if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
             const dominioKey = hostLimpio.replace(/\./g, "_");
             const mapeoRef = ref(db, `dominios/${dominioKey}`);
             const snapMapeo = await get(mapeoRef);
 
             if (snapMapeo.exists()) {
-                idUsuario = snapMapeo.val();
-                console.log("🔗 Dominio personalizado detectado para UID:", idUsuario);
+                idUsuarioFinal = snapMapeo.val();
+                console.log("🔗 Dominio personalizado -> UID:", idUsuarioFinal);
             }
         }
 
-        // --- CASO B: BUSQUEDA POR SLUG (Si no hubo dominio o es el dominio principal) ---
-        if (!idUsuario && slugUrl) {
-            console.log("🔍 Buscando por Slug:", slugUrl);
-            
-            // Aquí sí usamos query porque el Slug está dentro de cada usuario
+        // --- CASO B: BUSQUEDA POR SLUG (Si no hubo dominio o falla el anterior) ---
+        if (!idUsuarioFinal && slugUrl && slugUrl !== "") {
+            console.log("🔍 Buscando por Slug en la raíz...");
             const raizRef = ref(db, '/'); 
             const q = query(
                 raizRef, 
@@ -917,45 +921,37 @@ async function detectarEmpresaPorDominio() {
 
             if (snapshotSlug.exists()) {
                 snapshotSlug.forEach((child) => {
-                    idUsuario = child.key;
+                    idUsuarioFinal = child.key;
                 });
+                console.log("🔗 Slug detectado -> UID:", idUsuarioFinal);
             }
         }
 
-        // --- CARGA FINAL DE DATOS ---
-        if (idUsuario) {
-            const perfilRef = ref(db, `${idUsuario}/Domiciliarios/Entregas/basededatos/perfilempresa`);
+        // --- CARGA FINAL Y ASIGNACIÓN A GLOBALES ---
+        if (idUsuarioFinal) {
+            const perfilRef = ref(db, `${idUsuarioFinal}/Domiciliarios/Entregas/basededatos/perfilempresa`);
             const snapPerfil = await get(perfilRef);
             
             if (snapPerfil.exists()) {
-                empresaEncontrada = snapPerfil.val();
-                console.log("✅ Empresa cargada:", empresaEncontrada.nombreEmpresa);
-                return empresaEncontrada;
+                const datos = snapPerfil.val();
+                
+                // CRITICAL: Asignar a tus variables globales para que los productos carguen
+                empresaId = idUsuarioFinal; 
+                telefonoEmpresa = datos.WhatsApp || datos.telefono;
+                slug = datos.slug;
+
+                console.log("✅ Variables globales actualizadas para:", datos.nombreEmpresa);
+                return datos;
             }
         }
 
-        // Si llegó aquí y no hay empresa, mostramos el error
-        irAMantenimiento("No se encontró ninguna tienda vinculada a este dominio o slug.");
+        irAMantenimiento("No se encontró ninguna tienda vinculada.");
         return null;
 
     } catch (error) {
         console.error("🚨 Error en detección:", error);
         irAMantenimiento("Error de conexión.");
     }
-}
-
-// CORRECCIÓN: Función de mantenimiento sin redirección externa
-function irAMantenimiento(motivo) {
-    console.log("Mantenimiento por:", motivo);
-    // En lugar de window.location.href (que te saca del sitio), 
-    // mostramos un mensaje en la misma página para que no pierdas el dominio
-    document.body.innerHTML = `
-        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; text-align:center;">
-            <h1 style="color:#e11d48;">Tienda No Encontrada</h1>
-            <p style="color:#64748b;">El dominio <b>${window.location.hostname}</b> no está vinculado a ninguna tienda activa.</p>
-            <p style="font-size:12px; color:#94a3b8;">Motivo: ${motivo}</p>
-        </div>
-    `;
 }
 
 // Función auxiliar para mantener tu estilo de "Entorno seguro"
