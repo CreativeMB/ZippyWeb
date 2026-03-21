@@ -920,7 +920,7 @@ if (perfil.fechaExpiracion) {
             });
         });
 
-        function iniciarCargaPorSlug(slugDetectado) {
+       function iniciarCargaPorSlug(slugDetectado) {
     slug = slugDetectado;
 }
 
@@ -971,14 +971,15 @@ async function detectarEmpresaPorDominio() {
     const host = window.location.hostname;
     const path = window.location.pathname;
 
-    // ✅ CASO 1: YA VIENE CON /t/slug (usuarios SIN dominio)
+    // CASO 1: /t/slug
     if (path.startsWith("/t/")) {
         const slugDetectado = path.split("/t/")[1];
-        iniciarCargaPorSlug(slugDetectado);
+        slug = slugDetectado; // ✅ IMPORTANTE
+        iniciarCarga(slugDetectado);
         return;
     }
 
-    // ⚠️ CASO 2: ENTRA POR DOMINIO PERSONALIZADO
+    // CASO 2: dominio personalizado
     try {
         const q = query(
             collection(dbFirestore, "perfilempresa"),
@@ -991,16 +992,33 @@ async function detectarEmpresaPorDominio() {
             const empresa = querySnapshot.docs[0].data();
             const slugDetectado = empresa.slug;
 
-            // 🔁 Redirige al sistema normal
             window.location.replace(`/t/${slugDetectado}`);
         } else {
-            // ⚠️ NO TIENE DOMINIO → no hacer nada (evita romper slugs)
-            console.log("Dominio no configurado, usando slug si existe");
+            console.log("Dominio no configurado");
         }
 
     } catch (error) {
         console.error("Error dominio:", error);
     }
+}
+
+function iniciarCarga(slugDetectado) {
+    slug = slugDetectado;
+
+    const empresasRef = ref(db);
+
+    onValue(empresasRef, (snapshot) => {
+        snapshot.forEach((child) => {
+            const data = child.val();
+
+            if (data.perfilempresa?.slug === slug) {
+                empresaId = child.key;
+                const perfil = data.perfilempresa;
+
+                continuarCarga(perfil, data);
+            }
+        });
+    });
 }
         // 2. GESTIÓN DE PRODUCTOS
         function cargarProductosJSON(contenido) {
