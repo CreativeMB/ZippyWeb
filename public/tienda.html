@@ -874,61 +874,57 @@
     // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
- async function detectarEmpresaPorDominio() {
+async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase();
-    const path = window.location.pathname;
-    const hostLimpio = host.replace("www.", "");
+    const hostLimpio = host.replace("www.", "").trim(); // .trim() es VITAL
 
     console.log("🏪 Iniciando detección para:", hostLimpio);
 
     try {
         let slugEncontrado = "";
 
-        // CASO A: Dominio Propio
         if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
             
-            const dominioLimpio = hostLimpio.trim();
-            // ALERT DE PRUEBA: Para ver qué dominio está intentando buscar
-            alert("Intentando buscar este dominio en Firestore: [" + hostLimpio + "]");
-
+            // 1. Referencia a la colección correcta
             const q = query(
                 collection(dbFirestore, "perfilempresa"),
                 where("dominio", "==", hostLimpio)
             );
+
             const querySnapshot = await getDocs(q);
 
             if (!querySnapshot.empty) {
-                slugEncontrado = querySnapshot.docs[0].data().slug;
-                alert("✅ ¡Éxito! Encontrado slug: " + slugEncontrado);
+                // 2. Extraemos el slug del primer documento encontrado
+                const datosEmpresa = querySnapshot.docs[0].data();
+                slugEncontrado = datosEmpresa.slug; 
+                
+                console.log("✅ ¡Éxito! Encontrado slug:", slugEncontrado);
             } else {
-                // ALERT DE ERROR: Si llega aquí, es porque NO existe el dominio en Firestore
-                alert("❌ ERROR: El dominio '" + hostLimpio + "' no existe en la colección 'perfilempresa'. Revisa que en Firestore esté escrito exactamente así.");
-                irAMantenimiento("Dominio no registrado");
+                // 3. Si llega aquí, es porque Firestore no encontró coincidencia exacta
+                console.error("❌ ERROR: No hay coincidencia para el dominio:", hostLimpio);
+                irAMantenimiento("El dominio '" + hostLimpio + "' no está registrado.");
                 return;
             }
         } 
-        // CASO B: Por ruta /t/
-        else if (path.includes("/t/")) {
-            const partes = path.split("/t/");
+        // Caso para desarrollo local o rutas /t/
+        else if (window.location.pathname.includes("/t/")) {
+            const partes = window.location.pathname.split("/t/");
             slugEncontrado = partes[1].split('/')[0];
         }
 
-        // --- VALIDACIÓN FINAL DEL SLUG ---
         if (slugEncontrado) {
             slug = slugEncontrado; 
             if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
             iniciarCargaBase(slug); 
         } else {
-            // Si no hay slug, mandamos al portal de Zippy, no a la floristería externa
             window.location.replace("https://zippy-727d5.web.app/portal.html");
         }
 
     } catch (error) {
-        alert("🔥 Error de conexión: " + error.message);
+        console.error("🔥 Error de Firebase:", error);
         irAMantenimiento("Error de conexión con la base de datos");
     }
 }
-
 // CORRECCIÓN: Función de mantenimiento sin redirección externa
 function irAMantenimiento(motivo) {
     console.log("Mantenimiento por:", motivo);
