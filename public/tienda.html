@@ -874,14 +874,12 @@
     // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
-  async function detectarEmpresaPorDominio() {
-    const host = window.location.hostname;
+ // --- 3. TU FUNCIÓN DE DETECCIÓN (La que me pasaste, con un pequeño ajuste) ---
+async function detectarEmpresaPorDominio() {
+    const host = window.location.hostname.toLowerCase();
     const path = window.location.pathname;
-    // Normalizamos para que incluya o no el www funcione igual
-    const hostLimpio = host.startsWith("www.") ? host.replace("www.", "") : host;
+    const hostLimpio = host.replace("www.", "");
 
-    // --- NUEVA PRIORIDAD: VALIDAR SI ES UN DOMINIO PERSONALIZADO PRIMERO ---
-    // Si NO estamos en el dominio base de Zippy, obligamos a que el slug sea el del dueño del dominio
     if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
         try {
             const q = query(
@@ -893,47 +891,43 @@
             if (!querySnapshot.empty) {
                 const empresaDoc = querySnapshot.docs[0].data();
                 const slugOficial = empresaDoc.slug;
-
-                // Si el usuario intenta entrar a /t/otra-tienda en ESTE dominio, lo corregimos
+                
+                // Si está en /t/slug-equivocado, lo llevamos al correcto
                 if (path.includes("/t/")) {
                     const slugEnUrl = path.split("/t/")[1].split('/')[0];
                     if (slugEnUrl !== slugOficial) {
-                        console.warn("🚫 Ruta no coincide con el dominio. Corrigiendo...");
                         window.location.replace(`https://${host}/t/${slugOficial}`);
                         return;
                     }
                 }
                 
-                // Si está en la raíz (floristerialoslirios.com.co) sin /t/, lo cargamos directo
                 slug = slugOficial;
-                console.log("✅ Dominio Premium:", slug);
-                iniciarCargaBase(slug);
+                document.getElementById("loaderTienda").style.display = "none";
+                iniciarCargaBase(slug); 
                 return;
-
             } else {
-                // Dominio no registrado (caso de alguien apuntando un DNS sin permiso)
                 mostrarPantallaCargaYSalir();
                 return;
             }
         } catch (error) {
-            console.error("❌ Error en validación:", error);
-            window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
+            console.error("❌ Error:", error);
+            window.location.replace("/mantenimiento.html");
             return;
         }
     }
 
-    // --- PRIORIDAD 2: ACCESO POR SLUG (Solo para el dominio raíz de Zippy) ---
+    // Prioridad 2: Ruta /t/ (Para los que NO tienen dominio propio)
     if (path.includes("/t/")) {
         const partes = path.split("/t/");
         if (partes[1]) {
             slug = partes[1].split('/')[0];
-            console.log("📂 Cargando por Ruta en Zippy App:", slug);
+            document.getElementById("loaderTienda").style.display = "none";
             iniciarCargaBase(slug);
             return;
         }
     }
 
-    // --- CASO FINAL: Si llegamos aquí y no hay nada, mantenimiento ---
+    // Si nada coincide, fuera.
     mostrarPantallaCargaYSalir();
 }
 
