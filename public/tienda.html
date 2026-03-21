@@ -881,62 +881,16 @@ async function detectarEmpresaPorDominio() {
     // Normalizamos el host para comparar con y sin www
     const hostSinWww = host.replace("www.", "");
     const hostConWww = "www." + hostSinWww;
-    
-    // Identificamos si están en el entorno general de la aplicación Zippy o localhost
-    const esDominioZippy = (hostSinWww === "zippy-727d5.web.app" || hostSinWww === "localhost");
 
     console.log("🔍 Analizando host:", host);
 
-    try {
-        // =========================================================================
-        // CASO 1: ENTRAN DESDE LA APP ZIPPY USANDO UN SLUG (Ej: /t/floristera-los-lirios)
-        // =========================================================================
-        if (esDominioZippy && path.includes("/t/")) {
-            const partes = path.split("/t/");
-            const slugExtraido = partes[1].split('/')[0];
-
-            if (slugExtraido) {
-                console.log("📡 Consultando base de datos para el slug:", slugExtraido);
-                
-                const q = query(
-                    collection(dbFirestore, "perfilempresa"),
-                    where("slug", "==", slugExtraido)
-                );
-                const querySnapshot = await getDocs(q);
-
-                if (!querySnapshot.empty) {
-                    const empresaDoc = querySnapshot.docs[0].data();
-                    
-                    // 🚨 REGLA CLAVE: Si la tienda tiene un dominio propio, NO permitimos 
-                    // que se queden en la URL de Zippy. Los expulsamos a su propio dominio.
-                    if (empresaDoc.dominio && empresaDoc.dominio.trim() !== "") {
-                        console.log("🚀 La tienda tiene dominio propio. Redirigiendo a:", empresaDoc.dominio);
-                        // window.location.replace evita que el usuario pueda darle al botón "Atrás" y volver al slug
-                        window.location.replace(`https://${empresaDoc.dominio}`);
-                        return;
-                    }
-
-                    // Si no tiene dominio propio, asignamos el slug y cargamos la tienda aquí mismo.
-                    slug = empresaDoc.slug;
-                    console.log("✅ Tienda Estándar identificada:", slug);
-                    iniciarCargaBase(slug);
-                    return;
-
-                } else {
-                    console.error("❌ La ruta no pertenece a ninguna tienda registrada.");
-                    mostrarPantallaCargaYSalir();
-                    return;
-                }
-            }
-        }
-
-        // =========================================================================
-        // CASO 2: ENTRAN DESDE UN DOMINIO PERSONALIZADO (Ej: floristerialoslirios.com.co)
-        // =========================================================================
-        else if (!esDominioZippy) {
-            console.log("📡 Consultando base de datos para dominio externo:", hostSinWww);
+    // --- CASO 1: DOMINIO PERSONALIZADO (Ej: floristerialoslirios.com.co) ---
+    // Si NO es el dominio base de la App ni localhost, es un cliente externo
+    if (hostSinWww !== "zippy-727d5.web.app" && hostSinWww !== "localhost") {
+        try {
+            console.log("📡 Consultando base de datos para dominio:", hostSinWww);
             
-            // Buscamos a qué tienda le pertenece este dominio
+            // Buscamos en la colección 'perfilempresa' el campo 'dominio'
             const q = query(
                 collection(dbFirestore, "perfilempresa"),
                 where("dominio", "in", [hostSinWww, hostConWww])
@@ -946,40 +900,53 @@ async function detectarEmpresaPorDominio() {
 
             if (!querySnapshot.empty) {
                 const empresaDoc = querySnapshot.docs[0].data();
-                slug = empresaDoc.slug; // Asignamos el slug internamente para cargar los datos
+                slug = empresaDoc.slug; // Asignamos el slug a la variable global
                 
                 console.log("✅ Tienda Premium identificada:", slug);
                 
-                // Si alguien pone "/t/slug" dentro de su dominio premium por error, 
-                // limpiamos la URL y lo enviamos a la raíz limpia de su dominio.
+                // Si el usuario escribió /t/algomas por error en este dominio, lo limpiamos
                 if (path.includes("/t/")) {
-                    console.warn("🔄 Limpiando URL. Eliminando subrutas innecesarias...");
-                    window.location.replace(`https://${host}`);
-                    return;
+                    const slugEnUrl = path.split("/t/")[1].split('/')[0];
+                    if (slugEnUrl !== slug) {
+                        console.warn("🔄 Corrigiendo ruta para dominio premium...");
+                        window.location.replace(`https://${host}/t/${slug}`);
+                        return;
+                    }
                 }
 
-                // Cargamos la base de datos de los productos usando el slug encontrado
+                // CARGA DE DATOS DE LA TIENDA
                 iniciarCargaBase(slug);
-                return;
+                return; // Detenemos aquí, todo salió bien.
 
             } else {
+                // El dominio apunta a Zippy pero no está registrado en la base de datos
                 console.error("❌ El dominio no está asociado a ninguna tienda activa.");
                 mostrarPantallaCargaYSalir();
                 return;
             }
+        } catch (error) {
+            console.error("❌ Error crítico en la consulta de Firestore:", error);
+            mostrarPantallaCargaYSalir();
+            return;
         }
-
-        // =========================================================================
-        // CASO FINAL: NO ES UN SLUG VÁLIDO NI UN DOMINIO REGISTRADO
-        // =========================================================================
-        console.warn("⚠️ No se detectó configuración de tienda.");
-        // mostrarPantallaCargaYSalir(); 
-        
-    } catch (error) {
-        console.error("❌ Error crítico en la consulta de Firestore:", error);
-        mostrarPantallaCargaYSalir();
-        return;
     }
+
+    // --- CASO 2: ACCESO POR SUB-RUTA (zippy-727d5.web.app/t/nombre-tienda) ---
+    // Esto es para cuando acceden desde el dominio base de Zippy
+    if (path.includes("/t/")) {
+        const partes = path.split("/t/");
+        if (partes[1]) {
+            slug = partes[1].split('/')[0];
+            console.log("📂 Cargando por sub-ruta en Zippy:", slug);
+            iniciarCargaBase(slug);
+            return;
+        }
+    }
+
+    // --- CASO FINAL: Si llega aquí es porque no hay tienda ni dominio válido ---
+    console.warn("⚠️ No se detectó ninguna configuración de tienda.");
+    // Opcional: Si quieres que en el dominio base de Zippy cargue el login:
+    // window.location.href = "/login"; 
 }
 
 /**
