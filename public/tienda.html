@@ -875,63 +875,79 @@
     detectarEmpresaPorDominio();
 
   async function detectarEmpresaPorDominio() {
-    const host = window.location.hostname; // Ejemplo: floristerialoslirios.com o localhost
-    const path = window.location.pathname; // Ejemplo: /t/tienda-pepe
+    const host = window.location.hostname;
+    const path = window.location.pathname;
+    // Normalizamos para que incluya o no el www funcione igual
+    const hostLimpio = host.startsWith("www.") ? host.replace("www.", "") : host;
 
-    // --- PRIORIDAD 1: ACCESO POR SLUG (/t/tienda) ---
-    // Si la URL contiene "/t/", ignoramos el dominio y cargamos por el nombre en la ruta.
+    // --- NUEVA PRIORIDAD: VALIDAR SI ES UN DOMINIO PERSONALIZADO PRIMERO ---
+    // Si NO estamos en el dominio base de Zippy, obligamos a que el slug sea el del dueño del dominio
+    if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
+        try {
+            const q = query(
+                collection(dbFirestore, "perfilempresa"),
+                where("dominio", "==", hostLimpio)
+            );
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const empresaDoc = querySnapshot.docs[0].data();
+                const slugOficial = empresaDoc.slug;
+
+                // Si el usuario intenta entrar a /t/otra-tienda en ESTE dominio, lo corregimos
+                if (path.includes("/t/")) {
+                    const slugEnUrl = path.split("/t/")[1].split('/')[0];
+                    if (slugEnUrl !== slugOficial) {
+                        console.warn("🚫 Ruta no coincide con el dominio. Corrigiendo...");
+                        window.location.replace(`https://${host}/t/${slugOficial}`);
+                        return;
+                    }
+                }
+                
+                // Si está en la raíz (floristerialoslirios.com.co) sin /t/, lo cargamos directo
+                slug = slugOficial;
+                console.log("✅ Dominio Premium:", slug);
+                iniciarCargaBase(slug);
+                return;
+
+            } else {
+                // Dominio no registrado (caso de alguien apuntando un DNS sin permiso)
+                mostrarPantallaCargaYSalir();
+                return;
+            }
+        } catch (error) {
+            console.error("❌ Error en validación:", error);
+            window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
+            return;
+        }
+    }
+
+    // --- PRIORIDAD 2: ACCESO POR SLUG (Solo para el dominio raíz de Zippy) ---
     if (path.includes("/t/")) {
         const partes = path.split("/t/");
         if (partes[1]) {
-            const slugDetectado = partes[1].split('/')[0];
-            slug = slugDetectado;
-            console.log("📂 Cargando por Ruta (Slug):", slug);
+            slug = partes[1].split('/')[0];
+            console.log("📂 Cargando por Ruta en Zippy App:", slug);
             iniciarCargaBase(slug);
-            return; // Detenemos aquí, no hace falta buscar dominio.
+            return;
         }
     }
 
-    // --- PRIORIDAD 2: DOMINIO PERSONALIZADO ---
-    // Si llegamos aquí, es porque no hay "/t/". Buscamos si el host actual es de una tienda.
-    try {
-        console.log("🌐 Buscando si el host es un dominio personalizado:", host);
-        
-        const q = query(
-            collection(dbFirestore, "perfilempresa"),
-            where("dominio", "==", host)
-        );
-
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-            // ¡Éxito! El dominio está registrado a una tienda.
-            const empresaDoc = querySnapshot.docs[0].data();
-            slug = empresaDoc.slug; 
-            console.log("✅ Dominio Premium detectado. Cargando slug:", slug);
-            iniciarCargaBase(slug);
-       } else {
-            // --- CASO 3: NADA ENCONTRADO (DOMINIO NO REGISTRADO Y SIN /t/) ---
-            console.warn("🏠 Acceso no autorizado o dominio no registrado.");
-
-            // Limpiamos el HTML para que no se vea nada de la estructura de la tienda
-            document.documentElement.innerHTML = `
-                <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh;">
-                    <div style="text-align:center; font-family:sans-serif;">
-                        <p style="color:#64748b; font-size:18px;">Cargando entorno seguro...</p>
-                    </div>
-                </body>`;
-
-            // Salida inmediata a la página oficial de mantenimiento de Zippy
-            window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
-        }
-    } catch (error) {
-        console.error("❌ Error crítico en validación de dominios:", error);
-        
-        // En caso de error de conexión a Firestore (como falta de internet o bloqueo de API), 
-        // protegemos el sistema mandándolo a mantenimiento.
-        window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
-    }
+    // --- CASO FINAL: Si llegamos aquí y no hay nada, mantenimiento ---
+    mostrarPantallaCargaYSalir();
 }
+
+// Función auxiliar para mantener tu estilo de "Entorno seguro"
+function mostrarPantallaCargaYSalir() {
+    document.documentElement.innerHTML = `
+        <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh;">
+            <div style="text-align:center; font-family:sans-serif;">
+                <p style="color:#64748b; font-size:18px;">Cargando entorno seguro...</p>
+            </div>
+        </body>`;
+    window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
+}
+
 function iniciarCargaBase(slugBusqueda) {
     if (!slugBusqueda) return;
     
