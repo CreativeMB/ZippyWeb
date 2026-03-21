@@ -874,33 +874,50 @@
     // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
-    async function detectarEmpresaPorDominio() {
-        const host = window.location.hostname;
-        const path = window.location.pathname;
+   async function detectarEmpresaPorDominio() {
+    const host = window.location.hostname;
+    const path = window.location.pathname;
 
-        // Caso A: Por carpeta /t/
-        if (path.startsWith("/t/")) {
-            const slugDetectado = path.split("/t/")[1].split('/')[0];
-            slug = slugDetectado; 
-            iniciarCargaBase(slugDetectado);
-            return;
-        }
+    console.log("🔍 Detectando acceso para:", host, path);
 
-        // Caso B: Por Dominio Personalizado
-        try {
-            const q = query(collection(dbFirestore, "perfilempresa"), where("dominio", "==", host));
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                const empresa = querySnapshot.docs[0].data();
-                slug = empresa.slug;
+    // CASO A: Acceso por subcarpeta /t/ (Prioridad manual)
+    if (path.startsWith("/t/")) {
+        const slugDetectado = path.split("/t/")[1].split('/')[0];
+        slug = slugDetectado; 
+        console.log("📂 Acceso por Slug:", slug);
+        iniciarCargaBase(slug);
+        return;
+    }
+
+    // CASO B: Dominio personalizado (Ej: floristerialoslirios.com.co)
+    try {
+        // Buscamos en la colección 'perfilempresa' donde el campo 'dominio' coincida con el host actual
+        const q = query(
+            collection(dbFirestore, "perfilempresa"),
+            where("dominio", "==", host)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const empresaDoc = querySnapshot.docs[0].data();
+            slug = empresaDoc.slug; // ✅ Extraemos el slug vinculado al dominio
+            console.log("🌐 Dominio Personalizado detectado. Slug vinculado:", slug);
+            
+            if (slug) {
                 iniciarCargaBase(slug);
             } else {
-                console.warn("Dominio no configurado o acceso directo no válido.");
+                console.error("❌ El dominio está registrado pero no tiene un slug asociado.");
             }
-        } catch (error) {
-            console.error("Error validando dominio:", error);
+        } else {
+            // Si no es un dominio personalizado y no tiene /t/, podría ser el home de Zippy
+            console.warn("⚠️ Dominio no reconocido en Firestore.");
+            // Aquí podrías redirigir a tu landing page principal si gustas
         }
+    } catch (error) {
+        console.error("❌ Error crítico validando dominio en Firestore:", error);
     }
+}
 
     function iniciarCargaBase(slugBusqueda) {
         const empresasRef = ref(db);
