@@ -876,55 +876,50 @@
 
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase();
-    const path = window.location.pathname;
     const hostLimpio = host.replace("www.", "");
 
     console.log("🏪 Iniciando detección para:", hostLimpio);
 
     try {
-        let slugEncontrado = "";
+        let empresaEncontrada = null;
 
         // CASO A: Dominio Propio
         if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
             
-            // ALERT DE PRUEBA: Para ver qué dominio está intentando buscar
-            alert("Intentando buscar este dominio en Firestore: [" + hostLimpio + "]");
+            // ALERT DE PRUEBA
+            alert("Intentando buscar este dominio en Realtime DB: [" + hostLimpio + "]");
 
-            const q = query(
-                collection(dbFirestore, "perfilempresa"),
-                where("dominio", "==", hostLimpio)
-            );
-            const querySnapshot = await getDocs(q);
+            const dbRealtime = getDatabase();
+            
+            // ⚠️ IMPORTANTE: Esta ruta debe apuntar al NODO PADRE que contiene la lista de todas las empresas.
+            // Si cada empresa está bajo el ID del usuario (ej. tc62AVkjwv...), tendrás que iterar sobre ellos
+            // o reestructurar para tener un nodo "empresas" general. Asumiendo que apuntas al nodo correcto:
+            const empresasRef = ref(dbRealtime, 'ruta/al/nodo/donde/estan/las/empresas'); 
 
-            if (!querySnapshot.empty) {
-                slugEncontrado = querySnapshot.docs[0].data().slug;
-                alert("✅ ¡Éxito! Encontrado slug: " + slugEncontrado);
+            // Creamos la consulta buscando el hijo 'dominio' que sea igual a 'hostLimpio'
+            const q = query(empresasRef, orderByChild('dominio'), equalTo(hostLimpio));
+            const snapshot = await get(q);
+
+            if (snapshot.exists()) {
+                // Realtime DB devuelve un objeto con los resultados, iteramos para extraer el primero
+                snapshot.forEach((childSnapshot) => {
+                    empresaEncontrada = childSnapshot.val();
+                    // Si necesitas también la llave (ID) de la empresa:
+                    // const empresaId = childSnapshot.key; 
+                });
+                
+                console.log("✅ Empresa detectada:", empresaEncontrada.nombreEmpresa);
+                console.log("Slug de la empresa:", empresaEncontrada.slug);
+                
             } else {
-                // ALERT DE ERROR: Si llega aquí, es porque NO existe el dominio en Firestore
-                alert("❌ ERROR: El dominio '" + hostLimpio + "' no existe en la colección 'perfilempresa'. Revisa que en Firestore esté escrito exactamente así.");
-                irAMantenimiento("Dominio no registrado");
-                return;
+                console.log("❌ No se encontró ninguna empresa asociada a este dominio en la base de datos.");
             }
-        } 
-        // CASO B: Por ruta /t/
-        else if (path.includes("/t/")) {
-            const partes = path.split("/t/");
-            slugEncontrado = partes[1].split('/')[0];
         }
 
-        // --- VALIDACIÓN FINAL DEL SLUG ---
-        if (slugEncontrado) {
-            slug = slugEncontrado; 
-            if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
-            iniciarCargaBase(slug); 
-        } else {
-            // Si no hay slug, mandamos al portal de Zippy, no a la floristería externa
-            window.location.replace("https://zippy-727d5.web.app/portal.html");
-        }
+        return empresaEncontrada;
 
     } catch (error) {
-        alert("🔥 Error de conexión: " + error.message);
-        irAMantenimiento("Error de conexión con la base de datos");
+        console.error("🚨 Error al consultar Realtime Database:", error);
     }
 }
 
