@@ -887,6 +887,7 @@
         // CASO A: Dominio Propio
         if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
             
+            const dominioLimpio = hostLimpio.trim();
             // ALERT DE PRUEBA: Para ver qué dominio está intentando buscar
             alert("Intentando buscar este dominio en Firestore: [" + hostLimpio + "]");
 
