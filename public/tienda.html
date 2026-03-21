@@ -874,24 +874,28 @@
     // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
-   async function detectarEmpresaPorDominio() {
-    const host = window.location.hostname;
-    const path = window.location.pathname;
+  async function detectarEmpresaPorDominio() {
+    const host = window.location.hostname; // Ejemplo: floristerialoslirios.com o localhost
+    const path = window.location.pathname; // Ejemplo: /t/tienda-pepe
 
-    console.log("🔍 Detectando acceso para:", host, path);
-
-    // CASO A: Acceso por subcarpeta /t/ (Prioridad manual)
-    if (path.startsWith("/t/")) {
-        const slugDetectado = path.split("/t/")[1].split('/')[0];
-        slug = slugDetectado; 
-        console.log("📂 Acceso por Slug:", slug);
-        iniciarCargaBase(slug);
-        return;
+    // --- PRIORIDAD 1: ACCESO POR SLUG (/t/tienda) ---
+    // Si la URL contiene "/t/", ignoramos el dominio y cargamos por el nombre en la ruta.
+    if (path.includes("/t/")) {
+        const partes = path.split("/t/");
+        if (partes[1]) {
+            const slugDetectado = partes[1].split('/')[0];
+            slug = slugDetectado;
+            console.log("📂 Cargando por Ruta (Slug):", slug);
+            iniciarCargaBase(slug);
+            return; // Detenemos aquí, no hace falta buscar dominio.
+        }
     }
 
-    // CASO B: Dominio personalizado (Ej: floristerialoslirios.com.co)
+    // --- PRIORIDAD 2: DOMINIO PERSONALIZADO ---
+    // Si llegamos aquí, es porque no hay "/t/". Buscamos si el host actual es de una tienda.
     try {
-        // Buscamos en la colección 'perfilempresa' donde el campo 'dominio' coincida con el host actual
+        console.log("🌐 Buscando si el host es un dominio personalizado:", host);
+        
         const q = query(
             collection(dbFirestore, "perfilempresa"),
             where("dominio", "==", host)
@@ -900,40 +904,55 @@
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
+            // ¡Éxito! El dominio está registrado a una tienda.
             const empresaDoc = querySnapshot.docs[0].data();
-            slug = empresaDoc.slug; // ✅ Extraemos el slug vinculado al dominio
-            console.log("🌐 Dominio Personalizado detectado. Slug vinculado:", slug);
-            
-            if (slug) {
-                iniciarCargaBase(slug);
-            } else {
-                console.error("❌ El dominio está registrado pero no tiene un slug asociado.");
-            }
-        } else {
-            // Si no es un dominio personalizado y no tiene /t/, podría ser el home de Zippy
-            console.warn("⚠️ Dominio no reconocido en Firestore.");
-            // Aquí podrías redirigir a tu landing page principal si gustas
+            slug = empresaDoc.slug; 
+            console.log("✅ Dominio Premium detectado. Cargando slug:", slug);
+            iniciarCargaBase(slug);
+       } else {
+            // --- CASO 3: NADA ENCONTRADO (DOMINIO NO REGISTRADO Y SIN /t/) ---
+            console.warn("🏠 Acceso no autorizado o dominio no registrado.");
+
+            // Limpiamos el HTML para que no se vea nada de la estructura de la tienda
+            document.documentElement.innerHTML = `
+                <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh;">
+                    <div style="text-align:center; font-family:sans-serif;">
+                        <p style="color:#64748b; font-size:18px;">Cargando entorno seguro...</p>
+                    </div>
+                </body>`;
+
+            // Salida inmediata a la página oficial de mantenimiento de Zippy
+            window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
         }
     } catch (error) {
-        console.error("❌ Error crítico validando dominio en Firestore:", error);
+        console.error("❌ Error crítico en validación de dominios:", error);
+        
+        // En caso de error de conexión a Firestore (como falta de internet o bloqueo de API), 
+        // protegemos el sistema mandándolo a mantenimiento.
+        window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
     }
 }
-
-    function iniciarCargaBase(slugBusqueda) {
-        const empresasRef = ref(db);
-        onValue(empresasRef, (snapshot) => {
-            let empresaEncontrada = false;
-            snapshot.forEach((child) => {
-                const data = child.val();
-                if (data.perfilempresa?.slug === slugBusqueda) {
-                    empresaId = child.key;
-                    empresaEncontrada = true;
-                    validarYContinuar(data.perfilempresa, data);
-                }
-            });
-            if (!empresaEncontrada) console.error("No se encontró la empresa con slug:", slugBusqueda);
-        }, { onlyOnce: true });
-    }
+function iniciarCargaBase(slugBusqueda) {
+    if (!slugBusqueda) return;
+    
+    const empresasRef = ref(db);
+    // Usamos get() primero para una carga rápida y luego onValue si es necesario
+    get(empresasRef).then((snapshot) => {
+        let empresaEncontrada = false;
+        snapshot.forEach((child) => {
+            const data = child.val();
+            if (data.perfilempresa?.slug === slugBusqueda) {
+                empresaId = child.key;
+                empresaEncontrada = true;
+                validarYContinuar(data.perfilempresa, data);
+            }
+        });
+        
+        if (!empresaEncontrada) {
+            console.error("🚫 Slug no encontrado en Realtime Database:", slugBusqueda);
+        }
+    }).catch(err => console.error("Error en conexión Realtime:", err));
+}
 
     // --- 2. VALIDACIÓN DE EXPIRACIÓN ---
     function validarYContinuar(perfil, data) {
