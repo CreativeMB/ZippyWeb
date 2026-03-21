@@ -874,72 +874,59 @@
     // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
-async function detectarEmpresaPorDominio() {
-    const hostLimpio = window.location.hostname.toLowerCase().replace("www.", "");
-    
-    // 1. Buscamos la tienda por el dominio
+ async function detectarEmpresaPorDominio() {
+    const host = window.location.hostname.toLowerCase();
+    const path = window.location.pathname;
+    const hostLimpio = host.replace("www.", "");
+
+    console.log("🏪 Iniciando detección para:", hostLimpio);
+
     try {
-        const q = query(collection(dbFirestore, "perfilempresa"), where("dominio", "==", hostLimpio));
-        const querySnapshot = await getDocs(q);
+        let slugEncontrado = "";
 
-        if (!querySnapshot.empty) {
-            const perfil = querySnapshot.docs[0].data();
+        // CASO A: Dominio Propio (ej: floristerialoslirios.com.co)
+        if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
+            const q = query(
+                collection(dbFirestore, "perfilempresa"),
+                where("dominio", "==", hostLimpio)
+            );
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                slugEncontrado = querySnapshot.docs[0].data().slug;
+            } else {
+                console.warn("❌ Dominio no vinculado a ninguna tienda.");
+                irAMantenimiento("Dominio no registrado");
+                return;
+            }
+        } 
+        // CASO B: Por ruta /t/
+        else if (path.includes("/t/")) {
+            const partes = path.split("/t/");
+            slugEncontrado = partes[1].split('/')[0];
+        }
+
+        // --- VALIDACIÓN FINAL DEL SLUG ---
+        if (slugEncontrado) {
+            slug = slugEncontrado; // Asignamos a la variable global
+            console.log("✅ Slug identificado:", slug);
             
-            // 🚩 AQUÍ LLAMAMOS A TU FUNCIÓN DE VALIDACIÓN
-            // Le pasamos el perfil que acabamos de encontrar
-            validarYContinuar(perfil); 
-
+            // Antes de cargar, podrías verificar si el slug tiene datos reales
+            // Pero por ahora, procedemos a la carga base
+            if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
+            
+            iniciarCargaBase(slug); 
         } else {
-            // Si el dominio no existe, al portal
+            // Si llegamos aquí y no hay slug, es un acceso directo al dominio raíz sin nada
             window.location.replace("https://zippy-727d5.web.app/portal.html");
         }
+
     } catch (error) {
-        console.error("Error consultando dominio:", error);
+        console.error("❌ Error crítico en detección:", error);
+        irAMantenimiento("Error de conexión con la base de datos");
     }
 }
 
-// --- TU FUNCIÓN DE VALIDACIÓN (Ajustada para recibir el perfil del dominio) ---
-function validarYContinuar(perfil) {
-    // Si no tiene fecha, carga normal
-    if (!perfil.fechaExpiracion) {
-        continuarCargaDesdeDominio(perfil);
-        return;
-    }
-
-    // Tu lógica de split para la fecha "DD/MM/YYYY HH:mm:ss"
-    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
-    const [dia, mes, anio] = fechaPart.split("/");
-    const [hora, min, seg] = horaPart.split(":");
-    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
-
-    const offsetRef = ref(db, ".info/serverTimeOffset");
-    onValue(offsetRef, (offsetSnapshot) => {
-        const offset = offsetSnapshot.val() || 0;
-        const horaRealServidor = Date.now() + offset;
-
-        if (horaRealServidor > tiempoExpiracion) {
-            // 🛑 BLOQUEO POR EXPIRACIÓN
-            document.documentElement.innerHTML = `
-                <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh;">
-                    <div style="text-align:center; font-family:sans-serif;">
-                        <h1 style="color:#1e293b;">Acceso Suspendido</h1>
-                        <p style="color:#64748b; font-size:18px;">Esta tienda se encuentra en mantenimiento técnico.</p>
-                    </div>
-                </body>`;
-            setTimeout(() => window.location.replace("/mantenimiento.html"), 2000);
-        } else {
-            // ✅ TODO BIEN, CONTINUAR
-            continuarCargaDesdeDominio(perfil);
-        }
-    }, { onlyOnce: true });
-}
-
-// Función final para arrancar la tienda tras las validaciones
-function continuarCargaDesdeDominio(perfil) {
-    slug = perfil.slug; // Guardamos el slug globalmente
-    document.getElementById("loaderTienda").style.display = "none";
-    iniciarCargaBase(slug); // Tu función que trae los productos de RTDB
-}
 // Función auxiliar para centralizar la salida a mantenimiento
 function irAMantenimiento(motivo) {
     console.log("Redirigiendo a mantenimiento por:", motivo);
@@ -979,48 +966,39 @@ function iniciarCargaBase(slugBusqueda) {
     }).catch(err => console.error("Error en conexión Realtime:", err));
 }
 
-    // --- TU FUNCIÓN DE VALIDACIÓN (Ajustada para recibir el perfil del dominio) ---
-function validarYContinuar(perfil) {
-    // Si no tiene fecha, carga normal
-    if (!perfil.fechaExpiracion) {
-        continuarCargaDesdeDominio(perfil);
-        return;
-    }
-
-    // Tu lógica de split para la fecha "DD/MM/YYYY HH:mm:ss"
-    const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
-    const [dia, mes, anio] = fechaPart.split("/");
-    const [hora, min, seg] = horaPart.split(":");
-    const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
-
-    const offsetRef = ref(db, ".info/serverTimeOffset");
-    onValue(offsetRef, (offsetSnapshot) => {
-        const offset = offsetSnapshot.val() || 0;
-        const horaRealServidor = Date.now() + offset;
-
-        if (horaRealServidor > tiempoExpiracion) {
-            // 🛑 BLOQUEO POR EXPIRACIÓN
-            document.documentElement.innerHTML = `
-                <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh;">
-                    <div style="text-align:center; font-family:sans-serif;">
-                        <h1 style="color:#1e293b;">Acceso Suspendido</h1>
-                        <p style="color:#64748b; font-size:18px;">Esta tienda se encuentra en mantenimiento técnico.</p>
-                    </div>
-                </body>`;
-            setTimeout(() => window.location.replace("/mantenimiento.html"), 2000);
-        } else {
-            // ✅ TODO BIEN, CONTINUAR
-            continuarCargaDesdeDominio(perfil);
+    // --- 2. VALIDACIÓN DE EXPIRACIÓN ---
+    function validarYContinuar(perfil, data) {
+        if (!perfil.fechaExpiracion) {
+            continuarCarga(perfil, data);
+            return;
         }
-    }, { onlyOnce: true });
-}
 
-// Función final para arrancar la tienda tras las validaciones
-function continuarCargaDesdeDominio(perfil) {
-    slug = perfil.slug; // Guardamos el slug globalmente
-    document.getElementById("loaderTienda").style.display = "none";
-    iniciarCargaBase(slug); // Tu función que trae los productos de RTDB
-}
+        const [fechaPart, horaPart] = perfil.fechaExpiracion.split(" ");
+        const [dia, mes, anio] = fechaPart.split("/");
+        const [hora, min, seg] = horaPart.split(":");
+        const tiempoExpiracion = new Date(anio, mes - 1, dia, hora, min, seg).getTime();
+
+        const offsetRef = ref(db, ".info/serverTimeOffset");
+        onValue(offsetRef, (offsetSnapshot) => {
+            const offset = offsetSnapshot.val() || 0;
+            const horaRealServidor = Date.now() + offset;
+
+            if (horaRealServidor > tiempoExpiracion) {
+                bloqueoActivo = true;
+                document.documentElement.innerHTML = `
+                    <body style="margin:0; background:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh;">
+                        <div style="text-align:center; font-family:sans-serif;">
+                            <h1 style="color:#1e293b;">Acceso Suspendido</h1>
+                            <p style="color:#64748b; font-size:18px;">Esta tienda se encuentra en mantenimiento técnico.</p>
+                            <p style="color:#94a3b8; font-size:14px;">Redirigiendo...</p>
+                        </div>
+                    </body>`;
+                setTimeout(() => window.location.replace("/mantenimiento.html"), 2000);
+            } else {
+                continuarCarga(perfil, data);
+            }
+        }, { onlyOnce: true });
+    }
 
     // --- 3. CARGA DE INTERFAZ (UI) ---
     function continuarCarga(perfil, data) {
