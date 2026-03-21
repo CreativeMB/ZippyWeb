@@ -874,18 +874,18 @@
     // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
- // --- 3. TU FUNCIÓN DE DETECCIÓN (La que me pasaste, con un pequeño ajuste) ---
-// --- 3. DETECTOR DE TIENDA (Solo en tienda.html) ---
-async function detectarEmpresaPorDominio() {
+ async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase();
     const path = window.location.pathname;
     const hostLimpio = host.replace("www.", "");
 
-    console.log("🏪 Iniciando detección de tienda para:", hostLimpio);
+    console.log("🏪 Iniciando detección para:", hostLimpio);
 
-    // CASO A: Dominio Propio (ej: floristerialoslirios.com.co)
-    if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
-        try {
+    try {
+        let slugEncontrado = "";
+
+        // CASO A: Dominio Propio (ej: floristerialoslirios.com.co)
+        if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
             const q = query(
                 collection(dbFirestore, "perfilempresa"),
                 where("dominio", "==", hostLimpio)
@@ -893,45 +893,46 @@ async function detectarEmpresaPorDominio() {
             const querySnapshot = await getDocs(q);
 
             if (!querySnapshot.empty) {
-                const empresaDoc = querySnapshot.docs[0].data();
-                slug = empresaDoc.slug; // Asignamos el slug de la DB
-                
-                console.log("✅ Tienda detectada por dominio:", slug);
-                
-                // Finalizamos la carga
-                if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
-                iniciarCargaBase(slug); 
-                return;
+                slugEncontrado = querySnapshot.docs[0].data().slug;
             } else {
-                console.warn("❌ Este dominio no está registrado en Zippy.");
-                mostrarPantallaCargaYSalir();
+                console.warn("❌ Dominio no vinculado a ninguna tienda.");
+                irAMantenimiento("Dominio no registrado");
                 return;
             }
-        } catch (error) {
-            console.error("❌ Error consultando Firestore:", error);
-            window.location.replace("/mantenimiento.html");
-            return;
+        } 
+        // CASO B: Por ruta /t/
+        else if (path.includes("/t/")) {
+            const partes = path.split("/t/");
+            slugEncontrado = partes[1].split('/')[0];
         }
-    }
 
-    // CASO B: Por ruta /t/ (ej: zippy.web.app/t/misuper)
-    if (path.includes("/t/")) {
-        const partes = path.split("/t/");
-        if (partes[1]) {
-            slug = partes[1].split('/')[0];
-            console.log("📂 Cargando por ruta:", slug);
+        // --- VALIDACIÓN FINAL DEL SLUG ---
+        if (slugEncontrado) {
+            slug = slugEncontrado; // Asignamos a la variable global
+            console.log("✅ Slug identificado:", slug);
             
+            // Antes de cargar, podrías verificar si el slug tiene datos reales
+            // Pero por ahora, procedemos a la carga base
             if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
-            iniciarCargaBase(slug);
-            return;
+            
+            iniciarCargaBase(slug); 
+        } else {
+            // Si llegamos aquí y no hay slug, es un acceso directo al dominio raíz sin nada
+            window.location.replace("https://zippy-727d5.web.app/portal.html");
         }
-    }
 
-    // CASO C: Si no hay dominio ni ruta /t/, mandamos al portal principal
-    console.log("🏠 No se detectó tienda, enviando al inicio.");
-    window.location.replace("https://zippy-727d5.web.app");
+    } catch (error) {
+        console.error("❌ Error crítico en detección:", error);
+        irAMantenimiento("Error de conexión con la base de datos");
+    }
 }
 
+// Función auxiliar para centralizar la salida a mantenimiento
+function irAMantenimiento(motivo) {
+    console.log("Redirigiendo a mantenimiento por:", motivo);
+    // Puedes usar una página externa o un modal interno
+    window.location.href = "/mantenimiento.html";
+}
 // Función auxiliar para mantener tu estilo de "Entorno seguro"
 function mostrarPantallaCargaYSalir() {
     document.documentElement.innerHTML = `
