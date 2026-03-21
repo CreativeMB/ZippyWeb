@@ -66,6 +66,55 @@
         const db = getDatabase(app);
 
         let empresaId = "";
+        (async function() {
+    const host = window.location.hostname.toLowerCase().replace("www.", "");
+    const path = window.location.pathname;
+
+    // 1. Definimos si es un dominio personalizado (No es localhost ni el subdominio de firebase)
+    const esDominioPropio = (host !== "zippy-727d5.web.app" && host !== "localhost");
+
+    if (esDominioPropio) {
+        console.log("🎯 Dominio detectado:", host);
+        
+        // Evitamos que cualquier otra lógica de "Admin" o "Login" se ejecute
+        try {
+            // Buscamos directamente el slug vinculado a este dominio
+            const q = query(
+                collection(dbFirestore, "perfilempresa"),
+                where("dominio", "==", host)
+            );
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const datosEmpresa = querySnapshot.docs[0].data();
+                const slugOficial = datosEmpresa.slug;
+
+                // Bloqueamos visualmente el panel de admin si existe
+                if(document.getElementById("contenedorAdmin")) {
+                    document.getElementById("contenedorAdmin").style.display = "none";
+                }
+
+                // Cargamos la tienda usando el slug encontrado
+                console.log("🚀 Cargando productos para:", slugOficial);
+                
+                // Quitamos el loader y arrancamos tu función de productos
+                if(document.getElementById("loaderTienda")) {
+                    document.getElementById("loaderTienda").style.display = "none";
+                }
+                
+                // IMPORTANTE: Llamamos a tu función de carga de productos
+                iniciarCargaBase(slugOficial); 
+
+            } else {
+                // Si el dominio no está en la base de datos, ahí sí mandamos a mantenimiento
+                window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
+            }
+        } catch (e) {
+            console.error("Error cargando dominio:", e);
+        }
+        return; // Detiene la ejecución de cualquier otra función (como el login)
+    }
+})();
 
         // 🛑 FRENO DE MANO INMEDIATO
 (function() {
