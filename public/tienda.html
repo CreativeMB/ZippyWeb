@@ -876,73 +876,58 @@
 
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase();
-    const hostLimpio = host.replace("www.", "").trim();
     const path = window.location.pathname;
+    const hostLimpio = host.replace("www.", "");
 
     console.log("🏪 Iniciando detección para:", hostLimpio);
 
     try {
-        let empresaData = null;
+        let slugEncontrado = "";
 
-        // --- 1. INTENTAR BUSCAR POR DOMINIO ---
-        // Buscamos en 'perfilempresa' el documento que tenga el campo dominio igual al host
-        const qDominio = query(
-            collection(dbFirestore, "perfilempresa"),
-            where("dominio", "==", hostLimpio)
-        );
+        // CASO A: Dominio Propio
+        if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
+            
+            // ALERT DE PRUEBA: Para ver qué dominio está intentando buscar
+            alert("Intentando buscar este dominio en Firestore: [" + hostLimpio + "]");
 
-        const querySnapshot = await getDocs(qDominio);
-
-        if (!querySnapshot.empty) {
-            empresaData = querySnapshot.docs[0].data();
-            console.log("✅ Encontrado por Dominio:", hostLimpio);
-        } 
-        
-        // --- 2. SI NO SE ENCONTRÓ, BUSCAR POR SLUG EN LA URL ---
-        if (!empresaData && path.includes("/t/")) {
-            const slugBuscado = path.split("/t/")[1].split('/')[0].trim();
-            console.log("🔍 Buscando por Slug:", slugBuscado);
-
-            const qSlug = query(
+            const q = query(
                 collection(dbFirestore, "perfilempresa"),
-                where("slug", "==", slugBuscado)
+                where("dominio", "==", hostLimpio)
             );
-            const querySnapshotSlug = await getDocs(qSlug);
+            const querySnapshot = await getDocs(q);
 
-            if (!querySnapshotSlug.empty) {
-                empresaData = querySnapshotSlug.docs[0].data();
-                console.log("✅ Encontrado por Slug!");
+            if (!querySnapshot.empty) {
+                slugEncontrado = querySnapshot.docs[0].data().slug;
+                alert("✅ ¡Éxito! Encontrado slug: " + slugEncontrado);
+            } else {
+                // ALERT DE ERROR: Si llega aquí, es porque NO existe el dominio en Firestore
+                alert("❌ ERROR: El dominio '" + hostLimpio + "' no existe en la colección 'perfilempresa'. Revisa que en Firestore esté escrito exactamente así.");
+                irAMantenimiento("Dominio no registrado");
+                return;
             }
+        } 
+        // CASO B: Por ruta /t/
+        else if (path.includes("/t/")) {
+            const partes = path.split("/t/");
+            slugEncontrado = partes[1].split('/')[0];
         }
 
-        // --- 3. PROCESAR RESULTADO ---
-        if (empresaData) {
-            // USAMOS EL SLUG QUE VIENE DE FIRESTORE (floristera-los-lirios)
-            const slugOficial = empresaData.slug; 
-            console.log("🚀 Cargando tienda:", slugOficial);
-            
-            if(document.getElementById("loaderTienda")) {
-                document.getElementById("loaderTienda").style.display = "none";
-            }
-
-            // Llamamos a tu función de carga con el slug correcto
-            iniciarCargaBase(slugOficial); 
-
+        // --- VALIDACIÓN FINAL DEL SLUG ---
+        if (slugEncontrado) {
+            slug = slugEncontrado; 
+            if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
+            iniciarCargaBase(slug); 
         } else {
-            // ALERTA DE DEPURACIÓN SI FALLA
-            alert(`❌ TIENDA NO ENCONTRADA\n\n` +
-                  `Dominio buscado: [${hostLimpio}]\n` +
-                  `Ruta actual: ${path}\n\n` +
-                  `Asegúrate de que en Firestore el campo 'dominio' sea exactamente igual.`);
-            
+            // Si no hay slug, mandamos al portal de Zippy, no a la floristería externa
             window.location.replace("https://zippy-727d5.web.app/portal.html");
         }
 
     } catch (error) {
-        console.error("🔥 Error en la detección:", error);
-        alert("Error técnico al conectar con la base de datos.");
+        alert("🔥 Error de conexión: " + error.message);
+        irAMantenimiento("Error de conexión con la base de datos");
     }
 }
+
 // CORRECCIÓN: Función de mantenimiento sin redirección externa
 function irAMantenimiento(motivo) {
     console.log("Mantenimiento por:", motivo);
@@ -956,6 +941,7 @@ function irAMantenimiento(motivo) {
         </div>
     `;
 }
+
 // Función auxiliar para mantener tu estilo de "Entorno seguro"
 function mostrarPantallaCargaYSalir() {
     document.documentElement.innerHTML = `
