@@ -1060,36 +1060,46 @@ if (perfil.fechaExpiracion) {
         if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
     }, 500);
 }
-// Agrega o busca esta parte en tu código de inicialización
-function buscarDomiciliario() {
-    const domRef = ref(db, empresaId + "/Domiciliarios");
+function vincularDomiciliarioPrincipal() {
+    // Referencia a la lista de domiciliarios de la empresa
+    const domRef = ref(db, `${empresaId}/Domiciliarios`);
+
+    // Usamos get para obtener los datos una sola vez al inicio
     get(domRef).then((snapshot) => {
         if (snapshot.exists()) {
-            // Tomamos el primer domiciliario disponible
-            const keys = Object.keys(snapshot.val());
-            const primerId = keys[0];
-            const datos = snapshot.val()[primerId];
+            // Obtenemos el primer ID (la clave) y sus datos (el valor)
+            const entries = Object.entries(snapshot.val());
+            const [id, datos] = entries[0]; 
 
-            idDomiciliarioAsignado = primerId;
-            // 🚩 AQUÍ GUARDAMOS EL NOMBRE
-            nombreDomiciliarioAsignado = datos.nombre || "Domiciliario General"; 
-            
-            console.log("Conectado a:", nombreDomiciliarioAsignado);
+            idDomiciliarioAsignado = id;
+            nombreDomiciliarioAsignado = datos.nombre || "Domiciliario Principal";
+
+            console.log(`✅ Vinculado a: ${nombreDomiciliarioAsignado} (ID: ${id})`);
+        } else {
+            console.error("❌ No se encontraron domiciliarios para esta empresa.");
         }
+    }).catch((error) => {
+        console.error("Error al vincular domiciliario:", error);
     });
 }
-// Llama a la función al cargar
-buscarDomiciliario();
+
+// Llamar a la función al cargar la página
+vincularDomiciliarioPrincipal();
         // 3. SISTEMA DE PEDIDOS
-    function enviarPedido() {
+   function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
     
-    if (!idDomiciliarioAsignado) {
-        alert("❌ Error: No hay un domiciliario asignado.");
+    // Validación de seguridad
+    if (!idDomiciliarioAsignado || !nombreDomiciliarioAsignado) {
+        alert("❌ Error: El sistema aún está vinculando un domiciliario. Reintenta en un momento.");
         return;
     }
 
     const cliente = document.getElementById("celularComprador").value.trim();
+    const nombreComprador = document.getElementById("nombreComprador").value.trim();
+    const direccion = document.getElementById("direccionEntrega").value.trim();
+    
+    // Formato de fecha
     const fechaOriginal = document.getElementById("fechaEntrega").value;
     let fechaFormateada = "";
     if (fechaOriginal) {
@@ -1097,11 +1107,8 @@ buscarDomiciliario();
         fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
     }
 
-    const direccion = document.getElementById("direccionEntrega").value.trim();
-    const nombreComprador = document.getElementById("nombreComprador").value.trim();
-
-    if (!direccion || !nombreComprador || !fechaFormateada) {
-        alert("⚠️ Por favor, complete Dirección, Nombre y Fecha.");
+    if (!direccion || !nombreComprador || !fechaFormateada || !cliente) {
+        alert("⚠️ Por favor, complete todos los campos obligatorios.");
         return;
     }
 
@@ -1110,7 +1117,6 @@ buscarDomiciliario();
 
     const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
 
-    // Usamos get para obtener la posición una sola vez de forma limpia
     get(pedidosRef).then((snapshot) => {
         let maxPos = 0;
         if (snapshot.exists()) {
@@ -1130,8 +1136,7 @@ buscarDomiciliario();
             idPedido: nuevoRef.key,
             idEmpresa: empresaId,
             idDomiciliario: idDomiciliarioAsignado,
-            // 🚩 CAMBIO AQUÍ: Ahora usa el nombre que guardamos al inicio
-            nombreDomiciliario: nombreDomiciliarioAsignado, 
+            nombreDomiciliario: nombreDomiciliarioAsignado, // ✅ AHORA YA TIENE VALOR
             direccion: direccion,
             imagenUrl: imagenProducto || "",
             nombreCliente: nombreComprador,
