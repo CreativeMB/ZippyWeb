@@ -845,7 +845,7 @@
 
    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, onValue, push, query, orderByChild, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -882,37 +882,41 @@ async function detectarEmpresaPorDominio() {
 
     try {
         let empresaEncontrada = null;
+        let idUsuario = null;
 
-        // CASO A: Dominio Propio
         if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
             
-            // ALERT DE PRUEBA
-            alert("Intentando buscar este dominio en Realtime DB: [" + hostLimpio + "]");
+            console.log("Intentando buscar este dominio en la raíz de Realtime DB: [" + hostLimpio + "]");
 
             const dbRealtime = getDatabase();
             
-            // ⚠️ IMPORTANTE: Esta ruta debe apuntar al NODO PADRE que contiene la lista de todas las empresas.
-            // Si cada empresa está bajo el ID del usuario (ej. tc62AVkjwv...), tendrás que iterar sobre ellos
-            // o reestructurar para tener un nodo "empresas" general. Asumiendo que apuntas al nodo correcto:
-            const empresasRef = ref(dbRealtime, 'ruta/al/nodo/donde/estan/las/empresas'); 
+            // Apuntamos a la RAÍZ de la base de datos
+            const raizRef = ref(dbRealtime, '/'); 
 
-            // Creamos la consulta buscando el hijo 'dominio' que sea igual a 'hostLimpio'
-            const q = query(empresasRef, orderByChild('dominio'), equalTo(hostLimpio));
+            // Le decimos a Firebase la ruta exacta hacia el hijo que queremos evaluar desde la raíz
+            const q = query(
+                raizRef, 
+                orderByChild('Domiciliarios/Entregas/basededatos/perfilempresa/dominio'), 
+                equalTo(hostLimpio)
+            );
+            
             const snapshot = await get(q);
 
             if (snapshot.exists()) {
-                // Realtime DB devuelve un objeto con los resultados, iteramos para extraer el primero
+                // Iteramos sobre los resultados (los nodos con el ID del usuario)
                 snapshot.forEach((childSnapshot) => {
-                    empresaEncontrada = childSnapshot.val();
-                    // Si necesitas también la llave (ID) de la empresa:
-                    // const empresaId = childSnapshot.key; 
+                    idUsuario = childSnapshot.key; // Este será el 'tc62AVkj...'
+                    const datosUsuario = childSnapshot.val();
+                    
+                    // Extraemos específicamente el perfil de la empresa
+                    empresaEncontrada = datosUsuario.Domiciliarios.Entregas.basededatos.perfilempresa;
                 });
                 
                 console.log("✅ Empresa detectada:", empresaEncontrada.nombreEmpresa);
-                console.log("Slug de la empresa:", empresaEncontrada.slug);
+                console.log("👤 ID del propietario:", idUsuario);
                 
             } else {
-                console.log("❌ No se encontró ninguna empresa asociada a este dominio en la base de datos.");
+                console.log("❌ No se encontró ninguna empresa asociada a este dominio.");
             }
         }
 
