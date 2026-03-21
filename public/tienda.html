@@ -877,46 +877,44 @@
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase();
     const hostLimpio = host.replace("www.", "");
+    
+    // 1. Convertimos el dominio a la llave de Firebase (puntos por rayas al piso)
+    // Ejemplo: floristerialoslirios.com.co -> floristerialoslirios_com_co
+    const dominioKey = hostLimpio.replace(/\./g, "_");
 
-    console.log("🏪 Iniciando detección para:", hostLimpio);
+    console.log("🏪 Iniciando detección rápida para:", hostLimpio);
 
     try {
         let empresaEncontrada = null;
-        let idUsuario = null;
 
+        // Evitamos ejecutar la búsqueda si estamos en el dominio principal o localhost
         if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
             
-            console.log("Intentando buscar este dominio en la raíz de Realtime DB: [" + hostLimpio + "]");
-
             const dbRealtime = getDatabase();
             
-            // Apuntamos a la RAÍZ de la base de datos
-            const raizRef = ref(dbRealtime, '/'); 
+            // 2. Vamos DIRECTO al nuevo nodo de mapeo en la raíz
+            const mapeoRef = ref(dbRealtime, `dominios/${dominioKey}`);
+            const snapshotMapeo = await get(mapeoRef);
 
-            // Le decimos a Firebase la ruta exacta hacia el hijo que queremos evaluar desde la raíz
-            const q = query(
-                raizRef, 
-                orderByChild('Domiciliarios/Entregas/basededatos/perfilempresa/dominio'), 
-                equalTo(hostLimpio)
-            );
-            
-            const snapshot = await get(q);
+            if (snapshotMapeo.exists()) {
+                // El valor del snapshot es directamente el ID del usuario (UID)
+                const idUsuario = snapshotMapeo.val(); 
+                console.log("✅ Dominio asociado al UID:", idUsuario);
 
-            if (snapshot.exists()) {
-                // Iteramos sobre los resultados (los nodos con el ID del usuario)
-                snapshot.forEach((childSnapshot) => {
-                    idUsuario = childSnapshot.key; // Este será el 'tc62AVkj...'
-                    const datosUsuario = childSnapshot.val();
-                    
-                    // Extraemos específicamente el perfil de la empresa
-                    empresaEncontrada = datosUsuario.Domiciliarios.Entregas.basededatos.perfilempresa;
-                });
-                
-                console.log("✅ Empresa detectada:", empresaEncontrada.nombreEmpresa);
-                console.log("👤 ID del propietario:", idUsuario);
-                
+                // 3. Con el ID, vamos directo a la ruta del perfil de esa empresa
+                const perfilRef = ref(dbRealtime, `${idUsuario}/Domiciliarios/Entregas/basededatos/perfilempresa`);
+                const snapshotPerfil = await get(perfilRef);
+
+                if (snapshotPerfil.exists()) {
+                    empresaEncontrada = snapshotPerfil.val();
+                    console.log("✅ Datos de empresa cargados:", empresaEncontrada.nombreEmpresa);
+                } else {
+                    irAMantenimiento("El perfil de la empresa no existe en la base de datos.");
+                }
+
             } else {
-                console.log("❌ No se encontró ninguna empresa asociada a este dominio.");
+                console.log("❌ Este dominio no está registrado en el nodo /dominios/");
+                irAMantenimiento("Dominio no vinculado.");
             }
         }
 
@@ -924,6 +922,7 @@ async function detectarEmpresaPorDominio() {
 
     } catch (error) {
         console.error("🚨 Error al consultar Realtime Database:", error);
+        irAMantenimiento("Error de conexión con la base de datos.");
     }
 }
 
