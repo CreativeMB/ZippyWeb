@@ -874,27 +874,42 @@
     // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
- async function detectarEmpresaPorDominio() {
+async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase();
     const path = window.location.pathname;
     const hostLimpio = host.replace("www.", "");
+
+    // 🚩 ALERTA 1: ¿Qué está leyendo el navegador?
+    alert("🔍 PASO 1: Detectando Host\nHost original: " + host + "\nHost limpio (sin www): " + hostLimpio);
 
     console.log("🏪 Iniciando detección para:", hostLimpio);
 
     try {
         let slugEncontrado = "";
 
-        // CASO A: Dominio Propio (ej: floristerialoslirios.com.co)
+        // CASO A: Dominio Propio
         if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
+            
+            // 🚩 ALERTA 2: Entró a la búsqueda de base de datos
+            alert("📡 PASO 2: Buscando en Firestore...\nDonde 'dominio' sea igual a: '" + hostLimpio + "'");
+
             const q = query(
                 collection(dbFirestore, "perfilempresa"),
                 where("dominio", "==", hostLimpio)
             );
+            
             const querySnapshot = await getDocs(q);
 
             if (!querySnapshot.empty) {
-                slugEncontrado = querySnapshot.docs[0].data().slug;
+                const empresaDoc = querySnapshot.docs[0].data();
+                slugEncontrado = empresaDoc.slug;
+                
+                // 🚩 ALERTA 3: ¡Éxito! Encontró la tienda
+                alert("✅ PASO 3: ¡Empresa encontrada!\nSlug oficial: " + slugEncontrado);
             } else {
+                // 🚩 ALERTA 4: El error de "No encontrado"
+                alert("❌ PASO 3: Error de base de datos\nNo existe ningún documento en 'perfilempresa' que tenga el dominio: '" + hostLimpio + "'\n\nRevisa espacios o mayúsculas en Firestore.");
+                
                 console.warn("❌ Dominio no vinculado a ninguna tienda.");
                 irAMantenimiento("Dominio no registrado");
                 return;
@@ -904,24 +919,25 @@
         else if (path.includes("/t/")) {
             const partes = path.split("/t/");
             slugEncontrado = partes[1].split('/')[0];
+            alert("📂 Acceso por ruta detected\nSlug: " + slugEncontrado);
         }
 
         // --- VALIDACIÓN FINAL DEL SLUG ---
         if (slugEncontrado) {
-            slug = slugEncontrado; // Asignamos a la variable global
+            slug = slugEncontrado; 
             console.log("✅ Slug identificado:", slug);
             
-            // Antes de cargar, podrías verificar si el slug tiene datos reales
-            // Pero por ahora, procedemos a la carga base
             if(document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
             
             iniciarCargaBase(slug); 
         } else {
-            // Si llegamos aquí y no hay slug, es un acceso directo al dominio raíz sin nada
+            alert("⚠️ No se encontró Slug ni Dominio. Redirigiendo al portal...");
             window.location.replace("https://zippy-727d5.web.app/portal.html");
         }
 
     } catch (error) {
+        // 🚩 ALERTA 5: Error de código o conexión
+        alert("🔥 ERROR CRÍTICO:\n" + error.message);
         console.error("❌ Error crítico en detección:", error);
         irAMantenimiento("Error de conexión con la base de datos");
     }
