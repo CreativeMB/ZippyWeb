@@ -874,55 +874,69 @@
     // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
-async function detectarEmpresaPorDominio() {
-    const host = window.location.hostname.toLowerCase();
+  async function detectarEmpresaPorDominio() {
+    const host = window.location.hostname;
     const path = window.location.pathname;
-    
-    // Normalizamos el host para las comparaciones
-    const hostSinWww = host.replace("www.", "");
-    const hostConWww = "www." + hostSinWww;
+    // Normalizamos para que incluya o no el www funcione igual
+    const hostLimpio = host.startsWith("www.") ? host.replace("www.", "") : host;
 
-    console.log("🔍 Analizando host:", host);
-
-    // --- CASO 1: DOMINIO PERSONALIZADO (Ej: floristerialoslirios.com.co) ---
-    if (hostSinWww !== "zippy-727d5.web.app" && hostSinWww !== "localhost") {
+    // --- NUEVA PRIORIDAD: VALIDAR SI ES UN DOMINIO PERSONALIZADO PRIMERO ---
+    // Si NO estamos en el dominio base de Zippy, obligamos a que el slug sea el del dueño del dominio
+    if (hostLimpio !== "zippy-727d5.web.app" && hostLimpio !== "localhost") {
         try {
-            // Buscamos en Firestore que el dominio sea igual a la versión con o sin www
             const q = query(
                 collection(dbFirestore, "perfilempresa"),
-                where("dominio", "in", [hostSinWww, hostConWww])
+                where("dominio", "==", hostLimpio)
             );
             const querySnapshot = await getDocs(q);
 
             if (!querySnapshot.empty) {
                 const empresaDoc = querySnapshot.docs[0].data();
-                slug = empresaDoc.slug; // Asignamos el slug global
+                const slugOficial = empresaDoc.slug;
+
+                // Si el usuario intenta entrar a /t/otra-tienda en ESTE dominio, lo corregimos
+                if (path.includes("/t/")) {
+                    const slugEnUrl = path.split("/t/")[1].split('/')[0];
+                    if (slugEnUrl !== slugOficial) {
+                        console.warn("🚫 Ruta no coincide con el dominio. Corrigiendo...");
+                        window.location.replace(`https://${host}/t/${slugOficial}`);
+                        return;
+                    }
+                }
                 
-                console.log("✅ Tienda Premium detectada:", slug);
+                // Si está en la raíz (floristerialoslirios.com.co) sin /t/, lo cargamos directo
+                slug = slugOficial;
+                console.log("✅ Dominio Premium:", slug);
                 iniciarCargaBase(slug);
-                return; // Éxito, detenemos la ejecución aquí
+                return;
+
             } else {
-                console.error("❌ El dominio no está asociado a ninguna tienda en la base de datos.");
-                window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
+                // Dominio no registrado (caso de alguien apuntando un DNS sin permiso)
+                mostrarPantallaCargaYSalir();
                 return;
             }
         } catch (error) {
-            console.error("❌ Error consultando Firestore:", error);
+            console.error("❌ Error en validación:", error);
+            window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
             return;
         }
     }
 
-    // --- CASO 2: DOMINIO BASE DE ZIPPY (zippy-727d5.web.app/t/slug) ---
+    // --- PRIORIDAD 2: ACCESO POR SLUG (Solo para el dominio raíz de Zippy) ---
     if (path.includes("/t/")) {
         const partes = path.split("/t/");
         if (partes[1]) {
             slug = partes[1].split('/')[0];
-            console.log("📂 Cargando por sub-ruta en Zippy:", slug);
+            console.log("📂 Cargando por Ruta en Zippy App:", slug);
             iniciarCargaBase(slug);
             return;
         }
     }
+
+    // --- CASO FINAL: Si llegamos aquí y no hay nada, mantenimiento ---
+    mostrarPantallaCargaYSalir();
 }
+
 // Función auxiliar para mantener tu estilo de "Entorno seguro"
 function mostrarPantallaCargaYSalir() {
     document.documentElement.innerHTML = `
