@@ -935,9 +935,19 @@ if (perfil.fechaExpiracion) {
             }
 
             // Asignar Domiciliario
-            if (data.Domiciliarios) {
-                idDomiciliarioAsignado = Object.keys(data.Domiciliarios)[0];
-            }
+        
+if (data.Domiciliarios) {
+    // Obtenemos el ID (la clave)
+    const idDom = Object.keys(data.Domiciliarios)[0];
+    // Obtenemos el objeto completo de ese domiciliario
+    const infoDom = data.Domiciliarios[idDom];
+
+    idDomiciliarioAsignado = idDom;
+    // Capturamos el nombre desde el campo 'nombre' que me mostraste
+    nombreDomiciliarioAsignado = infoDom.nombre || "Domiciliario General";
+
+    console.log("✅ Domiciliario vinculado:", nombreDomiciliarioAsignado);
+}
 
             // Textos de Interfaz
             document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
@@ -1065,35 +1075,30 @@ if (perfil.fechaExpiracion) {
     function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
     
-    // 🔹 VALIDACIÓN CRÍTICA: ¿Hay un domiciliario asignado?
-    // Asumo que 'idDomiciliarioAsignado' es una variable global o previa
     if (!idDomiciliarioAsignado) {
-        alert("❌ Error: No hay un domiciliario disponible o asignado para este pedido. No se puede enviar.");
-        return; // Detenemos la ejecución aquí
+        alert("❌ Error: No hay un domiciliario asignado para este pedido.");
+        return;
     }
-const  cliente= document.getElementById("celularComprador").value.trim();
-    // 1. Formato diaEntrega: DD-MM-YYYY
+
+    const cliente = document.getElementById("celularComprador").value.trim();
+    const direccion = document.getElementById("direccionEntrega").value.trim();
+    const nombreComprador = document.getElementById("nombreComprador").value.trim();
     const fechaOriginal = document.getElementById("fechaEntrega").value;
+
     let fechaFormateada = "";
     if (fechaOriginal) {
         const partes = fechaOriginal.split("-"); 
         fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
     }
 
-    // 2. Captura de campos obligatorios
-    const direccion = document.getElementById("direccionEntrega").value.trim();
-    const nombreComprador = document.getElementById("nombreComprador").value.trim();
-
-    if (!direccion || !nombreComprador || !fechaFormateada) {
-        alert("⚠️ Por favor, complete Dirección, Nombre y Fecha.");
+    if (!direccion || !nombreComprador || !fechaFormateada || !cliente) {
+        alert("⚠️ Por favor, complete todos los campos obligatorios.");
         return;
     }
 
-    // Bloquear botón para evitar doble envío
     btn.disabled = true;
     btn.innerText = "Enviando...";
 
-    // Referencia a la base de datos usando el ID del domiciliario validado
     const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
 
     onValue(pedidosRef, (snapshot) => {
@@ -1107,27 +1112,20 @@ const  cliente= document.getElementById("celularComprador").value.trim();
 
         const nuevoRef = push(pedidosRef);
         const hoy = new Date();
-
-        // Formateo de Fecha y Hora (Estilo Kotlin)
-        const fechaRegistro = hoy.toLocaleDateString('es-CO', {
-            day: '2-digit', month: '2-digit', year: 'numeric'
-        }).replace(/\-/g, '/');
-
-        const horaRegistro = hoy.toLocaleTimeString('es-CO', {
-            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-        });
+        const fechaRegistro = hoy.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\-/g, '/');
+        const horaRegistro = hoy.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
         const pedidoData = {
             idPedido: nuevoRef.key,
             idEmpresa: empresaId,
             idDomiciliario: idDomiciliarioAsignado,
-            nombreDomiciliario: nombreDomiciliarioAsignado,
+            nombreDomiciliario: nombreDomiciliarioAsignado, // ✅ AHORA LLEGARÁ: "Soy Mucho Masrapido"
             direccion: direccion,
             imagenUrl: imagenProducto || "",
             nombreCliente: nombreComprador,
             cliente: cliente,
             nombreDestinatario: document.getElementById("nombreDestinatario").value.trim() || nombreComprador,
-            destinatario: document.getElementById("celularDestinatario").value.trim() || celularComprador,
+            destinatario: document.getElementById("celularDestinatario").value.trim() || cliente,
             referencia: productoSeleccionado || "Pedido Web",
             adicional: document.getElementById("productoAdicional").value.trim(),
             banco: document.getElementById("medioPago").value,
@@ -1141,7 +1139,6 @@ const  cliente= document.getElementById("celularComprador").value.trim();
             notificado: false,
             timestampEntrega: null,
             color: "#BBDEFB",
-            nombreDomiciliario: "", // Puedes llenar esto si tienes el nombre a mano
             fechaRegistro: fechaRegistro,
             horaRegistro: horaRegistro
         };
@@ -1159,7 +1156,6 @@ const  cliente= document.getElementById("celularComprador").value.trim();
 
     }, { onlyOnce: true });
 }
-
 // Ejemplo de cómo capturas los datos del objeto que mostraste:
 function vincularDomiciliario(datosObjeto) {
     idDomiciliarioAsignado = datosObjeto.idDomiciliario; // vFlNTcYFOcd3bkpS6JcPMqTD4YL2
