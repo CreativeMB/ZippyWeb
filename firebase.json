@@ -18,14 +18,6 @@
       {
         "source": "/t/**",
         "destination": "/tienda.html"
-      },
-      {
-        "source": "/", 
-        "destination": "/tienda.html"
-      },
-      {
-        "source": "**",
-        "destination": "/tienda.html"
       }
     ]
   }
