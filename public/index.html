@@ -67,17 +67,40 @@
 
         let empresaId = "";
 
-        // --- 1. GUARDIÁN DE SESIÓN ---
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = "/login";
-            } else {
-                empresaId = user.uid;
-                cargarDatosIniciales();
-                escucharProductos();
-            }
-        });
+    // --- 1. GUARDIÁN DE SESIÓN ---
+onAuthStateChanged(auth, async (user) => {
+    // Primero revisamos si estamos en un dominio de una tienda
+    const esTienda = await verificarSiEsTienda(); 
 
+    if (!user) {
+        // SI NO hay usuario Y NO es una tienda personalizada, mandamos a login
+        if (!esTienda) {
+            console.log("🔒 Acceso administrativo requerido. Redirigiendo...");
+            window.location.href = "/login";
+        } else {
+            console.log("🛍️ Navegación pública detectada (Tienda).");
+        }
+    } else {
+        // Si hay usuario, es el admin
+        empresaId = user.uid;
+        cargarDatosIniciales();
+        escucharProductos();
+    }
+});
+
+// Función auxiliar para que el guardián sepa dónde está parado
+async function verificarSiEsTienda() {
+    const host = window.location.hostname.toLowerCase();
+    const hostSinWww = host.replace("www.", "");
+    
+    // Si es el dominio raíz, no es una tienda directa (a menos que tenga /t/)
+    if (hostSinWww === "zippy-727d5.web.app" || hostSinWww === "localhost") {
+        return window.location.pathname.includes("/t/");
+    }
+    
+    // Si es un dominio externo, asumimos que es tienda (la función detectarEmpresa lo validará después)
+    return true; 
+}
         // --- 2. CERRAR SESIÓN ---
         document.getElementById("btnCerrarSesion").onclick = () => {
             if(confirm("¿Seguro que desea salir?")) {
