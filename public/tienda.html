@@ -846,7 +846,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
- 
+ import { getFirestore, collection, query, where, getDocs } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "TU_API_KEY",
             authDomain: "zippy-727d5.firebaseapp.com",
@@ -856,7 +857,8 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-
+const dbFirestore = getFirestore(app);
+detectarEmpresaPorDominio();
         let productosJson = {};
         let productosRealtime = {};
         let telefonoEmpresa = "";
@@ -865,8 +867,8 @@
         let nombreDomiciliarioAsignado = "";
         let productoSeleccionado = "";
         let imagenProducto = "";
-
-        const slug = window.location.pathname.split("/").pop();
+let slug = "";
+    
 let bloqueoActivo = false;
         // 1. NÚCLEO DE CARGA Y VALIDACIÓN
         const empresasRef = ref(db);
@@ -918,6 +920,10 @@ if (perfil.fechaExpiracion) {
             });
         });
 
+        function iniciarCargaPorSlug(slugDetectado) {
+    slug = slugDetectado;
+}
+
         function continuarCarga(perfil, data) {
             if (bloqueoActivo) return;
             telefonoEmpresa = perfil.WhatsApp.replace("+", "");
@@ -960,7 +966,42 @@ if (data.Domiciliarios) {
             cargarProductosJSON(perfil.json_datos);
             escucharCambios(empresaId);
         }
+       
+async function detectarEmpresaPorDominio() {
+    const host = window.location.hostname;
+    const path = window.location.pathname;
 
+    // ✅ CASO 1: YA VIENE CON /t/slug (usuarios SIN dominio)
+    if (path.startsWith("/t/")) {
+        const slugDetectado = path.split("/t/")[1];
+        iniciarCargaPorSlug(slugDetectado);
+        return;
+    }
+
+    // ⚠️ CASO 2: ENTRA POR DOMINIO PERSONALIZADO
+    try {
+        const q = query(
+            collection(dbFirestore, "perfilempresa"),
+            where("dominio", "==", host)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const empresa = querySnapshot.docs[0].data();
+            const slugDetectado = empresa.slug;
+
+            // 🔁 Redirige al sistema normal
+            window.location.replace(`/t/${slugDetectado}`);
+        } else {
+            // ⚠️ NO TIENE DOMINIO → no hacer nada (evita romper slugs)
+            console.log("Dominio no configurado, usando slug si existe");
+        }
+
+    } catch (error) {
+        console.error("Error dominio:", error);
+    }
+}
         // 2. GESTIÓN DE PRODUCTOS
         function cargarProductosJSON(contenido) {
             if (bloqueoActivo) return;
