@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative M | Portafolio de Proyectos</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --secondary: #a29bfe;
+            --dark: #1e272e;
+            --light: #ffffff;
+            --accent: #FF9800;
+            --gradient: linear-gradient(135deg, #6c5ce7 0%, #4834d4 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body { background-color: #f4f7f6; color: var(--dark); overflow-x: hidden; }
+
+        /* Header */
+        header {
+            background: var(--gradient);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+        }
+
+        .hero h1 { font-size: 3.5rem; letter-spacing: -1px; margin-bottom: 10px; }
+        .hero p { font-size: 1.1rem; opacity: 0.9; font-weight: 300; }
+
+        /* Grid */
+        .container {
+            max-width: 1200px;
+            margin: -40px auto 60px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        /* Card Estilo Moderno */
+        .app-card {
+            background: var(--light);
+            border-radius: 24px;
+            padding: 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid #eee;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 40px rgba(108, 92, 231, 0.15);
+        }
+
+        .category-tag {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f1f2f6;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        .icon-circle {
+            width: 70px;
+            height: 70px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+
+        .app-card:hover .icon-circle {
+            background: var(--primary);
+            color: white;
+        }
+
+        .app-card h3 { font-size: 1.6rem; margin-bottom: 12px; color: #2d3436; }
+        .app-card p { font-size: 0.95rem; color: #636e72; margin-bottom: 25px; line-height: 1.5; }
+
+        /* Botón */
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            background: var(--dark);
+            color: white;
+            padding: 14px;
+            border-radius: 16px;
+            font-weight: 600;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-download:hover {
+            background: var(--primary);
+            transform: scale(1.02);
+        }
+
+        /* Floating WhatsApp */
+        .btn-whatsapp {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #25d366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: 0.3s;
+        }
+
+        .btn-whatsapp:hover { transform: rotate(15deg) scale(1.1); }
+
+        footer { text-align: center; padding: 50px; color: #a4b0be; }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <h1>Creative M</h1>
+        <p>Ecosistemas Digitales y Soluciones Móviles</p>
+    </header>
+
+    <div class="container" id="project-list">
+        </div>
+
+    <a href="https://wa.me/57TU_NUMERO_AQUI" class="btn-whatsapp" target="_blank">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <footer>
+        <p>© 2026 Creative M | Innovación Constante</p>
+    </footer>
+
+    <script>
+        const projects = [
+            {
+                name: "FullTV",
+                cat: "Entretenimiento",
+                desc: "¡Descubre la forma más fácil y económica de disfrutar del cine en casa! 🎬✨",
+                icon: "fa-film",
+                link: "https://github.com/CreativeMB/center/releases/download/apk/FullTV.apk",
+                label: "Descargar APK"
+            },
+            {
+                name: "Zippy Ecosistema",
+                cat: "Negocios",
+                desc: "Gestión Integral para tu Negocio. La plataforma central de administración.",
+                icon: "fa-rocket",
+                link: "https://zippy-727d5.web.app/empresa",
+                label: "Visitar Plataforma"
+            },
+            {
+                name: "Zippy Entregas",
+                cat: "Logística",
+                desc: "Optimiza la gestión de tus entregas y domicilios con eficiencia.",
+                icon: "fa-truck-fast",
+                link: "https://zippy-727d5.web.app/empresa",
+                label: "Ver Proyecto"
+            },
+            {
+                name: "Zippy Catálogo",
+                cat: "Ventas",
+                desc: "Catálogo interactivo para tu punto de venta. Moderniza tu atención.",
+                icon: "fa-store",
+                link: "https://zippy-727d5.web.app/empresa",
+                label: "Ver Proyecto"
+            },
+            {
+                name: "Galeria TV",
+                cat: "Utilidad",
+                desc: "Explora su contenido USB con facilidad en pantallas grandes.",
+                icon: "fa-usb",
+                link: "https://www.mediafire.com/folder/xtlg6z45j060l/Tienda_control",
+                label: "Descargar APK"
+            },
+            {
+                name: "Tienda Control",
+                cat: "Administración",
+                desc: "Eficiencia y organización clave para el éxito empresarial.",
+                icon: "fa-gauge-high",
+                link: "https://www.mediafire.com/folder/xtlg6z45j060l/Tienda_control",
+                label: "Descargar APK"
+            },
+            {
+                name: "Comunidad IPUC",
+                cat: "Comunidad",
+                desc: "Creemos que la Biblia es inspirada por Dios. Recursos de fe y justicia.",
+                icon: "fa-book-bible",
+                link: "https://play.google.com/store/apps/details?id=ipuc.santacecilia&hl=es_419",
+                label: "Ir a Play Store"
+            },
+            {
+                name: "Floristería Los Lirios",
+                cat: "E-Commerce",
+                desc: "Nuestra aplicación para ver productos con la mejor facilidad.",
+                icon: "fa-leaf",
+                link: "https://play.google.com/store/apps/details?id=floristeria.loslirios&hl=es_419",
+                label: "Ir a Play Store"
+            }
+        ];
+
+        const container = document.getElementById('project-list');
+
+        projects.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'app-card';
+            card.innerHTML = `
+                <div>
+                    <span class="category-tag">${p.cat}</span>
+                    <div class="icon-circle"><i class="fa-solid ${p.icon}"></i></div>
+                    <h3>${p.name}</h3>
+                    <p>${p.desc}</p>
+                </div>
+                <a href="${p.link}" class="btn-download" target="_blank">
+                    ${p.label} <i class="fa-solid fa-arrow-right-long"></i>
+                </a>
+            `;
+            container.appendChild(card);
+        });
+    </script>
+</body>
+</html>
