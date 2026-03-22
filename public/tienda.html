@@ -885,52 +885,54 @@ async function detectarEmpresaPorDominio() {
         let slug = "";
 
         // ==========================================
-        // VALIDAR RTDB INICIALIZADO
-        // ==========================================
-        if (!dbRealtime) {
-            console.error("❌ Realtime Database no inicializada");
-            return irAMantenimiento("Error de configuración");
-        }
-
-        // ==========================================
         // CASO 1: DOMINIO PROPIO
         // ==========================================
         if (host !== "zippy-727d5.web.app" && host !== "localhost") {
 
             const dominioKey = host.replaceAll(".", "_");
-            console.log("🔎 DominioKey:", dominioKey);
 
-            try {
-                const dominioRef = ref(dbRealtime, "dominios/" + dominioKey);
-                const snap = await get(dominioRef);
+            console.log("🔎 Buscando dominio en RTDB:", dominioKey);
 
-                // 🔍 DEBUG GENERAL (opcional)
-                console.log("📡 Snapshot existe:", snap.exists());
-                console.log("📦 Valor:", snap.val());
+          const dominioRef = ref(dbRealtime, `${clienteId}/dominios/${dominioKey}`);
 
-                if (!snap.exists()) {
-                    console.error("❌ Dominio no encontrado en RTDB");
-                    return irAMantenimiento("Dominio no registrado");
-                }
-
+            if (snap.exists()) {
                 const data = snap.val();
 
-                if (!data) {
-                    console.error("❌ Datos vacíos en RTDB");
-                    return irAMantenimiento("Datos inválidos");
-                }
+                console.log("✅ Dominio encontrado en RTDB:", data);
 
+                // PRIORIDAD: usar slug del dominio
                 if (data.slug) {
                     slug = data.slug;
                     console.log("🎯 Slug obtenido desde dominio:", slug);
-                } else {
-                    console.error("❌ El dominio existe pero no tiene slug");
-                    return irAMantenimiento("Slug no configurado");
                 }
 
-            } catch (e) {
-                console.error("🔥 Error leyendo RTDB:", e);
-                return irAMantenimiento("Error de conexión");
+                // (Opcional) si quisieras validar con Firestore:
+                // const idEmpresa = data.idEmpresa;
+            }
+
+            // ==========================================
+            // FALLBACK: SI NO EXISTE DOMINIO
+            // ==========================================
+            if (!slug) {
+                console.log("⚠️ Dominio no encontrado, buscando en Firestore...");
+
+                // Buscar perfil por dominio no aplica, entonces usamos otro criterio
+                // Ejemplo: por slug en Firestore o listado general
+
+                const q = query(collection(dbFirestore, "perfilempresa"));
+                const res = await getDocs(q);
+
+                res.forEach(doc => {
+                    const data = doc.data();
+                    if (data.slug) {
+                        slug = data.slug; // aquí puedes ajustar si tienes lógica de coincidencia
+                    }
+                });
+
+                if (!slug) {
+                    console.error("❌ No se encontró slug en Firestore");
+                    return irAMantenimiento("Perfil no encontrado");
+                }
             }
 
         }
@@ -964,22 +966,18 @@ async function detectarEmpresaPorDominio() {
         iniciarCargaBase(slug);
 
     } catch (error) {
-        console.error("🔥 Error general:", error);
+        console.error("🔥 Error:", error);
         irAMantenimiento("Error de conexión");
     }
 }
+// Función de mantenimiento sin redirección externa
 function irAMantenimiento(motivo) {
-    console.log("⚠️ Mantenimiento por:", motivo);
-
+    console.log("Mantenimiento por:", motivo);
     document.body.innerHTML = `
         <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif; text-align:center;">
             <h1 style="color:#e11d48;">Tienda No Encontrada</h1>
-            <p style="color:#64748b;">
-                El dominio <b>${window.location.hostname}</b> no está vinculado a ninguna tienda activa.
-            </p>
-            <p style="font-size:12px; color:#94a3b8;">
-                Motivo: ${motivo}
-            </p>
+            <p style="color:#64748b;">El dominio <b>${window.location.hostname}</b> no está vinculado a ninguna tienda activa.</p>
+            <p style="font-size:12px; color:#94a3b8;">Motivo: ${motivo}</p>
         </div>
     `;
 }
