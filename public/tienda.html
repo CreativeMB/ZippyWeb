@@ -1129,10 +1129,13 @@ card.className = `producto ${real.agotado ? 'agotado' : ''}`;
 const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
 const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
 
-// 2. Creamos el mensaje usando directamente la variable 'descProd'
-// ¡Aquí está el truco! Usamos la variable de texto, no el elemento del DOM.
+// 2. Creamos el mensaje usando formato de texto ultra-compatible (Opción 2)
+// Usamos asteriscos para negritas y guiones para los puntos, evitando iconos que se rompan.
 const mensajeWa = encodeURIComponent(
-    `Hola, me interesa:\n📌 *Ref:* ${refProd}\n📝 *Descripción:* ${descProd}\n💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`
+    `Hola, me interesa:\n\n` +
+    `*Ref:* ${refProd}\n` +
+    `*Descripción:* ${descProd}\n` +
+    `*Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`
 );
             
 const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
