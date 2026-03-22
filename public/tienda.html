@@ -891,55 +891,33 @@ async function detectarEmpresaPorDominio() {
 
             const dominioKey = host.replaceAll(".", "_");
 
-            console.log("🔎 Buscando dominio en RTDB:", dominioKey);
+            console.log("🔎 Buscando dominio:", dominioKey);
 
-         const dominioRef = ref(dbRealtime, `dominios/${dominioKey}`);
-const snap = await get(dominioRef);
+            // 🔥 Usamos TU variable global (dbFirestore)
+            const dominioRef = ref(dbFirestore, `dominios/${dominioKey}`);
+            const snap = await get(dominioRef);
 
-            if (snap.exists()) {
-                const data = snap.val();
-
-                console.log("✅ Dominio encontrado en RTDB:", data);
-
-                // PRIORIDAD: usar slug del dominio
-                if (data.slug) {
-                    slug = data.slug;
-                    console.log("🎯 Slug obtenido desde dominio:", slug);
-                }
-
-                // (Opcional) si quisieras validar con Firestore:
-                // const idEmpresa = data.idEmpresa;
+            if (!snap.exists()) {
+                console.error("❌ Dominio no registrado");
+                return irAMantenimiento("Dominio no registrado");
             }
 
-            // ==========================================
-            // FALLBACK: SI NO EXISTE DOMINIO
-            // ==========================================
-            if (!slug) {
-                console.log("⚠️ Dominio no encontrado, buscando en Firestore...");
+            const data = snap.val();
 
-                // Buscar perfil por dominio no aplica, entonces usamos otro criterio
-                // Ejemplo: por slug en Firestore o listado general
+            console.log("✅ Dominio encontrado:", data);
 
-                const q = query(collection(dbFirestore, "perfilempresa"));
-                const res = await getDocs(q);
-
-                res.forEach(doc => {
-                    const data = doc.data();
-                    if (data.slug) {
-                        slug = data.slug; // aquí puedes ajustar si tienes lógica de coincidencia
-                    }
-                });
-
-                if (!slug) {
-                    console.error("❌ No se encontró slug en Firestore");
-                    return irAMantenimiento("Perfil no encontrado");
-                }
+            if (!data.slug) {
+                console.error("❌ Dominio sin slug");
+                return irAMantenimiento("Slug no configurado");
             }
 
+            slug = data.slug;
+
+            console.log("🎯 Slug obtenido desde dominio:", slug);
         }
 
         // ==========================================
-        // CASO 2: RUTA /t/slug
+        // CASO 2: URL /t/slug
         // ==========================================
         else if (path.includes("/t/")) {
             slug = path.split("/t/")[1]?.split("/")[0] || "";
@@ -967,7 +945,7 @@ const snap = await get(dominioRef);
         iniciarCargaBase(slug);
 
     } catch (error) {
-        console.error("🔥 Error:", error);
+        console.error("🔥 Error general:", error);
         irAMantenimiento("Error de conexión");
     }
 }
