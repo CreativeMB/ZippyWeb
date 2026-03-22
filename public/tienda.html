@@ -893,7 +893,8 @@ async function detectarEmpresaPorDominio() {
 
             console.log("🔎 Buscando dominio en RTDB:", dominioKey);
 
-          const dominioRef = ref(dbRealtime, `${clienteId}/dominios/${dominioKey}`);
+         const dominioRef = ref(dbRealtime, `dominios/${dominioKey}`);
+const snap = await get(dominioRef);
 
             if (snap.exists()) {
                 const data = snap.val();
