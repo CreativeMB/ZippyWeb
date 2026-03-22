@@ -1194,7 +1194,6 @@ function iniciarCargaBase(slugBusqueda) {
     console.log("🔥 EXISTS:", snapshot.exists());
     console.log("🔥 VAL:", snapshot.val());
 
-
                 snapshot.forEach(c => {
                     const pos = parseInt(c.val().posicion) || 0;
                     if (pos > maxPos) maxPos = pos;
