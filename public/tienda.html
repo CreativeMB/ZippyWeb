@@ -894,7 +894,7 @@ async function detectarEmpresaPorDominio() {
             console.log("🔎 Buscando dominio:", dominioKey);
 
             // 🔥 Usamos TU variable global (dbFirestore)
-            const dominioRef = ref(dbFirestore, `dominios/${dominioKey}`);
+          const dominioRef = ref(db, `dominios/${dominioKey}`);
             const snap = await get(dominioRef);
 
             if (!snap.exists()) {
@@ -1188,11 +1188,11 @@ function iniciarCargaBase(slugBusqueda) {
         const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
         get(pedidosRef).then((snapshot) => {
             let maxPos = 0;
-            if (snapshot.exists()) {
+          if (snapshot.exists()) {
 
-                console.log("🔥 SNAPSHOT RAW:", snap);
-console.log("🔥 EXISTS:", snap.exists());
-console.log("🔥 VAL:", snap.val());
+    console.log("🔥 SNAPSHOT RAW:", snapshot);
+    console.log("🔥 EXISTS:", snapshot.exists());
+    console.log("🔥 VAL:", snapshot.val());
 
 
                 snapshot.forEach(c => {
