@@ -3,254 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative M | Portafolio de Proyectos</title>
+    <title>Creative M | Portafolio de Proyectos Modernos</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root {
-            --primary: #6C5CE7;
-            --secondary: #a29bfe;
-            --dark: #1e272e;
-            --light: #ffffff;
-            --accent: #FF9800;
-            --gradient: linear-gradient(135deg, #6c5ce7 0%, #4834d4 100%);
+            --bg-dark: #0a0e17; /* Fondo oscuro profundo moderno */
+            --primary-blue: #00d2ff; /* Azul neón eléctrico sofisticado */
+            --secondary-blue: #3a7bd5; /* Azul medio para degradados */
+            --primary-orange: #ff9f43; /* Naranja neón suave, no chillón */
+            --primary-green: #00cec9; /* Verde esmeralda sutil para Zippy */
+            --text-main: #fcfcfc; /* Texto casi blanco */
+            --text-muted: #a4b0be; /* Texto gris para descripciones */
+            --card-bg: rgba(255, 255, 255, 0.03); /* Fondo translúcido tipo vidrio */
+            --card-border: rgba(255, 255, 255, 0.08); /* Borde sutil */
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            font-family: 'Poppins', sans-serif; 
+            overflow-x: hidden; 
+        }
 
-        body { background-color: #f4f7f6; color: var(--dark); overflow-x: hidden; }
+        /* Tipografía Especial para Títulos */
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
 
-        /* Header */
+        /* Cabecera / Hero */
         header {
-            background: var(--gradient);
-            color: white;
-            padding: 80px 20px;
+            background: radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.1) 0%, rgba(10, 14, 23, 1) 90%);
+            padding: 100px 20px;
             text-align: center;
-            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+            border-bottom: 1px solid var(--card-border);
         }
 
-        .hero h1 { font-size: 3.5rem; letter-spacing: -1px; margin-bottom: 10px; }
-        .hero p { font-size: 1.1rem; opacity: 0.9; font-weight: 300; }
+        header h1 {
+            font-size: 4rem;
+            background: linear-gradient(135deg, var(--text-main) 0%, var(--primary-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
 
-        /* Grid */
+        header p { font-size: 1.2rem; color: var(--text-muted); font-weight: 300; }
+
+        /* Títulos de Sección con Efecto Neón */
+        .section-title {
+            text-align: center;
+            margin: 80px 0 40px;
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+            color: var(--text-main);
+        }
+
+        .section-title.zippy-title {
+            background: linear-gradient(135deg, var(--text-main) 30%, var(--primary-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-title.others-title {
+            background: linear-gradient(135deg, var(--text-main) 30%, var(--primary-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Contenedores */
         .container {
             max-width: 1200px;
-            margin: -40px auto 60px;
-            padding: 0 20px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
         }
 
-        /* Card Estilo Moderno */
+        /* Tarjeta Estilo Glassmorphism / Neón sutil */
         .app-card {
-            background: var(--light);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
             border-radius: 24px;
             padding: 35px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid var(--card-border);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid #eee;
             position: relative;
             overflow: hidden;
         }
 
-        .app-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 20px 40px rgba(108, 92, 231, 0.15);
+        /* Efecto de borde neón al hover - Zippy */
+        .app-card.zippy-card {
+            border-image: linear-gradient(135deg, var(--card-border) 80%, rgba(255, 159, 67, 0.5) 100%) 1;
         }
 
-        .category-tag {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #f1f2f6;
-            padding: 5px 12px;
-            border-radius: 50px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: var(--primary);
-            text-transform: uppercase;
+        .app-card.zippy-card:hover {
+            border-image: linear-gradient(135deg, rgba(255, 159, 67, 0.3) 0%, rgba(0, 206, 201, 0.3) 100%) 1;
+            box-shadow: 0 10px 40px rgba(255, 159, 67, 0.1);
+            transform: translateY(-8px);
         }
 
-        .icon-circle {
+        /* Efecto de borde neón al hover - Otros */
+        .app-card.others-card {
+            border-image: linear-gradient(135deg, var(--card-border) 80%, rgba(0, 210, 255, 0.5) 100%) 1;
+        }
+
+        .app-card.others-card:hover {
+            border-image: linear-gradient(135deg, rgba(0, 210, 255, 0.3) 0%, rgba(58, 123, 213, 0.3) 100%) 1;
+            box-shadow: 0 10px 40px rgba(0, 210, 255, 0.1);
+            transform: translateY(-8px);
+        }
+
+        /* Iconos */
+        .icon-box {
             width: 70px;
             height: 70px;
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            color: var(--primary);
-            margin-bottom: 20px;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            border: 1px solid var(--card-border);
             transition: 0.3s;
         }
 
-        .app-card:hover .icon-circle {
-            background: var(--primary);
-            color: white;
-        }
+        .zippy-card .icon-box { color: var(--primary-orange); }
+        .others-card .icon-box { color: var(--primary-blue); }
 
-        .app-card h3 { font-size: 1.6rem; margin-bottom: 12px; color: #2d3436; }
-        .app-card p { font-size: 0.95rem; color: #636e72; margin-bottom: 25px; line-height: 1.5; }
+        .app-card h3 { font-size: 1.6rem; margin-bottom: 12px; letter-spacing: -0.5px; }
+        .app-card p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 25px; line-height: 1.6; min-height: 70px; }
 
-        /* Botón */
-        .btn-download {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        /* Botón Estilo Neón */
+        .btn-action {
             text-decoration: none;
-            background: var(--dark);
             color: white;
             padding: 14px;
             border-radius: 16px;
+            text-align: center;
             font-weight: 600;
-            gap: 10px;
+            font-size: 0.95rem;
             transition: 0.3s;
-        }
-
-        .btn-download:hover {
-            background: var(--primary);
-            transform: scale(1.02);
-        }
-
-        /* Floating WhatsApp */
-        .btn-whatsapp {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background-color: #25d366;
-            color: white;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 1000;
+            gap: 10px;
+            border: 1px solid transparent;
+        }
+
+        /* Botón Zippy (Naranja) */
+        .zippy-card .btn-action {
+            background: rgba(255, 159, 67, 0.1);
+            border-color: rgba(255, 159, 67, 0.3);
+            color: var(--primary-orange);
+        }
+
+        .zippy-card .btn-action:hover {
+            background: rgba(255, 159, 67, 0.2);
+            box-shadow: 0 0 15px rgba(255, 159, 67, 0.3);
+        }
+
+        /* Botón Otros (Azul) */
+        .others-card .btn-action {
+            background: rgba(0, 210, 255, 0.1);
+            border-color: rgba(0, 210, 255, 0.3);
+            color: var(--primary-blue);
+        }
+
+        .others-card .btn-action:hover {
+            background: rgba(0, 210, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+
+        /* Floating WhatsApp Moderno */
+        .btn-whatsapp {
+            position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px;
+            background-color: #25d366; color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); z-index: 1000;
             transition: 0.3s;
         }
 
-        .btn-whatsapp:hover { transform: rotate(15deg) scale(1.1); }
+        .btn-whatsapp:hover { transform: rotate(10deg) scale(1.1); }
 
-        footer { text-align: center; padding: 50px; color: #a4b0be; }
+        footer { text-align: center; padding: 60px; color: var(--text-muted); border-top: 1px solid var(--card-border); font-size: 0.9rem;}
 
         @media (max-width: 600px) {
-            .hero h1 { font-size: 2.2rem; }
+            header h1 { font-size: 2.8rem; }
+            .section-title { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-    <header class="hero">
+    <header>
         <h1>Creative M</h1>
-        <p>Ecosistemas Digitales y Soluciones Móviles</p>
+        <p>Innovación Digital & Ecosistemas Móviles de Alto Rendimiento</p>
     </header>
 
-    <div class="container" id="project-list">
+    <h2 class="section-title zippy-title">Ecosistema Digital Zippy</h2>
+    <div class="container" id="zippy-list">
         </div>
 
-    <a href="https://wa.me/3150725566" class="btn-whatsapp" target="_blank">
+    <h2 class="section-title others-title">Otros Proyectos Destacados</h2>
+    <div class="container" id="others-list">
+        </div>
+
+    <a href="https://wa.me/57TU_NUMERO_AQUI" class="btn-whatsapp" target="_blank">
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
     <footer>
-        <p>© 2026 Creative M | Innovación Constante</p>
+        <p>© 2026 Creative M | Empujando los límites de la tecnología</p>
     </footer>
 
     <script>
-        const projects = [
+        const zippyApps = [
             {
-                name: "FullTV",
-                cat: "Entretenimiento",
-                desc: "¡Descubre la forma más fácil y económica de disfrutar del cine en casa! 🎬✨",
-                icon: "fa-film",
-                link: "https://github.com/CreativeMB/center/releases/download/apk/FullTV.apk",
-                label: "Descargar APK"
-            },
-            {
-                name: "Zippy Ecosistema",
-                cat: "Negocios",
-                desc: "Gestión Integral para tu Negocio. La plataforma central de administración.",
+                name: "Zippy Principal",
+                desc: "Gestión Integral para tu Negocio. La plataforma central para controlar tu empresa.",
                 icon: "fa-rocket",
                 link: "https://zippy-727d5.web.app/empresa",
-                label: "Visitar Plataforma"
+                btn: "Abrir Plataforma"
             },
             {
                 name: "Zippy Entregas",
-                cat: "Logística",
-                desc: "Optimiza la gestión de tus entregas y domicilios con eficiencia.",
+                desc: "Optimiza y rastrea la logística de tus domicilios en tiempo real con eficiencia.",
                 icon: "fa-truck-fast",
                 link: "https://zippy-727d5.web.app/empresa",
-                label: "Ver Proyecto"
+                btn: "Ver Detalles"
             },
             {
                 name: "Zippy Catálogo",
-                cat: "Ventas",
-                desc: "Catálogo interactivo para tu punto de venta. Moderniza tu atención.",
+                desc: "Catálogo interactivo moderno para tu punto de venta. Potencia tu atención al cliente.",
                 icon: "fa-store",
                 link: "https://zippy-727d5.web.app/empresa",
-                label: "Ver Proyecto"
-            },
-            {
-                name: "Galeria TV",
-                cat: "Utilidad",
-                desc: "Explora su contenido USB con facilidad en pantallas grandes.",
-                icon: "fa-usb",
-                link: "https://www.mediafire.com/folder/xtlg6z45j060l/Tienda_control",
-                label: "Descargar APK"
-            },
-            {
-                name: "Tienda Control",
-                cat: "Administración",
-                desc: "Eficiencia y organización clave para el éxito empresarial.",
-                icon: "fa-gauge-high",
-                link: "https://www.mediafire.com/folder/xtlg6z45j060l/Tienda_control",
-                label: "Descargar APK"
-            },
-            {
-                name: "Comunidad IPUC",
-                cat: "Comunidad",
-                desc: "Creemos que la Biblia es inspirada por Dios. Recursos de fe y justicia.",
-                icon: "fa-book-bible",
-                link: "https://play.google.com/store/apps/details?id=ipuc.santacecilia&hl=es_419",
-                label: "Ir a Play Store"
-            },
-            {
-                name: "Floristería Los Lirios",
-                cat: "E-Commerce",
-                desc: "Nuestra aplicación para ver productos con la mejor facilidad.",
-                icon: "fa-leaf",
-                link: "https://play.google.com/store/apps/details?id=floristeria.loslirios&hl=es_419",
-                label: "Ir a Play Store"
+                btn: "Ver Catálogo"
             }
         ];
 
-        const container = document.getElementById('project-list');
+        const otherApps = [
+            {
+                name: "FullTV",
+                desc: "¡Disfruta del cine en casa con FullTV! La forma más fácil, rápida y económica.",
+                icon: "fa-film",
+                link: "https://github.com/CreativeMB/center/releases/download/apk/FullTV.apk",
+                btn: "Descargar APK"
+            },
+            {
+                name: "Galeria TV",
+                desc: "Explora y reproduce tus archivos USB en la pantalla grande de tu TV con facilidad.",
+                icon: "fa-usb",
+                link: "https://www.mediafire.com/folder/xtlg6z45j060l/Tienda_control",
+                btn: "Descargar APK"
+            },
+            {
+                name: "Tienda Control",
+                desc: "Eficiencia, organización y control total. La clave para el éxito empresarial moderno.",
+                icon: "fa-gauge-high",
+                link: "https://www.mediafire.com/folder/xtlg6z45j060l/Tienda_control",
+                btn: "Descargar APK"
+            },
+            {
+                name: "Comunidad IPUC",
+                desc: "Recursos bíblicos, fe e instrucción basada en la infalible Palabra de Dios.",
+                icon: "fa-book-bible",
+                link: "https://play.google.com/store/apps/details?id=ipuc.santacecilia&hl=es_419",
+                btn: "Play Store"
+            },
+            {
+                name: "Floristería Los Lirios",
+                desc: "Catálogo completo de arreglos florales con la mejor experiencia de usuario móvil.",
+                icon: "fa-leaf",
+                link: "https://play.google.com/store/apps/details?id=floristeria.loslirios&hl=es_419",
+                btn: "Play Store"
+            }
+        ];
 
-        projects.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'app-card';
-            card.innerHTML = `
-                <div>
-                    <span class="category-tag">${p.cat}</span>
-                    <div class="icon-circle"><i class="fa-solid ${p.icon}"></i></div>
-                    <h3>${p.name}</h3>
-                    <p>${p.desc}</p>
-                </div>
-                <a href="${p.link}" class="btn-download" target="_blank">
-                    ${p.label} <i class="fa-solid fa-arrow-right-long"></i>
-                </a>
-            `;
-            container.appendChild(card);
-        });
+        function render(data, containerId, isZippy) {
+            const container = document.getElementById(containerId);
+            data.forEach(p => {
+                const card = document.createElement('div');
+                card.className = `app-card ${isZippy ? 'zippy-card' : 'others-card'}`;
+                card.innerHTML = `
+                    <div>
+                        <div class="icon-box"><i class="fa-solid ${p.icon}"></i></div>
+                        <h3>${p.name}</h3>
+                        <p>${p.desc}</p>
+                    </div>
+                    <a href="${p.link}" class="btn-action" target="_blank">${p.btn}</a>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        render(zippyApps, 'zippy-list', true);
+        render(otherApps, 'others-list', false);
     </script>
 </body>
 </html>
