@@ -1132,7 +1132,7 @@ const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
 // 2. Creamos el mensaje usando formato de texto ultra-compatible (Opción 2)
 // Usamos asteriscos para negritas y guiones para los puntos, evitando iconos que se rompan.
 const mensajeWa = encodeURIComponent(
-    `Hola, me interesa:\n\n` +
+    `*Hola, Quiero comprar el siguiente producto:*\n\n` +
     `*Producto:* ${refProd}\n` +
     `*Descripción:* ${descProd}\n` +
     `*Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`
