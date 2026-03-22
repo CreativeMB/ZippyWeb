@@ -1128,8 +1128,12 @@ function iniciarCargaBase(slugBusqueda) {
             const descProd = (real.descripcion || "").replace(/'/g, "\\'");
             const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
             
-            const mensajeWa = encodeURIComponent(`Hola, me interesa:\n📌 *Ref:* ${real.referenciaReal || refP}\n💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`);
-            const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
+    
+const mensajeWa = encodeURIComponent(
+  `Hola, me interesa:\n📌 *Ref:* ${real.referenciaReal || refP}\n📝 *Descripción:* ${descripcion || "Sin descripción disponible"}\n💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`
+);
+            
+const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
 
             let botonAccion = real.agotado 
                 ? `<button class="btn" style="background:#888; color:white; cursor:not-allowed;" disabled>Agotado</button>`
