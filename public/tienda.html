@@ -1122,24 +1122,27 @@ function iniciarCargaBase(slugBusqueda) {
                 precioHTML = `<div class="precio">Consultar precio</div>`;
             }
 
-            const card = document.createElement("div");
-            card.className = `producto ${real.agotado ? 'agotado' : ''}`;
+          const card = document.createElement("div");
+card.className = `producto ${real.agotado ? 'agotado' : ''}`;
 
-            const descProd = (real.descripcion || "").replace(/'/g, "\\'");
-            const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
-            
-    
+// 1. Limpiamos las variables de texto (evitamos errores de comillas)
+const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
+const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
+
+// 2. Creamos el mensaje usando directamente la variable 'descProd'
+// ¡Aquí está el truco! Usamos la variable de texto, no el elemento del DOM.
 const mensajeWa = encodeURIComponent(
-  `Hola, me interesa:\n📌 *Ref:* ${real.referenciaReal || refP}\n📝 *Descripción:* ${descripcion || "Sin descripción disponible"}\n💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`
+    `Hola, me interesa:\n📌 *Ref:* ${refProd}\n📝 *Descripción:* ${descProd}\n💰 *Precio:* ${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}`
 );
             
 const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
 
-            let botonAccion = real.agotado 
-                ? `<button class="btn" style="background:#888; color:white; cursor:not-allowed;" disabled>Agotado</button>`
-                : `<a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none;">Pedir por WhatsApp</a>`;
+// 3. Definimos el botón según la disponibilidad
+let botonAccion = real.agotado 
+    ? `<button class="btn" style="background:#888; color:white; cursor:not-allowed;" disabled>Agotado</button>`
+    : `<a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none; display:inline-block; text-align:center;">Pedir por WhatsApp</a>`;
 
-            const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '';
+const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '';
 
             card.innerHTML = `
                 <div class="img-container">
