@@ -1018,33 +1018,18 @@ function mostrarDatos(base) {
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    // ===================== 🔵 CARGA INICIAL =====================
-    ref.once('value', snapshot => {
-        const items = [];
-
-        snapshot.forEach(snap => {
-            const item = snap.val();
-            if (item && item.nombre && item.fechaHora) {
-                items.push({ ...item, key: snap.key });
-            }
-        });
-
-        // ordenar por fecha (más reciente primero)
-        items.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
-
-        items.forEach(item => {
-            procesarItem(item);
-        });
-    });
-
-    // ===================== 🔴 TIEMPO REAL =====================
+    // ==========================================================
+    // 🟢 SOLO TIEMPO REAL (Esto cargará los viejos y los nuevos)
+    // ==========================================================
     ref.on('child_added', snap => {
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
 
+        // Si ya existe el ID, no lo duplicamos
+        if (itemsMostrados.has(snap.key)) return;
+
         procesarItem({ ...item, key: snap.key });
     });
-
     // ===================== 🔧 FUNCION INTERNA =====================
     function procesarItem(item) {
         if (itemsMostrados.has(item.key)) return;
