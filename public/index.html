@@ -6,21 +6,47 @@
     <title>Zippy - Panel de Administración</title>
     <style>
         :root { --primary: #6200ee; --bg: #f8f9fa; }
+        
+        /* --- BLOQUEO VISUAL CRÍTICO --- */
+        #contenedorAdmin { 
+            display: none; /* Oculto por defecto */
+        }
+
+        /* Pantalla de carga moderna */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- ESTILOS DEL PANEL --- */
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
         .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         h1 { color: var(--primary); margin: 0; font-size: 1.5rem; }
-        
         .btn-logout { background: #ff4757; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        
         .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media (max-width: 800px) { .container { grid-template-columns: 1fr; } }
-        
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         h2 { border-bottom: 2px solid var(--bg); padding-bottom: 10px; font-size: 1.2rem; color: #333; }
-        
         textarea { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-family: monospace; box-sizing: border-box; margin-bottom: 10px; }
         .btn-save { background: var(--primary); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        
         .product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
         .product-info { display: flex; align-items: center; gap: 10px; }
         .product-img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
@@ -28,23 +54,30 @@
 </head>
 <body>
 
-    <div class="header">
-        <h1>Zippy Admin</h1>
-        <button class="btn-logout" id="btnCerrarSesion">Cerrar Sesión</button>
+    <div id="splash-screen">
+        <div class="spinner"></div>
+        <p style="margin-top:20px; color:#666; font-weight:500;">Verificando credenciales...</p>
     </div>
 
-    <div class="container">
-        <div class="card">
-            <h2>Catálogo Maestro (JSON)</h2>
-            <p style="font-size: 0.85rem; color: #666;">Pega aquí el JSON con Referencias y URLs de Drive.</p>
-            <textarea id="jsonInput" placeholder='{"REF001": "https://drive.google.com/..."}'></textarea>
-            <button class="btn-save" id="btnGuardarJson">Actualizar Catálogo</button>
+    <div id="contenedorAdmin">
+        <div class="header">
+            <h1>Zippy Admin</h1>
+            <button class="btn-logout" id="btnCerrarSesion">Cerrar Sesión</button>
         </div>
 
-        <div class="card">
-            <h2>Productos con Precio/Stock</h2>
-            <div id="listaProductos">
-                <p>Cargando productos...</p>
+        <div class="container">
+            <div class="card">
+                <h2>Catálogo Maestro (JSON)</h2>
+                <p style="font-size: 0.85rem; color: #666;">Pega aquí el JSON con Referencias y URLs de Drive.</p>
+                <textarea id="jsonInput" placeholder='{"REF001": "https://drive.google.com/..."}'></textarea>
+                <button class="btn-save" id="btnGuardarJson">Actualizar Catálogo</button>
+            </div>
+
+            <div class="card">
+                <h2>Productos con Precio/Stock</h2>
+                <div id="listaProductos">
+                    <p>Cargando productos...</p>
+                </div>
             </div>
         </div>
     </div>
