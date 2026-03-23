@@ -18,14 +18,28 @@
       --text-gray: #9CA3AF;
     }
 
-    body, html {
-      margin: 0; padding: 0; height: 100%;
-      background-color: var(--android-bg) !important;
-      font-family: 'Inter', sans-serif;
-      display: flex; justify-content: center; align-items: center;
-    }
+   body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    /* Color sólido exacto del XML de Android Studio */
+    background-color: #0F172A !important; 
+    /* Eliminamos cualquier rastro de degradado anterior */
+    background-image: none !important;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    .container { width: 100%; max-width: 420px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
+/* También aseguramos que el contenedor no tenga fondos extraños */
+.container {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+    box-sizing: border-box;
+    background: transparent !important;
+}
 
     /* TARJETA PRINCIPAL */
     .card {
@@ -47,7 +61,7 @@
       text-transform: uppercase;
     }
 
-    .nombreEmpresa span { color: var(--zippy-orange); }
+    .nombreEmpresa span { color: var(--text-white); }
 
     .subTitle { 
       font-size: 14px; 
