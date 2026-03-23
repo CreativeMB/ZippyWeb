@@ -1340,16 +1340,34 @@ set(nuevoRef, pedidoData).then(() => {
             if (container) container.style.zIndex = '10005';
         },
         willClose: () => {
-            // 3. LIMPIEZA TOTAL DE DATOS (Para evitar duplicados)
-            const formulario = document.getElementById("modalPedido");
-            if (formulario) formulario.reset();
+           // 1. Limpieza total de IDs
+    const idsParaLimpiar = [
+        "celularComprador", "direccionEntrega", "nombreComprador", "fechaEntrega",
+        "nombreDestinatario", "celularDestinatario", "productoAdicional", "medioPago",
+        "horaEntrega", "notasPedido", "mensajeTarjeta", "deTarjeta", "paraTarjeta"
+    ];
+    idsParaLimpiar.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.tagName === "SELECT") el.selectedIndex = 0;
+            else el.value = "";
+        }
+    });
 
-            // Limpiamos variables globales de Zippy
-            productoSeleccionado = "";
-            imagenProducto = "";
-            
-            btn.disabled = false;
-            btn.innerText = "Enviar Pedido";
+    // 2. DESBLOQUEO DE MOUSE Y SCROLL (Vital para Creative M)
+    document.body.style.overflow = 'auto'; // Devuelve el scroll
+    document.body.style.pointerEvents = 'auto'; // Devuelve los clics
+    document.body.classList.remove('modal-open');
+    
+    // Quitar cualquier rastro de fondo oscuro
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) backdrop.remove();
+
+    // 3. Reset de variables y botón
+    productoSeleccionado = "";
+    imagenProducto = "";
+    btn.disabled = false;
+    btn.innerText = "Enviar Pedido";
         }
     });
 
@@ -1420,7 +1438,31 @@ set(nuevoRef, pedidoData).then(() => {
     };
 
     window.enviarPedido = enviarPedido;
-    window.cerrarModal = () => document.getElementById("modalPedido").style.display = "none";
+    window.cerrarModal = () => {
+    // 1. Ocultar el modal visualmente
+    const modal = document.getElementById("modalPedido");
+    if (modal) {
+        modal.style.display = "none";
+    }
+
+    // 2. 🚀 LIBERAR EL MOUSE Y EL SCROLL
+    // Esto quita cualquier bloqueo que SweetAlert o Bootstrap hayan dejado
+    document.body.style.overflow = 'auto'; // Devuelve el scroll
+    document.body.style.pointerEvents = 'auto'; // Devuelve los clics
+    document.body.classList.remove('modal-open'); // Quita clase de bloqueo si existe
+
+    // 3. ELIMINAR FONDOS OSCUROS (Backdrops)
+    // A veces se queda una mancha oscura que no deja tocar nada
+    const backdrops = document.querySelectorAll('.modal-backdrop, .swal2-container');
+    backdrops.forEach(el => el.remove());
+
+    // 4. LIMPIEZA PREVENTIVA
+    // Si el usuario lo cerró para elegir otro producto, vaciamos los campos
+    const formulario = document.getElementById("tuFormularioId"); 
+    if (formulario) formulario.reset();
+
+    console.log("✅ Modal cerrado y mouse liberado para nuevas compras.");
+};
 
     // Social & Buscador
     document.addEventListener("DOMContentLoaded", () => {
