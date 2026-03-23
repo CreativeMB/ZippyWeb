@@ -996,7 +996,6 @@ document.addEventListener('keydown', e => {
     });
 });
 
-// --- FUNCION MOSTRAR DATOS DE BASE ---
 function mostrarDatos(base) {
     baseSeleccionada = base;
 
@@ -1009,7 +1008,7 @@ function mostrarDatos(base) {
     document.getElementById('resumenTotales').style.display = 'grid';
 
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-    ref.off(); // eliminar listeners previos
+    ref.off(); 
     sidebarList.innerHTML = '';
 
     const separadoresPorDia = {};
@@ -1018,27 +1017,19 @@ function mostrarDatos(base) {
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-  // ===================== 🔄 FLUJO ÚNICO EN TIEMPO REAL =====================
-    // Eliminamos el .once para que no haya retrasos ni duplicados
-    
+    // --- TIEMPO REAL ---
     ref.on('child_added', snap => {
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
-
-        // procesarItem ya tiene "itemsMostrados.has" para evitar duplicados
-        // y usa "insertarItemOrdenado" para que lo más nuevo siempre esté arriba
         procesarItem({ ...item, key: snap.key });
     });
 
-    // Opcional: listener para cuando se borra algo (mantiene la lista limpia)
     ref.on('child_removed', snap => {
         const elemento = document.querySelector(`li[data-key="${snap.key}"]`);
         if (elemento) elemento.remove();
-        // Nota: Si borras, los totales del separador no se recalculan solos 
-        // a menos que refresques o añadas lógica extra aquí.
     });
 
-    // ===================== 🔧 FUNCION INTERNA =====================
+    // --- FUNCIÓN INTERNA ---
     function procesarItem(item) {
         if (itemsMostrados.has(item.key)) return;
         itemsMostrados.add(item.key);
@@ -1046,65 +1037,76 @@ function mostrarDatos(base) {
         const fechaObj = new Date(item.fechaHora);
         const timestamp = fechaObj.getTime();
 
-        // clave única por día
-        const fechaDia =
-            fechaObj.getFullYear() + '-' +
+        // Formato YYYY-MM-DD para comparar fechas
+        const fechaDia = fechaObj.getFullYear() + '-' +
             String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
             String(fechaObj.getDate()).padStart(2, '0');
-// crear separador si no existe
+
+        // 1. Obtener o crear el separador del día
         let separadorActual = separadoresPorDia[fechaDia];
         if (!separadorActual) {
             separadorActual = crearSeparadorDiaEditable(fechaObj, fechaDia);
-            
-            // IMPORTANTE: Agregar esta clase para que el orden funcione
             separadorActual.classList.add('separador-dia'); 
-
-            separadorActual.dataset.pos = 0;
-            separadorActual.dataset.neg = 0;
+            separadorActual.dataset.fecha = fechaDia; 
+            separadorActual.dataset.pos = "0";
+            separadorActual.dataset.neg = "0";
             separadoresPorDia[fechaDia] = separadorActual;
 
-            // 🔥 CAMBIO CLAVE: Usa prepend() para que salga al inicio DE UNA VEZ
-            sidebarList.prepend(separadorActual); 
+            // Insertar el separador en la posición correcta (más reciente arriba)
+            let insertado = false;
+            const separadoresExistentes = sidebarList.querySelectorAll('.separador-dia');
+            
+            for (let sep of separadoresExistentes) {
+                if (fechaDia > sep.dataset.fecha) {
+                    sidebarList.insertBefore(separadorActual, sep);
+                    insertado = true;
+                    break;
+                }
+            }
+            if (!insertado) sidebarList.appendChild(separadorActual);
         }
 
-// --- EL RESTO DE LA FUNCIÓN SIGUE IGUAL ---
-
+        // 2. Calcular valores
         const valor = Number(item.valor) || 0;
-
-        // acumular totales
         if (valor > 0) {
             totalPositivo += valor;
-            separadorActual.dataset.pos =
-                Number(separadorActual.dataset.pos) + valor;
-        } else if (valor < 0) {
+            separadorActual.dataset.pos = (Number(separadorActual.dataset.pos) + valor).toString();
+        } else {
             totalNegativo += valor;
-            separadorActual.dataset.neg =
-                Number(separadorActual.dataset.neg) + valor;
+            separadorActual.dataset.neg = (Number(separadorActual.dataset.neg) + valor).toString();
         }
 
-        separadorActual.actualizar();
+        // 3. Actualizar visualmente el separador
+        if (typeof separadorActual.actualizar === 'function') {
+            separadorActual.actualizar();
+        }
 
-        // crear elemento de lista
+        // 4. Crear el elemento de la lista (el registro)
         const li = document.createElement('li');
         li.dataset.key = item.key;
         li.dataset.timestamp = timestamp;
+        li.className = "item-dato";
 
-        const fechaFormateada = formatearFechaBD(item.fechaHora);
-        li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${fechaFormateada}`;
+        const fFormateada = typeof formatearFechaBD === 'function' ? formatearFechaBD(item.fechaHora) : item.fechaHora;
+        li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${fFormateada}`;
 
+        // Estilos básicos (puedes moverlos a CSS)
         li.style.padding = '10px';
         li.style.marginBottom = '5px';
         li.style.borderRadius = '6px';
+        li.style.listStyle = 'none';
         li.style.color = valor < 0 ? '#D32F2F' : '#388E3C';
         li.style.backgroundColor = valor < 0 ? '#FFCDD2' : '#C8E6C9';
 
-        // insertar ordenado dentro del día
+        // 5. Insertar el dato debajo de su separador en orden
         insertarItemOrdenado(separadorActual, li, timestamp);
 
-        // actualizar totales globales
-        actualizarTotales(totalPositivo, totalNegativo);
+        // 6. Actualizar totales generales arriba
+        if (typeof actualizarTotales === 'function') {
+            actualizarTotales(totalPositivo, totalNegativo);
+        }
     }
-}
+} 
 
 
 function insertarItemOrdenado(separador, li, timestamp) {
