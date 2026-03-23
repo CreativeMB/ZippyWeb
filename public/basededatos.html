@@ -1045,33 +1045,29 @@ document.addEventListener('keydown', e => {
 
 function mostrarDatos(base) {
     baseSeleccionada = base;
-
-    // Título con la base actual
     sidebarTitulo.textContent = `📊 ${base}`;
 
-    // --- AJUSTE DE BOTONES SUPERIORES ---
-    btnVolver.style.display = "none"; // ❌ Ya no necesitamos "Volver"
-    btnAgregarDato.style.display = "inline-block"; // ✅ Botón para nueva entrada
-    formNuevoDato.style.display = "none";
+    // --- 1. BOTONES SUPERIORES (Donde estaba Volver) ---
+    btnVolver.style.display = "none"; 
+    btnAgregarDato.style.display = "inline-block";
 
-    // --- CONFIGURACIÓN DEL BOTÓN "CAMBIAR/FIJAR" ---
-    // Usamos opcionesExtra para que el botón aparezca ARRIBA y no en el formulario
+    // Usamos un contenedor que NO sea el de las opciones del formulario
+    // Si tu contenedor de arriba se llama 'opcionesExtra', asegúrate de 
+    // que el checkbox NO esté dentro de ese mismo ID en el HTML.
     opcionesExtra.innerHTML = ''; 
-    const btnConfig = document.createElement('button');
-    btnConfig.innerHTML = "🔄 Cambiar Base";
-    btnConfig.className = "btn-volver"; // Reutilizamos tu clase de CSS
-    
-    // Al hacer clic, cargamos la lista de bases para que elija la nueva favorita
-    btnConfig.onclick = () => cargarBases(); 
+    const btnCambiar = document.createElement('button');
+    btnCambiar.innerHTML = "🔄 Cambiar Base";
+    btnCambiar.className = "btn-volver"; 
+    btnCambiar.onclick = () => cargarBases(); 
+    opcionesExtra.appendChild(btnCambiar);
+    opcionesExtra.style.display = "inline-block";
 
-    opcionesExtra.appendChild(btnConfig);
-    opcionesExtra.style.display = "inline-block"; 
-    // --------------------------------------------
+    formNuevoDato.style.display = "none"; 
 
+    // --- 3. CARGA DE DATOS ---
     document.getElementById('resumenTotales').style.display = 'grid';
-
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-    ref.off(); // Limpiar listeners previos
+    ref.off();
     sidebarList.innerHTML = '';
 
     const separadoresPorDia = {};
@@ -1079,12 +1075,9 @@ function mostrarDatos(base) {
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    // --- ESCUCHA EN TIEMPO REAL ---
     ref.on('child_added', snap => {
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
-        
-        // procesarItem se encarga de agrupar por días y sumar
         procesarItem({ ...item, key: snap.key });
     });
 
