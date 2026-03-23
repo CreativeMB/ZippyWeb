@@ -917,85 +917,35 @@ function cargarPerfilEmpresa() {
     });
 }
 
-function mostrarDatos(base) {
-    baseSeleccionada = base;
-    sidebarTitulo.textContent = `📊 ${base}`;
+// --- CARGAR BASES ---
+function cargarBases() {
+    document.getElementById('resumenTotales').style.display = 'none';
+    sidebarTitulo.textContent = "📂 Contabilidad";
+    btnVolver.style.display = "none";
+    btnAgregarDato.style.display = "none";
+    formNuevoDato.style.display = "none";
+    opcionesExtra.style.display = "none";
 
-    // --- BOTÓN PARA CAMBIAR Y FIJAR FAVORITA ---
-    btnVolver.style.display = "none"; 
-    btnAgregarDato.style.display = "inline-block";
-
-    opcionesExtra.innerHTML = ''; 
-    const btnSeleccionar = document.createElement('button');
-    // El nombre del botón indica que aquí se cambia la base principal
-    btnSeleccionar.innerHTML = "⚙️ Cambiar Base Principal";
-    btnSeleccionar.className = "btn-volver"; // Tu clase de diseño
-    
-    // Al hacer clic, cargamos la lista para que elija una nueva
-    btnSeleccionar.onclick = () => cargarBasesParaSeleccionar();
-
-    opcionesExtra.appendChild(btnSeleccionar);
-    opcionesExtra.style.display = "inline-block";
-    // --------------------------------------------
-
-    document.getElementById('resumenTotales').style.display = 'grid';
-
-    const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-    ref.off(); 
     sidebarList.innerHTML = '';
 
-    const separadoresPorDia = {};
-    const itemsMostrados = new Set();
-    let totalPositivo = 0;
-    let totalNegativo = 0;
+    const ref = db
+        .ref(`${idEmpresa}/basededatos`)
+        .orderByChild('timestamp')
+        .limitToLast(100);
 
     ref.on('child_added', snap => {
-        const item = snap.val();
-        if (!item || !item.nombre || !item.fechaHora) return;
-        procesarItem({ ...item, key: snap.key });
+        if (!snap.exists()) return;
+
+        const li = document.createElement('li');
+        li.textContent = snap.key;
+        li.onclick = () => mostrarDatos(snap.key);
+
+        // 🔥 MÁS RECIENTE ARRIBA
+        sidebarList.insertBefore(li, sidebarList.firstChild);
     });
 }
-function cargarBasesParaSeleccionar() {
-    sidebarTitulo.textContent = "Selecciona tu Base Principal";
-    sidebarList.innerHTML = ''; 
-    opcionesExtra.style.display = "none"; // Ocultamos el botón de cambio mientras elige
-    document.getElementById('resumenTotales').style.display = 'none';
 
-    const ref = db.ref(`${idEmpresa}/basededatos`);
 
-    ref.once('value', snapshot => {
-        snapshot.forEach(snap => {
-            const nombre = snap.key;
-            const li = document.createElement('li');
-            li.textContent = nombre;
-            li.className = "btn-volver"; // Reutilizamos tu estilo
-            li.style.margin = "10px 0";
-            li.style.listStyle = "none";
-
-            // AL HACER CLIC: La hace favorita y la abre de una vez
-            li.onclick = () => marcarComoPredeterminada(nombre);
-            
-            sidebarList.appendChild(li);
-        });
-    });
-}
-function marcarComoPredeterminada(nombreBase) {
-    const refTodas = db.ref(`${idEmpresa}/basededatos`);
-
-    refTodas.once('value', snapshot => {
-        const updates = {};
-        snapshot.forEach(snap => {
-            updates[`${snap.key}/oculto`] = true; // "Apaga" las demás
-        });
-
-        updates[`${nombreBase}/oculto`] = false; // "Enciende" la elegida
-
-        refTodas.update(updates).then(() => {
-            // Una vez guardado, abrimos los datos de esa base
-            mostrarDatos(nombreBase);
-        });
-    });
-}
 // --- BOTONES ---
 btnVolver.onclick = () => {
     document.getElementById('resumenTotales').style.display = 'none';
@@ -1049,40 +999,25 @@ document.addEventListener('keydown', e => {
 function mostrarDatos(base) {
     baseSeleccionada = base;
 
-    // Título dinámico
-    sidebarTitulo.textContent = `📊 ${base}`;
-
-    // --- CONTROL DE BOTONES ---
-    btnVolver.style.display = "none"; // Ya no lo necesitas si es predeterminada
+    sidebarTitulo.textContent = `📄 Datos de: ${base}`;
+    btnVolver.style.display = "inline-block";
     btnAgregarDato.style.display = "inline-block";
     formNuevoDato.style.display = "none";
+    opcionesExtra.style.display = "none";
 
-    // --- CONFIGURACIÓN DEL BOTÓN "FIJAR PRINCIPAL" ---
-    opcionesExtra.innerHTML = ''; 
-    const btnFijar = document.createElement('button');
-    btnFijar.innerHTML = "📌 Dejar como Predeterminada";
-    btnFijar.className = "btn-fijar-favorita"; 
-    
-    // Al hacer clic, se guarda en Firebase y se queda ahí
-    btnFijar.onclick = () => marcarComoPredeterminada(base);
-
-    opcionesExtra.appendChild(btnFijar);
-    opcionesExtra.style.display = "block";
-
-    // Mostrar el resumen de dinero
     document.getElementById('resumenTotales').style.display = 'grid';
 
-    // Limpieza de datos antiguos
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
     ref.off(); 
     sidebarList.innerHTML = '';
 
     const separadoresPorDia = {};
     const itemsMostrados = new Set();
+
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    // --- ESCUCHA EN TIEMPO REAL ---
+    // --- TIEMPO REAL ---
     ref.on('child_added', snap => {
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
@@ -1094,19 +1029,20 @@ function mostrarDatos(base) {
         if (elemento) elemento.remove();
     });
 
-
     // --- FUNCIÓN INTERNA ---
-   function procesarItem(item) {
+    function procesarItem(item) {
         if (itemsMostrados.has(item.key)) return;
         itemsMostrados.add(item.key);
 
         const fechaObj = new Date(item.fechaHora);
         const timestamp = fechaObj.getTime();
+
+        // Formato YYYY-MM-DD para comparar fechas
         const fechaDia = fechaObj.getFullYear() + '-' +
             String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
             String(fechaObj.getDate()).padStart(2, '0');
 
-        // --- BUSCAR O CREAR SEPARADOR ---
+        // 1. Obtener o crear el separador del día
         let separadorActual = separadoresPorDia[fechaDia];
         if (!separadorActual) {
             separadorActual = crearSeparadorDiaEditable(fechaObj, fechaDia);
@@ -1116,12 +1052,13 @@ function mostrarDatos(base) {
             separadorActual.dataset.neg = "0";
             separadoresPorDia[fechaDia] = separadorActual;
 
-            // Insertar el día en orden (más reciente arriba)
+            // Insertar el separador en la posición correcta (más reciente arriba)
             let insertado = false;
-            const seps = sidebarList.querySelectorAll('.separador-dia');
-            for (let s of seps) {
-                if (fechaDia > s.dataset.fecha) {
-                    sidebarList.insertBefore(separadorActual, s);
+            const separadoresExistentes = sidebarList.querySelectorAll('.separador-dia');
+            
+            for (let sep of separadoresExistentes) {
+                if (fechaDia > sep.dataset.fecha) {
+                    sidebarList.insertBefore(separadorActual, sep);
                     insertado = true;
                     break;
                 }
@@ -1129,59 +1066,61 @@ function mostrarDatos(base) {
             if (!insertado) sidebarList.appendChild(separadorActual);
         }
 
+        // 2. Calcular valores
         const valor = Number(item.valor) || 0;
         if (valor > 0) {
-            separadorActual.dataset.pos = (Number(separadorActual.dataset.pos) + valor).toString();
             totalPositivo += valor;
+            separadorActual.dataset.pos = (Number(separadorActual.dataset.pos) + valor).toString();
         } else {
-            separadorActual.dataset.neg = (Number(separadorActual.dataset.neg) + valor).toString();
             totalNegativo += valor;
+            separadorActual.dataset.neg = (Number(separadorActual.dataset.neg) + valor).toString();
         }
 
-        if (typeof separadorActual.actualizar === 'function') separadorActual.actualizar();
+        // 3. Actualizar visualmente el separador
+        if (typeof separadorActual.actualizar === 'function') {
+            separadorActual.actualizar();
+        }
 
-        // --- CREAR EL DATO ---
+        // 4. Crear el elemento de la lista (el registro)
         const li = document.createElement('li');
         li.dataset.key = item.key;
         li.dataset.timestamp = timestamp;
-        li.classList.add('item-dato'); // Clase para diferenciar de los separadores
+        li.className = "item-dato";
 
         const fFormateada = typeof formatearFechaBD === 'function' ? formatearFechaBD(item.fechaHora) : item.fechaHora;
-        li.innerHTML = `<strong>${item.nombre}</strong>: $${valor.toLocaleString('es-CO')} <small>${fFormateada}</small>`;
+        li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${fFormateada}`;
 
+        // Estilos básicos (puedes moverlos a CSS)
         li.style.padding = '10px';
-        li.style.margin = '5px 10px';
-        li.style.borderRadius = '8px';
+        li.style.marginBottom = '5px';
+        li.style.borderRadius = '6px';
         li.style.listStyle = 'none';
-        li.style.display = 'block';
-        li.style.color = valor < 0 ? '#D32F2F' : '#1B5E20';
-        li.style.backgroundColor = valor < 0 ? '#FFEBEE' : '#E8F5E9';
+        li.style.color = valor < 0 ? '#D32F2F' : '#388E3C';
+        li.style.backgroundColor = valor < 0 ? '#FFCDD2' : '#C8E6C9';
 
-        // --- INSERCIÓN CRÍTICA ---
+        // 5. Insertar el dato debajo de su separador en orden
         insertarItemOrdenado(separadorActual, li, timestamp);
 
-        if (typeof actualizarTotales === 'function') actualizarTotales(totalPositivo, totalNegativo);
+        // 6. Actualizar totales generales arriba
+        if (typeof actualizarTotales === 'function') {
+            actualizarTotales(totalPositivo, totalNegativo);
+        }
     }
- }
+} 
+
 
 function insertarItemOrdenado(separador, li, timestamp) {
-    // Empezamos a buscar justo después del separador del día
     let nodo = separador.nextSibling;
 
-    // Recorremos los elementos mientras existan y NO sean el separador de OTRO día
     while (nodo && !nodo.classList?.contains('separador-dia')) {
         const tsNodo = Number(nodo.dataset.timestamp);
 
-        // Si el ítem que estamos insertando es más reciente (timestamp mayor)
-        // que el que estamos comparando, lo ponemos justo antes de ese nodo.
+        // si el nuevo es más reciente → va antes
         if (timestamp > tsNodo) break;
 
-        // Si no, seguimos bajando al siguiente ítem del mismo día
         nodo = nodo.nextSibling;
     }
 
-    // Finalmente, insertamos el 'li' (el dato) en la posición encontrada
-    // Si 'nodo' es null o es el siguiente separador, insertBefore lo pone al final del grupo.
     separador.parentNode.insertBefore(li, nodo);
 }
 
