@@ -1186,24 +1186,36 @@ const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '
     function enviarPedido() {
         const btn = document.getElementById("enviarPedidoBtn");
         if (!idDomiciliarioAsignado) {
-    // --- DISEÑO SWEETALERT2 PARA ADVERTENCIA ---
-  
-    Swal.fire({
+   // --- DISEÑO SWEETALERT2 PARA ADVERTENCIA ---
+// 1. Cerramos el modal/formulario inmediatamente
+const modal = document.getElementById("modalPedido"); // <--- Asegúrate de que este sea el ID de tu ventana
+if (modal) {
+    modal.style.display = "none";
+    
+    // Si usas Bootstrap, eliminamos el fondo oscuro
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) backdrop.remove();
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = 'auto';
+}
+
+// Tambien puedes usar Swal.close() si el formulario es otro SweetAlert
+Swal.close(); 
+
+// 2. Lanzamos la alerta informativa
+Swal.fire({
     icon: 'info',
     title: '📍 Sin Domiciliarios',
     text: 'Lo sentimos, no hay domiciliarios activos en este momento. Por favor, contacta a la tienda directamente para coordinar tu entrega.',
     confirmButtonText: 'Entendido',
     confirmButtonColor: '#FF6600',
-      
-    // --- ESTO ASEGURA QUE SE POSICIONE SOBRE EL FORMULARIO ---
     target: 'body',
     didOpen: () => {
         const container = document.querySelector('.swal2-container');
         if (container) {
-            container.style.zIndex = '10001'; // Un nivel más alto que el promedio
+            container.style.zIndex = '10001';
         }
     },
-    
     showClass: {
         popup: 'animate__animated animate__fadeInDown'
     },
