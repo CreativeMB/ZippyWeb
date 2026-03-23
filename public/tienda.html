@@ -1297,28 +1297,36 @@ Swal.fire({
                 horaRegistro: horaReg
             };
 
-         // --- AQUÍ SE ENVÍA EL PEDIDO ---
-        set(nuevoRef, pedidoData).then(() => {
-            Swal.fire({
-                icon: 'success',
-                title: '¡Pedido Enviado!',
-                text: 'Tu pedido ha sido registrado...',
-                timer: 5000,
-                timerProgressBar: true,
-                confirmButtonColor: '#ff6600',
-                target: 'body',
-                didOpen: () => {
-                    const container = document.querySelector('.swal2-container');
-                    if (container) container.style.zIndex = '10002';
-                },
-                willClose: () => {
-                    // Asegúrate de que el ID del formulario sea el correcto
-                    const formulario = document.getElementById("tuFormularioId");
-                    if (formulario) formulario.reset();
-                    btn.disabled = false;
-                    btn.innerText = "Enviar Pedido";
-                }
-            });
+      // --- AQUÍ SE ENVÍA EL PEDIDO ---
+set(nuevoRef, pedidoData).then(() => {
+    Swal.fire({
+        icon: 'success',
+        title: '¡Pedido Enviado y registrado!',
+        text: 'Confirmas por WhatsApp',
+        timer: 8000,
+        timerProgressBar: true,
+        confirmButtonColor: '#ff6600',
+        target: 'body',
+        didOpen: () => {
+            const container = document.querySelector('.swal2-container');
+            if (container) container.style.zIndex = '10002';
+        },
+        willClose: () => {
+            // 1. Cerramos el diálogo que contiene el formulario (el anterior)
+            // Si el formulario está dentro de otro Swal, esto cierra TODOS los abiertos.
+            Swal.close(); 
+
+            // 2. Limpiamos los datos del formulario por si acaso
+            const formulario = document.getElementById("tuFormularioId");
+            if (formulario) formulario.reset();
+
+            // 3. Restauramos el botón
+            btn.disabled = false;
+            btn.innerText = "Enviar Pedido";
+            
+            console.log("Cerrando formulario y limpiando datos...");
+        }
+    });
         }).catch(err => {
             Swal.fire({
                 icon: 'error',
