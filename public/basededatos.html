@@ -918,37 +918,60 @@ function cargarPerfilEmpresa() {
 }
 
 function cargarBases() {
-    sidebarList.innerHTML = '<p style="color:white; padding:10px;">Cargando bases...</p>';
+    // Usamos el contenedor principal para mostrar que está cargando
+    sidebarList.innerHTML = '<p style="color:white; padding:10px; text-align:center;">Cargando bases...</p>';
     
-    // Referencia a todas las bases del usuario
+    // Ocultamos el resumen y otros botones mientras cargamos la lista
+    document.getElementById('resumenTotales').style.display = 'none';
+    opcionesExtra.style.display = 'none';
+    btnAgregarDato.style.display = 'none';
+    btnVolver.style.display = 'none';
+    sidebarTitulo.textContent = "📂 Mis Bases de Datos";
+
     const ref = db.ref(`${idEmpresa}/basededatos`);
 
     ref.once('value', snapshot => {
-        sidebarList.innerHTML = ''; // Limpiar cargando
+        sidebarList.innerHTML = ''; 
         let baseParaAutoAbrir = null;
 
         snapshot.forEach(snap => {
             const data = snap.val();
             const nombreBase = snap.key;
 
-            // Crear el elemento de la lista (Botón en el sidebar)
+            // Crear el elemento de la lista
             const li = document.createElement('li');
             li.textContent = nombreBase;
-            li.className = "base-item"; // Tu clase de CSS
             
-            // Si es la predeterminada (oculto: false), le ponemos un estilo especial
+            // 🎨 USANDO TUS CLASES: Aplicamos el estilo del botón volver
+            // Asumo que tu clase es algo como "btn-volver" o similar
+            li.className = "btn-volver"; 
+            
+            // Ajustes de estilo para que parezca un ítem de lista
+            li.style.listStyle = "none";
+            li.style.marginBottom = "10px";
+            li.style.display = "block";
+            li.style.cursor = "pointer";
+            li.style.textAlign = "center";
+
+            // Si es la predeterminada (oculto: false)
             if (data.oculto === false) {
-                li.style.borderLeft = "4px solid #4CAF50"; 
-                baseParaAutoAbrir = nombreBase; // La marcamos para abrirla
+                li.style.borderLeft = "6px solid #4CAF50"; // Marca verde lateral
+                li.style.backgroundColor = "rgba(76, 175, 80, 0.2)"; // Fondo sutil verde
+                baseParaAutoAbrir = nombreBase;
             }
 
             li.onclick = () => mostrarDatos(nombreBase);
+            
+            // Los agregamos al sidebar
             sidebarList.prepend(li);
         });
 
-        // 🔥 AUTO-APERTURA: Si existe una base activa, se abre sola al cargar
+        // 🔥 AUTO-APERTURA
         if (baseParaAutoAbrir) {
             mostrarDatos(baseParaAutoAbrir);
+        } else {
+            // Si no hay ninguna predeterminada, dejamos el título para elegir
+            sidebarTitulo.textContent = "Selecciona una Base";
         }
     });
 }
@@ -1029,35 +1052,40 @@ document.addEventListener('keydown', e => {
 function mostrarDatos(base) {
     baseSeleccionada = base;
 
-    sidebarTitulo.textContent = `📄 Datos de: ${base}`;
-    btnVolver.style.display = "inline-block";
+    // Título dinámico
+    sidebarTitulo.textContent = `📊 ${base}`;
+
+    // --- CONTROL DE BOTONES ---
+    btnVolver.style.display = "none"; // Ya no lo necesitas si es predeterminada
     btnAgregarDato.style.display = "inline-block";
     formNuevoDato.style.display = "none";
 
-    // --- CONFIGURACIÓN DEL BOTÓN "FIJAR" ---
-    opcionesExtra.innerHTML = ''; // 🔥 IMPORTANTE: Limpia botones anteriores para que no se dupliquen
+    // --- CONFIGURACIÓN DEL BOTÓN "FIJAR PRINCIPAL" ---
+    opcionesExtra.innerHTML = ''; 
     const btnFijar = document.createElement('button');
-    btnFijar.textContent = "📌 Fijar como Principal";
+    btnFijar.innerHTML = "📌 Dejar como Predeterminada";
     btnFijar.className = "btn-fijar-favorita"; 
+    
+    // Al hacer clic, se guarda en Firebase y se queda ahí
     btnFijar.onclick = () => marcarComoPredeterminada(base);
 
     opcionesExtra.appendChild(btnFijar);
     opcionesExtra.style.display = "block";
-    // ---------------------------------------
 
+    // Mostrar el resumen de dinero
     document.getElementById('resumenTotales').style.display = 'grid';
 
+    // Limpieza de datos antiguos
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
     ref.off(); 
     sidebarList.innerHTML = '';
 
     const separadoresPorDia = {};
     const itemsMostrados = new Set();
-
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    // --- TIEMPO REAL ---
+    // --- ESCUCHA EN TIEMPO REAL ---
     ref.on('child_added', snap => {
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
@@ -1068,6 +1096,7 @@ function mostrarDatos(base) {
         const elemento = document.querySelector(`li[data-key="${snap.key}"]`);
         if (elemento) elemento.remove();
     });
+
 
     // --- FUNCIÓN INTERNA ---
    function procesarItem(item) {
