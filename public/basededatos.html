@@ -8,73 +8,67 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-    body {
-    font-family: 'Roboto', sans-serif;
+   /* ===================================================
+   ESTILO ECOSISTEMA ZIPPY - SOLO ESTRUCTURA
+   =================================================== */
+
+:root {
+    --fondo-zippy: #0F172A;    /* El azul oscuro del XML */
+    --card-zippy: #1E293B;     /* El fondo de las tarjetas en Android */
+    --azul-accion: #2563EB;    /* El color del botón Ingresar */
+    --borde-suave: #334155;
+}
+
+/* Aplicamos el fondo general de la App */
+body {
+    background-color: var(--fondo-zippy) !important;
+    font-family: 'Inter', sans-serif;
+    color: #FFFFFF;
     margin: 0;
-    min-height: 100vh;
-    display: flex;
-
-    background: linear-gradient(
-        to bottom,
-        rgba(74, 173, 78, 0.34),
-        rgba(0, 150, 136, 0.90)
-    );
 }
 
-    /* Barra lateral a la derecha con fondo negro */
+/* --- SIDEBAR (Contenedor de la derecha) --- */
 #sidebar {
-    width: 25%;
-    background: #000; /* fondo negro */
-    color: #fff; /* texto blanco */
-    padding: 15px;
-    overflow-y: auto;
-    box-sizing: border-box;
-    border-left: 2px solid #444; /* en lugar de border-right */
-    border-right: none;
-    position: fixed; /* fijar al lado derecho */
-    top: 0;
-    right: 0; /* mover al lado derecho */
-    height: 100vh;
+    background: var(--card-zippy) !important; /* Estilo CardView de Android */
+    border-left: 1px solid var(--borde-suave) !important;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.4);
 }
 
-/* Cambiar estilos de lista dentro de la sidebar */
-#sidebar li {
-    padding: 10px;
-    background: #111; /* ligeramente más claro que el negro */
-    margin-bottom: 8px;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: 0.2s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-#sidebar li:hover {
-    background: #222;
-}
-
-/* Botones dentro de la barra */
-#sidebar button {
-    margin: 5px 0;
-    padding: 10px;
-    width: 100%;
-    border-radius: 6px;
+/* --- BOTONES DE CONTROL (Volver/Agregar/Sesión) --- */
+/* Estos botones ahora tendrán el ADN de Zippy */
+#btnCerrarSesion, .btn-volver, #btnAgregarDato, #btnGuardarDato {
+    background-color: var(--azul-accion) !important;
+    border-radius: 12px !important; /* app:cornerRadius="12dp" */
+    font-weight: bold;
+    text-transform: uppercase;
     border: none;
-    cursor: pointer;
-    font-size: 16px;
-    background: #333;
-    color: #fff;
-    transition: 0.2s;
+    transition: 0.3s;
 }
 
-#sidebar button:hover {
-    background: #555;
+#btnCerrarSesion:hover, .btn-volver:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
+
+/* --- FORMULARIO DE NUEVO DATO --- */
+/* Lo hacemos lucir como el CardView del Login de tu XML */
+#formNuevoDato {
+    background: var(--card-zippy) !important;
+    border-radius: 20px !important; /* app:cardCornerRadius="20dp" */
+    border: 1px solid var(--borde-suave) !important;
+    padding: 25px !important;
+}
+
+#formNuevoDato input, #formNuevoDato textarea {
+    background-color: var(--fondo-zippy) !important;
+    border: 1px solid var(--borde-suave) !important;
+    color: white !important;
+    border-radius: 10px !important;
 }
 
 /* Ajustar el main para que no quede tapado */
 #main {
-    margin-right: 25%; /* dejar espacio para la sidebar */
-    padding: 15px;
-     width: calc(100% - 25%);
+    background-color: var(--fondo-zippy);
 }
 
    /* Tabla */
@@ -1046,7 +1040,7 @@ document.addEventListener('keydown', e => {
 function mostrarDatos(base) {
     baseSeleccionada = base;
 
-    sidebarTitulo.textContent = `📄 Datos de: ${base}`;
+    sidebarTitulo.textContent = `📄 Historial de: ${base}`;
     
     // --- CAMBIO CLAVE: REEMPLAZAMOS EL BOTÓN VOLVER ---
     // En lugar de ocultar/mostrar el btnVolver original, lo usamos para la nueva función
