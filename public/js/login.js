@@ -94,7 +94,7 @@ firebase.auth().signInWithPopup(provider)
           icon: 'success',
           title: 'Suscripción Activa',
           text: mensajeDias,
-          timer: 2000, // Se cierra solo en 2 segundos para no molestar
+          timer: 5000, // Se cierra solo en 2 segundos para no molestar
           showConfirmButton: false,
           timerProgressBar: true
         }).then(() => {
