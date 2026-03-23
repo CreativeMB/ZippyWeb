@@ -1330,7 +1330,7 @@ set(nuevoRef, pedidoData).then(() => {
     Swal.fire({
         icon: 'success',
         title: '¡Pedido Enviado!',
-        text: 'Tu orden fue registrada correctamente.',
+        text: 'Tu orden fue registrada correctamente Confirma por WhatsApp.',
         timer: 5000,
         timerProgressBar: true,
         confirmButtonColor: '#ff6600',
@@ -1341,7 +1341,7 @@ set(nuevoRef, pedidoData).then(() => {
         },
         willClose: () => {
             // 3. LIMPIEZA TOTAL DE DATOS (Para evitar duplicados)
-            const formulario = document.getElementById("tuFormularioId");
+            const formulario = document.getElementById("modalPedido");
             if (formulario) formulario.reset();
 
             // Limpiamos variables globales de Zippy
@@ -1384,7 +1384,7 @@ set(nuevoRef, pedidoData).then(() => {
 
     window.abrirProducto = (nombre, imagen, precio, descripcion) => {
         // --- 🚀 NUEVO: LIMPIEZA PREVENTIVA AL ABRIR ---
-    const formulario = document.getElementById("tuFormularioId"); // Asegúrate que este ID sea el de tu <form>
+    const formulario = document.getElementById("modalPedido"); // Asegúrate que este ID sea el de tu <form>
     if (formulario) {
         formulario.reset(); 
     }
