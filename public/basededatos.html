@@ -891,7 +891,7 @@ auth.onAuthStateChanged(user => {
         idEmpresa = user.uid;
 
         cargarPerfilEmpresa();
-        cargarBases();
+    
 inicializarContabilidad();
         cargarReferenciasDesdeFirebase().then(() => {
             cargarPedidosRealtime();
