@@ -67,7 +67,6 @@ firebase.auth().signInWithPopup(provider)
           confirmButtonColor: '#f8bb86'
         });
       }
-
       const empresaData = snapshot.val();
       const fechaExpStr = empresaData.fechaExpiracion;
 
