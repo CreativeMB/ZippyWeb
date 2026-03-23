@@ -1297,8 +1297,14 @@ Swal.fire({
                 horaRegistro: horaReg
             };
 
-      // --- AQUÍ SE ENVÍA EL PEDIDO ---
+// --- AQUÍ SE ENVÍA EL PEDIDO ---
 set(nuevoRef, pedidoData).then(() => {
+    
+    // 1. CERRAMOS EL FORMULARIO INMEDIATAMENTE (Antes de la alerta de éxito)
+    // Esto quita el SweetAlert que está atrás de una vez.
+    Swal.close(); 
+
+    // 2. LANZAMOS LA ALERTA DE ÉXITO
     Swal.fire({
         icon: 'success',
         title: '¡Pedido Enviado y registrado!',
@@ -1312,37 +1318,29 @@ set(nuevoRef, pedidoData).then(() => {
             if (container) container.style.zIndex = '10002';
         },
         willClose: () => {
-            // 1. Cerramos el diálogo que contiene el formulario (el anterior)
-            // Si el formulario está dentro de otro Swal, esto cierra TODOS los abiertos.
-            Swal.close(); 
-
-            // 2. Limpiamos los datos del formulario por si acaso
+            // 3. LIMPIEZA FINAL (Al terminar los 8 segundos)
             const formulario = document.getElementById("tuFormularioId");
             if (formulario) formulario.reset();
 
-            // 3. Restauramos el botón
             btn.disabled = false;
             btn.innerText = "Enviar Pedido";
             
-            console.log("Cerrando formulario y limpiando datos...");
+            console.log("Proceso finalizado con éxito.");
         }
     });
-        }).catch(err => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No pudimos enviar el pedido: ' + err.message,
-                target: 'body',
-                didOpen: () => {
-                    const container = document.querySelector('.swal2-container');
-                    if (container) container.style.zIndex = '10002';
-                }
-            });
-            btn.disabled = false;
-            btn.innerText = "Enviar Pedido";
-        });
-
-    }); 
+}).catch(err => {
+    // Si hay error, reactivamos el botón para que el usuario intente de nuevo
+    btn.disabled = false;
+    btn.innerText = "Enviar Pedido";
+    
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No pudimos enviar el pedido: ' + err.message,
+        confirmButtonColor: '#d33'
+    });
+});
+});
 } 
 
     // --- 6. UTILIDADES ---
