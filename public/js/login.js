@@ -48,48 +48,85 @@ document.addEventListener("DOMContentLoaded", () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
-    firebase.auth().signInWithPopup(provider)
-      .then((result) => {
-        const user = result.user;
-        if (!user) return errorMessage.textContent = "No se pudo obtener el usuario";
+   // ... dentro de iniciarSesionGoogle() ...
 
-        const empresaRef = firebase.database().ref(user.uid + "/perfilempresa");
-        empresaRef.get().then((snapshot) => {
-          if (!snapshot.exists()) return alert("⚠️ Debes crear primero una empresa desde la app móvil.");
+firebase.auth().signInWithPopup(provider)
+  .then((result) => {
+    const user = result.user;
+    if (!user) return errorMessage.textContent = "No se pudo obtener el usuario";
 
-          const empresaData = snapshot.val();
-          const fechaExpStr = empresaData.fechaExpiracion;
-          if (!fechaExpStr) return alert("❌ No se encontró la fecha de expiración de la empresa.");
+    const empresaRef = firebase.database().ref(user.uid + "/perfilempresa");
+    empresaRef.get().then((snapshot) => {
+      
+      // ESCENARIO 1: No existe la empresa
+      if (!snapshot.exists()) {
+        return Swal.fire({
+          icon: 'warning',
+          title: 'Empresa no registrada',
+          text: 'Debes crear primero una empresa desde la app móvil.',
+          confirmButtonColor: '#f8bb86'
+        });
+      }
 
-          const mensajeDias = mostrarDiasRestantes(fechaExpStr);
-          alert(mensajeDias);
+      const empresaData = snapshot.val();
+      const fechaExpStr = empresaData.fechaExpiracion;
 
-          // Validar suscripción
-          const fechaExp = parseFechaExpiracion(fechaExpStr);
-          const ahora = new Date();
-          const fechaExpSoloDia = new Date(fechaExp.getFullYear(), fechaExp.getMonth(), fechaExp.getDate());
-          const ahoraSoloDia = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+      // ESCENARIO 2: No hay fecha de expiración
+      if (!fechaExpStr) {
+        return Swal.fire({
+          icon: 'question',
+          title: 'Error de cuenta',
+          text: 'No se encontró la fecha de expiración. Contacta a soporte.',
+          confirmButtonColor: '#3085d6'
+        });
+      }
 
-          if (ahoraSoloDia <= fechaExpSoloDia) {
-            // Suscripción activa -> puede entrar
-            sessionStorage.setItem("suscripcionValida", "true");
-            window.location.href = "basededatos.html";
-          } else {
-            // Suscripción vencida -> no entra
-            alert("❌ Su suscripción ha vencido, no puede ingresar.");
-            sessionStorage.setItem("suscripcionValida", "false");
-            firebase.auth().signOut(); // cerrar sesión
-          }
+      // Calculamos el estado usando tus funciones
+      const mensajeDias = mostrarDiasRestantes(fechaExpStr);
+      const fechaExp = parseFechaExpiracion(fechaExpStr);
+      const ahora = new Date();
+      const fechaExpSoloDia = new Date(fechaExp.getFullYear(), fechaExp.getMonth(), fechaExp.getDate());
+      const ahoraSoloDia = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
 
-        }).catch(err => {
-          console.error(err);
-          errorMessage.textContent = "Error al leer perfil de empresa: " + err.message;
+      if (ahoraSoloDia <= fechaExpSoloDia) {
+        // ESCENARIO 3: SUSCRIPCIÓN ACTIVA
+        Swal.fire({
+          icon: 'success',
+          title: 'Suscripción Activa',
+          text: mensajeDias,
+          timer: 2000, // Se cierra solo en 2 segundos para no molestar
+          showConfirmButton: false,
+          timerProgressBar: true
+        }).then(() => {
+          sessionStorage.setItem("suscripcionValida", "true");
+          window.location.href = "basededatos.html";
         });
 
-      }).catch(error => {
-        console.error(error);
-        errorMessage.textContent = "Error al autenticar con Google: " + error.message;
-      });
+      } else {
+        // ESCENARIO 4: SUSCRIPCIÓN VENCIDA
+        Swal.fire({
+          icon: 'error',
+          title: 'Acceso Denegado',
+          text: 'Su suscripción ha vencido.',
+          footer: `<b>${mensajeDias}</b>`,
+          confirmButtonText: 'Cerrar Sesión',
+          confirmButtonColor: '#d33',
+          allowOutsideClick: false
+        }).then(() => {
+          sessionStorage.setItem("suscripcionValida", "false");
+          firebase.auth().signOut();
+        });
+      }
+
+    }).catch(err => {
+      console.error(err);
+      Swal.fire('Error', 'No se pudo leer el perfil: ' + err.message, 'error');
+    });
+
+  }).catch(error => {
+    console.error(error);
+    errorMessage.textContent = "Error al autenticar: " + error.message;
+  });
   }
 
   // --- Botón Google ---
