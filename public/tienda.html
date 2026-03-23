@@ -1301,11 +1301,8 @@ Swal.fire({
 // --- AQUÍ SE ENVÍA EL PEDIDO ---
 set(nuevoRef, pedidoData).then(() => {
     
-    // 1. CERRAMOS EL FORMULARIO INMEDIATAMENTE (Antes de la alerta de éxito)
-    // Esto quita el SweetAlert que está atrás de una vez.
-    Swal.close(); 
-
-    // 2. LANZAMOS LA ALERTA DE ÉXITO
+    // 1. FORZAR EL CIERRE DEL FORMULARIO
+    // En lugar de solo Swal.close(), usamos esto para asegurar que el anterior se elimine
     Swal.fire({
         icon: 'success',
         title: '¡Pedido Enviado y registrado!',
@@ -1314,26 +1311,33 @@ set(nuevoRef, pedidoData).then(() => {
         timerProgressBar: true,
         confirmButtonColor: '#ff6600',
         target: 'body',
+        // Esto es CLAVE: permite que esta alerta reemplace a la anterior si estaba abierta
+        allowOutsideClick: false, 
         didOpen: () => {
+            // Aseguramos que esta alerta esté al frente
             const container = document.querySelector('.swal2-container');
             if (container) container.style.zIndex = '10002';
         },
         willClose: () => {
-            // 3. LIMPIEZA FINAL (Al terminar los 8 segundos)
+            // 2. LIMPIEZA FINAL Y RECARGA DE INTERFAZ (Sin recargar página)
             const formulario = document.getElementById("tuFormularioId");
-            if (formulario) formulario.reset();
+            if (formulario) {
+                formulario.reset();
+            }
+
+            // Si el formulario sigue visible por alguna razón (clases de CSS), lo ocultamos manualmente
+            // document.getElementById("contenedorDelModal").style.display = 'none';
 
             btn.disabled = false;
             btn.innerText = "Enviar Pedido";
             
-            console.log("Proceso finalizado con éxito.");
+            console.log("Proceso finalizado.");
         }
     });
+
 }).catch(err => {
-    // Si hay error, reactivamos el botón para que el usuario intente de nuevo
     btn.disabled = false;
     btn.innerText = "Enviar Pedido";
-    
     Swal.fire({
         icon: 'error',
         title: 'Error',
