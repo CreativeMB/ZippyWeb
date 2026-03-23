@@ -1188,19 +1188,29 @@ const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '
         if (!idDomiciliarioAsignado) {
     // --- DISEÑO SWEETALERT2 PARA ADVERTENCIA ---
     Swal.fire({
-        icon: 'info',
-        title: '📍 Sin Domiciliarios',
-        text: 'Lo sentimos, no hay domiciliarios activos en este momento. Por favor, contacta a la tienda directamente para coordinar tu entrega.',
-        confirmButtonText: 'Entendido',
-        confirmButtonColor: '#FF6600', // El naranja de tu marca Creative M / Zippy
-        footer: '<a href="https://wa.me/TU_NUMERO_AQUI" target="_blank" style="color: #25d366; font-weight: bold;">💬 Contactar por WhatsApp</a>',
-        showClass: {
-            popup: 'animate__animated animate__fadeInDown'
-        },
-        hideClass: {
-            popup: 'animate__animated animate__fadeOutUp'
+    icon: 'info',
+    title: '📍 Sin Domiciliarios',
+    text: 'Lo sentimos, no hay domiciliarios activos en este momento. Por favor, contacta a la tienda directamente para coordinar tu entrega.',
+    confirmButtonText: 'Entendido',
+    confirmButtonColor: '#FF6600',
+    footer: '<a href="https://wa.me/TU_NUMERO_AQUI" target="_blank" style="color: #25d366; font-weight: bold; text-decoration: none;">💬 Contactar por WhatsApp</a>',
+    
+    // --- ESTO ASEGURA QUE SE POSICIONE SOBRE EL FORMULARIO ---
+    target: 'body',
+    didOpen: () => {
+        const container = document.querySelector('.swal2-container');
+        if (container) {
+            container.style.zIndex = '10001'; // Un nivel más alto que el promedio
         }
-    });
+    },
+    
+    showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+    },
+    hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+    }
+});
     return;
 }
 
@@ -1217,16 +1227,25 @@ const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '
 
         if (!direccion || !nombreComprador || !fechaFormateada || !cliente) {
     // --- DISEÑO SWEETALERT2 PARA VALIDACIÓN ---
-    Swal.fire({
-        icon: 'warning',
-        title: 'Campos Incompletos',
-        text: 'Por favor, rellena todos los datos de envío para continuar con tu pedido.',
-        confirmButtonText: 'Revisar Formulario',
-        confirmButtonColor: '#FF6600', // El naranja de Creative M
-        showClass: {
-            popup: 'animate__animated animate__shakeX' // Animación de "sacudida" para indicar error
+Swal.fire({
+    icon: 'warning',
+    title: 'Campos Incompletos',
+    text: 'Por favor, rellena todos los datos de envío para continuar con tu pedido.',
+    confirmButtonText: 'Revisar Formulario',
+    confirmButtonColor: '#FF6600',
+    // --- ESTO ASEGURA QUE SE VEA ENCIMA DEL FORMULARIO ---
+    target: 'body', 
+    didOpen: () => {
+        // Forzamos que la nueva alerta esté en la capa más alta (Z-index)
+        const container = document.querySelector('.swal2-container');
+        if (container) {
+            container.style.zIndex = '10000'; 
         }
-    });
+    },
+    showClass: {
+        popup: 'animate__animated animate__shakeX'
+    }
+});
     return;
 }
 
@@ -1279,43 +1298,45 @@ const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '
                 horaRegistro: horaReg
             };
 
-           set(nuevoRef, pedidoData).then(() => {
-    // --- DISEÑO SWEETALERT2 AUTO-CIERRE ---
-    Swal.fire({
-        icon: 'success',
-        title: '¡Pedido Enviado!',
-        text: 'Tu pedido ha sido registrado. Esta ventana se cerrará sola.',
-        timer: 5000, // 5 segundos exactos
-        timerProgressBar: true, // Barra visual de tiempo
-        showConfirmButton: true,
-        confirmButtonText: 'Entendido',
-        confirmButtonColor: '#ff6600',
-        willClose: () => {
-            // --- MEJORA DE RENDIMIENTO ---
-            // En lugar de location.reload(), solo reseteamos el formulario
-            const formulario = document.getElementById("tuFormularioId"); // Asegúrate de que el ID sea correcto
-            if (formulario) {
-                formulario.reset(); 
-            }
-            
-            // Si usas un carrito en una variable global, límpialo también
-            // carrito = []; 
-            // actualizarVistaCarrito(); 
-            
-            console.log("Formulario limpiado, productos mantenidos.");
-        }
-    });
-
-}).catch(err => {
-    Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No pudimos enviar el pedido: ' + err.message,
-        confirmButtonColor: '#d33'
-    });
-});
+         // --- AQUÍ SE ENVÍA EL PEDIDO ---
+        set(nuevoRef, pedidoData).then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Pedido Enviado!',
+                text: 'Tu pedido ha sido registrado...',
+                timer: 5000,
+                timerProgressBar: true,
+                confirmButtonColor: '#ff6600',
+                target: 'body',
+                didOpen: () => {
+                    const container = document.querySelector('.swal2-container');
+                    if (container) container.style.zIndex = '10002';
+                },
+                willClose: () => {
+                    // Asegúrate de que el ID del formulario sea el correcto
+                    const formulario = document.getElementById("tuFormularioId");
+                    if (formulario) formulario.reset();
+                    btn.disabled = false;
+                    btn.innerText = "Enviar Pedido";
+                }
+            });
+        }).catch(err => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No pudimos enviar el pedido: ' + err.message,
+                target: 'body',
+                didOpen: () => {
+                    const container = document.querySelector('.swal2-container');
+                    if (container) container.style.zIndex = '10002';
+                }
+            });
+            btn.disabled = false;
+            btn.innerText = "Enviar Pedido";
         });
-    }
+
+    }); 
+} 
 
     // --- 6. UTILIDADES ---
     function obtenerLinkDirecto(entrada) {
