@@ -1298,52 +1298,53 @@ Swal.fire({
                 horaRegistro: horaReg
             };
 
-// --- AQUÍ SE ENVÍA EL PEDIDO ---
 set(nuevoRef, pedidoData).then(() => {
     
-    // 1. FORZAR EL CIERRE DEL FORMULARIO
-    // En lugar de solo Swal.close(), usamos esto para asegurar que el anterior se elimine
+    // 1. FORZAR CIERRE DEL MODAL/VENTANA (Sustituye 'modalPedido' por el ID de tu div)
+    const modal = document.getElementById("modalPedido"); // <--- PON AQUÍ EL ID DE TU VENTANA
+    if (modal) {
+        modal.style.display = "none"; // Desaparece de la vista
+        
+        // Si usas Bootstrap, esto también quita el fondo oscuro (backdrop)
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) backdrop.remove(); 
+        
+        // Quitar la clase que bloquea el scroll en el body
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = 'auto';
+    }
+
+    // 2. LANZAR ALERTA DE ÉXITO
     Swal.fire({
         icon: 'success',
-        title: '¡Pedido Enviado y registrado!',
-        text: 'Confirmas por WhatsApp',
-        timer: 8000,
+        title: '¡Pedido Enviado!',
+        text: 'Tu orden fue registrada correctamente.',
+        timer: 5000,
         timerProgressBar: true,
         confirmButtonColor: '#ff6600',
         target: 'body',
-        // Esto es CLAVE: permite que esta alerta reemplace a la anterior si estaba abierta
-        allowOutsideClick: false, 
         didOpen: () => {
-            // Aseguramos que esta alerta esté al frente
             const container = document.querySelector('.swal2-container');
-            if (container) container.style.zIndex = '10002';
+            if (container) container.style.zIndex = '10005';
         },
         willClose: () => {
-            // 2. LIMPIEZA FINAL Y RECARGA DE INTERFAZ (Sin recargar página)
+            // 3. LIMPIEZA TOTAL DE DATOS (Para evitar duplicados)
             const formulario = document.getElementById("tuFormularioId");
-            if (formulario) {
-                formulario.reset();
-            }
+            if (formulario) formulario.reset();
 
-            // Si el formulario sigue visible por alguna razón (clases de CSS), lo ocultamos manualmente
-            // document.getElementById("contenedorDelModal").style.display = 'none';
-
+            // Limpiamos variables globales de Zippy
+            productoSeleccionado = "";
+            imagenProducto = "";
+            
             btn.disabled = false;
             btn.innerText = "Enviar Pedido";
-            
-            console.log("Proceso finalizado.");
         }
     });
 
 }).catch(err => {
     btn.disabled = false;
     btn.innerText = "Enviar Pedido";
-    Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No pudimos enviar el pedido: ' + err.message,
-        confirmButtonColor: '#d33'
-    });
+    alert("Error: " + err.message);
 });
 });
 } 
