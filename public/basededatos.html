@@ -892,7 +892,7 @@ auth.onAuthStateChanged(user => {
 
         cargarPerfilEmpresa();
         cargarBases();
-
+inicializarContabilidad();
         cargarReferenciasDesdeFirebase().then(() => {
             cargarPedidosRealtime();
         });
@@ -919,8 +919,9 @@ function cargarPerfilEmpresa() {
 
 // --- CARGAR BASES ---
 function cargarBases() {
+    // Limpiamos la interfaz para mostrar la lista de selección
     document.getElementById('resumenTotales').style.display = 'none';
-    sidebarTitulo.textContent = "📂 Contabilidad";
+    sidebarTitulo.textContent = "⚙️ Seleccionar Base Principal";
     btnVolver.style.display = "none";
     btnAgregarDato.style.display = "none";
     formNuevoDato.style.display = "none";
@@ -928,24 +929,70 @@ function cargarBases() {
 
     sidebarList.innerHTML = '';
 
-    const ref = db
-        .ref(`${idEmpresa}/basededatos`)
-        .orderByChild('timestamp')
-        .limitToLast(100);
+    const ref = db.ref(`${idEmpresa}/basededatos`).orderByChild('timestamp');
 
-    ref.on('child_added', snap => {
-        if (!snap.exists()) return;
+    ref.once('value', snapshot => {
+        snapshot.forEach(snap => {
+            const nombreBase = snap.key;
+            const data = snap.val();
 
-        const li = document.createElement('li');
-        li.textContent = snap.key;
-        li.onclick = () => mostrarDatos(snap.key);
+            const li = document.createElement('li');
+            li.textContent = nombreBase;
+            // Usamos tu clase de botón para que se vea profesional
+            li.className = "btn-volver"; 
+            li.style.listStyle = "none";
+            li.style.marginBottom = "10px";
+            li.style.display = "block";
 
-        // 🔥 MÁS RECIENTE ARRIBA
-        sidebarList.insertBefore(li, sidebarList.firstChild);
+            // Si es la actual favorita, le damos un toque visual
+            if (data.oculto === false) {
+                li.style.borderLeft = "6px solid #4CAF50";
+                li.innerHTML = `✅ ${nombreBase}`;
+            }
+
+            // AL HACER CLIC: Se vuelve la favorita y se abre
+            li.onclick = () => fijarYMostrarBase(nombreBase);
+
+            sidebarList.prepend(li);
+        });
     });
 }
+function inicializarContabilidad() {
+    const ref = db.ref(`${idEmpresa}/basededatos`);
+    
+    ref.once('value', snapshot => {
+        let baseParaAbrir = null;
 
+        snapshot.forEach(snap => {
+            if (snap.val().oculto === false) {
+                baseParaAbrir = snap.key;
+            }
+        });
 
+        if (baseParaAbrir) {
+            mostrarDatos(baseParaAbrir);
+        } else {
+            // Si no hay ninguna predeterminada, mostramos la lista para que elija
+            cargarBases();
+        }
+    });
+}
+function fijarYMostrarBase(nombreBase) {
+    const refTodas = db.ref(`${idEmpresa}/basededatos`);
+
+    refTodas.once('value', snapshot => {
+        const updates = {};
+        snapshot.forEach(snap => {
+            updates[`${snap.key}/oculto`] = true; // Ocultar apertura de las demás
+        });
+
+        updates[`${nombreBase}/oculto`] = false; // Activar apertura de esta
+
+        refTodas.update(updates).then(() => {
+            mostrarDatos(nombreBase);
+        });
+    });
+}
 // --- BOTONES ---
 btnVolver.onclick = () => {
     document.getElementById('resumenTotales').style.display = 'none';
@@ -999,28 +1046,45 @@ document.addEventListener('keydown', e => {
 function mostrarDatos(base) {
     baseSeleccionada = base;
 
-    sidebarTitulo.textContent = `📄 Datos de: ${base}`;
-    btnVolver.style.display = "inline-block";
-    btnAgregarDato.style.display = "inline-block";
+    // Título con la base actual
+    sidebarTitulo.textContent = `📊 ${base}`;
+
+    // --- AJUSTE DE BOTONES SUPERIORES ---
+    btnVolver.style.display = "none"; // ❌ Ya no necesitamos "Volver"
+    btnAgregarDato.style.display = "inline-block"; // ✅ Botón para nueva entrada
     formNuevoDato.style.display = "none";
-    opcionesExtra.style.display = "none";
+
+    // --- CONFIGURACIÓN DEL BOTÓN "CAMBIAR/FIJAR" ---
+    // Usamos opcionesExtra para que el botón aparezca ARRIBA y no en el formulario
+    opcionesExtra.innerHTML = ''; 
+    const btnConfig = document.createElement('button');
+    btnConfig.innerHTML = "🔄 Cambiar Base";
+    btnConfig.className = "btn-volver"; // Reutilizamos tu clase de CSS
+    
+    // Al hacer clic, cargamos la lista de bases para que elija la nueva favorita
+    btnConfig.onclick = () => cargarBases(); 
+
+    opcionesExtra.appendChild(btnConfig);
+    opcionesExtra.style.display = "inline-block"; 
+    // --------------------------------------------
 
     document.getElementById('resumenTotales').style.display = 'grid';
 
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-    ref.off(); 
+    ref.off(); // Limpiar listeners previos
     sidebarList.innerHTML = '';
 
     const separadoresPorDia = {};
     const itemsMostrados = new Set();
-
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    // --- TIEMPO REAL ---
+    // --- ESCUCHA EN TIEMPO REAL ---
     ref.on('child_added', snap => {
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
+        
+        // procesarItem se encarga de agrupar por días y sumar
         procesarItem({ ...item, key: snap.key });
     });
 
