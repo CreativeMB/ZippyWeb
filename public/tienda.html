@@ -1383,6 +1383,17 @@ set(nuevoRef, pedidoData).then(() => {
     const formatearPrecio = (v) => "$" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
     window.abrirProducto = (nombre, imagen, precio, descripcion) => {
+        // --- 🚀 NUEVO: LIMPIEZA PREVENTIVA AL ABRIR ---
+    const formulario = document.getElementById("tuFormularioId"); // Asegúrate que este ID sea el de tu <form>
+    if (formulario) {
+        formulario.reset(); 
+    }
+    // Limpieza manual de campos que no siempre se borran con reset
+    const camposExtra = ["notasPedido", "mensajeTarjeta", "deTarjeta", "paraTarjeta", "direccionEntrega"];
+    camposExtra.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+    });
         productoSeleccionado = nombre; imagenProducto = normalizarImagen(imagen);
         document.getElementById("productoTitulo").innerText = nombre;
         document.getElementById("productoDescripcion").innerText = descripcion;
