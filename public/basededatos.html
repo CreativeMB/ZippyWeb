@@ -1018,33 +1018,24 @@ function mostrarDatos(base) {
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-   // ===================== 🔵 CARGA INICIAL =====================
-    ref.once('value', snapshot => {
-        const items = [];
+  // ===================== 🔄 FLUJO ÚNICO EN TIEMPO REAL =====================
+    // Eliminamos el .once para que no haya retrasos ni duplicados
+    
+    ref.on('child_added', snap => {
+        const item = snap.val();
+        if (!item || !item.nombre || !item.fechaHora) return;
 
-        snapshot.forEach(snap => {
-            const item = snap.val();
-            if (item && item.nombre && item.fechaHora) {
-                items.push({ ...item, key: snap.key });
-            }
-        });
+        // procesarItem ya tiene "itemsMostrados.has" para evitar duplicados
+        // y usa "insertarItemOrdenado" para que lo más nuevo siempre esté arriba
+        procesarItem({ ...item, key: snap.key });
+    });
 
-        // Ordenar por fecha (más reciente primero)
-        items.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
-
-        items.forEach(item => {
-            procesarItem(item);
-        });
-
-        // ===================== 🔴 TIEMPO REAL =====================
-        // Lo activamos AQUÍ ADENTRO para que no choque con la carga inicial
-        ref.on('child_added', snap => {
-            const item = snap.val();
-            if (!item || !item.nombre || !item.fechaHora) return;
-
-            // procesarItem ya tiene el "itemsMostrados.has" que evita duplicados
-            procesarItem({ ...item, key: snap.key });
-        });
+    // Opcional: listener para cuando se borra algo (mantiene la lista limpia)
+    ref.on('child_removed', snap => {
+        const elemento = document.querySelector(`li[data-key="${snap.key}"]`);
+        if (elemento) elemento.remove();
+        // Nota: Si borras, los totales del separador no se recalculan solos 
+        // a menos que refresques o añadas lógica extra aquí.
     });
 
     // ===================== 🔧 FUNCION INTERNA =====================
@@ -1061,15 +1052,22 @@ function mostrarDatos(base) {
             String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
             String(fechaObj.getDate()).padStart(2, '0');
 
-        // crear separador si no existe
-        let separadorActual = separadoresPorDia[fechaDia];
-        if (!separadorActual) {
-            separadorActual = crearSeparadorDiaEditable(fechaObj, fechaDia);
-            separadorActual.dataset.pos = 0;
-            separadorActual.dataset.neg = 0;
-            separadoresPorDia[fechaDia] = separadorActual;
-            sidebarList.appendChild(separadorActual);
-        }
+   // --- REEMPLAZA ESTA PARTE DENTRO DE procesarItem ---
+
+// crear separador si no existe
+let separadorActual = separadoresPorDia[fechaDia];
+if (!separadorActual) {
+    separadorActual = crearSeparadorDiaEditable(fechaObj, fechaDia);
+    separadorActual.dataset.pos = 0;
+    separadorActual.dataset.neg = 0;
+    separadoresPorDia[fechaDia] = separadorActual;
+    
+    // 🔥 CAMBIO AQUÍ: Usamos prepend en lugar de appendChild 
+    // para que el día más nuevo (hoy) aparezca arriba de la lista.
+    sidebarList.prepend(separadorActual); 
+}
+
+// --- EL RESTO DE LA FUNCIÓN SIGUE IGUAL ---
 
         const valor = Number(item.valor) || 0;
 
