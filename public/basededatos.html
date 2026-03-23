@@ -917,62 +917,53 @@ function cargarPerfilEmpresa() {
     });
 }
 
-function cargarBases() {
-    // Usamos el contenedor principal para mostrar que está cargando
-    sidebarList.innerHTML = '<p style="color:white; padding:10px; text-align:center;">Cargando bases...</p>';
+function mostrarDatos(base) {
+    baseSeleccionada = base;
+
+    // Título de la base actual
+    sidebarTitulo.textContent = `📊 ${base}`;
+
+    // --- REEMPLAZO DEL BOTÓN VOLVER ---
+    btnVolver.style.display = "none"; // ❌ Eliminamos el volver
+    btnAgregarDato.style.display = "inline-block"; // ✅ Mantener agregar
+    formNuevoDato.style.display = "none";
+
+    // --- CONFIGURACIÓN DEL NUEVO BOTÓN PRINCIPAL (Donde estaba volver) ---
+    opcionesExtra.innerHTML = ''; 
+    const btnFijar = document.createElement('button');
+    btnFijar.innerHTML = "📌 Fijar Principal";
     
-    // Ocultamos el resumen y otros botones mientras cargamos la lista
-    document.getElementById('resumenTotales').style.display = 'none';
-    opcionesExtra.style.display = 'none';
-    btnAgregarDato.style.display = 'none';
-    btnVolver.style.display = 'none';
-    sidebarTitulo.textContent = "📂 Mis Bases de Datos";
+    // Usamos tu clase 'btn-volver' para que tenga el mismo diseño
+    btnFijar.className = "btn-volver"; 
+    
+    // Al hacer clic, se vuelve la predeterminada en Firebase
+    btnFijar.onclick = () => marcarComoPredeterminada(base);
 
-    const ref = db.ref(`${idEmpresa}/basededatos`);
+    opcionesExtra.appendChild(btnFijar);
+    opcionesExtra.style.display = "inline-block";
+    // ---------------------------------------------------------
 
-    ref.once('value', snapshot => {
-        sidebarList.innerHTML = ''; 
-        let baseParaAutoAbrir = null;
+    document.getElementById('resumenTotales').style.display = 'grid';
 
-        snapshot.forEach(snap => {
-            const data = snap.val();
-            const nombreBase = snap.key;
+    const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
+    ref.off(); 
+    sidebarList.innerHTML = '';
 
-            // Crear el elemento de la lista
-            const li = document.createElement('li');
-            li.textContent = nombreBase;
-            
-            // 🎨 USANDO TUS CLASES: Aplicamos el estilo del botón volver
-            // Asumo que tu clase es algo como "btn-volver" o similar
-            li.className = "btn-volver"; 
-            
-            // Ajustes de estilo para que parezca un ítem de lista
-            li.style.listStyle = "none";
-            li.style.marginBottom = "10px";
-            li.style.display = "block";
-            li.style.cursor = "pointer";
-            li.style.textAlign = "center";
+    const separadoresPorDia = {};
+    const itemsMostrados = new Set();
+    let totalPositivo = 0;
+    let totalNegativo = 0;
 
-            // Si es la predeterminada (oculto: false)
-            if (data.oculto === false) {
-                li.style.borderLeft = "6px solid #4CAF50"; // Marca verde lateral
-                li.style.backgroundColor = "rgba(76, 175, 80, 0.2)"; // Fondo sutil verde
-                baseParaAutoAbrir = nombreBase;
-            }
+    // Escucha en tiempo real de los datos
+    ref.on('child_added', snap => {
+        const item = snap.val();
+        if (!item || !item.nombre || !item.fechaHora) return;
+        procesarItem({ ...item, key: snap.key });
+    });
 
-            li.onclick = () => mostrarDatos(nombreBase);
-            
-            // Los agregamos al sidebar
-            sidebarList.prepend(li);
-        });
-
-        // 🔥 AUTO-APERTURA
-        if (baseParaAutoAbrir) {
-            mostrarDatos(baseParaAutoAbrir);
-        } else {
-            // Si no hay ninguna predeterminada, dejamos el título para elegir
-            sidebarTitulo.textContent = "Selecciona una Base";
-        }
+    ref.on('child_removed', snap => {
+        const elemento = document.querySelector(`li[data-key="${snap.key}"]`);
+        if (elemento) elemento.remove();
     });
 }
 function marcarComoPredeterminada(nombreBase) {
