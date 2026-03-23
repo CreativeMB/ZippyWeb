@@ -1051,21 +1051,21 @@ function mostrarDatos(base) {
             fechaObj.getFullYear() + '-' +
             String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
             String(fechaObj.getDate()).padStart(2, '0');
-
-   // --- REEMPLAZA ESTA PARTE DENTRO DE procesarItem ---
-
 // crear separador si no existe
-let separadorActual = separadoresPorDia[fechaDia];
-if (!separadorActual) {
-    separadorActual = crearSeparadorDiaEditable(fechaObj, fechaDia);
-    separadorActual.dataset.pos = 0;
-    separadorActual.dataset.neg = 0;
-    separadoresPorDia[fechaDia] = separadorActual;
-    
-    // 🔥 CAMBIO AQUÍ: Usamos prepend en lugar de appendChild 
-    // para que el día más nuevo (hoy) aparezca arriba de la lista.
-    sidebarList.prepend(separadorActual); 
-}
+        let separadorActual = separadoresPorDia[fechaDia];
+        if (!separadorActual) {
+            separadorActual = crearSeparadorDiaEditable(fechaObj, fechaDia);
+            
+            // IMPORTANTE: Agregar esta clase para que el orden funcione
+            separadorActual.classList.add('separador-dia'); 
+
+            separadorActual.dataset.pos = 0;
+            separadorActual.dataset.neg = 0;
+            separadoresPorDia[fechaDia] = separadorActual;
+
+            // 🔥 CAMBIO CLAVE: Usa prepend() para que salga al inicio DE UNA VEZ
+            sidebarList.prepend(separadorActual); 
+        }
 
 // --- EL RESTO DE LA FUNCIÓN SIGUE IGUAL ---
 
