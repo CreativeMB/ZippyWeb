@@ -1030,19 +1030,17 @@ function mostrarDatos(base) {
     });
 
     // --- FUNCIÓN INTERNA ---
-    function procesarItem(item) {
+   function procesarItem(item) {
         if (itemsMostrados.has(item.key)) return;
         itemsMostrados.add(item.key);
 
         const fechaObj = new Date(item.fechaHora);
         const timestamp = fechaObj.getTime();
-
-        // Formato YYYY-MM-DD para comparar fechas
         const fechaDia = fechaObj.getFullYear() + '-' +
             String(fechaObj.getMonth() + 1).padStart(2, '0') + '-' +
             String(fechaObj.getDate()).padStart(2, '0');
 
-        // 1. Obtener o crear el separador del día
+        // --- BUSCAR O CREAR SEPARADOR ---
         let separadorActual = separadoresPorDia[fechaDia];
         if (!separadorActual) {
             separadorActual = crearSeparadorDiaEditable(fechaObj, fechaDia);
@@ -1052,13 +1050,12 @@ function mostrarDatos(base) {
             separadorActual.dataset.neg = "0";
             separadoresPorDia[fechaDia] = separadorActual;
 
-            // Insertar el separador en la posición correcta (más reciente arriba)
+            // Insertar el día en orden (más reciente arriba)
             let insertado = false;
-            const separadoresExistentes = sidebarList.querySelectorAll('.separador-dia');
-            
-            for (let sep of separadoresExistentes) {
-                if (fechaDia > sep.dataset.fecha) {
-                    sidebarList.insertBefore(separadorActual, sep);
+            const seps = sidebarList.querySelectorAll('.separador-dia');
+            for (let s of seps) {
+                if (fechaDia > s.dataset.fecha) {
+                    sidebarList.insertBefore(separadorActual, s);
                     insertado = true;
                     break;
                 }
@@ -1066,61 +1063,59 @@ function mostrarDatos(base) {
             if (!insertado) sidebarList.appendChild(separadorActual);
         }
 
-        // 2. Calcular valores
         const valor = Number(item.valor) || 0;
         if (valor > 0) {
-            totalPositivo += valor;
             separadorActual.dataset.pos = (Number(separadorActual.dataset.pos) + valor).toString();
+            totalPositivo += valor;
         } else {
-            totalNegativo += valor;
             separadorActual.dataset.neg = (Number(separadorActual.dataset.neg) + valor).toString();
+            totalNegativo += valor;
         }
 
-        // 3. Actualizar visualmente el separador
-        if (typeof separadorActual.actualizar === 'function') {
-            separadorActual.actualizar();
-        }
+        if (typeof separadorActual.actualizar === 'function') separadorActual.actualizar();
 
-        // 4. Crear el elemento de la lista (el registro)
+        // --- CREAR EL DATO ---
         const li = document.createElement('li');
         li.dataset.key = item.key;
         li.dataset.timestamp = timestamp;
-        li.className = "item-dato";
+        li.classList.add('item-dato'); // Clase para diferenciar de los separadores
 
         const fFormateada = typeof formatearFechaBD === 'function' ? formatearFechaBD(item.fechaHora) : item.fechaHora;
-        li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${fFormateada}`;
+        li.innerHTML = `<strong>${item.nombre}</strong>: $${valor.toLocaleString('es-CO')} <small>${fFormateada}</small>`;
 
-        // Estilos básicos (puedes moverlos a CSS)
         li.style.padding = '10px';
-        li.style.marginBottom = '5px';
-        li.style.borderRadius = '6px';
+        li.style.margin = '5px 10px';
+        li.style.borderRadius = '8px';
         li.style.listStyle = 'none';
-        li.style.color = valor < 0 ? '#D32F2F' : '#388E3C';
-        li.style.backgroundColor = valor < 0 ? '#FFCDD2' : '#C8E6C9';
+        li.style.display = 'block';
+        li.style.color = valor < 0 ? '#D32F2F' : '#1B5E20';
+        li.style.backgroundColor = valor < 0 ? '#FFEBEE' : '#E8F5E9';
 
-        // 5. Insertar el dato debajo de su separador en orden
+        // --- INSERCIÓN CRÍTICA ---
         insertarItemOrdenado(separadorActual, li, timestamp);
 
-        // 6. Actualizar totales generales arriba
-        if (typeof actualizarTotales === 'function') {
-            actualizarTotales(totalPositivo, totalNegativo);
-        }
+        if (typeof actualizarTotales === 'function') actualizarTotales(totalPositivo, totalNegativo);
     }
-} 
-
+ }
 
 function insertarItemOrdenado(separador, li, timestamp) {
+    // Empezamos a buscar justo después del separador del día
     let nodo = separador.nextSibling;
 
+    // Recorremos los elementos mientras existan y NO sean el separador de OTRO día
     while (nodo && !nodo.classList?.contains('separador-dia')) {
         const tsNodo = Number(nodo.dataset.timestamp);
 
-        // si el nuevo es más reciente → va antes
+        // Si el ítem que estamos insertando es más reciente (timestamp mayor)
+        // que el que estamos comparando, lo ponemos justo antes de ese nodo.
         if (timestamp > tsNodo) break;
 
+        // Si no, seguimos bajando al siguiente ítem del mismo día
         nodo = nodo.nextSibling;
     }
 
+    // Finalmente, insertamos el 'li' (el dato) en la posición encontrada
+    // Si 'nodo' es null o es el siguiente separador, insertBefore lo pone al final del grupo.
     separador.parentNode.insertBefore(li, nodo);
 }
 
