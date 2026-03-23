@@ -917,35 +917,65 @@ function cargarPerfilEmpresa() {
     });
 }
 
-// --- CARGAR BASES ---
 function cargarBases() {
-    document.getElementById('resumenTotales').style.display = 'none';
-    sidebarTitulo.textContent = "📂 Contabilidad";
-    btnVolver.style.display = "none";
-    btnAgregarDato.style.display = "none";
-    formNuevoDato.style.display = "none";
-    opcionesExtra.style.display = "none";
+    sidebarList.innerHTML = '<p style="color:white; padding:10px;">Cargando bases...</p>';
+    
+    // Referencia a todas las bases del usuario
+    const ref = db.ref(`${idEmpresa}/basededatos`);
 
-    sidebarList.innerHTML = '';
+    ref.once('value', snapshot => {
+        sidebarList.innerHTML = ''; // Limpiar cargando
+        let baseParaAutoAbrir = null;
 
-    const ref = db
-        .ref(`${idEmpresa}/basededatos`)
-        .orderByChild('timestamp')
-        .limitToLast(100);
+        snapshot.forEach(snap => {
+            const data = snap.val();
+            const nombreBase = snap.key;
 
-    ref.on('child_added', snap => {
-        if (!snap.exists()) return;
+            // Crear el elemento de la lista (Botón en el sidebar)
+            const li = document.createElement('li');
+            li.textContent = nombreBase;
+            li.className = "base-item"; // Tu clase de CSS
+            
+            // Si es la predeterminada (oculto: false), le ponemos un estilo especial
+            if (data.oculto === false) {
+                li.style.borderLeft = "4px solid #4CAF50"; 
+                baseParaAutoAbrir = nombreBase; // La marcamos para abrirla
+            }
 
-        const li = document.createElement('li');
-        li.textContent = snap.key;
-        li.onclick = () => mostrarDatos(snap.key);
+            li.onclick = () => mostrarDatos(nombreBase);
+            sidebarList.prepend(li);
+        });
 
-        // 🔥 MÁS RECIENTE ARRIBA
-        sidebarList.insertBefore(li, sidebarList.firstChild);
+        // 🔥 AUTO-APERTURA: Si existe una base activa, se abre sola al cargar
+        if (baseParaAutoAbrir) {
+            mostrarDatos(baseParaAutoAbrir);
+        }
     });
 }
+function marcarComoPredeterminada(nombreBase) {
+    const refTodas = db.ref(`${idEmpresa}/basededatos`);
 
+    // 1. Buscamos todas las bases
+    refTodas.once('value', snapshot => {
+        const actualizaciones = {};
 
+        snapshot.forEach(snap => {
+            // A todas les ponemos oculto: true
+            actualizaciones[`${snap.key}/oculto`] = true;
+        });
+
+        // 2. A la seleccionada le ponemos oculto: false
+        actualizaciones[`${nombreBase}/oculto`] = false;
+
+        // 3. Ejecutamos la actualización masiva
+        refTodas.update(actualizaciones)
+            .then(() => {
+                alert(`✅ "${nombreBase}" ahora es tu base predeterminada.`);
+                cargarBases(); // Recargamos el menú para ver los cambios
+            })
+            .catch(error => console.error("Error al fijar favorita:", error));
+    });
+}
 // --- BOTONES ---
 btnVolver.onclick = () => {
     document.getElementById('resumenTotales').style.display = 'none';
@@ -1003,7 +1033,17 @@ function mostrarDatos(base) {
     btnVolver.style.display = "inline-block";
     btnAgregarDato.style.display = "inline-block";
     formNuevoDato.style.display = "none";
-    opcionesExtra.style.display = "none";
+
+    // --- CONFIGURACIÓN DEL BOTÓN "FIJAR" ---
+    opcionesExtra.innerHTML = ''; // 🔥 IMPORTANTE: Limpia botones anteriores para que no se dupliquen
+    const btnFijar = document.createElement('button');
+    btnFijar.textContent = "📌 Fijar como Principal";
+    btnFijar.className = "btn-fijar-favorita"; 
+    btnFijar.onclick = () => marcarComoPredeterminada(base);
+
+    opcionesExtra.appendChild(btnFijar);
+    opcionesExtra.style.display = "block";
+    // ---------------------------------------
 
     document.getElementById('resumenTotales').style.display = 'grid';
 
