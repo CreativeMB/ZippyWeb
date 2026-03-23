@@ -3,6 +3,7 @@
 
 <head>
    <meta charset="UTF-8">
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Tienda Virtual | Pedidos por WhatsApp</title>
@@ -1185,9 +1186,23 @@ const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '
     function enviarPedido() {
         const btn = document.getElementById("enviarPedidoBtn");
         if (!idDomiciliarioAsignado) {
-            alert("📍 No hay domiciliarios activos. Contacta a la tienda directamente.");
-            return;
+    // --- DISEÑO SWEETALERT2 PARA ADVERTENCIA ---
+    Swal.fire({
+        icon: 'info',
+        title: '📍 Sin Domiciliarios',
+        text: 'Lo sentimos, no hay domiciliarios activos en este momento. Por favor, contacta a la tienda directamente para coordinar tu entrega.',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#FF6600', // El naranja de tu marca Creative M / Zippy
+        footer: '<a href="https://wa.me/TU_NUMERO_AQUI" target="_blank" style="color: #25d366; font-weight: bold;">💬 Contactar por WhatsApp</a>',
+        showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
         }
+    });
+    return;
+}
 
         const cliente = document.getElementById("celularComprador").value.trim();
         const direccion = document.getElementById("direccionEntrega").value.trim();
@@ -1201,9 +1216,19 @@ const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '
         }
 
         if (!direccion || !nombreComprador || !fechaFormateada || !cliente) {
-            alert("⚠️ Complete todos los campos.");
-            return;
+    // --- DISEÑO SWEETALERT2 PARA VALIDACIÓN ---
+    Swal.fire({
+        icon: 'warning',
+        title: 'Campos Incompletos',
+        text: 'Por favor, rellena todos los datos de envío para continuar con tu pedido.',
+        confirmButtonText: 'Revisar Formulario',
+        confirmButtonColor: '#FF6600', // El naranja de Creative M
+        showClass: {
+            popup: 'animate__animated animate__shakeX' // Animación de "sacudida" para indicar error
         }
+    });
+    return;
+}
 
         btn.disabled = true;
         btn.innerText = "Enviando...";
@@ -1254,10 +1279,41 @@ const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '
                 horaRegistro: horaReg
             };
 
-            set(nuevoRef, pedidoData).then(() => {
-                alert("✅ Pedido enviado con éxito");
-                location.reload();
-            }).catch(err => alert("Error: " + err.message));
+           set(nuevoRef, pedidoData).then(() => {
+    // --- DISEÑO SWEETALERT2 AUTO-CIERRE ---
+    Swal.fire({
+        icon: 'success',
+        title: '¡Pedido Enviado!',
+        text: 'Tu pedido ha sido registrado. Esta ventana se cerrará sola.',
+        timer: 5000, // 5 segundos exactos
+        timerProgressBar: true, // Barra visual de tiempo
+        showConfirmButton: true,
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#ff6600',
+        willClose: () => {
+            // --- MEJORA DE RENDIMIENTO ---
+            // En lugar de location.reload(), solo reseteamos el formulario
+            const formulario = document.getElementById("tuFormularioId"); // Asegúrate de que el ID sea correcto
+            if (formulario) {
+                formulario.reset(); 
+            }
+            
+            // Si usas un carrito en una variable global, límpialo también
+            // carrito = []; 
+            // actualizarVistaCarrito(); 
+            
+            console.log("Formulario limpiado, productos mantenidos.");
+        }
+    });
+
+}).catch(err => {
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No pudimos enviar el pedido: ' + err.message,
+        confirmButtonColor: '#d33'
+    });
+});
         });
     }
 
