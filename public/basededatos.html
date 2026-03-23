@@ -919,29 +919,24 @@ function cargarPerfilEmpresa() {
 
 function mostrarDatos(base) {
     baseSeleccionada = base;
-
-    // Título de la base actual
     sidebarTitulo.textContent = `📊 ${base}`;
 
-    // --- REEMPLAZO DEL BOTÓN VOLVER ---
-    btnVolver.style.display = "none"; // ❌ Eliminamos el volver
-    btnAgregarDato.style.display = "inline-block"; // ✅ Mantener agregar
-    formNuevoDato.style.display = "none";
+    // --- BOTÓN PARA CAMBIAR Y FIJAR FAVORITA ---
+    btnVolver.style.display = "none"; 
+    btnAgregarDato.style.display = "inline-block";
 
-    // --- CONFIGURACIÓN DEL NUEVO BOTÓN PRINCIPAL (Donde estaba volver) ---
     opcionesExtra.innerHTML = ''; 
-    const btnFijar = document.createElement('button');
-    btnFijar.innerHTML = "📌 Fijar Principal";
+    const btnSeleccionar = document.createElement('button');
+    // El nombre del botón indica que aquí se cambia la base principal
+    btnSeleccionar.innerHTML = "⚙️ Cambiar Base Principal";
+    btnSeleccionar.className = "btn-volver"; // Tu clase de diseño
     
-    // Usamos tu clase 'btn-volver' para que tenga el mismo diseño
-    btnFijar.className = "btn-volver"; 
-    
-    // Al hacer clic, se vuelve la predeterminada en Firebase
-    btnFijar.onclick = () => marcarComoPredeterminada(base);
+    // Al hacer clic, cargamos la lista para que elija una nueva
+    btnSeleccionar.onclick = () => cargarBasesParaSeleccionar();
 
-    opcionesExtra.appendChild(btnFijar);
+    opcionesExtra.appendChild(btnSeleccionar);
     opcionesExtra.style.display = "inline-block";
-    // ---------------------------------------------------------
+    // --------------------------------------------
 
     document.getElementById('resumenTotales').style.display = 'grid';
 
@@ -954,40 +949,51 @@ function mostrarDatos(base) {
     let totalPositivo = 0;
     let totalNegativo = 0;
 
-    // Escucha en tiempo real de los datos
     ref.on('child_added', snap => {
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
         procesarItem({ ...item, key: snap.key });
     });
+}
+function cargarBasesParaSeleccionar() {
+    sidebarTitulo.textContent = "Selecciona tu Base Principal";
+    sidebarList.innerHTML = ''; 
+    opcionesExtra.style.display = "none"; // Ocultamos el botón de cambio mientras elige
+    document.getElementById('resumenTotales').style.display = 'none';
 
-    ref.on('child_removed', snap => {
-        const elemento = document.querySelector(`li[data-key="${snap.key}"]`);
-        if (elemento) elemento.remove();
+    const ref = db.ref(`${idEmpresa}/basededatos`);
+
+    ref.once('value', snapshot => {
+        snapshot.forEach(snap => {
+            const nombre = snap.key;
+            const li = document.createElement('li');
+            li.textContent = nombre;
+            li.className = "btn-volver"; // Reutilizamos tu estilo
+            li.style.margin = "10px 0";
+            li.style.listStyle = "none";
+
+            // AL HACER CLIC: La hace favorita y la abre de una vez
+            li.onclick = () => marcarComoPredeterminada(nombre);
+            
+            sidebarList.appendChild(li);
+        });
     });
 }
 function marcarComoPredeterminada(nombreBase) {
     const refTodas = db.ref(`${idEmpresa}/basededatos`);
 
-    // 1. Buscamos todas las bases
     refTodas.once('value', snapshot => {
-        const actualizaciones = {};
-
+        const updates = {};
         snapshot.forEach(snap => {
-            // A todas les ponemos oculto: true
-            actualizaciones[`${snap.key}/oculto`] = true;
+            updates[`${snap.key}/oculto`] = true; // "Apaga" las demás
         });
 
-        // 2. A la seleccionada le ponemos oculto: false
-        actualizaciones[`${nombreBase}/oculto`] = false;
+        updates[`${nombreBase}/oculto`] = false; // "Enciende" la elegida
 
-        // 3. Ejecutamos la actualización masiva
-        refTodas.update(actualizaciones)
-            .then(() => {
-                alert(`✅ "${nombreBase}" ahora es tu base predeterminada.`);
-                cargarBases(); // Recargamos el menú para ver los cambios
-            })
-            .catch(error => console.error("Error al fijar favorita:", error));
+        refTodas.update(updates).then(() => {
+            // Una vez guardado, abrimos los datos de esa base
+            mostrarDatos(nombreBase);
+        });
     });
 }
 // --- BOTONES ---
