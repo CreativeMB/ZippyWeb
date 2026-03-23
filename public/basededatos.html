@@ -1045,36 +1045,34 @@ document.addEventListener('keydown', e => {
 
 function mostrarDatos(base) {
     baseSeleccionada = base;
-    sidebarTitulo.textContent = `📊 ${base}`;
 
-    // --- 1. BOTONES SUPERIORES (Donde estaba Volver) ---
-    btnVolver.style.display = "none"; 
+    sidebarTitulo.textContent = `📄 Datos de: ${base}`;
+    
+    // --- CAMBIO CLAVE: REEMPLAZAMOS EL BOTÓN VOLVER ---
+    // En lugar de ocultar/mostrar el btnVolver original, lo usamos para la nueva función
+    btnVolver.style.display = "inline-block";
+    btnVolver.innerHTML = "📂 Cambiar Base"; // Le cambiamos el texto
+    btnVolver.onclick = () => cargarBases(); // Ahora al darle clic carga el listado
+    
     btnAgregarDato.style.display = "inline-block";
+    formNuevoDato.style.display = "none";
+    
+    // ⚠️ NO TOCAMOS opcionesExtra aquí para que el checkbox no se borre
+    // opcionesExtra.style.display = "none"; 
 
-    // Usamos un contenedor que NO sea el de las opciones del formulario
-    // Si tu contenedor de arriba se llama 'opcionesExtra', asegúrate de 
-    // que el checkbox NO esté dentro de ese mismo ID en el HTML.
-    opcionesExtra.innerHTML = ''; 
-    const btnCambiar = document.createElement('button');
-    btnCambiar.innerHTML = "🔄 Cambiar Base";
-    btnCambiar.className = "btn-volver"; 
-    btnCambiar.onclick = () => cargarBases(); 
-    opcionesExtra.appendChild(btnCambiar);
-    opcionesExtra.style.display = "inline-block";
-
-    formNuevoDato.style.display = "none"; 
-
-    // --- 3. CARGA DE DATOS ---
     document.getElementById('resumenTotales').style.display = 'grid';
+
     const ref = db.ref(`${idEmpresa}/basededatos/${base}`);
-    ref.off();
+    ref.off(); 
     sidebarList.innerHTML = '';
 
     const separadoresPorDia = {};
     const itemsMostrados = new Set();
+
     let totalPositivo = 0;
     let totalNegativo = 0;
 
+    // --- TIEMPO REAL ---
     ref.on('child_added', snap => {
         const item = snap.val();
         if (!item || !item.nombre || !item.fechaHora) return;
