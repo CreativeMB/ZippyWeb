@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Zippy - Ecosistema Digital</title>
   
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --android-bg: #0F172A;
-      --card-bg: #1E293B;
-      --btn-blue: #2563EB;
+      --android-bg: #0F172A;     /* Fondo XML Kotlin */
+      --card-bg: #1E293B;        /* CardView XML Kotlin */
+      --zippy-orange: #FF9800;   /* Naranja del Catálogo */
+      --btn-blue: #2563EB;       /* Botón Ingresar XML */
       --text-white: #FFFFFF;
       --text-gray: #9CA3AF;
       --text-legal: #64748B;
@@ -18,63 +21,75 @@
     body, html {
       margin: 0; padding: 0; height: 100%;
       background-color: var(--android-bg);
-      font-family: 'Inter', 'Segoe UI', sans-serif;
+      font-family: 'Inter', sans-serif;
       display: flex; justify-content: center; align-items: center;
     }
 
     .container { width: 100%; max-width: 420px; padding: 20px; box-sizing: border-box; }
 
-    /* TARJETA PRINCIPAL */
+    /* TARJETA PRINCIPAL (Réplica CardViewinicio) */
     .card {
       background-color: var(--card-bg);
-      border-radius: 20px;
-      padding: 35px;
+      border-radius: 24px;       /* app:cardCornerRadius="20dp" */
+      padding: 40px 30px;
       text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
       color: var(--text-white);
+      border: 1px solid rgba(255,255,255,0.05);
     }
 
-    .logo { width: 90px; height: 90px; margin-bottom: 16px; }
-    .nombreEmpresa { font-size: 26px; font-weight: 800; margin: 0; }
-    .subTitle { font-size: 14px; color: var(--text-gray); margin: 8px 0 30px 0; }
+    .logo { width: 95px; height: 95px; margin-bottom: 20px; }
 
-    /* BOTÓN AZUL ZIPPY */
+    /* TÍTULO NARANJA ESTILO ZIPPY */
+    .nombreEmpresa { 
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px;           /* android:textSize="28sp" */
+      font-weight: 900; 
+      margin: 0;
+      color: var(--zippy-orange); /* Color Naranja solicitado */
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+
+    /* NUEVO SUBTÍTULO SOLICITADO */
+    .subTitle { 
+      font-size: 14px;           /* android:textSize="14sp" */
+      color: var(--text-gray); 
+      margin: 12px 0 35px 0; 
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    /* BOTÓN AZUL (Réplica btnIngresar) */
     #btnGoogle {
-      width: 100%; height: 60px;
+      width: 100%; height: 62px;
       background-color: var(--btn-blue);
-      color: white; border: none; border-radius: 12px;
+      color: white; border: none; border-radius: 14px;
       font-size: 15px; font-weight: bold; text-transform: uppercase;
-      cursor: pointer; transition: 0.3s;
+      cursor: pointer; transition: 0.3s ease;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
 
     #btnGoogle:hover { background-color: #1d4ed8; transform: translateY(-2px); }
 
-    /* ESTILO DE LOS AVISOS DE DESCARGA (Móvil y Sin Empresa) */
+    /* AVISOS DE DESCARGA (Mismo estilo que la Card) */
     .aviso-descarga {
-      margin-top: 20px;
-      padding: 20px;
-      background-color: #1E293B; /* Mismo que la card */
-      border: 1px solid var(--btn-blue); /* Borde azul para resaltar */
-      border-radius: 15px;
-      color: #FFFFFF;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      margin-top: 25px; padding: 20px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--zippy-orange); /* Borde naranja para avisos */
+      border-radius: 18px;
+      color: #FFFFFF; text-align: center;
     }
 
-    .aviso-descarga p { margin: 10px 0; font-weight: bold; }
-    
     .btn-descarga {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: var(--btn-blue);
-      color: white !important;
-      text-decoration: none;
-      border-radius: 8px;
-      font-size: 14px;
+      display: inline-block; margin-top: 12px;
+      padding: 10px 22px; background-color: var(--zippy-orange);
+      color: white !important; text-decoration: none;
+      border-radius: 10px; font-size: 13px; font-weight: bold;
     }
 
-    .legal-box { margin-top: 25px; font-size: 10px; color: var(--text-legal); line-height: 1.4; }
+    .legal-box { margin-top: 30px; font-size: 10px; color: var(--text-legal); line-height: 1.6; }
   </style>
 </head>
 <body>
@@ -82,15 +97,20 @@
   <div class="container" id="container">
     <div class="card" id="cardLogin">
       <img src="img/icono.png" alt="Logo Zippy" class="logo">
-      <h1 class="nombreEmpresa">Ecosistema Zippy</h1>
-      <p class="subTitle">Administra tu negocio en un solo lugar</p>
+      
+      <h1 class="nombreEmpresa">ECOSISTEMA ZIPPY</h1>
+      
+      <p class="subTitle">
+        Toma el control total de tu negocio desde tu móvil. 
+        Vende más, gestiona pedidos, contabilidad y domicilios con facilidad.
+      </p>
       
       <button id="btnGoogle">INGRESAR AL SISTEMA</button>
       
-      <div id="error-message" style="color: #f87171; margin-top: 10px; font-size: 12px;"></div>
+      <div id="error-message" style="color: #f87171; margin-top: 12px; font-size: 12px;"></div>
 
       <div class="legal-box">
-        <p>Zippy © 2026 - Gestión Profesional</p>
+        <p>Zippy © 2026 - Gestión Profesional de Creative M</p>
       </div>
     </div>
   </div>
@@ -104,25 +124,22 @@
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       }
 
-      // CAMBIAR SEGÚN TU LÓGICA REAL
-      const usuarioTieneEmpresa = false; 
+      const usuarioTieneEmpresa = false; // Lógica real de Firebase
 
       if (esDispositivoMovil()) {
-        // MODO MÓVIL: Ocultamos login y mostramos aviso de App
         card.style.display = 'none';
-        crearAviso("Estás en un dispositivo móvil. Para continuar, descarga nuestra app:", "DESCARGAR APP");
+        crearAviso("Estás en un dispositivo móvil. Para una mejor experiencia, descarga nuestra app oficial:", "DESCARGAR ZIPPY APP");
       } 
       else if (!usuarioTieneEmpresa) {
-        // MODO DESKTOP SIN EMPRESA: Mostramos login Y aviso abajo
-        crearAviso("No tienes empresa registrada. Para crear una y continuar, usa nuestra app móvil:", "OBTENER ZIPPY");
+        crearAviso("No tienes una empresa registrada. Crea una fácilmente desde nuestra app:", "CREAR MI EMPRESA");
       }
 
       function crearAviso(mensaje, textoBoton) {
         const div = document.createElement('div');
         div.className = 'aviso-descarga';
         div.innerHTML = `
-          <p>${mensaje}</p>
-          <a href="https://zippy-727d5.web.app/empresa" target="_blank" class="btn-descarga">${textoBoton}</a>
+          <p style="margin:0; font-size:14px;">${mensaje}</p>
+          <a href="https://zipy.carrd.co/" target="_blank" class="btn-descarga">${textoBoton}</a>
         `;
         container.appendChild(div);
       }
