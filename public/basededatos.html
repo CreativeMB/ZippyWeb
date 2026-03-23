@@ -879,10 +879,32 @@ btnMasOpciones.onclick = () => {
 
 // --- CERRAR SESIÓN ---
 btnCerrarSesion.onclick = () => {
-    if(confirm("¿Está seguro que desea cerrar sesión?")){
-        auth.signOut().then(()=> window.location.href="login.html")
-        .catch(err => alert("Error cerrando sesión: " + err.message));
-    }
+    Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: "Tendrás que volver a autenticarte para acceder al panel.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ff6600', // El naranja de Creative M / Zippy
+        cancelButtonColor: '#6e7881',
+        confirmButtonText: 'Sí, salir',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true // Pone el botón de confirmar a la derecha
+    }).then((result) => {
+        if (result.isConfirmed) {
+            auth.signOut()
+                .then(() => {
+                    window.location.href = "login.html";
+                })
+                .catch(err => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo cerrar la sesión: ' + err.message,
+                        confirmButtonColor: '#d33'
+                    });
+                });
+        }
+    });
 };
 
 // --- AUTH ---
