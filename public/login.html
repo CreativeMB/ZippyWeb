@@ -3,85 +3,170 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ZippyWeb</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <title>Zippy - Ecosistema Digital</title>
+  
+  <style>
+    /* VARIABLES BASADAS EN TU XML KOTLIN */
+    :root {
+      --android-bg: #0F172A;        /* android:background="#0F172A" */
+      --card-bg: #1E293B;           /* app:cardBackgroundColor="#1E293B" */
+      --btn-blue: #2563EB;          /* app:backgroundTint="#2563EB" */
+      --text-white: #FFFFFF;
+      --text-gray: #9CA3AF;         /* Color para subtítulos */
+      --text-legal: #64748B;        /* Color para avisos legales */
+    }
 
-  <!-- Firebase SDK compat (solo CDN) -->
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: var(--android-bg);
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    /* TARJETA - REPLICA DE CardViewinicio */
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 20px;          /* app:cardCornerRadius="20dp" */
+      padding: 32px;
+      text-align: center;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4); /* app:cardElevation="12dp" */
+      color: var(--text-white);
+    }
+
+    .logo {
+      width: 90px;                  /* android:layout_width="90dp" */
+      height: 90px;
+      margin-bottom: 16px;
+    }
+
+    .nombreEmpresa {
+      font-size: 28px;              /* android:textSize="28sp" */
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .subTitle {
+      font-size: 14px;              /* android:textSize="14sp" */
+      color: var(--text-gray);
+      margin-top: 4px;
+      margin-bottom: 32px;
+    }
+
+    /* BOTÓN - REPLICA DE btnIngresar */
+    #btnGoogle {
+      width: 100%;
+      height: 62px;                 /* android:layout_height="62dp" */
+      background-color: var(--btn-blue);
+      color: white;
+      border: none;
+      border-radius: 12px;          /* app:cornerRadius="12dp" */
+      font-size: 15px;              /* android:textSize="15sp" */
+      font-weight: bold;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    #btnGoogle:hover {
+      background-color: #1d4ed8;
+    }
+
+    /* TEXTO LEGAL - REPLICA DE txtCuerpoLegal */
+    .legal-box {
+      margin-top: 28px;
+      font-size: 10px;              /* android:textSize="10sp" */
+      color: var(--text-legal);
+      line-height: 1.4;
+    }
+
+    .legal-link {
+      color: var(--btn-blue);
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 12px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* AVISO MÓVIL / NO EMPRESA (Adaptado al diseño oscuro) */
+    .aviso-zippy {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: rgba(37, 99, 235, 0.1);
+      border: 1px solid var(--btn-blue);
+      border-radius: 12px;
+      color: var(--text-white);
+      font-size: 14px;
+      text-align: center;
+    }
+    
+    .aviso-zippy a {
+      color: var(--btn-blue);
+      text-decoration: underline;
+    }
+  </style>
+
   <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/12.6.0/firebase-database-compat.js"></script>
 
-  <!-- Inicialización y login -->
   <script defer src="js/init.js"></script>
   <script defer src="js/login.js"></script>
 </head>
 <body>
+
   <div class="container" id="container">
     <div class="card" id="cardLogin">
       <img src="img/icono.png" alt="Logo Zippy" class="logo">
-      <h1 class="nombreEmpresa">Todo en un solo lugar</h1>
-      <h2 class="signInText">Zippy Administra tus finanzas</h2>
-      <p class="subTitle">Toca la tarjeta para continuar</p>
-      <button id="btnGoogle">Iniciar sesión con Google</button>
-      <div id="error-message" style="color: red; margin-top: 10px;"></div>
+      <h1 class="nombreEmpresa">Ecosistema Zippy</h1>
+      <p class="subTitle">Administra tu negocio en un solo lugar</p>
+      
+      <button id="btnGoogle">INGRESAR AL SISTEMA</button>
+      
+      <div id="error-message" style="color: #f87171; margin-top: 10px; font-size: 12px;"></div>
+
+      <div class="legal-box">
+        <a href="#" class="legal-link">Aviso de Privacidad y Términos</a>
+        <p>Al acceder, el usuario acepta que Zippy procesa información con fines de gestión tecnológica. Zippy aplica protocolos de seguridad estándar según la normativa vigente.</p>
+        <p style="margin-top: 12px; color: #475569;">Zippy © 2026 - Gestión Profesional</p>
+      </div>
     </div>
   </div>
 
   <script>
-  document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
+      const container = document.getElementById('container');
+      const card = document.getElementById('cardLogin');
 
-    function esDispositivoMovil() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
+      function esDispositivoMovil() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      }
 
-    const container = document.getElementById('container');
-    const card = document.getElementById('cardLogin');
-
-    // Aquí pondrás tu lógica real para saber si el usuario tiene empresa
-    const usuarioTieneEmpresa = false; // Cambiar según tu lógica real
-
-    if (esDispositivoMovil()) {
-      // Ocultar tarjeta y mostrar aviso de descarga en móvil
-      card.style.display = 'none';
-
-      const avisoMovil = document.createElement('div');
-      avisoMovil.style.marginTop = '50px';
-      avisoMovil.style.padding = '20px';
-      avisoMovil.style.backgroundColor = '#e0f7fa';
-      avisoMovil.style.color = '#00796b';
-      avisoMovil.style.border = '1px solid #00796b';
-      avisoMovil.style.borderRadius = '10px';
-      avisoMovil.style.textAlign = 'center';
-      avisoMovil.style.fontWeight = 'bold';
-      avisoMovil.style.fontSize = '18px';
-      avisoMovil.innerHTML = `
-        <p>Estás en un dispositivo móvil.</p>
-        <p>Para continuar, descarga nuestra app:</p>
-        <a href="https://zipy.carrd.co/" target="_blank" style="color: blue; text-decoration: underline; font-size: 18px;">Descarga la app aquí</a>
-      `;
-
-      container.appendChild(avisoMovil);
-
-    } else if (!usuarioTieneEmpresa) {
-      // En desktop, mostrar mensaje debajo de la tarjeta solo si no tiene empresa
-      const avisoDesktop = document.createElement('div');
-      avisoDesktop.style.marginTop = '20px';
-      avisoDesktop.style.padding = '15px';
-      avisoDesktop.style.backgroundColor = '#e0f7fa';
-      avisoDesktop.style.color = '#00796b';
-      avisoDesktop.style.border = '1px solid #00796b';
-      avisoDesktop.style.borderRadius = '8px';
-      avisoDesktop.style.textAlign = 'center';
-      avisoDesktop.style.fontWeight = 'bold';
-      avisoDesktop.innerHTML = `
-        <p>No tienes empresa registrada. Para crear una empresa y continuar, descarga nuestra app:</p>
-        <a href="https://zipy.carrd.co/" target="_blank" style="color: blue; text-decoration: underline; font-weight: bold;">Descarga la app aquí</a>
-      `;
-
-      container.appendChild(avisoDesktop);
-    }
-
-  });
+      // Lógica de avisos con el nuevo diseño
+      if (esDispositivoMovil()) {
+        card.style.display = 'none';
+        const aviso = document.createElement('div');
+        aviso.className = 'aviso-zippy';
+        aviso.innerHTML = `
+          <p>Estás en un dispositivo móvil.</p>
+          <p>Para continuar, descarga nuestra app:</p>
+          <a href="https://zipy.carrd.co/" target="_blank">Descarga la app aquí</a>
+        `;
+        container.appendChild(aviso);
+      }
+    });
   </script>
 </body>
 </html>
