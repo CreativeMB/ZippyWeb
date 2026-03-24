@@ -592,6 +592,67 @@
             }
         }
 
+        /* --- ESTILOS DEL NUEVO MENÚ --- */
+.tabs-container {
+    display: flex;
+    background: #1a1a1a; /* Fondo oscuro elegante */
+    border-bottom: 2px solid #E5C453; /* Línea dorada que combina con Zippy */
+    position: sticky;
+    top: 0;
+    z-index: 1100; /* Por encima de todo */
+}
+
+.tab-item {
+    flex: 1;
+    text-align: center;
+    padding: 15px;
+    color: #ffffff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tab-item i {
+    font-size: 18px;
+}
+
+.tab-item.active {
+    background: #E5C453; /* Color dorado activo */
+    color: #000;
+}
+
+/* --- ESTILOS DE LA TARJETA DE EMPRESA --- */
+.perfil-empresa-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 40px auto;
+    border: 1px solid #eee;
+}
+
+.tab-content {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ajuste para que el buscador no tape el menú */
+.search-flotante {
+    z-index: 1050;
+}
+
         /* ========================================= */
         /* 8 DISEÑO PARA MÓVIL (PANTALLAS PEQUEÑAS)    */
         /* ========================================= */
@@ -736,41 +797,66 @@
         <p style="margin-top:15px; font-weight:bold; color:#202020;">Cargando...</p>
     </div>
 
-    <div class="header">
-        <div class="marca-principal">
-            <img id="logoEmpresa" src="" alt="" class="logo-estilo">
-            <h1 id="nombreEmpresa"></h1>
+    <div class="tabs-container">
+        <div style="display: flex; flex: 1;">
+            <div class="tab-item active" onclick="cambiarPestaña('productos-tab', this)">
+                <i class="fas fa-store"></i> Tienda
+            </div>
+            <div class="tab-item" onclick="cambiarPestaña('empresa-tab', this)">
+                <i class="fas fa-building"></i> Empresa
+            </div>
         </div>
+        
+        <div class="redes-nav">
+            <a href="#" id="shareFB_nav" target="_blank" class="icono-nav facebook">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" id="shareWA_nav" target="_blank" class="icono-nav whatsapp">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+        </div>
+    </div>
 
-        <div id="eslogan" class="eslogan"></div>
+    <div id="empresa-tab" class="tab-content" style="display: none; padding: 20px;">
+        <div class="perfil-empresa-card">
+            <img id="perfil-logo" src="" alt="Logo" style="max-width: 120px; display: block; margin: 0 auto 15px; border-radius: 10px;">
+            <h2 id="perfil-nombre" style="text-align: center; margin-bottom: 5px; color: #1a1a1a;"></h2>
+            <p id="perfil-eslogan" style="text-align: center; font-style: italic; color: #666; font-size: 14px;"></p>
+            
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 12px; margin-top: 20px;">
+                <p style="margin-bottom: 10px;"><strong><i class="fas fa-map-marker-alt" style="color: #E5C453;"></i> Dirección:</strong> <br><span id="perfil-direccion"></span></p>
+                <p style="margin-bottom: 10px;"><strong><i class="fas fa-phone" style="color: #E5C453;"></i> Teléfono:</strong> <br><span id="perfil-telefono"></span></p>
+                <p style="margin-bottom: 10px;"><strong><i class="fas fa-envelope" style="color: #E5C453;"></i> Correo:</strong> <br><span id="perfil-correo"></span></p>
+                <p><strong><i class="fas fa-info-circle" style="color: #E5C453;"></i> Sobre nosotros:</strong> <br><span id="perfil-descripcion"></span></p>
+            </div>
+        </div>
+    </div>
 
-        <div class="compartir-contenedor">
-            <div class="redes-header">
-                <a href="#" id="shareFB" target="_blank" class="icono-red facebook">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" id="shareWA" target="_blank" class="icono-red whatsapp-share">
-                    <i class="fab fa-whatsapp"></i>
-                </a>
+    <div id="productos-tab" class="tab-content">
+        <div class="header">
+            <div class="marca-principal">
+                <img id="logoEmpresa" src="" alt="" class="logo-estilo">
+                <h1 id="nombreEmpresa"></h1>
+            </div>
+
+            <div id="eslogan" class="eslogan"></div>
+
+            <div class="banner-informativo">
+                <div id="info-destacada" class="texto-destacado"></div>
             </div>
         </div>
 
-        <div class="banner-informativo">
-            <div id="info-destacada" class="texto-destacado"></div>
-        </div>
+        <div id="productos" class="productos"></div>
     </div>
-    <div id="productos" class="productos"></div>
 
     <div id="modalPedido" class="modal">
         <div class="modal-contenido">
             <span style="float:right; cursor:pointer; font-size:24px;" onclick="cerrarModal()">×</span>
             <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <img id="productoImagen"
-                    style="width:120px; height:150px; object-fit:contain; background:#f9f9f9; border-radius:8px;">
+                <img id="productoImagen" style="width:120px; height:150px; object-fit:contain; background:#f9f9f9; border-radius:8px;">
                 <div class="infoProducto">
                     <div class="aviso-privacidad" style="font-size: 10px; line-height: 1.2; color: #666;">
-                        🔒 Tus datos están protegidos y se usan exclusivamente para procesar y entregar tu pedido,
-                        conforme a la <strong>Normativa colombiana</strong> de protección de datos.
+                        🔒 Tus datos están protegidos y se usan exclusivamente para procesar y entregar tu pedido, conforme a la Normativa colombiana de protección de datos.
                     </div>
                     <div id="productoTitulo" style="font-weight:bold;"></div>
                     <div id="productoDescripcion" style="font-size:12px; color:#666;"></div>
@@ -780,8 +866,7 @@
 
             <div class="formulario">
                 <div class="aviso-privacidad">
-                    <span class="icono-check">✓</span>
-                    Pedido sujeto a validación previa de disponibilidad y pago.
+                    <span class="icono-check">✓</span> Pedido sujeto a validación previa de disponibilidad y pago.
                 </div>
                 <div class="fila2">
                     <input id="productoAdicional" placeholder="Productos Adicionales (opcional)">
@@ -794,7 +879,6 @@
                         <option>Efectivo</option>
                     </select>
                 </div>
-
                 <div class="fila2">
                     <input id="nombreComprador" placeholder="Nombre comprador">
                     <input id="celularComprador" placeholder="Celular comprador">
@@ -804,21 +888,17 @@
                     <input id="celularDestinatario" placeholder="Celular destinatario">
                 </div>
                 <input id="direccionEntrega" placeholder="Direccion de entrega Exacta Ejemplo, Calle 140a#132-21">
-                <textarea id="notasPedido"
-                    placeholder="Casa primer piso, torre 5 Apartamen 201, Conjunto, Productos adicionales, Peluche, Chocolates "></textarea>
-                <div class="separador-tarjeta">
-                    <strong>Tarjeta para el Regalo</strong>
-                </div>
+                <textarea id="notasPedido" placeholder="Casa primer piso, torre 5 Apartamen 201, Conjunto, Productos adicionales, Peluche, Chocolates "></textarea>
+                
+                <div class="separador-tarjeta"><strong>Tarjeta para el Regalo</strong></div>
                 <textarea id="mensajeTarjeta" placeholder="Mensaje tarjeta"></textarea>
                 <div class="fila2">
                     <input id="deTarjeta" placeholder="De">
                     <input id="paraTarjeta" placeholder="Para">
                 </div>
-                <div class="separador-entrega">
-                    <strong>Fecha y Hora de entrega</strong>
-                </div>
+                
+                <div class="separador-entrega"><strong>Fecha y Hora de entrega</strong></div>
                 <div class="fila2">
-
                     <input type="date" id="fechaEntrega">
                     <select id="horaEntrega">
                         <option>8AM-10AM</option>
@@ -834,12 +914,14 @@
             </div>
         </div>
     </div>
+
     <div class="search-flotante" id="contenedorBusqueda">
         <input type="text" id="inputBusqueda" class="search-input" placeholder="Buscar producto...">
         <div class="search-btn" id="btnBusqueda">
             <i class="fas fa-search"></i>
         </div>
     </div>
+
     <div class="footer">
         <p id="descripcion" class="info-footer-elegante"></p>
         <p id="direccion" class="info-footer-elegante"></p>
@@ -848,8 +930,7 @@
         <p id="correo" class="info-footer-elegante"></p>
 
         <p style="margin-top:25px; font-size:13px; opacity:.8; border-top: 1px solid #333; padding-top: 20px;">
-            © 2026 - <a href="https://zippy-727d5.web.app/empresa.html" target="_blank"
-                style="color:#fbbf24; text-decoration:none; font-weight:bold;">Creado con Zippy</a>
+            © 2026 - <a href="https://zippy-727d5.web.app/empresa.html" target="_blank" style="color:#fbbf24; text-decoration:none; font-weight:bold;">Creado con Zippy</a>
         </p>
     </div>
 
@@ -1225,8 +1306,7 @@ Swal.fire({
 });
     return;
 }
-
-       // --- 1. CAPTURAR TODOS LOS CAMPOS ---
+// --- 1. CAPTURAR TODOS LOS CAMPOS ---
     const cliente = document.getElementById("celularComprador").value.trim();
     const direccion = document.getElementById("direccionEntrega").value.trim();
     const nombreComprador = document.getElementById("nombreComprador").value.trim();
@@ -1494,6 +1574,62 @@ set(nuevoRef, pedidoData).then(() => {
             card.style.display = nombre.includes(texto) ? 'flex' : 'none';
         });
     });
+
+    // --- 1. FUNCIÓN PARA CAMBIAR ENTRE PESTAÑAS ---
+// La declaramos en window para que el HTML pueda verla desde el 'onclick'
+window.cambiarPestaña = function(tabId, elemento) {
+    // Ocultar todos los contenidos de pestañas
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Quitar la clase 'active' de todos los botones del menú
+    document.querySelectorAll('.tab-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Mostrar solo la pestaña seleccionada
+    document.getElementById(tabId).style.display = 'block';
+    
+    // Marcar el botón actual como activo
+    elemento.classList.add('active');
+
+    // Opcional: Si vas a la pestaña empresa, ocultar el buscador flotante
+    const buscador = document.getElementById('contenedorBusqueda');
+    if (tabId === 'empresa-tab') {
+        buscador.style.display = 'none';
+    } else {
+        buscador.style.display = 'flex';
+    }
+};
+
+// --- 2. FUNCIÓN PARA CARGAR DATOS EN LA PESTAÑA EMPRESA ---
+// Esta función toma los datos que ya recibes de Firebase y los pone en la nueva pestaña
+function llenarPestañaEmpresa(data) {
+    if (!data) return;
+
+    // Llenamos los campos de la nueva pestaña 'Empresa'
+    const campos = {
+        'perfil-logo': data.logo,
+        'perfil-nombre': data.nombre,
+        'perfil-eslogan': data.eslogan,
+        'perfil-direccion': data.direccion,
+        'perfil-telefono': data.telefono,
+        'perfil-correo': data.correo,
+        'perfil-descripcion': data.descripcion
+    };
+
+    for (const id in campos) {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+            if (elemento.tagName === 'IMG') {
+                elemento.src = campos[id] || '';
+            } else {
+                elemento.innerText = campos[id] || 'No disponible';
+            }
+        }
+    }
+}
 </script>
 </body>
 
