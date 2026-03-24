@@ -1916,35 +1916,42 @@ function llenarPestañaEmpresa(data) {
         descripcion.innerText = data.descripcionEmpresa || '';
     }
 
-    // --- LÓGICA DE MEDIOS DE PAGO (INTEGRADA) ---
-    const contenedorPagos = document.getElementById('perfil-medios-pago');
-    if (contenedorPagos) {
-        contenedorPagos.innerHTML = ""; // Limpiar contenido previo
-        
-        // Capturamos la variable desde Realtime Database
-        const mediosStr = data.mediosPago || ""; 
-        
-        if (mediosStr.trim() !== "") {
-            // Separamos por comas
-            const listaMedios = mediosStr.split(',');
+   // --- PROCESAMIENTO DE MEDIOS DE PAGO ---
+const contenedorPagos = document.getElementById('perfil-medios-pago');
 
-            listaMedios.forEach(medio => {
-                const medioLimpio = medio.trim(); 
+if (contenedorPagos) {
+    contenedorPagos.innerHTML = ""; // Limpiar antes de llenar
+    
+    // Capturamos el String: "Nequi, Daviplata, Efectivo, Bancolombia, Tarjeta"
+    const mediosStr = data.mediosPago || ""; 
+
+    if (mediosStr.trim() !== "") {
+        // El .split(',') corta el texto en cada coma y crea una lista (Array)
+        const listaMedios = mediosStr.split(',');
+
+        listaMedios.forEach(medio => {
+            const nombreLimpio = medio.trim(); // Quita espacios vacíos
+            
+            if (nombreLimpio !== "") {
+                // Creamos un DIV para que sea una línea independiente
+                const linea = document.createElement('div');
                 
-                if (medioLimpio !== "") {
-                    // Creamos el div que activará la nueva línea según tu CSS
-                    const linea = document.createElement('div');
-                    
-                    // Icono de check y el texto del medio de pago
-                    linea.innerHTML = `<i class="fas fa-check-circle" style="color: #E5C453; margin-right: 10px; font-size: 14px;"></i> ${medioLimpio}`;
-                    
-                    contenedorPagos.appendChild(linea);
-                }
-            });
-        } else {
-            contenedorPagos.innerText = "Consultar con el establecimiento.";
-        }
+                // Estilo rápido para asegurar que se vea bien
+                linea.style.display = "block";
+                linea.style.padding = "10px 0";
+                linea.style.borderBottom = "1px solid #222"; // Línea divisoria sutil
+                
+                // Agregamos icono y el nombre del medio
+                linea.innerHTML = `<i class="fas fa-check-circle" style="color: #E5C453; margin-right: 12px;"></i> 
+                                   <span style="color: #ffffff; font-weight: 600;">${nombreLimpio}</span>`;
+                
+                contenedorPagos.appendChild(linea);
+            }
+        });
+    } else {
+        contenedorPagos.innerHTML = '<p style="color: #666;">Consultar medios de pago con el vendedor.</p>';
     }
+}
 
     // ===== DIRECCIÓN (CONCATENADA) =====
     const direccionTexto = data.direccion || '';
