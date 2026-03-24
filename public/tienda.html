@@ -694,12 +694,12 @@
         <input type="text" id="busqueda-productos" placeholder="Buscar...">
     </div>
 
-    <div class="tab-item active" onclick="cambiarTab('inicio')">
-        <i class="fas fa-home"></i> <span>Inicio</span>
-    </div>
-    <div class="tab-item" onclick="cambiarTab('perfil')">
-        <i class="fas fa-store"></i> <span>Tienda</span>
-    </div>
+  <div class="tab-item active" onclick="cambiarTab('productos-tab')">
+    <i class="fas fa-home"></i> <span>Inicio</span>
+</div>
+<div class="tab-item" onclick="cambiarTab('empresa-tab')">
+    <i class="fas fa-store"></i> <span>Tienda</span>
+</div>
 
     <div class="compartir-nav">
         <a href="#" class="icono-red facebook"><i class="fab fa-facebook-f"></i></a>
@@ -802,13 +802,6 @@
                 </div>
                 <button id="enviarPedidoBtn" onclick="enviarPedido()">Enviar pedido</button>
             </div>
-        </div>
-    </div>
-
-    <div class="search-flotante" id="contenedorBusqueda">
-        <input type="text" id="inputBusqueda" class="search-input" placeholder="Buscar producto...">
-        <div class="search-btn" id="btnBusqueda">
-            <i class="fas fa-search"></i>
         </div>
     </div>
 
@@ -1475,9 +1468,8 @@ set(nuevoRef, pedidoData).then(() => {
         });
     });
 
-    // --- 1. FUNCIÓN PARA CAMBIAR ENTRE PESTAÑAS ---
-// La declaramos en window para que el HTML pueda verla desde el 'onclick'
-window.cambiarPestaña = function(tabId, elemento) {
+   // --- 1. FUNCIÓN PARA CAMBIAR ENTRE PESTAÑAS ---
+window.cambiarTab = function(tabId) { // Cambiado a 'cambiarTab' para que coincida con el HTML
     // Ocultar todos los contenidos de pestañas
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.style.display = 'none';
@@ -1488,18 +1480,23 @@ window.cambiarPestaña = function(tabId, elemento) {
         item.classList.remove('active');
     });
     
-    // Mostrar solo la pestaña seleccionada
-    document.getElementById(tabId).style.display = 'block';
+    // Mostrar la pestaña seleccionada
+    const pestañaDestino = document.getElementById(tabId);
+    if (pestañaDestino) {
+        pestañaDestino.style.display = 'block';
+    }
     
-    // Marcar el botón actual como activo
-    elemento.classList.add('active');
+    // Marcar el botón actual como activo (usando event.currentTarget)
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    }
 
-    // Opcional: Si vas a la pestaña empresa, ocultar el buscador flotante
-    const buscador = document.getElementById('contenedorBusqueda');
-    if (tabId === 'empresa-tab') {
-        buscador.style.display = 'none';
-    } else {
-        buscador.style.display = 'flex';
+    // El buscador de la barra: 
+    // Si estamos en 'empresa-tab', lo ocultamos para que no estorbe
+    const buscadorNav = document.querySelector('.search-wrapper-nav');
+    if (buscadorNav) {
+        buscadorNav.style.opacity = (tabId === 'empresa-tab') ? "0" : "1";
+        buscadorNav.style.pointerEvents = (tabId === 'empresa-tab') ? "none" : "auto";
     }
 };
 
