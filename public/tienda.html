@@ -751,26 +751,34 @@
             }
         }
 
-      /* --- BARRA PRINCIPAL --- */
+     /* --- BARRA PRINCIPAL --- */
 .tabs-container {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-between; /* Distribuye: Izquierda, Centro, Derecha */
     background: #1a1a1a;
     border-bottom: 2px solid #E5C453;
     position: sticky;
     top: 0;
     z-index: 1100;
-    padding: 0 10px;
-    height: 60px;
+    padding: 0 15px;
+    height: 65px;
+    box-sizing: border-box; /* Evita que el padding sume al ancho */
 }
 
-/* --- ESTILO DEL BUSCADOR --- */
+/* --- GRUPO DE PESTAÑAS (IZQUIERDA) --- */
+.tabs-left {
+    display: flex;
+    flex: 0 0 auto; /* No crece, no se encoge */
+}
+
+/* --- ESTILO DEL BUSCADOR (CENTRO) --- */
 .search-nav-container {
     position: relative;
-    flex: 1.5; /* Le damos un poco más de espacio que a las pestañas */
-    margin: 0 15px;
-    max-width: 300px; /* Evita que crezca demasiado en PC */
+    flex: 1;           /* Toma el espacio sobrante en medio */
+    max-width: 400px;  /* Pero no más de 400px en PC */
+    margin: 0 20px;    /* Espacio a los lados para no chocar */
+    min-width: 150px;  /* Para que no desaparezca en pantallas medianas */
 }
 
 .search-input-nav {
@@ -781,53 +789,30 @@
     padding: 8px 15px 8px 35px;
     color: white;
     font-size: 14px;
-    outline: none;
-    transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
-.search-input-nav:focus {
-    border-color: #E5C453;
-    background: #333;
-    box-shadow: 0 0 5px rgba(229, 196, 83, 0.3);
-}
-
-.search-icon-nav {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #888;
-    font-size: 14px;
-}
-
-/* --- REDES NAV --- */
+/* --- REDES NAV (DERECHA) --- */
 .redes-nav {
     display: flex;
-    gap: 8px;
+    flex: 0 0 auto; /* Se queda fijo a la derecha */
+    gap: 10px;
 }
 
-.icono-nav {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    text-decoration: none;
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: 0.3s;
-}
-
-.icono-nav.facebook:hover { background: #1877F2; }
-.icono-nav.whatsapp:hover { background: #25D366; }
-
-/* --- RESPONSIVE --- */
+/* --- RESPONSIVE PARA CELULARES --- */
 @media screen and (max-width: 600px) {
-    .tab-item span { display: none; } /* Solo iconos en pestañas para celular */
-    .search-nav-container { margin: 0 8px; flex: 2; }
-    .search-input-nav { font-size: 12px; }
+    .tabs-container {
+        padding: 0 8px; /* Menos padding en los bordes */
+    }
+    
+    .tab-item span { 
+        display: none; /* Oculta texto 'Tienda'/'Empresa' para ganar espacio */
+    }
+
+    .search-nav-container {
+        margin: 0 10px;
+        max-width: none; /* Deja que el flex:1 controle el tamaño */
+    }
 }
         
         /* --- BOTÓN FLOTANTE DE WHATSAPP --- */
