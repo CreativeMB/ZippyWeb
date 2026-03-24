@@ -824,83 +824,71 @@
             }
         }
         /* --- DISEÑO PREMIUM PESTAÑA EMPRESA --- */
-/* ELIMINAR LÍMITES DE LA PÁGINA */
+/* --- ESTILO DARK ELEGANCE --- */
+
 #empresa-tab {
-    background: #080808 !important;
-    width: 100vw !important;
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    min-height: 100vh;
-    padding: 0 !important;
-    overflow-x: hidden;
+    background: #050505 !important; /* Negro más profundo */
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
 }
 
-.zippy-modern-full {
-    width: 100%;
-    max-width: 100%;
+/* TÍTULOS GRANDES Y ELEGANTES */
+.z-main-title {
+    font-size: 52px; /* Título gigante */
+    font-weight: 900; /* Negrita extrema */
+    color: #ffffff;
+    letter-spacing: -2px;
     margin: 0;
-    padding: 0;
+    text-transform: capitalize;
 }
 
-/* BANNER SUPERIOR (Como el del link) */
-.z-banner-header {
-    width: 100%;
-    height: 350px;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.1), #080808), 
-                url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=2000&auto=format&fit=crop'); /* Imagen de fondo elegante */
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* COLOR PREMIUM PARA SUBTÍTULOS */
+.z-sub-gold {
+    color: #E5C453; /* Dorado Zippy */
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-top: 10px;
+}
+
+/* DESCRIPCIÓN ELEGANTE */
+#perfil-descripcion {
+    font-family: 'Inter', sans-serif; /* O Montserrat light */
+    font-weight: 300; /* Letra delgada */
+    font-size: 20px;
+    line-height: 1.8;
+    color: #a0a0a0; /* Gris platino, no cansa la vista */
+    max-width: 850px;
+    margin: 0 auto;
     text-align: center;
 }
 
-.z-glass-identity {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(229, 196, 83, 0.2);
-    padding: 40px;
-    border-radius: 40px;
-    width: 90%;
-    max-width: 800px;
-}
-
-/* TARJETAS ESTILO DASHBOARD */
-.z-container-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    padding: 40px;
-    max-width: 1300px;
-    margin: 0 auto;
-}
-
+/* TARJETAS SIN FONDO CLARO (GRADIENTE SUTIL) */
 .z-card-premium {
-    background: #121212;
-    border: 1px solid #1f1f1f;
-    border-radius: 25px;
-    padding: 30px;
-    transition: 0.3s;
+    background: linear-gradient(145deg, #0f0f0f, #151515) !important;
+    border: 1px solid #222 !important;
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
 }
 
-.z-card-premium:hover {
-    border-color: #E5C453;
-    transform: translateY(-5px);
-}
-
-.z-btn-action {
-    background: #E5C453;
-    color: #000;
-    padding: 12px 30px;
-    border-radius: 12px;
+/* ETIQUETAS DE LAS TARJETAS */
+.z-card-premium label {
+    color: #444; /* Color oscuro sutil */
+    font-size: 11px;
     font-weight: 800;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 15px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+/* VALORES DE LAS TARJETAS */
+.z-card-premium span {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    display: block;
+    margin-top: 5px;
 }
     </style>
 </head>
@@ -1032,47 +1020,50 @@
     </div>
 
 <div id="empresa-tab" class="tab-content" style="display: none;">
-   <div class="zippy-modern-full">
-    <div class="z-banner-header">
-        <div class="z-glass-identity">
-            <div style="width: 120px; height: 120px; background: white; border-radius: 50%; margin: 0 auto 20px; padding: 10px;">
+  <div class="zippy-modern-full">
+    <div class="z-banner-header" style="height: 450px;">
+        <div class="z-glass-identity" style="border: none; background: transparent;">
+            <div style="width: 150px; height: 150px; background: white; border-radius: 50%; margin: 0 auto 30px; padding: 5px; border: 2px solid #E5C453;">
                 <img id="perfil-logo" src="" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;">
             </div>
-            <h1 id="perfil-nombre" class="brand-title"></h1>
-            <p id="perfil-eslogan" class="glow-text"></p>
+            
+            <h1 id="perfil-nombre" class="z-main-title"></h1>
+            <p id="perfil-eslogan" class="z-sub-gold"></p>
         </div>
     </div>
 
-    <div style="padding: 60px 20px; text-align: center; background: #080808;">
-        <label style="color: #444; letter-spacing: 5px; font-size: 12px; font-weight: bold;">NUESTRA EMPRESA</label>
-        <p id="perfil-descripcion" style="max-width: 900px; margin: 20px auto; color: #ccc; font-size: 18px; line-height: 1.8; font-weight: 300;"></p>
+    <div style="padding: 100px 20px; background: #050505;">
+        <div style="margin-bottom: 40px; text-align: center;">
+            <div style="width: 50px; height: 2px; background: #E5C453; margin: 0 auto 20px;"></div>
+            <p id="perfil-descripcion" class="descripcion-elegante"></p>
+        </div>
     </div>
 
     <div class="z-container-cards">
         <div class="z-card-premium" style="grid-column: span 2;">
-            <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-                <i class="fas fa-map-marked-alt" style="color: #E5C453; font-size: 24px;"></i>
-                <div>
-                    <label style="color: #555; font-size: 10px; font-weight: 800; display: block;">DIRECCIÓN</label>
-                    <span id="perfil-direccion" style="color: white; font-weight: 600;"></span>
-                </div>
+            <div style="margin-bottom: 25px;">
+                <label>Ubicación Privilegiada</label>
+                <span id="perfil-direccion"></span>
             </div>
-            <iframe id="google-map-iframe" width="100%" height="300" frameborder="0" style="border-radius: 20px; border: 1px solid #333;"></iframe>
-        </div>
+            <iframe id="google-map-iframe" width="100%" height="350" frameborder="0" style="border-radius: 20px; filter: grayscale(1) invert(0.92) contrast(1.2);"></iframe>
+            </div>
 
         <div class="z-card-premium">
-            <i class="fas fa-phone-alt" style="color: #E5C453; font-size: 24px; margin-bottom: 15px;"></i>
-            <label style="color: #555; font-size: 10px; font-weight: 800; display: block;">CONTACTO</label>
-            <span id="perfil-telefono" style="color: white; font-size: 20px; font-weight: 800; display: block; margin: 10px 0;"></span>
-            <a id="btn-llamar" href="#" class="z-btn-action">LLAMAR AHORA</a>
+            <i class="fas fa-phone-alt" style="color: #E5C453; font-size: 30px; margin-bottom: 20px;"></i>
+            <label>Línea de Atención</label>
+            <span id="perfil-telefono"></span>
+            <a id="btn-llamar" href="#" class="z-btn-action" style="width: 100%; text-align: center; margin-top: 30px;">CONTACTAR AHORA</a>
         </div>
         
         <div class="z-card-premium">
-            <i class="fas fa-file-contract" style="color: #E5C453; font-size: 24px; margin-bottom: 15px;"></i>
-            <label style="color: #555; font-size: 10px; font-weight: 800; display: block;">NIT REGISTRO</label>
-            <span id="perfil-nit" style="color: white; font-size: 18px; font-weight: 600;"></span>
-            <label style="color: #555; font-size: 10px; font-weight: 800; display: block; margin-top: 20px;">CORREO</label>
-            <span id="perfil-correo" style="color: white; font-size: 14px;"></span>
+            <i class="fas fa-shield-alt" style="color: #E5C453; font-size: 30px; margin-bottom: 20px;"></i>
+            <label>Identidad Corporativa</label>
+            <span id="perfil-nit"></span>
+            
+            <div style="margin-top: 30px;">
+                <label>Canal Digital</label>
+                <span id="perfil-correo" style="font-size: 16px;"></span>
+            </div>
         </div>
     </div>
 </div>
@@ -1827,49 +1818,70 @@ if (inputBusquedaNav) {
 };
 
 // --- FUNCIÓN PRINCIPAL DE LLENADO (CORREGIDA) ---
+// --- FUNCIÓN PRINCIPAL DE LLENADO (VERSIÓN PREMIUM FINAL) ---
 function llenarPestañaEmpresa(data) {
     if (!data) return;
 
-    // Actualizamos variable global por si la necesitas en pedidos
+    // 0. ACTUALIZACIÓN DE VARIABLES GLOBALES
+    // Usamos el operador de asignación para que esté disponible en toda la App
     telefonoEmpresa = data.telefono || "";
+    empresaId = data.id || empresaId; // Por si necesitas rastrear el ID actual
 
-    // 1. LOGO Y TEXTOS PRINCIPALES
+    // 1. CARGA DEL LOGO (Efecto suave y Proxy de seguridad)
     const imgElement = document.getElementById('perfil-logo');
     if (imgElement && data.urlLogo) {
-        const urlFinal = `https://drive.google.com/uc?export=view&id=${data.urlLogo}`;
-        imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`;
+        const urlDrive = `https://drive.google.com/uc?export=view&id=${data.urlLogo}`;
+        // Usamos el proxy para evitar bloqueos de Google Drive
+        imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlDrive)}`;
+        imgElement.style.opacity = '1';
     }
 
-    document.getElementById('perfil-nombre').innerText = data.nombreEmpresa || 'Mi Tienda';
-    document.getElementById('perfil-eslogan').innerText = data.eslogan || '';
-    document.getElementById('perfil-descripcion').innerText = data.descripcionEmpresa || '';
+    // 2. TÍTULOS DE ALTO IMPACTO (Negrita extrema y Dorado)
+    // Usamos innerHTML en el nombre por si quieres meter un <span> dorado luego
+    const elNombre = document.getElementById('perfil-nombre');
+    if (elNombre) elNombre.innerText = data.nombreEmpresa || 'Zippy Store';
 
-    // 2. MAPA DE GOOGLE (Caja con dirección)
+    const elEslogan = document.getElementById('perfil-eslogan');
+    if (elEslogan) elEslogan.innerText = data.eslogan || '';
+
+    // 3. DESCRIPCIÓN ELEGANTE (Tipografía delgada y espaciada)
+    const elDesc = document.getElementById('perfil-descripcion');
+    if (elDesc) elDesc.innerText = data.descripcionEmpresa || 'Bienvenidos a nuestra experiencia premium.';
+
+    // 4. MAPA DE GOOGLE (Integración con filtro oscuro del CSS)
     const direccionFull = `${data.direccion || ''}, ${data.ciudad || ''}`;
+    const elDireccion = document.getElementById('perfil-direccion');
     const mapIframe = document.getElementById('google-map-iframe');
     
-    if (mapIframe && data.direccion) {
-        const query = encodeURIComponent(direccionFull);
-        mapIframe.src = `https://www.google.com/maps/embed/v1/place?key=TU_API_KEY_AQUI&q=${query}`;
-        // Nota: Si no tienes API Key de Maps, usa esta alternativa gratuita:
-        mapIframe.src = `https://maps.google.com/maps?q=${query}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-    }
-    
-    document.getElementById('perfil-direccion').innerText = direccionFull;
+    if (elDireccion) elDireccion.innerText = direccionFull;
 
-    // 3. BOTÓN DE TELÉFONO (Estilo Premium)
+    if (mapIframe && data.direccion) {
+        const queryMapa = encodeURIComponent(direccionFull);
+        // Generamos el mapa dinámico basado en la dirección de la base de datos
+        mapIframe.src = `https://maps.google.com/maps?q=${queryMapa}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+    }
+
+    // 5. TELÉFONO Y BOTÓN DE LLAMADA (Acción Rápida)
     const elTelefono = document.getElementById('perfil-telefono');
     const btnLlamar = document.getElementById('btn-llamar');
+
+    if (elTelefono) elTelefono.innerText = telefonoEmpresa || 'Contacto Privado';
     
-    if (elTelefono) elTelefono.innerText = telefonoEmpresa || 'No disponible';
-    if (btnLlamar && telefonoEmpresa) {
-        btnLlamar.href = `tel:${telefonoEmpresa}`;
-        btnLlamar.style.display = 'inline-block';
+    if (btnLlamar) {
+        if (telefonoEmpresa) {
+            btnLlamar.href = `tel:${telefonoEmpresa}`;
+            btnLlamar.style.display = 'inline-block';
+        } else {
+            btnLlamar.style.display = 'none';
+        }
     }
 
-    // 4. OTROS DATOS
-    document.getElementById('perfil-nit').innerText = data.nit || 'N/A';
-    document.getElementById('perfil-correo').innerText = data.correo || '';
+    // 6. DATOS LEGALES Y DE RESPALDO
+    const elNit = document.getElementById('perfil-nit');
+    if (elNit) elNit.innerText = data.nit || 'NIT Verificado';
+
+    const elCorreo = document.getElementById('perfil-correo');
+    if (elCorreo) elCorreo.innerText = data.correo || 'contacto@zippy.com';
 }
 </script>
 </body>
