@@ -650,25 +650,58 @@
 /* --- 6. RESPONSIVE (MÓVILES) --- */
 @media screen and (max-width: 600px) {
     .tabs-container {
-        padding: 0 10px;
+        padding: 0 5px; /* Reducimos padding lateral al mínimo */
+        height: 60px;   /* Un poco más compacta */
     }
     
-    .tab-item span { 
-        display: none; /* Solo iconos en móvil para ahorrar espacio */
+    /* Prioridad a las pestañas */
+    .tabs-left {
+        flex: 2; /* Ocupa el doble de espacio que el buscador */
     }
 
     .tab-item {
-        padding: 0 12px;
+        padding: 0 8px; /* Espacio mínimo entre pestañas */
+        gap: 4px;       /* Pegamos el icono al texto */
     }
 
+    /* FORZAMOS QUE EL TEXTO SE VEA */
+    .tab-item span { 
+        display: inline-block !important; 
+        font-size: 11px; /* Letra pequeña para que quepa */
+        white-space: nowrap; /* Evita que el texto salte de línea */
+    }
+
+    .tab-item i {
+        font-size: 15px; /* Iconos un poco más pequeños */
+    }
+
+    /* BUSCADOR ULTRA COMPACTO */
     .search-nav-container {
-        margin: 0 8px;
-        min-width: 80px;
+        flex: 1; /* Se encoge para dar paso a los títulos */
+        margin: 0 5px;
+        min-width: 70px; /* Tamaño mínimo para que no desaparezca */
+        max-width: 110px; /* No dejamos que crezca más de esto */
     }
 
     .search-input-nav {
-        font-size: 12px;
-        padding-left: 30px;
+        font-size: 11px;
+        padding: 6px 5px 6px 25px; /* Reducimos padding interno */
+        height: 32px;
+    }
+
+    .search-icon-nav {
+        left: 8px;
+        font-size: 11px;
+    }
+
+    /* REDES SOCIALES MÁS PEQUEÑAS */
+    .redes-nav {
+        gap: 4px;
+    }
+
+    .icono-nav {
+        width: 28px;
+        height: 28px;
     }
 }
         
@@ -736,52 +769,66 @@
         /* 8 DISEÑO PARA MÓVIL (PANTALLAS PEQUEÑAS)    */
         /* ========================================= */
 
-      @media screen and (max-width: 767px) {
-    /* --- AJUSTE DE LA BARRA DE NAVEGACIÓN --- */
-    .tabs-container {
-        padding: 0 5px !important; /* Menos espacio en los bordes de la pantalla */
-        height: 55px !important;   /* Un poco más delgada la barra */
-    }
+        @media screen and (max-width: 767px) {
+            .productos {
+                grid-template-columns: repeat(2, 1fr) !important;
+                /* Dos columnas */
+                gap: 15px !important;
+                /* Más espacio entre tarjetas para que no choquen */
+                padding: 15px !important;
+                background-color: #f8f9fa;
+                /* Un fondo ligeramente distinto para resaltar la tarjeta blanca */
+            }
 
-    /* Reducimos el buscador al mínimo necesario */
-    .search-nav-container {
-        flex: 0.8 !important;      /* Ocupa menos de la mitad del espacio central */
-        margin: 0 5px !important;  /* Casi nada de margen a los lados */
-        min-width: 80px !important; /* Evita que desaparezca del todo */
-    }
+            .producto {
+                border: none !important;
+                /* Quitamos el borde gris para que la sombra sea la protagonista */
+                border-radius: 15px !important;
+                /* Bordes más redondeados se ven más modernos */
 
-    .search-input-nav {
-        font-size: 11px !important; /* Letra más pequeña para que quepa el placeholder */
-        padding: 6px 8px 6px 25px !important; /* Menos relleno interno */
-        border-radius: 15px !important;
-    }
+                /* SOMBRA MÁS ATRACTIVA PARA MÓVIL */
+                /* Un poco más profunda (8px) para que se note la elevación en pantallas pequeñas */
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 
-    .search-icon-nav {
-        left: 8px !important;       /* Lupa más pegada al borde */
-        font-size: 11px !important;
-    }
+                background: #ffffff;
+                margin-bottom: 5px;
+            }
 
-    /* Ajuste de Pestañas para que quepan bien los iconos */
-    .tab-item {
-        padding: 0 8px !important;
-        font-size: 11px !important;
-        gap: 4px !important;        /* Menos espacio entre icono y texto */
-    }
+            .producto img {
+                aspect-ratio: 3 / 4 !important;
+                /* Menos alta como pediste */
+                border-radius: 15px 15px 0 0;
+                /* Redondeamos solo las esquinas de arriba de la foto */
+                object-fit: cover !important;
+            }
 
-    .tab-item i {
-        font-size: 15px !important; /* Iconos de Tienda/Empresa un poco más pequeños */
-    }
+            .nombre {
+                font-size: 13px !important;
+                color: #2c3e50;
+                /* Un gris muy oscuro, más elegante que el negro puro */
+                margin: 10px 0 5px 0 !important;
+                font-weight: 600 !important;
+                /* Letra un poco más gruesa */
+                padding: 0 8px !important;
+            }
 
-    /* Redes sociales un poco más juntas */
-    .redes-nav {
-        gap: 5px !important;
-    }
+            .precio {
+                font-size: 16px !important;
+                color: #111;
+                margin-bottom: 10px !important;
+            }
 
-    .icono-nav {
-        width: 28px !important;
-        height: 28px !important;
-    }
-}
+            /* BOTÓN MÁS ESTILIZADO */
+            .btn {
+                margin: 0 10px 15px 10px !important;
+                /* Espaciado interno para que no toque los bordes */
+                padding: 10px !important;
+                font-size: 11px !important;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                border-radius: 10px !important;
+            }
+        }
     </style>
 </head>
 
