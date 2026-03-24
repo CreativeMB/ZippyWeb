@@ -1966,27 +1966,21 @@ if (inputBusquedaNav) {
     }
 };
 
-// --- FUNCIÓN AUXILIAR PARA OBTENER LINK DIRECTO DE DRIVE ---
-function obtenerLinkDirecto(idDrive) {
-    if (!idDrive) return '';
-    // Si ya es una URL completa, la devuelve; si es solo ID, crea la URL
-    return idDrive.startsWith('http') ? idDrive : `https://drive.google.com/uc?export=view&id=${idDrive}`;
-}
-
 // --- FUNCIÓN PRINCIPAL DE LLENADO (CORREGIDA) ---
 function llenarPestañaEmpresa(data) {
     if (!data) return;
 
-    // 1. GESTIÓN PROFESIONAL DEL LOGO ('perfil-logo')
+    // 1. CARGA ESPECÍFICA DEL LOGO (Corrigiendo el llamado)
     const imgElement = document.getElementById('perfil-logo');
     if (imgElement) {
-        if (data.urlLogo && data.urlLogo.trim() !== "") {
-            const urlFinal = obtenerLinkDirecto(data.urlLogo);
+        // Usamos urlLogo que es el campo que viene en tu JSON de Skenda Colombia
+        const idLogo = data.urlLogo || ""; 
+        
+        if (idLogo.trim() !== "") {
+            // Construimos la URL de vista directa de Drive
+            const urlFinal = `https://drive.google.com/uc?export=view&id=${idLogo}`;
             
-            // Aplicamos seguridad para evitar bloqueos de Google
             imgElement.setAttribute('referrerpolicy', 'no-referrer');
-            
-            // Intentamos cargar la URL directa
             imgElement.src = urlFinal;
             
             imgElement.onload = () => { 
@@ -1994,41 +1988,35 @@ function llenarPestañaEmpresa(data) {
                 imgElement.style.opacity = '1'; 
             };
             
-            // Si falla, usamos el proxy de weserv.nl (como en tu ejemplo)
+            // Si falla (por bloqueos de Drive), usamos el proxy weserv que mencionaste
             imgElement.onerror = () => { 
-                console.warn("⚠️ Falló carga directa del logo, usando proxy.");
                 imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`; 
             };
         } else {
-            // Si no hay logo, ocultamos el contenedor
-            const wrapper = imgElement.closest('.perfil-logo-wrapper');
-            if (wrapper) wrapper.style.display = 'none';
+            imgElement.style.display = 'none';
         }
     }
 
-    // 2. MAPEO DEL RESTO DE CAMPOS DE TEXTO
-    const camposTexto = {
-        'perfil-nombre': data.nombreEmpresa || 'Skenda Colombia',
-        'perfil-eslogan': data.eslogan || 'Variedad de Productos',
-        'perfil-descripcion': data.descripcionEmpresa || 'Venta de variedad de productos...',
-        'perfil-ciudad': data.ciudad || 'Colombia',
-        'perfil-direccion': data.direccion || 'villamaria caldas',
-        'perfil-correo': data.correo || 'skendacolombia@gmail.com',
-        'perfil-nit': data.nit || '324273532815',
-        'perfil-admin': data.administrador || 'Doris Martinez',
-        'perfil-publicidad': data.publicidad || ''
+    // 2. CARGA DE LOS DEMÁS DATOS (Los que ya te estaban funcionando)
+    const campos = {
+        'perfil-nombre': data.nombreEmpresa,
+        'perfil-eslogan': data.eslogan,
+        'perfil-descripcion': data.descripcionEmpresa,
+        'perfil-ciudad': data.ciudad,
+        'perfil-direccion': data.direccion,
+        'perfil-correo': data.correo,
+        'perfil-nit': data.nit,
+        'perfil-admin': data.administrador,
+        'perfil-publicidad': data.publicidad
     };
 
-    // Llenamos los campos de texto
-    Object.entries(camposTexto).forEach(([id, valor]) => {
+    Object.entries(campos).forEach(([id, valor]) => {
         const elemento = document.getElementById(id);
         if (elemento) {
-            // Si es la publicidad y está vacía, ocultamos el banner
-            if (id === 'perfil-publicidad' && !valor) {
-                elemento.style.display = 'none';
-            } else {
-                elemento.innerText = valor;
-                if (id === 'perfil-publicidad') elemento.style.display = 'block';
+            elemento.innerText = valor || '';
+            // Manejo especial para el banner de publicidad
+            if (id === 'perfil-publicidad') {
+                elemento.style.display = valor ? 'inline-block' : 'none';
             }
         }
     });
