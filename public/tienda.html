@@ -634,6 +634,57 @@
 .search-flotante {
     z-index: 1050;
 }
+/* --- CONTENEDOR DE REDES EN LA NAV --- */
+.redes-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;          /* Espacio entre los dos iconos */
+    padding-right: 15px; /* Separación del borde derecho */
+}
+
+/* --- ESTILO DE CADA ICONO INDIVIDUAL --- */
+.icono-nav {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1); /* Círculo sutil */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.icono-nav i {
+    font-size: 16px;
+    color: white; /* Icono blanco por defecto */
+}
+
+/* --- COLORES DE MARCA AL PASAR EL MOUSE (HOVER) --- */
+.icono-nav.facebook:hover {
+    background: #1877F2;
+    border-color: #1877F2;
+    transform: translateY(-2px); /* Pequeño salto hacia arriba */
+}
+
+.icono-nav.whatsapp:hover {
+    background: #25D366;
+    border-color: #25D366;
+    transform: translateY(-2px);
+}
+
+/* --- AJUSTE PARA LA BARRA PRINCIPAL --- */
+.tabs-container {
+    display: flex;
+    justify-content: space-between; /* Empuja las pestañas a un lado y redes al otro */
+    align-items: center;
+    background: #1a1a1a;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+}
 
         /* ========================================= */
         /* 8 DISEÑO PARA MÓVIL (PANTALLAS PEQUEÑAS)    */
