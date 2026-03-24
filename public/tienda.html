@@ -4,6 +4,7 @@
 <head>
    <meta charset="UTF-8">
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Tienda Virtual | Pedidos por WhatsApp</title>
@@ -824,71 +825,122 @@
             }
         }
         /* --- DISEÑO PREMIUM PESTAÑA EMPRESA --- */
-/* --- ESTILO DARK ELEGANCE --- */
-
-#empresa-tab {
-    background: #050505 !important; /* Negro más profundo */
-    color: #ffffff;
-    font-family: 'Montserrat', sans-serif;
+/* CONTENEDOR GENERAL */
+.zippy-modern-full {
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    background: #050505;
 }
 
-/* TÍTULOS GRANDES Y ELEGANTES */
-.z-main-title {
-    font-size: 52px; /* Título gigante */
-    font-weight: 900; /* Negrita extrema */
-    color: #ffffff;
-    letter-spacing: -2px;
-    margin: 0;
-    text-transform: capitalize;
+/* HEADER CON IMAGEN / BANNER */
+.z-banner-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+        rgba(0,0,0,0.6),
+        rgba(0,0,0,0.9)
+    ), url('https://images.unsplash.com/photo-1524594227085-4f6a5c9f82a7?q=80&w=1400');
+    background-size: cover;
+    background-position: center;
 }
 
-/* COLOR PREMIUM PARA SUBTÍTULOS */
-.z-sub-gold {
-    color: #E5C453; /* Dorado Zippy */
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 6px;
-    text-transform: uppercase;
-    margin-top: 10px;
-}
-
-/* DESCRIPCIÓN ELEGANTE */
-#perfil-descripcion {
-    font-family: 'Inter', sans-serif; /* O Montserrat light */
-    font-weight: 300; /* Letra delgada */
-    font-size: 20px;
-    line-height: 1.8;
-    color: #a0a0a0; /* Gris platino, no cansa la vista */
-    max-width: 850px;
-    margin: 0 auto;
+/* EFECTO GLASS */
+.z-glass-identity {
+    backdrop-filter: blur(20px);
+    padding: 40px;
+    border-radius: 30px;
     text-align: center;
 }
 
-/* TARJETAS SIN FONDO CLARO (GRADIENTE SUTIL) */
-.z-card-premium {
-    background: linear-gradient(145deg, #0f0f0f, #151515) !important;
-    border: 1px solid #222 !important;
-    border-radius: 30px;
-    padding: 40px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-}
-
-/* ETIQUETAS DE LAS TARJETAS */
-.z-card-premium label {
-    color: #444; /* Color oscuro sutil */
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-}
-
-/* VALORES DE LAS TARJETAS */
-.z-card-premium span {
-    color: #ffffff;
-    font-size: 22px;
+/* TITULO PRINCIPAL */
+.z-main-title {
+    font-size: 48px;
     font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+/* SUBTITULO */
+.z-sub-gold {
+    color: #E5C453;
+    font-size: 20px;
+    letter-spacing: 2px;
+}
+
+/* DESCRIPCIÓN */
+.descripcion-elegante {
+    max-width: 800px;
+    margin: auto;
+    font-size: 18px;
+    line-height: 1.7;
+    color: #ccc;
+}
+
+/* CONTENEDOR CARDS */
+.z-container-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* TARJETAS */
+.z-card-premium {
+    background: rgba(255,255,255,0.03);
+    border-radius: 25px;
+    padding: 30px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.3s ease;
+}
+
+.z-card-premium:hover {
+    transform: translateY(-10px);
+    border: 1px solid rgba(229,196,83,0.4);
+}
+
+/* TEXTOS DENTRO */
+.z-card-premium label {
     display: block;
-    margin-top: 5px;
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 8px;
+}
+
+.z-card-premium span {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+/* BOTÓN MODERNO */
+.z-btn-action {
+    display: inline-block;
+    padding: 14px 20px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #E5C453, #c9a93d);
+    color: #000;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.z-btn-action:hover {
+    transform: scale(1.05);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .z-main-title {
+        font-size: 32px;
+    }
+
+    .z-banner-header {
+        height: 350px !important;
+    }
 }
     </style>
 </head>
@@ -1818,7 +1870,7 @@ if (inputBusquedaNav) {
 };
 
 // --- FUNCIÓN PRINCIPAL DE LLENADO (CORREGIDA) ---
-// --- FUNCIÓN PRINCIPAL DE LLENADO (VERSIÓN PREMIUM FINAL) ---
+
 function llenarPestañaEmpresa(data) {
     if (!data) return;
 
