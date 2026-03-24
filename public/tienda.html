@@ -806,35 +806,35 @@ body {
                 border-radius: 10px !important;
             }
         }
-       /* CONTENEDOR */
+      /* 1. CONTENEDOR pagina empresas */
+#empresa-tab {
+    background: #050505; /* Fondo negro profundo */
+    min-height: 100vh;
+    padding: 40px 20px !important;
+}
+
 .empresa-full {
-    background: #050505;
-    color: #F8F9FA;
+    max-width: 800px;
+    margin: 0 auto;
     font-family: 'Poppins', sans-serif;
+    color: #F8F9FA;
 }
 
-/* HEADER */
+/* 2. HEADER: LOGO, NOMBRE Y ESLOGAN */
 .empresa-header {
-    height: 450px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     text-align: center;
-    background: linear-gradient(
-        rgba(0,0,0,0.7),
-        rgba(0,0,0,0.95)
-    );
+    padding: 40px 0;
+    background: radial-gradient(circle, rgba(229,196,83,0.05) 0%, rgba(0,0,0,0) 70%);
 }
 
-.empresa-center {
-    max-width: 900px;
-}
-
-/* LOGO */
 .empresa-logo {
-    width: 150px;
-    height: 150px;
-    margin: 20px auto;
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 20px;
+    border: 2px solid #E5C453;
+    padding: 5px;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(229,196,83,0.2);
 }
 
 .empresa-logo img {
@@ -844,125 +844,120 @@ body {
     border-radius: 50%;
 }
 
-/* TITULO (ESTILO PRINCIPAL) */
 .empresa-titulo {
     font-family: 'Montserrat', sans-serif;
-    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
     font-weight: 900;
-
+    margin: 10px 0;
+    /* Animación de brillo */
     background: linear-gradient(to right, #ffffff 20%, #E5C453 50%, #ffffff 80%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-
     animation: shineSweep 5s linear infinite;
 }
 
-/* ESLOGAN */
 .empresa-eslogan {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-style: italic;
     color: #E5C453;
-    margin-top: 10px;
+    letter-spacing: 1px;
 }
 
-/* SECCIONES */
+/* 3. SECCIONES Y BLOQUES */
 .empresa-section {
-    padding: 80px 20px;
-    max-width: 900px;
-    margin: auto;
-    text-align: center;
+    padding: 30px 0;
+    border-bottom: 1px solid rgba(229,196,83,0.1);
 }
 
-/* DESCRIPCIÓN (IGUAL ESTILO ELEGANTE) */
-.empresa-descripcion {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.4rem;
-    color: #ccc;
-    line-height: 1.8;
-}
-
-/* SUBTÍTULOS */
 .empresa-subtitulo {
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-
-    background: linear-gradient(to right, #ffffff, #E5C453);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* TEXTOS */
-.empresa-texto {
-    font-size: 16px;
-    color: #bbb;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
     margin-bottom: 15px;
+    color: #E5C453;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-/* BOTÓN */
-.empresa-btn {
-    display: inline-block;
-    margin: 20px 0;
-    padding: 14px 30px;
-    border-radius: 50px;
-    background: linear-gradient(135deg, #E5C453, #b89c2f);
-    color: #000;
-    font-weight: 700;
-    text-decoration: none;
+.empresa-descripcion {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    color: #bbb;
+    line-height: 1.8;
+    text-align: justify;
+}
+
+/* 4. MEDIOS DE PAGO (LISTA VERTICAL) */
+#perfil-medios-pago {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+#perfil-medios-pago div {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid #E5C453;
+    padding: 14px 20px;
+    border-radius: 0 10px 10px 0;
+    color: #FFFFFF !important;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
     transition: 0.3s;
 }
 
+#perfil-medios-pago div:hover {
+    background: rgba(229, 196, 83, 0.1);
+    transform: translateX(10px);
+}
+
+#perfil-medios-pago div i {
+    margin-right: 15px;
+    color: #E5C453;
+    font-size: 1.1rem;
+}
+
+/* 5. BOTÓN DE CONTACTO */
+.empresa-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;
+    margin: 30px auto;
+    padding: 16px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #E5C453, #b89c2f);
+    color: #000 !important;
+    font-weight: 800;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: 0.4s;
+}
+
 .empresa-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 5px 20px rgba(229,196,83,0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(229,196,83,0.4);
 }
 
-/* DIVIDER */
-.divider-gold {
-    width: 60px;
-    height: 2px;
-    background: linear-gradient(to right, transparent, #E5C453, transparent);
-    margin: 0 auto 20px;
-}
-
-/* MAPA */
-#google-map-iframe {
-    border-radius: 20px;
-    margin-top: 20px;
-    filter: grayscale(1) contrast(1.2);
-}
-
-/* ANIMACIÓN */
+/* 6. ANIMACIONES */
 @keyframes shineSweep {
     0% { background-position: -200% center; }
     100% { background-position: 200% center; }
 }
-#perfil-medios-pago {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px;
-    padding: 10px 0;
-    width: 100%;
-    min-height: 50px; /* Obliga a que tenga altura */
-}
 
-#perfil-medios-pago .medio-item {
-    background: rgba(255, 255, 255, 0.05);
-    border-left: 4px solid #E5C453;
-    padding: 12px 15px;
-    border-radius: 4px;
-    color: #FFFFFF !important; /* Texto blanco siempre */
-    font-size: 16px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-}
-
-#perfil-medios-pago .medio-item i {
-    margin-right: 12px;
-    color: #E5C453;
+/* DIVIDER */
+.divider-gold {
+    width: 50px;
+    height: 2px;
+    background: #E5C453;
+    margin: 20px auto;
 }
     </style>
 </head>
