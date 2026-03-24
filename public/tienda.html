@@ -835,76 +835,70 @@
             }
         }
         /* --- DISEÑO PREMIUM PESTAÑA EMPRESA --- */
-.perfil-empresa-container {
-    max-width: 800px;
-    margin: 30px auto;
-    padding: 0 20px 50px 20px;
+/* Banner de Publicidad arriba de todo */
+.banner-publicidad {
+    background: #E5C453;
+    color: #000;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-transform: uppercase;
 }
 
-/* Tarjeta de Cabecera */
+.perfil-empresa-container {
+    max-width: 850px;
+    margin: 20px auto;
+    padding: 15px;
+}
+
+/* Tarjeta de Cabecera Blanca */
 .perfil-header-card {
     background: #fff;
-    border-radius: 25px;
-    padding: 40px 20px;
+    border-radius: 20px;
+    padding: 30px;
     text-align: center;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.06);
-    border-bottom: 5px solid #E5C453;
-    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border-bottom: 4px solid #E5C453;
 }
 
 .perfil-logo-wrapper {
-    width: 130px;
-    height: 130px;
-    margin: 0 auto 20px;
-    background: #fff;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 15px;
+    border: 3px solid #f9f9f9;
     border-radius: 50%;
-    padding: 8px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    border: 1px solid #eee;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .perfil-logo-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    border-radius: 50%;
+    object-fit: cover;
 }
 
-.perfil-header-card h2 {
-    font-size: 28px;
-    color: #1a1a1a;
-    margin: 0;
-    font-weight: 800;
-}
-
-.eslogan-texto {
-    color: #888;
-    font-style: italic;
-    margin-top: 8px;
-    font-size: 16px;
-}
-
-/* Grid de Información */
+/* Tarjetas de Información */
 .perfil-info-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 15px;
+    margin-top: 20px;
 }
 
 .info-card {
-    background: #fff;
+    background: white;
     padding: 20px;
-    border-radius: 18px;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     gap: 15px;
-    border: 1px solid #f0f0f0;
-    transition: 0.3s;
+    border: 1px solid #eee;
 }
 
-.info-card.wide {
-    grid-column: 1 / -1;
-}
+.info-card.wide { grid-column: 1 / -1; }
 
 .info-icon {
     width: 45px;
@@ -916,45 +910,31 @@
     align-items: center;
     justify-content: center;
     font-size: 20px;
-    flex-shrink: 0;
 }
 
 .info-text h3 {
-    font-size: 12px;
-    text-transform: uppercase;
+    font-size: 11px;
     color: #aaa;
-    margin: 0 0 4px 0;
-    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0 0 5px 0;
+    letter-spacing: 0.5px;
 }
 
 .info-text p {
     font-size: 15px;
-    color: #333;
+    color: #2c3e50;
     margin: 0;
-    line-height: 1.4;
+    font-weight: 600;
 }
 
-/* Sello de Seguridad Especial */
-.sello-zippy {
-    background: #1a1a1a !important;
-    border: none !important;
+/* Sello de Confianza Negro/Dorado */
+.sello-verificado {
+    background: #1a1a1a;
+    border-color: #1a1a1a;
 }
-
-.sello-zippy .info-text h3, .sello-zippy .info-text p {
-    color: #fff;
-}
-
-.sello-zippy .info-icon {
-    background: #E5C453;
-    color: #000;
-}
-
-/* Ajustes para Móvil */
-@media (max-width: 600px) {
-    .perfil-header-card { padding: 30px 15px; }
-    .perfil-logo-wrapper { width: 100px; height: 100px; }
-    .perfil-header-card h2 { font-size: 22px; }
-}
+.sello-verificado .info-text h3, 
+.sello-verificado .info-text p { color: #fff; }
+.sello-verificado .info-icon { background: #E5C453; color: #000; }
     </style>
 </head>
 
@@ -1086,56 +1066,66 @@
 <div id="empresa-tab" class="tab-content" style="display: none;">
     <div class="perfil-empresa-container">
         
+        <div class="banner-publicidad" id="perfil-publicidad"></div>
+
         <div class="perfil-header-card">
             <div class="perfil-logo-wrapper">
-                <img id="perfil-logo" src="" alt="Logo Empresa">
+                <img id="perfil-logo" src="" alt="Logo">
             </div>
-            <h2 id="perfil-nombre">Cargando...</h2>
+            <h2 id="perfil-nombre"></h2>
             <p id="perfil-eslogan" class="eslogan-texto"></p>
         </div>
 
         <div class="perfil-info-grid">
             
             <div class="info-card wide">
-                <div class="info-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="info-icon"><i class="fas fa-store"></i></div>
                 <div class="info-text">
-                    <h3>Nuestra Historia</h3>
-                    <p id="perfil-descripcion">Cargando descripción detallada...</p>
+                    <h3>¿Quiénes somos?</h3>
+                    <p id="perfil-descripcion"></p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon"><i class="fas fa-id-card"></i></div>
+                <div class="info-text">
+                    <h3>Identificación Legal (NIT)</h3>
+                    <p id="perfil-nit"></p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon"><i class="fas fa-user-tie"></i></div>
+                <div class="info-text">
+                    <h3>Administrador</h3>
+                    <p id="perfil-admin"></p>
                 </div>
             </div>
 
             <div class="info-card">
                 <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
                 <div class="info-text">
-                    <h3>Ubicación</h3>
-                    <p id="perfil-direccion">Dirección no especificada</p>
-                </div>
-            </div>
-
-            <div class="info-card">
-                <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
-                <div class="info-text">
-                    <h3>Línea de Atención</h3>
-                    <p id="perfil-telefono">Sin teléfono</p>
+                    <h3>Ciudad / Ubicación</h3>
+                    <p id="perfil-ciudad"></p>
+                    <small id="perfil-direccion" style="color: #888;"></small>
                 </div>
             </div>
 
             <div class="info-card">
                 <div class="info-icon"><i class="fas fa-envelope"></i></div>
                 <div class="info-text">
-                    <h3>Correo Electrónico</h3>
-                    <p id="perfil-correo">Sin correo</p>
+                    <h3>Contacto Electrónico</h3>
+                    <p id="perfil-correo"></p>
                 </div>
             </div>
 
-            <div class="info-card sello-zippy">
-                <div class="info-icon"><i class="fas fa-check-shield"></i></div>
+            <div class="info-card sello-verificado">
+                <div class="info-icon"><i class="fas fa-shield-alt"></i></div>
                 <div class="info-text">
-                    <h3>Comercio Verificado</h3>
-                    <p>Esta tienda opera bajo la plataforma tecnológica de <strong>Zippy</strong>, garantizando la gestión de su pedido.</p>
+                    <h3>Comercio Protegido</h3>
+                    <p>Tienda operando exitosamente desde el <span id="perfil-fechaRegistro">marzo 2026</span>.</p>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -1890,25 +1880,27 @@ if (inputBusquedaNav) {
 function llenarPestañaEmpresa(data) {
     if (!data) return;
 
-    // Mapeo de IDs de HTML con las llaves de tu Firebase
+    // Mapeo exacto basado en tu base de datos Realtime
     const campos = {
-        'perfil-logo': data.logo || data.logoURL, // Por si acaso usas logoURL
-        'perfil-nombre': data.nombre || data.nombreEmpresa,
+        'perfil-logo': data.urlLogo ? `https://drive.google.com/uc?export=view&id=${data.urlLogo}` : '',
+        'perfil-nombre': data.nombreEmpresa || 'Nombre no disponible',
         'perfil-eslogan': data.eslogan || 'Bienvenidos',
-        'perfil-direccion': data.direccion || 'Consultar por interno',
-        'perfil-telefono': data.telefono || data.celular,
-        'perfil-correo': data.correo || data.email,
-        'perfil-descripcion': data.descripcion || data.sobreNosotros
+        'perfil-descripcion': data.descripcionEmpresa || 'Sin descripción disponible',
+        'perfil-direccion': data.direccion || 'Consultar ubicación',
+        'perfil-ciudad': data.ciudad || 'Colombia',
+        'perfil-correo': data.correo || 'No especificado',
+        'perfil-nit': data.nit || 'En trámite',
+        'perfil-admin': data.administrador || 'Representante Legal',
+        'perfil-publicidad': data.publicidad || ''
     };
 
     Object.entries(campos).forEach(([id, valor]) => {
         const elemento = document.getElementById(id);
         if (elemento) {
             if (elemento.tagName === 'IMG') {
-                elemento.src = valor || 'https://via.placeholder.com/150'; // Imagen por defecto
-                elemento.style.display = valor ? 'block' : 'none';
+                elemento.src = valor || 'https://via.placeholder.com/150';
             } else {
-                elemento.innerText = valor || 'No disponible';
+                elemento.innerText = valor;
             }
         }
     });
