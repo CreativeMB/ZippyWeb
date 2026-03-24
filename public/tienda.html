@@ -1102,12 +1102,8 @@ body {
     <!-- CONTACTO -->
     <div class="empresa-section">
         <h2 class="empresa-subtitulo">Contacto</h2>
-
         <p class="empresa-texto" id="perfil-telefono"></p>
         <a id="btn-llamar" href="#" class="empresa-btn">CONTACTAR AHORA</a>
-
-        <p class="empresa-texto" id="perfil-correo"></p>
-        <p class="empresa-texto" id="perfil-nit"></p>
     </div>
 
   </div>
@@ -1905,14 +1901,6 @@ if (direccion) direccion.innerText = `${direccionTexto}, ${ciudadTexto}`;
             btn.style.display = 'none';
         }
     }
-
-    // ===== CORREO =====
-    const correo = document.getElementById('perfil-correo');
-    if (correo) correo.innerText = data.correo || '';
-
-    // ===== NIT =====
-    const nit = document.getElementById('perfil-nit');
-    if (nit) nit.innerText = data.nit || '';
 }
 </script>
 </body>
