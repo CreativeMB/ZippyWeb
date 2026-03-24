@@ -1885,16 +1885,18 @@ function llenarPestañaEmpresa(data) {
     }
 
     // ===== DIRECCIÓN + MAPA =====
-    const direccionFull = `${data.direccion || ''}, ${data.ciudad || ''}`.trim();
+   const direccionTexto = data.direccion || '';
+const ciudadTexto = data.ciudad || '';
 
-    const direccion = document.getElementById('perfil-direccion');
-    if (direccion) direccion.innerText = direccionFull;
+const direccion = document.getElementById('perfil-direccion');
+if (direccion) direccion.innerText = `${direccionTexto}, ${ciudadTexto}`;
 
-    const map = document.getElementById('google-map-iframe');
-    if (map && direccionFull !== '') {
-        const query = encodeURIComponent(direccionFull + ', Colombia');
-        map.src = `https://maps.google.com/maps?q=${query}&z=15&output=embed`;
-    }
+const map = document.getElementById('google-map-iframe');
+
+if (map && direccionTexto) {
+    const query = encodeURIComponent(`${direccionTexto}, ${ciudadTexto}, Colombia`);
+    map.src = `https://maps.google.com/maps?q=${query}&z=16&output=embed`;
+}
 
     // ===== TELÉFONO (WHATSAPP) =====
     const telefono = data.WhatsApp || '';
