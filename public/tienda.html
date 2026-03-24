@@ -869,11 +869,14 @@ body {
 /* 3. SECCIONES TIPO "CINTA" (ANCHO COMPLETO) */
 .empresa-section {
     width: 100%;
-    padding: 50px 20px;
+    padding: 60px 0; /* Centrado vertical */
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center;    /* Centra los elementos hijos horizontalmente */
+    justify-content: center;
+    text-align: center;      /* Centra el texto interno */
     border-bottom: 1px solid rgba(255,255,255,0.03);
+    box-sizing: border-box;  /* Evita que el padding empuje la caja hacia un lado */
 }
 
 /* Alternamos colores de cinta para dar ritmo visual */
@@ -896,21 +899,23 @@ body {
 }
 
 .empresa-descripcion {
-    max-width: 800px;
-    text-align: center;
+    max-width: 700px;        /* Un ancho más legible para lectura */
+    width: 90%;              /* Margen de seguridad para móviles */
+    margin: 0 auto;          /* FUERZA el centrado horizontal del bloque */
     line-height: 1.8;
     color: #cbd5e1;
     font-size: 1.05rem;
+    word-wrap: break-word;   /* Evita que palabras largas rompan el margen */
 }
 
 /* 4. MEDIOS DE PAGO (DISEÑO LIMPIO) */
 #perfil-medios-pago {
-    width: 100%;
-    max-width: 600px;
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto 0;     /* Centra el grid de pagos */
     display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
-    padding: 10px;
 }
 
 #perfil-medios-pago div {
@@ -933,10 +938,19 @@ body {
 
 /* 5. SECCIÓN DE CONTACTO Y BOTÓN SEPARADO */
 .contacto-container {
-    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;      /* Asegura que los iconos y texto estén al centro */
     color: #94a3b8;
 }
-
+.contacto-container p {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centra iconos con el texto */
+    gap: 10px;
+    margin-bottom: 15px;
+}
 .empresa-btn {
     display: inline-flex;
     align-items: center;
