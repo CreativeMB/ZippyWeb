@@ -835,163 +835,148 @@
             }
         }
         /* --- DISEÑO PREMIUM PESTAÑA EMPRESA --- */
-/* FONDO GENERAL DE LA PESTAÑA */
+/* --- CONTENEDOR GENERAL --- */
 #empresa-tab {
-    background-color: #0d0d0d; /* Negro absoluto */
-    padding-bottom: 60px;
+    background: #0a0a0a; /* Negro más profundo */
+    color: #fff;
+    padding-bottom: 50px;
 }
 
-.perfil-premium-container {
-    max-width: 800px;
+.perfil-luxe-container {
+    max-width: 750px;
     margin: 0 auto;
+    padding: 30px 15px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* --- TARJETAS MODULARES --- */
+.modulo-luxe {
+    background: #141414; /* Gris carbón muy oscuro */
+    border: 1px solid #222;
+    border-radius: 24px;
     padding: 40px 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
-/* --- ESTILO BASE DE LOS MÓDULOS --- */
-.modulo-premium {
-    background: linear-gradient(145deg, #1a1a1a, #141414);
-    border: 1px solid #252525;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-    transition: all 0.3s ease;
-}
-
-/* TARJETA DE IDENTIDAD */
-.identity-card {
-    padding: 50px 20px;
-    text-align: center;
-    margin-bottom: 50px;
-    border-top: 2px solid #E5C453;
-}
-
-.logo-outer-circle {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 25px;
+/* Logo y Título */
+.logo-premium-wrapper {
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 20px;
     background: #fff;
     border-radius: 50%;
-    padding: 6px;
-    box-shadow: 0 0 20px rgba(229, 196, 83, 0.2);
+    padding: 8px;
+    box-shadow: 0 10px 30px rgba(229, 196, 83, 0.2);
 }
 
-.logo-outer-circle img {
-    width: 100%; height: 100%;
-    object-fit: contain;
-    border-radius: 50%;
+.logo-premium-wrapper img {
+    width: 100%; height: 100%; object-fit: contain; border-radius: 50%;
 }
 
-.texto-premium-titulo {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 32px;
-    font-weight: 900;
-    color: #fff;
+.brand-title {
+    font-size: 30px;
+    font-weight: 800;
     letter-spacing: -1px;
     margin: 0;
 }
 
-.texto-premium-eslogan {
-    font-size: 16px;
-    color: #E5C453; /* Dorado para el eslogan */
-    font-weight: 300;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-top: 10px;
-}
-
-.chip-promo {
-    display: inline-block;
-    background: rgba(229, 196, 83, 0.1);
+.brand-slogan {
     color: #E5C453;
-    padding: 5px 20px;
-    border-radius: 30px;
-    font-size: 12px;
-    margin-top: 20px;
-    border: 1px solid rgba(229, 196, 83, 0.2);
-}
-
-/* --- DESCRIPCIÓN LIBRE --- */
-.modulo-descripcion-libre {
-    margin-bottom: 50px;
-    padding: 0 15px;
-}
-
-.subtitulo-premium {
-    display: block;
-    color: #555;
-    font-size: 12px;
+    font-size: 14px;
     text-transform: uppercase;
-    letter-spacing: 4px;
-    margin-bottom: 15px;
+    letter-spacing: 3px;
+    margin-top: 10px;
+    font-weight: 300;
+}
+
+/* --- SECCIÓN DESCRIPCIÓN (AIRY) --- */
+.modulo-texto-libre {
+    margin: 50px 0;
+    padding: 0 20px;
+}
+
+.section-divider {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.section-divider span {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    color: #444;
     font-weight: bold;
 }
 
-.texto-descripcion {
-    color: #ccc;
-    font-size: 18px;
-    line-height: 1.8;
+.descripcion-premium {
+    color: #bbb;
+    font-size: 17px;
+    line-height: 1.9;
     font-weight: 300;
     text-align: left;
 }
 
-/* --- GRID DE MINI CARDS --- */
-.grid-datos-empresa {
+/* --- GRID DE INFO TÉCNICA --- */
+.grid-luxe-info {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
 }
 
-.mini-card {
+.info-card-luxe {
+    background: #141414;
+    border: 1px solid #222;
+    padding: 20px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
-    gap: 20px;
-    padding: 25px;
+    gap: 15px;
+    transition: 0.3s;
 }
 
-.gold-icon {
-    font-size: 24px;
+.info-card-luxe:hover {
+    border-color: #E5C453;
+    transform: translateY(-5px);
+}
+
+.icon-luxe {
+    width: 45px;
+    height: 45px;
+    background: rgba(229, 196, 83, 0.1);
     color: #E5C453;
-    background: rgba(229, 196, 83, 0.05);
-    width: 55px;
-    height: 55px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 15px;
+    font-size: 18px;
 }
 
-.mini-content label {
+.text-luxe label {
     display: block;
-    color: #555;
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 4px;
+    color: #555;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
 }
 
-.dato-valor {
-    color: #fff;
-    font-size: 16px;
+.text-luxe span {
+    font-size: 15px;
     font-weight: 600;
+    color: #ddd;
 }
 
-/* SELLO FINAL */
-.sello-final-zippy {
+/* SELLO ZIPPY */
+.zippy-footer-sello {
     margin-top: 60px;
     text-align: center;
-}
-
-.sello-final-zippy p {
     color: #333;
-    font-size: 11px;
-    letter-spacing: 3px;
-    margin-top: 20px;
-}
-
-/* RESPONSIVE */
-@media (max-width: 600px) {
-    .grid-datos-empresa { grid-template-columns: 1fr; }
-    .texto-premium-titulo { font-size: 24px; }
-    .texto-descripcion { font-size: 16px; }
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
     </style>
 </head>
@@ -1123,59 +1108,60 @@
     </div>
 
 <div id="empresa-tab" class="tab-content" style="display: none;">
-    <div class="perfil-premium-container">
+    <div class="perfil-luxe-container">
         
-        <div class="modulo-premium identity-card">
-            <div class="logo-outer-circle">
+        <div class="modulo-luxe header-card">
+            <div class="logo-premium-wrapper">
                 <img id="perfil-logo" src="" alt="Logo" referrerpolicy="no-referrer">
             </div>
-            <h1 id="perfil-nombre" class="texto-premium-titulo"></h1>
-            <p id="perfil-eslogan" class="texto-premium-eslogan"></p>
-            <div id="perfil-publicidad" class="chip-promo"></div>
+            <h1 id="perfil-nombre" class="brand-title"></h1>
+            <p id="perfil-eslogan" class="brand-slogan"></p>
         </div>
 
-        <div class="modulo-descripcion-libre">
-            <span class="subtitulo-premium">Nuestra Misión</span>
-            <p id="perfil-descripcion" class="texto-descripcion"></p>
+        <div class="modulo-texto-libre">
+            <div class="section-divider">
+                <span>Nuestra Historia</span>
+            </div>
+            <p id="perfil-descripcion" class="descripcion-premium"></p>
         </div>
 
-        <div class="grid-datos-empresa">
-            <div class="modulo-premium mini-card">
-                <i class="fas fa-id-card-alt gold-icon"></i>
-                <div class="mini-content">
-                    <label>Identificación Legal</label>
-                    <span id="perfil-nit" class="dato-valor"></span>
+        <div class="grid-luxe-info">
+            <div class="info-card-luxe">
+                <div class="icon-luxe"><i class="fas fa-fingerprint"></i></div>
+                <div class="text-luxe">
+                    <label>NIT / Registro</label>
+                    <span id="perfil-nit"></span>
                 </div>
             </div>
 
-            <div class="modulo-premium mini-card">
-                <i class="fas fa-user-check gold-icon"></i>
-                <div class="mini-content">
-                    <label>Representante</label>
-                    <span id="perfil-admin" class="dato-valor"></span>
+            <div class="info-card-luxe">
+                <div class="icon-luxe"><i class="fas fa-user-tie"></i></div>
+                <div class="text-luxe">
+                    <label>Administrador</label>
+                    <span id="perfil-admin"></span>
                 </div>
             </div>
 
-            <div class="modulo-premium mini-card">
-                <i class="fas fa-map-marker-alt gold-icon"></i>
-                <div class="mini-content">
-                    <label>Ciudad</label>
-                    <span id="perfil-ciudad" class="dato-valor"></span>
+            <div class="info-card-luxe">
+                <div class="icon-luxe"><i class="fas fa-compass"></i></div>
+                <div class="text-luxe">
+                    <label>Sede Principal</label>
+                    <span id="perfil-ciudad"></span>
                 </div>
             </div>
 
-            <div class="modulo-premium mini-card">
-                <i class="fas fa-envelope gold-icon"></i>
-                <div class="mini-content">
-                    <label>Contacto Oficial</label>
-                    <span id="perfil-correo" class="dato-valor"></span>
+            <div class="info-card-luxe">
+                <div class="icon-luxe"><i class="fas fa-paper-plane"></i></div>
+                <div class="text-luxe">
+                    <label>Canal Digital</label>
+                    <span id="perfil-correo"></span>
                 </div>
             </div>
         </div>
 
-        <div class="sello-final-zippy">
-            <div class="linea-decorativa"></div>
-            <p><i class="fas fa-shield-alt"></i> TIENDA VERIFICADA POR ZIPPY</p>
+        <div class="zippy-footer-sello">
+            <i class="fas fa-shield-check"></i>
+            <span>Plataforma verificada por Zippy</span>
         </div>
     </div>
 </div>
