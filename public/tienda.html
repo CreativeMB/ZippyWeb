@@ -825,60 +825,89 @@
             }
         }
         /* --- DISEÑO PREMIUM PESTAÑA EMPRESA --- */
-/* CONTENEDOR GENERAL */
+/* ========================================= */
+/* FUENTES BASE (MISMO ADN TUYO) */
+/* ========================================= */
 .zippy-modern-full {
-    font-family: 'Poppins', sans-serif;
-    color: #fff;
+    font-family: 'Montserrat', sans-serif;
     background: #050505;
+    color: #F8F9FA;
 }
 
-/* HEADER CON IMAGEN / BANNER */
+/* ========================================= */
+/* HEADER / BANNER */
+/* ========================================= */
 .z-banner-header {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(
-        rgba(0,0,0,0.6),
-        rgba(0,0,0,0.9)
-    ), url('https://images.unsplash.com/photo-1524594227085-4f6a5c9f82a7?q=80&w=1400');
-    background-size: cover;
-    background-position: center;
+        rgba(0,0,0,0.7),
+        rgba(0,0,0,0.95)
+    );
 }
 
-/* EFECTO GLASS */
+/* CONTENEDOR CENTRAL */
 .z-glass-identity {
-    backdrop-filter: blur(20px);
-    padding: 40px;
-    border-radius: 30px;
     text-align: center;
+    padding: 40px;
 }
 
-/* TITULO PRINCIPAL */
+/* ========================================= */
+/* TITULO (COPIA EVOLUCIONADA DEL TUYO) */
+/* ========================================= */
 .z-main-title {
-    font-size: 48px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 900;
+    margin: 0;
+
+    background: linear-gradient(to right, #ffffff 20%, #E5C453 50%, #ffffff 80%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    animation: shineSweep 5s linear infinite;
 }
 
-/* SUBTITULO */
+/* ========================================= */
+/* ESLOGAN (TU ESTILO PERO MÁS LIMPIO) */
+/* ========================================= */
 .z-sub-gold {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-style: italic;
     color: #E5C453;
-    font-size: 20px;
-    letter-spacing: 2px;
+    margin-top: 10px;
+    animation: fadeSlogan 4s ease-in-out infinite;
 }
 
+/* ========================================= */
 /* DESCRIPCIÓN */
+/* ========================================= */
 .descripcion-elegante {
-    max-width: 800px;
+    max-width: 850px;
     margin: auto;
     font-size: 18px;
-    line-height: 1.7;
+    line-height: 1.8;
     color: #ccc;
+    font-weight: 400;
 }
 
-/* CONTENEDOR CARDS */
+/* ========================================= */
+/* LINEA DECORATIVA */
+/* ========================================= */
+.divider-gold {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #E5C453, transparent);
+    margin: 0 auto 20px;
+}
+
+/* ========================================= */
+/* CARDS MODERNAS OSCURAS */
+/* ========================================= */
 .z-container-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -888,58 +917,85 @@
     margin: auto;
 }
 
-/* TARJETAS */
 .z-card-premium {
-    background: rgba(255,255,255,0.03);
+    background: #0b0b0b;
     border-radius: 25px;
     padding: 30px;
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255,255,255,0.05);
-    transition: all 0.3s ease;
+    border: 1px solid rgba(229,196,83,0.15);
+    transition: 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
+/* EFECTO HOVER PREMIUM */
 .z-card-premium:hover {
-    transform: translateY(-10px);
-    border: 1px solid rgba(229,196,83,0.4);
+    transform: translateY(-8px);
+    border: 1px solid rgba(229,196,83,0.5);
+    box-shadow: 0 10px 40px rgba(229,196,83,0.15);
 }
 
-/* TEXTOS DENTRO */
+/* LINEA SUPERIOR GOLD */
+.z-card-premium::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background: linear-gradient(to right, transparent, #E5C453, transparent);
+}
+
+/* TEXTOS */
 .z-card-premium label {
-    display: block;
-    font-size: 14px;
+    font-size: 13px;
     color: #aaa;
-    margin-bottom: 8px;
+    letter-spacing: 1px;
 }
 
 .z-card-premium span {
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 600;
+    color: #fff;
 }
 
-/* BOTÓN MODERNO */
+/* ========================================= */
+/* BOTÓN ESTILO ORO PREMIUM */
+/* ========================================= */
 .z-btn-action {
     display: inline-block;
-    padding: 14px 20px;
+    padding: 14px;
     border-radius: 50px;
-    background: linear-gradient(135deg, #E5C453, #c9a93d);
+    background: linear-gradient(135deg, #E5C453, #b89c2f);
     color: #000;
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
     transition: 0.3s;
 }
 
 .z-btn-action:hover {
     transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(229,196,83,0.4);
 }
 
+/* ========================================= */
+/* ANIMACIONES (REUTILIZADAS DE TU SISTEMA) */
+/* ========================================= */
+@keyframes shineSweep {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+@keyframes fadeSlogan {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* ========================================= */
 /* RESPONSIVE */
+/* ========================================= */
 @media (max-width: 768px) {
     .z-main-title {
-        font-size: 32px;
-    }
-
-    .z-banner-header {
-        height: 350px !important;
+        font-size: 2rem;
     }
 }
     </style>
@@ -1075,7 +1131,7 @@
   <div class="zippy-modern-full">
     <div class="z-banner-header" style="height: 450px;">
         <div class="z-glass-identity" style="border: none; background: transparent;">
-            <div style="width: 150px; height: 150px; background: white; border-radius: 50%; margin: 0 auto 30px; padding: 5px; border: 2px solid #E5C453;">
+           <div class="divider-gold"></div>
                 <img id="perfil-logo" src="" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;">
             </div>
             
