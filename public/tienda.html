@@ -1096,16 +1096,8 @@ body {
     <!-- UBICACIÓN -->
     <div class="empresa-section">
         <h2 class="empresa-subtitulo">Ubicación</h2>
-        <p id="perfil-direccion" class="empresa-texto"></p>
-
-       <iframe 
-  id="google-map-iframe"
-  width="100%" 
-  height="250" 
-  style="border:0;" 
-  loading="lazy"
-  referrerpolicy="no-referrer-when-downgrade">
-</iframe>
+       </h2>
+    <p id="perfil-ubicacion-completa" class="empresa-texto" style="color: #ffffff; font-size: 18px; font-weight: 700; margin: 0; line-height: 1.4;"></p>
     </div>
 
     <!-- CONTACTO -->
@@ -1891,27 +1883,16 @@ function llenarPestañaEmpresa(data) {
         descripcion.innerText = data.descripcionEmpresa || '';
     }
 
-  // 2. Lógica del Mapa (CORREGIDA)
-    const calle = data.direccion || "";
-    const ciudad = data.ciudad || "Bogotá";
-    const elDireccion = document.getElementById('perfil-direccion');
-    const mapIframe = document.getElementById('google-map-iframe');
+  const direccion = data.direccion || "";
+    const ciudad = data.ciudad || "";
+    const elUbicacion = document.getElementById('perfil-ubicacion-completa');
 
-    if (elDireccion) elDireccion.innerText = calle;
-
-    if (mapIframe) {
-        if (calle.trim() !== "") {
-            // CONSTRUCCIÓN DE BÚSQUEDA SEGURA
-            const direccionFull = `${calle}, ${ciudad}, Colombia`;
-            const queryUrl = encodeURIComponent(direccionFull);
-            
-            // USAREMOS ESTA URL EXACTA (HTTPS y con el parámetro q)
-            const urlFinal = `https://maps.google.com/maps?q=${queryUrl}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
-            
-            mapIframe.src = urlFinal;
-            mapIframe.style.display = "block"; // Forzamos a que se muestre
+    if (elUbicacion) {
+        // Si ambos existen, ponemos coma. Si solo hay uno, ponemos ese.
+        if (direccion && ciudad) {
+            elUbicacion.innerText = `${direccion}, ${ciudad}`;
         } else {
-            mapIframe.style.display = "none";
+            elUbicacion.innerText = direccion || ciudad || "Dirección no disponible";
         }
     }
 
