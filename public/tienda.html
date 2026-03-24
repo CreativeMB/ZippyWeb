@@ -835,106 +835,197 @@
             }
         }
         /* --- DISEÑO PREMIUM PESTAÑA EMPRESA --- */
-/* Banner de Publicidad arriba de todo */
-.banner-publicidad {
-    background: #E5C453;
-    color: #000;
-    text-align: center;
-    padding: 10px;
-    border-radius: 10px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    font-size: 14px;
-    text-transform: uppercase;
+/* ========================================= */
+/* --- PERFIL EMPRESA MODO OSCURO PREMIUM --- */
+/* ========================================= */
+
+/* Fondo oscuro total para la pestaña */
+#empresa-tab {
+    background-color: #121212; /* Negro profundo */
+    min-height: 100vh;
+    color: #e0e0e0;
 }
 
-.perfil-empresa-container {
-    max-width: 850px;
-    margin: 20px auto;
-    padding: 15px;
+.perfil-empresa-dark-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 20px 60px 20px;
+    font-family: 'Montserrat', sans-serif;
 }
 
-/* Tarjeta de Cabecera Blanca */
-.perfil-header-card {
-    background: #fff;
+/* --- ESTILO DE TARJETA FLOTANTE (FLYING) --- */
+.perfil-card-flying {
+    background: #1a1a1a; /* Negro grisáceo para las tarjetas */
     border-radius: 20px;
-    padding: 30px;
+    padding: 25px;
+    margin-bottom: 20px; /* Separación entre tarjetas */
+    border: 1px solid #333; /* Borde sutil */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); /* Sombra profunda */
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.perfil-card-flying:hover {
+    transform: translateY(-5px);
+    border-color: #E5C453; /* Resalte dorado al pasar el mouse */
+}
+
+/* --- 1. CABECERA (HEADER CARD) --- */
+.perfil-card-flying.header-card {
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    border-bottom: 4px solid #E5C453;
+    border-bottom: 3px solid #E5C453; /* Sello Zippy arriba */
+    padding: 40px 20px;
 }
 
 .perfil-logo-wrapper {
-    width: 110px;
-    height: 110px;
-    margin: 0 auto 15px;
-    border: 3px solid #f9f9f9;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    background: #fff; /* Fondo blanco para el logo */
     border-radius: 50%;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 5px;
+    box-shadow: 0 5px 15px rgba(229, 196, 83, 0.3);
+    border: 2px solid #333;
 }
 
 .perfil-logo-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    border-radius: 50%;
+    transition: opacity 0.5s ease;
 }
 
-/* Tarjetas de Información */
-.perfil-info-grid {
+.perfil-card-flying h2 {
+    font-size: 28px;
+    color: #fff;
+    font-weight: 800;
+    margin: 0;
+}
+
+.eslogan-texto {
+    color: #aaa;
+    font-style: italic;
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+/* Banner Publicidad dentro de la cabecera */
+.banner-publicidad-inline {
+    background: rgba(229, 196, 83, 0.15);
+    color: #E5C453;
+    padding: 8px 15px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 12px;
+    border: 1px solid rgba(229, 196, 83, 0.3);
+}
+
+/* --- 2. DESCRIPCIÓN (SOBRE NOSOTROS) --- */
+.card-icon-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.card-icon-title h3 {
+    font-size: 18px;
+    color: #fff;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.gold-text { color: #E5C453; font-size: 22px; }
+
+#perfil-descripcion {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #ccc;
+    margin: 0;
+}
+
+/* --- 3. GRID DE MINI TARJETAS (INFO) --- */
+.perfil-info-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 15px;
-    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.info-card {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
+.perfil-card-flying.mini-card {
     display: flex;
     align-items: center;
     gap: 15px;
-    border: 1px solid #eee;
+    padding: 20px;
+    margin-bottom: 0; /* El grid maneja el gap */
 }
 
-.info-card.wide { grid-column: 1 / -1; }
-
-.info-icon {
-    width: 45px;
-    height: 45px;
-    background: #fdf8e6;
+.card-mini-icon {
+    font-size: 24px;
     color: #E5C453;
-    border-radius: 12px;
+    background: rgba(229, 196, 83, 0.1);
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    border-radius: 12px;
 }
 
-.info-text h3 {
+.mini-card-text h4 {
     font-size: 11px;
-    color: #aaa;
     text-transform: uppercase;
-    margin: 0 0 5px 0;
-    letter-spacing: 0.5px;
+    color: #888;
+    margin: 0 0 3px 0;
+    letter-spacing: 1px;
 }
 
-.info-text p {
+.mini-card-text p {
     font-size: 15px;
-    color: #2c3e50;
+    color: #fff;
     margin: 0;
     font-weight: 600;
 }
 
-/* Sello de Confianza Negro/Dorado */
-.sello-verificado {
-    background: #1a1a1a;
-    border-color: #1a1a1a;
+.mini-card-text small {
+    display: block;
+    color: #aaa;
+    margin-top: 2px;
+    font-size: 12px;
 }
-.sello-verificado .info-text h3, 
-.sello-verificado .info-text p { color: #fff; }
-.sello-verificado .info-icon { background: #E5C453; color: #000; }
+
+/* --- 4. SELLO FINAL ZIPPY --- */
+.sello-zippy-final {
+    text-align: center;
+    background: #000; /* Fondo negro puro */
+    border-color: #E5C453;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+}
+
+.sello-zippy-final p {
+    color: #E5C453;
+    margin: 0;
+    font-size: 14px;
+}
+
+/* ========================================= */
+/* --- RESPONSIVE MÓVIL --- */
+/* ========================================= */
+@media (max-width: 600px) {
+    .perfil-empresa-dark-container { padding: 20px 10px; }
+    .perfil-card-flying.header-card { padding: 30px 15px; }
+    .perfil-logo-wrapper { width: 100px; height: 100px; }
+    .perfil-card-flying h2 { font-size: 22px; }
+    .perfil-info-cards-grid { grid-template-columns: 1fr; } /* Una columna en móvil */
+}
     </style>
 </head>
 
@@ -1063,72 +1154,70 @@
             </div>
         </div>
     </div>
-<div id="empresa-tab" class="tab-content" style="display: none;">
-    <div class="perfil-empresa-container">
-        
-        <div class="banner-publicidad" id="perfil-publicidad"></div>
 
-        <div class="perfil-header-card">
+<div id="empresa-tab" class="tab-content" style="display: none;">
+    <div class="perfil-empresa-dark-container">
+        
+        <div class="perfil-card-flying header-card">
             <div class="perfil-logo-wrapper">
-                <img id="perfil-logo" src="" alt="Logo">
+                <img id="perfil-logo" src="" alt="Logo" style="opacity:0;">
             </div>
             <h2 id="perfil-nombre"></h2>
             <p id="perfil-eslogan" class="eslogan-texto"></p>
+            <div class="banner-publicidad-inline" id="perfil-publicidad"></div>
         </div>
 
-        <div class="perfil-info-grid">
-            
-            <div class="info-card wide">
-                <div class="info-icon"><i class="fas fa-store"></i></div>
-                <div class="info-text">
-                    <h3>¿Quiénes somos?</h3>
-                    <p id="perfil-descripcion"></p>
-                </div>
+        <div class="perfil-card-flying descripcion-card">
+            <div class="card-icon-title">
+                <i class="fas fa-store gold-text"></i>
+                <h3>Nuestra Empresa</h3>
             </div>
+            <p id="perfil-descripcion"></p>
+        </div>
 
-            <div class="info-card">
-                <div class="info-icon"><i class="fas fa-id-card"></i></div>
-                <div class="info-text">
-                    <h3>Identificación Legal (NIT)</h3>
+        <div class="perfil-info-cards-grid">
+            
+            <div class="perfil-card-flying mini-card">
+                <i class="fas fa-id-card card-mini-icon"></i>
+                <div class="mini-card-text">
+                    <h4>NIT</h4>
                     <p id="perfil-nit"></p>
                 </div>
             </div>
 
-            <div class="info-card">
-                <div class="info-icon"><i class="fas fa-user-tie"></i></div>
-                <div class="info-text">
-                    <h3>Administrador</h3>
+            <div class="perfil-card-flying mini-card">
+                <i class="fas fa-user-tie card-mini-icon"></i>
+                <div class="mini-card-text">
+                    <h4>Representante</h4>
                     <p id="perfil-admin"></p>
                 </div>
             </div>
 
-            <div class="info-card">
-                <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
-                <div class="info-text">
-                    <h3>Ciudad / Ubicación</h3>
+            <div class="perfil-card-flying mini-card">
+                <i class="fas fa-map-marked-alt card-mini-icon"></i>
+                <div class="mini-card-text">
+                    <h4>Ubicación</h4>
                     <p id="perfil-ciudad"></p>
-                    <small id="perfil-direccion" style="color: #888;"></small>
+                    <small id="perfil-direccion"></small>
                 </div>
             </div>
 
-            <div class="info-card">
-                <div class="info-icon"><i class="fas fa-envelope"></i></div>
-                <div class="info-text">
-                    <h3>Contacto Electrónico</h3>
+            <div class="perfil-card-flying mini-card">
+                <i class="fas fa-envelope-open-text card-mini-icon"></i>
+                <div class="mini-card-text">
+                    <h4>Contacto</h4>
                     <p id="perfil-correo"></p>
                 </div>
             </div>
 
-            <div class="info-card sello-verificado">
-                <div class="info-icon"><i class="fas fa-shield-alt"></i></div>
-                <div class="info-text">
-                    <h3>Comercio Protegido</h3>
-                    <p>Tienda operando exitosamente desde el <span id="perfil-fechaRegistro">marzo 2026</span>.</p>
-                </div>
-            </div>
+        </div> <div class="perfil-card-flying sello-zippy-final">
+            <i class="fas fa-shield-alt gold-text"></i>
+            <p>Comercio verificado y protegido por la plataforma tecnológica de <strong>Zippy</strong>.</p>
         </div>
+
     </div>
 </div>
+
     <div class="footer">
         <p id="descripcion" class="info-footer-elegante"></p>
         <p id="direccion" class="info-footer-elegante"></p>
@@ -1877,30 +1966,69 @@ if (inputBusquedaNav) {
     }
 };
 
+// --- FUNCIÓN AUXILIAR PARA OBTENER LINK DIRECTO DE DRIVE ---
+function obtenerLinkDirecto(idDrive) {
+    if (!idDrive) return '';
+    // Si ya es una URL completa, la devuelve; si es solo ID, crea la URL
+    return idDrive.startsWith('http') ? idDrive : `https://drive.google.com/uc?export=view&id=${idDrive}`;
+}
+
+// --- FUNCIÓN PRINCIPAL DE LLENADO (CORREGIDA) ---
 function llenarPestañaEmpresa(data) {
     if (!data) return;
 
-    // Mapeo exacto basado en tu base de datos Realtime
-    const campos = {
-        'perfil-logo': data.urlLogo ? `https://drive.google.com/uc?export=view&id=${data.urlLogo}` : '',
-        'perfil-nombre': data.nombreEmpresa || 'Nombre no disponible',
-        'perfil-eslogan': data.eslogan || 'Bienvenidos',
-        'perfil-descripcion': data.descripcionEmpresa || 'Sin descripción disponible',
-        'perfil-direccion': data.direccion || 'Consultar ubicación',
+    // 1. GESTIÓN PROFESIONAL DEL LOGO ('perfil-logo')
+    const imgElement = document.getElementById('perfil-logo');
+    if (imgElement) {
+        if (data.urlLogo && data.urlLogo.trim() !== "") {
+            const urlFinal = obtenerLinkDirecto(data.urlLogo);
+            
+            // Aplicamos seguridad para evitar bloqueos de Google
+            imgElement.setAttribute('referrerpolicy', 'no-referrer');
+            
+            // Intentamos cargar la URL directa
+            imgElement.src = urlFinal;
+            
+            imgElement.onload = () => { 
+                imgElement.style.display = 'inline-block'; 
+                imgElement.style.opacity = '1'; 
+            };
+            
+            // Si falla, usamos el proxy de weserv.nl (como en tu ejemplo)
+            imgElement.onerror = () => { 
+                console.warn("⚠️ Falló carga directa del logo, usando proxy.");
+                imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`; 
+            };
+        } else {
+            // Si no hay logo, ocultamos el contenedor
+            const wrapper = imgElement.closest('.perfil-logo-wrapper');
+            if (wrapper) wrapper.style.display = 'none';
+        }
+    }
+
+    // 2. MAPEO DEL RESTO DE CAMPOS DE TEXTO
+    const camposTexto = {
+        'perfil-nombre': data.nombreEmpresa || 'Skenda Colombia',
+        'perfil-eslogan': data.eslogan || 'Variedad de Productos',
+        'perfil-descripcion': data.descripcionEmpresa || 'Venta de variedad de productos...',
         'perfil-ciudad': data.ciudad || 'Colombia',
-        'perfil-correo': data.correo || 'No especificado',
-        'perfil-nit': data.nit || 'En trámite',
-        'perfil-admin': data.administrador || 'Representante Legal',
+        'perfil-direccion': data.direccion || 'villamaria caldas',
+        'perfil-correo': data.correo || 'skendacolombia@gmail.com',
+        'perfil-nit': data.nit || '324273532815',
+        'perfil-admin': data.administrador || 'Doris Martinez',
         'perfil-publicidad': data.publicidad || ''
     };
 
-    Object.entries(campos).forEach(([id, valor]) => {
+    // Llenamos los campos de texto
+    Object.entries(camposTexto).forEach(([id, valor]) => {
         const elemento = document.getElementById(id);
         if (elemento) {
-            if (elemento.tagName === 'IMG') {
-                elemento.src = valor || 'https://via.placeholder.com/150';
+            // Si es la publicidad y está vacía, ocultamos el banner
+            if (id === 'perfil-publicidad' && !valor) {
+                elemento.style.display = 'none';
             } else {
                 elemento.innerText = valor;
+                if (id === 'perfil-publicidad') elemento.style.display = 'block';
             }
         }
     });
