@@ -806,44 +806,49 @@ body {
                 border-radius: 10px !important;
             }
         }
-        /* --- DISEÑO PREMIUM PESTAÑA EMPRESA --- */
-/* ========================================= */
-/* FUENTES BASE (MISMO ADN TUYO) */
-/* ========================================= */
-.zippy-modern-full {
-    font-family: 'Montserrat', sans-serif;
+       /* CONTENEDOR */
+.empresa-full {
     background: #050505;
     color: #F8F9FA;
+    font-family: 'Poppins', sans-serif;
 }
 
-/* ========================================= */
-/* HEADER / BANNER */
-/* ========================================= */
-.z-banner-header {
-    position: relative;
+/* HEADER */
+.empresa-header {
+    height: 450px;
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     background: linear-gradient(
         rgba(0,0,0,0.7),
         rgba(0,0,0,0.95)
     );
 }
 
-/* CONTENEDOR CENTRAL */
-.z-glass-identity {
-    text-align: center;
-    padding: 40px;
+.empresa-center {
+    max-width: 900px;
 }
 
-/* ========================================= */
-/* TITULO (COPIA EVOLUCIONADA DEL TUYO) */
-/* ========================================= */
-.z-main-title {
+/* LOGO */
+.empresa-logo {
+    width: 150px;
+    height: 150px;
+    margin: 20px auto;
+}
+
+.empresa-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+/* TITULO (ESTILO PRINCIPAL) */
+.empresa-titulo {
     font-family: 'Montserrat', sans-serif;
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(2rem, 5vw, 3.2rem);
     font-weight: 900;
-    margin: 0;
 
     background: linear-gradient(to right, #ffffff 20%, #E5C453 50%, #ffffff 80%);
     background-size: 200% auto;
@@ -853,99 +858,54 @@ body {
     animation: shineSweep 5s linear infinite;
 }
 
-/* ========================================= */
-/* ESLOGAN (TU ESTILO PERO MÁS LIMPIO) */
-/* ========================================= */
-.z-sub-gold {
+/* ESLOGAN */
+.empresa-eslogan {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-style: italic;
     color: #E5C453;
     margin-top: 10px;
-    animation: fadeSlogan 4s ease-in-out infinite;
 }
 
-/* ========================================= */
-/* DESCRIPCIÓN */
-/* ========================================= */
-.descripcion-elegante {
-    max-width: 850px;
+/* SECCIONES */
+.empresa-section {
+    padding: 80px 20px;
+    max-width: 900px;
     margin: auto;
-    font-size: 18px;
-    line-height: 1.8;
+    text-align: center;
+}
+
+/* DESCRIPCIÓN (IGUAL ESTILO ELEGANTE) */
+.empresa-descripcion {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
     color: #ccc;
-    font-weight: 400;
+    line-height: 1.8;
 }
 
-/* ========================================= */
-/* LINEA DECORATIVA */
-/* ========================================= */
-.divider-gold {
-    width: 60px;
-    height: 2px;
-    background: linear-gradient(to right, transparent, #E5C453, transparent);
-    margin: 0 auto 20px;
-}
+/* SUBTÍTULOS */
+.empresa-subtitulo {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
 
-/* ========================================= */
-/* CARDS MODERNAS OSCURAS */
-/* ========================================= */
-.z-container-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    padding: 60px 20px;
-    max-width: 1200px;
-    margin: auto;
-}
-
-.z-card-premium {
-    background: #0b0b0b;
-    border-radius: 25px;
-    padding: 30px;
-    border: 1px solid rgba(229,196,83,0.15);
-    transition: 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-/* EFECTO HOVER PREMIUM */
-.z-card-premium:hover {
-    transform: translateY(-8px);
-    border: 1px solid rgba(229,196,83,0.5);
-    box-shadow: 0 10px 40px rgba(229,196,83,0.15);
-}
-
-/* LINEA SUPERIOR GOLD */
-.z-card-premium::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 2px;
-    width: 100%;
-    background: linear-gradient(to right, transparent, #E5C453, transparent);
+    background: linear-gradient(to right, #ffffff, #E5C453);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 /* TEXTOS */
-.z-card-premium label {
-    font-size: 13px;
-    color: #aaa;
-    letter-spacing: 1px;
+.empresa-texto {
+    font-size: 16px;
+    color: #bbb;
+    margin-bottom: 15px;
 }
 
-.z-card-premium span {
-    font-size: 18px;
-    font-weight: 600;
-    color: #fff;
-}
-
-/* ========================================= */
-/* BOTÓN ESTILO ORO PREMIUM */
-/* ========================================= */
-.z-btn-action {
+/* BOTÓN */
+.empresa-btn {
     display: inline-block;
-    padding: 14px;
+    margin: 20px 0;
+    padding: 14px 30px;
     border-radius: 50px;
     background: linear-gradient(135deg, #E5C453, #b89c2f);
     color: #000;
@@ -954,34 +914,30 @@ body {
     transition: 0.3s;
 }
 
-.z-btn-action:hover {
+.empresa-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 5px 20px rgba(229,196,83,0.4);
 }
-#empresa-tab {
-    background: #050505;
-    color: #F8F9FA;
+
+/* DIVIDER */
+.divider-gold {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #E5C453, transparent);
+    margin: 0 auto 20px;
 }
-/* ========================================= */
-/* ANIMACIONES (REUTILIZADAS DE TU SISTEMA) */
-/* ========================================= */
+
+/* MAPA */
+#google-map-iframe {
+    border-radius: 20px;
+    margin-top: 20px;
+    filter: grayscale(1) contrast(1.2);
+}
+
+/* ANIMACIÓN */
 @keyframes shineSweep {
     0% { background-position: -200% center; }
     100% { background-position: 200% center; }
-}
-
-@keyframes fadeSlogan {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
-}
-
-/* ========================================= */
-/* RESPONSIVE */
-/* ========================================= */
-@media (max-width: 768px) {
-    .z-main-title {
-        font-size: 2rem;
-    }
 }
     </style>
 </head>
@@ -1113,59 +1069,50 @@ body {
     </div>
 
 <div id="empresa-tab" class="tab-content" style="display: none;">
-  <div class="zippy-modern-full">
+  <div class="empresa-full">
 
-    <div class="z-banner-header" style="height: 450px;">
-        <div class="z-glass-identity">
+    <!-- HEADER -->
+    <div class="empresa-header">
+        <div class="empresa-center">
 
             <div class="divider-gold"></div>
 
-            <div style="width: 150px; height: 150px; margin: 20px auto;">
-                <img id="perfil-logo" src=""
-                     style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;">
+            <div class="empresa-logo">
+                <img id="perfil-logo" src="">
             </div>
 
-            <h1 id="perfil-nombre" class="z-main-title"></h1>
-            <p id="perfil-eslogan" class="z-sub-gold"></p>
+            <h1 id="perfil-nombre" class="empresa-titulo"></h1>
+            <p id="perfil-eslogan" class="empresa-eslogan"></p>
 
         </div>
     </div>
 
-    <div style="padding: 100px 20px; background: #050505;">
-        <div style="margin-bottom: 40px; text-align: center;">
-            <div class="divider-gold"></div>
-            <p id="perfil-descripcion" class="descripcion-elegante"></p>
-        </div>
+    <!-- DESCRIPCIÓN -->
+    <div class="empresa-section">
+        <div class="divider-gold"></div>
+        <p id="perfil-descripcion" class="empresa-descripcion"></p>
     </div>
 
-    <div class="z-container-cards">
-        <div class="z-card-premium" style="grid-column: span 2;">
-            <div style="margin-bottom: 25px;">
-                <label>Ubicación Privilegiada</label>
-                <span id="perfil-direccion"></span>
-            </div>
-            <iframe id="google-map-iframe" width="100%" height="350" frameborder="0" style="border-radius: 20px; filter: grayscale(1) invert(0.92) contrast(1.2);"></iframe>
-            </div>
+    <!-- UBICACIÓN -->
+    <div class="empresa-section">
+        <h2 class="empresa-subtitulo">Ubicación</h2>
+        <p id="perfil-direccion" class="empresa-texto"></p>
 
-        <div class="z-card-premium">
-            <i class="fas fa-phone-alt" style="color: #E5C453; font-size: 30px; margin-bottom: 20px;"></i>
-            <label>Línea de Atención</label>
-            <span id="perfil-telefono"></span>
-            <a id="btn-llamar" href="#" class="z-btn-action" style="width: 100%; text-align: center; margin-top: 30px;">CONTACTAR AHORA</a>
-        </div>
-        
-        <div class="z-card-premium">
-            <i class="fas fa-shield-alt" style="color: #E5C453; font-size: 30px; margin-bottom: 20px;"></i>
-            <label>Identidad Corporativa</label>
-            <span id="perfil-nit"></span>
-            
-            <div style="margin-top: 30px;">
-                <label>Canal Digital</label>
-                <span id="perfil-correo" style="font-size: 16px;"></span>
-            </div>
-        </div>
+        <iframe id="google-map-iframe" width="100%" height="350"></iframe>
     </div>
-</div>
+
+    <!-- CONTACTO -->
+    <div class="empresa-section">
+        <h2 class="empresa-subtitulo">Contacto</h2>
+
+        <p class="empresa-texto" id="perfil-telefono"></p>
+        <a id="btn-llamar" href="#" class="empresa-btn">CONTACTAR AHORA</a>
+
+        <p class="empresa-texto" id="perfil-correo"></p>
+        <p class="empresa-texto" id="perfil-nit"></p>
+    </div>
+
+  </div>
 </div>
 
     <div class="footer">
