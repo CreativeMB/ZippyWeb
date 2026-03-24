@@ -835,196 +835,150 @@
             }
         }
         /* --- DISEÑO PREMIUM PESTAÑA EMPRESA --- */
-/* ========================================= */
-/* --- PERFIL EMPRESA MODO OSCURO PREMIUM --- */
-/* ========================================= */
-
-/* Fondo oscuro total para la pestaña */
+/* --- CONTENEDOR MODO OSCURO --- */
 #empresa-tab {
-    background-color: #121212; /* Negro profundo */
+    background-color: #121212; /* Fondo base de la página */
     min-height: 100vh;
-    color: #e0e0e0;
 }
 
-.perfil-empresa-dark-container {
-    max-width: 900px;
+.perfil-dark-layout {
+    max-width: 700px;
     margin: 0 auto;
-    padding: 30px 20px 60px 20px;
+    padding: 40px 15px;
     font-family: 'Montserrat', sans-serif;
 }
 
-/* --- ESTILO DE TARJETA FLOTANTE (FLYING) --- */
-.perfil-card-flying {
-    background: #1a1a1a; /* Negro grisáceo para las tarjetas */
-    border-radius: 20px;
-    padding: 25px;
-    margin-bottom: 20px; /* Separación entre tarjetas */
-    border: 1px solid #333; /* Borde sutil */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3); /* Sombra profunda */
-    transition: transform 0.3s ease, border-color 0.3s ease;
+/* --- ESTILO DE TARJETAS (CARDS) --- */
+.card-premium {
+    background: #1e1e1e; /* Negro un poco más claro para resaltar */
+    border-radius: 24px;
+    padding: 30px;
+    border: 1px solid #2a2a2a;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    margin-bottom: 40px;
 }
 
-.perfil-card-flying:hover {
-    transform: translateY(-5px);
-    border-color: #E5C453; /* Resalte dorado al pasar el mouse */
-}
-
-/* --- 1. CABECERA (HEADER CARD) --- */
-.perfil-card-flying.header-card {
+/* Identidad (Logo y Nombre) */
+.identity-card {
     text-align: center;
-    border-bottom: 3px solid #E5C453; /* Sello Zippy arriba */
-    padding: 40px 20px;
+    border-top: 4px solid #E5C453;
 }
 
-.perfil-logo-wrapper {
-    width: 120px;
-    height: 120px;
+.logo-circle {
+    width: 110px;
+    height: 110px;
     margin: 0 auto 20px;
-    background: #fff; /* Fondo blanco para el logo */
+    background: #fff;
     border-radius: 50%;
-    padding: 5px;
-    box-shadow: 0 5px 15px rgba(229, 196, 83, 0.3);
+    padding: 4px;
     border: 2px solid #333;
+    overflow: hidden;
 }
 
-.perfil-logo-wrapper img {
+.logo-circle img {
     width: 100%;
     height: 100%;
     object-fit: contain;
     border-radius: 50%;
-    transition: opacity 0.5s ease;
 }
 
-.perfil-card-flying h2 {
-    font-size: 28px;
+.identity-card h2 {
     color: #fff;
-    font-weight: 800;
+    font-size: 26px;
     margin: 0;
+    font-weight: 800;
 }
 
-.eslogan-texto {
-    color: #aaa;
+#perfil-eslogan {
+    color: #888;
     font-style: italic;
-    font-size: 16px;
-    margin-top: 5px;
+    margin: 10px 0;
 }
 
-/* Banner Publicidad dentro de la cabecera */
-.banner-publicidad-inline {
-    background: rgba(229, 196, 83, 0.15);
+.badge-promo {
+    background: rgba(229, 196, 83, 0.1);
     color: #E5C453;
-    padding: 8px 15px;
-    border-radius: 10px;
-    display: inline-block;
-    margin-top: 15px;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 11px;
     font-weight: bold;
-    text-transform: uppercase;
-    font-size: 12px;
     border: 1px solid rgba(229, 196, 83, 0.3);
 }
 
-/* --- 2. DESCRIPCIÓN (SOBRE NOSOTROS) --- */
-.card-icon-title {
+/* --- DESCRIPCIÓN (FUERA DE TARJETA) --- */
+.descripcion-libre {
+    padding: 0 10px;
+    margin-bottom: 45px;
+}
+
+.section-title {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 15px;
 }
 
-.card-icon-title h3 {
-    font-size: 18px;
-    color: #fff;
-    margin: 0;
+.section-title span {
+    color: #E5C453;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 13px;
+    letter-spacing: 2px;
+    font-weight: bold;
 }
-
-.gold-text { color: #E5C453; font-size: 22px; }
 
 #perfil-descripcion {
+    color: #bbb;
+    line-height: 1.8;
     font-size: 16px;
-    line-height: 1.6;
-    color: #ccc;
-    margin: 0;
+    text-align: justify;
 }
 
-/* --- 3. GRID DE MINI TARJETAS (INFO) --- */
-.perfil-info-cards-grid {
+/* --- TARJETA DE DATOS (GRID) --- */
+.data-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 15px;
-    margin-bottom: 20px;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
-.perfil-card-flying.mini-card {
+.data-item {
     display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 20px;
-    margin-bottom: 0; /* El grid maneja el gap */
+    flex-direction: column;
+    gap: 5px;
 }
 
-.card-mini-icon {
-    font-size: 24px;
-    color: #E5C453;
-    background: rgba(229, 196, 83, 0.1);
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-}
+.full-width { grid-column: 1 / -1; }
 
-.mini-card-text h4 {
-    font-size: 11px;
+.label {
+    color: #555;
+    font-size: 10px;
     text-transform: uppercase;
-    color: #888;
-    margin: 0 0 3px 0;
+    font-weight: bold;
     letter-spacing: 1px;
 }
 
-.mini-card-text p {
+.value {
+    color: #ddd;
     font-size: 15px;
-    color: #fff;
-    margin: 0;
-    font-weight: 600;
+    font-weight: 500;
 }
 
-.mini-card-text small {
-    display: block;
-    color: #aaa;
-    margin-top: 2px;
-    font-size: 12px;
-}
-
-/* --- 4. SELLO FINAL ZIPPY --- */
-.sello-zippy-final {
+/* SELLO FINAL */
+.zippy-verified {
     text-align: center;
-    background: #000; /* Fondo negro puro */
-    border-color: #E5C453;
+    color: #444;
+    font-size: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
-    padding: 20px;
+    gap: 8px;
 }
 
-.sello-zippy-final p {
-    color: #E5C453;
-    margin: 0;
-    font-size: 14px;
-}
+.zippy-verified i { color: #E5C453; }
 
-/* ========================================= */
-/* --- RESPONSIVE MÓVIL --- */
-/* ========================================= */
-@media (max-width: 600px) {
-    .perfil-empresa-dark-container { padding: 20px 10px; }
-    .perfil-card-flying.header-card { padding: 30px 15px; }
-    .perfil-logo-wrapper { width: 100px; height: 100px; }
-    .perfil-card-flying h2 { font-size: 22px; }
-    .perfil-info-cards-grid { grid-template-columns: 1fr; } /* Una columna en móvil */
+/* RESPONSIVE */
+@media (max-width: 500px) {
+    .data-grid { grid-template-columns: 1fr; }
+    .perfil-dark-layout { padding-top: 20px; }
 }
     </style>
 </head>
@@ -1156,63 +1110,53 @@
     </div>
 
 <div id="empresa-tab" class="tab-content" style="display: none;">
-    <div class="perfil-empresa-dark-container">
+    <div class="perfil-dark-layout">
         
-        <div class="perfil-card-flying header-card">
-            <div class="perfil-logo-wrapper">
-                <img id="perfil-logo" src="" alt="Logo" style="opacity:0;">
+        <div class="card-premium identity-card">
+            <div class="logo-circle">
+                <img id="perfil-logo" src="" alt="Logo" referrerpolicy="no-referrer">
             </div>
             <h2 id="perfil-nombre"></h2>
-            <p id="perfil-eslogan" class="eslogan-texto"></p>
-            <div class="banner-publicidad-inline" id="perfil-publicidad"></div>
+            <p id="perfil-eslogan"></p>
+            <div id="perfil-publicidad" class="badge-promo"></div>
         </div>
 
-        <div class="perfil-card-flying descripcion-card">
-            <div class="card-icon-title">
-                <i class="fas fa-store gold-text"></i>
-                <h3>Nuestra Empresa</h3>
+        <div class="descripcion-libre">
+            <div class="section-title">
+                <i class="fas fa-star gold-icon"></i>
+                <span>Nuestra Historia</span>
             </div>
             <p id="perfil-descripcion"></p>
         </div>
 
-        <div class="perfil-info-cards-grid">
-            
-            <div class="perfil-card-flying mini-card">
-                <i class="fas fa-id-card card-mini-icon"></i>
-                <div class="mini-card-text">
-                    <h4>NIT</h4>
-                    <p id="perfil-nit"></p>
+        <div class="card-premium data-card">
+            <div class="data-grid">
+                <div class="data-item">
+                    <span class="label">Identificación NIT</span>
+                    <span class="value" id="perfil-nit"></span>
+                </div>
+                <div class="data-item">
+                    <span class="label">Representante</span>
+                    <span class="value" id="perfil-admin"></span>
+                </div>
+                <div class="data-item">
+                    <span class="label">Ciudad</span>
+                    <span class="value" id="perfil-ciudad"></span>
+                </div>
+                <div class="data-item">
+                    <span class="label">Ubicación</span>
+                    <span class="value" id="perfil-direccion"></span>
+                </div>
+                <div class="data-item full-width">
+                    <span class="label">Correo Oficial</span>
+                    <span class="value" id="perfil-correo"></span>
                 </div>
             </div>
+        </div>
 
-            <div class="perfil-card-flying mini-card">
-                <i class="fas fa-user-tie card-mini-icon"></i>
-                <div class="mini-card-text">
-                    <h4>Representante</h4>
-                    <p id="perfil-admin"></p>
-                </div>
-            </div>
-
-            <div class="perfil-card-flying mini-card">
-                <i class="fas fa-map-marked-alt card-mini-icon"></i>
-                <div class="mini-card-text">
-                    <h4>Ubicación</h4>
-                    <p id="perfil-ciudad"></p>
-                    <small id="perfil-direccion"></small>
-                </div>
-            </div>
-
-            <div class="perfil-card-flying mini-card">
-                <i class="fas fa-envelope-open-text card-mini-icon"></i>
-                <div class="mini-card-text">
-                    <h4>Contacto</h4>
-                    <p id="perfil-correo"></p>
-                </div>
-            </div>
-
-        </div> <div class="perfil-card-flying sello-zippy-final">
-            <i class="fas fa-shield-alt gold-text"></i>
-            <p>Comercio verificado y protegido por la plataforma tecnológica de <strong>Zippy</strong>.</p>
+        <div class="zippy-verified">
+            <i class="fas fa-shield-alt"></i>
+            <span>Comercio Protegido por Zippy</span>
         </div>
 
     </div>
