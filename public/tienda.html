@@ -1908,30 +1908,39 @@ function llenarPestañaEmpresa(data) {
         descripcion.innerText = data.descripcionEmpresa || '';
     }
 
-   // 3. --- SECCIÓN MEDIOS DE PAGO (CORREGIDA) ---
-    const contenedorPagos = document.getElementById('perfil-medios-pago');
-    if (contenedorPagos) {
-        contenedorPagos.innerHTML = ""; // Limpiar
-        
-        const mediosStr = data.mediosPago || ""; 
-        
-        if (mediosStr.trim() !== "") {
-            const listaMedios = mediosStr.split(',');
+   // --- LÓGICA DE MEDIOS DE PAGO (REFORZADA) ---
+const contenedorPagos = document.getElementById('perfil-medios-pago');
 
-            listaMedios.forEach(medio => {
-                const nombreLimpio = medio.trim();
-                if (nombreLimpio !== "") {
-                    const item = document.createElement('div');
-                    // Usamos FontAwesome para el icono
-                    item.innerHTML = `<i class="fas fa-check-circle" style="color: #E5C453; margin-right: 12px;"></i> ${nombreLimpio}`;
-                    contenedorPagos.appendChild(item);
-                }
-            });
-        } else {
-            contenedorPagos.innerHTML = "<p style='color: #888;'>Consultar medios de pago.</p>";
-        }
+if (contenedorPagos) {
+    contenedorPagos.innerHTML = ""; // Limpiamos contenido previo
+    
+    // 1. Intentamos leer la variable (Probamos diferentes formas por si acaso)
+    const mediosStr = data.mediosPago || data.MediosPago || ""; 
+    
+    // Esto aparecerá en tu consola (F12) para saber si Realtime está enviando el dato
+    console.log("Revisando medios de pago en data:", mediosStr);
+
+    if (mediosStr && mediosStr.toString().trim() !== "") {
+        // Convertimos a array separando por comas
+        const listaMedios = mediosStr.split(',');
+
+        listaMedios.forEach(medio => {
+            const nombreLimpio = medio.trim();
+            
+            if (nombreLimpio !== "") {
+                const linea = document.createElement('div');
+                
+                // IMPORTANTE: El JS crea el DIV, el CSS que ya tienes le dará el estilo
+                linea.innerHTML = `<i class="fas fa-check-circle"></i> <span>${nombreLimpio}</span>`;
+                
+                contenedorPagos.appendChild(linea);
+            }
+        });
+    } else {
+        // Si llega vacío o no existe, mostramos esto para saber que el código pasó por aquí
+        contenedorPagos.innerHTML = '<p style="color: #555; font-size: 14px; padding-left: 10px;">No se encontraron medios de pago registrados.</p>';
     }
-
+}
     // ===== DIRECCIÓN (CONCATENADA) =====
     const direccionTexto = data.direccion || '';
     const ciudadTexto = data.ciudad || '';
