@@ -1379,6 +1379,7 @@ function configurarRedesNav(perfil) {
         // Textos
         document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
         document.getElementById("eslogan").innerText = perfil.eslogan;
+        document.getElementById("descripcion").innerText = perfil.descripcionEmpresa;
         document.getElementById("direccion").innerText = "📍 " + perfil.direccion;
         document.getElementById("ciudad").innerText = perfil.ciudad;
         document.getElementById("telefono").innerText = "📞 " + perfil.WhatsApp;
@@ -1866,7 +1867,7 @@ function llenarPestañaEmpresa(data) {
     if (!data) return;
 
     // ===== VARIABLES GLOBALES =====
-    telefonoEmpresa = data.telefono || "";
+  telefonoEmpresa = data.WhatsApp || "";
     empresaId = data.id || empresaId;
 
     // ===== LOGO =====
@@ -1896,7 +1897,7 @@ function llenarPestañaEmpresa(data) {
     if (direccion) direccion.innerText = direccionFull;
 
     const map = document.getElementById('google-map-iframe');
-    if (map && direccionFull !== ',') {
+   if (map && direccionFull.trim() !== '') {
         const query = encodeURIComponent(direccionFull + ', Colombia');
         map.src = `https://maps.google.com/maps?q=${query}&z=15&output=embed`;
     }
