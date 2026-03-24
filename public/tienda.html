@@ -562,15 +562,6 @@
     color: #000;
 }
 
-/* --- 3. BUSCADOR INTEGRADO (CENTRO) --- */
-.search-nav-container {
-    position: relative;
-    flex: 1;
-    max-width: 400px;
-    margin: 0 15px;
-    min-width: 120px;
-}
-
 .search-input-nav {
     width: 100%;
     background: #2a2a2a;
@@ -645,6 +636,16 @@
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+/* --- 3. BUSCADOR INTEGRADO (CENTRO) --- */
+.search-nav-container {
+    position: relative;
+    /* flex-grow: 1 (crece), flex-shrink: 1 (se encoge), flex-basis: auto */
+    flex: 1 1 auto; 
+    max-width: 400px;  /* No deja que se vea gigante en monitores grandes */
+    min-width: 150px;  /* Espacio mínimo para que sea funcional en PC */
+    margin: 0 15px;
+    transition: all 0.3s ease; /* Para que el cambio de tamaño sea suave */
 }
 
 /* --- 6. RESPONSIVE (MÓVILES) --- */
