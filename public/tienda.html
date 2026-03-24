@@ -1881,19 +1881,12 @@ function llenarPestañaEmpresa(data) {
     if (descripcion) {
         descripcion.innerText = data.descripcionEmpresa || '';
     }
+ // ===== DIRECION =====
+  const direccionTexto = data.direccion || '';
+const ciudadTexto = data.ciudad || '';
 
-  const direccion = data.direccion || "";
-    const ciudad = data.ciudad || "";
-    const elUbicacion = document.getElementById('perfil-ubicacion-completa');
-
-    if (elUbicacion) {
-        // Si ambos existen, ponemos coma. Si solo hay uno, ponemos ese.
-        if (direccion && ciudad) {
-            elUbicacion.innerText = `${direccion}, ${ciudad}`;
-        } else {
-            elUbicacion.innerText = direccion || ciudad || "Dirección no disponible";
-        }
-    }
+const direccion = document.getElementById('perfil-direccion');
+if (direccion) direccion.innerText = `${direccionTexto}, ${ciudadTexto}`;
 
     // ===== TELÉFONO (WHATSAPP) =====
     const telefono = data.WhatsApp || '';
