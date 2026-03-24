@@ -913,6 +913,27 @@ body {
     word-wrap: break-word;   /* Evita que palabras largas rompan el margen */
 }
 
+/* --- ESTILO DEL MAPA --- */
+#contenedor-mapa {
+    width: 100%;
+    max-width: 900px; /* Para que no sea infinito en pantallas grandes */
+    margin: 20px auto 0;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+#google-map-iframe {
+    border-radius: 15px; /* Cuadrado suavizado igual que el logo */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    /* Filtro para que el mapa se vea más oscuro/moderno */
+    filter: grayscale(0.8) invert(0.9) hue-rotate(180deg) brightness(0.9);
+    transition: filter 0.5s ease;
+}
+
+#google-map-iframe:hover {
+    filter: grayscale(0); /* Se pone a color cuando el usuario pasa el mouse */
+}
+
 /* 4. MEDIOS DE PAGO (DISEÑO LIMPIO) */
 #perfil-medios-pago {
     width: 90%;
@@ -1126,6 +1147,24 @@ body {
             <p><i class="fas fa-phone"></i> <span id="perfil-telefono"></span></p>
         </div>
     </section>
+
+    <section class="empresa-section" style="background: #161920; padding: 0;">
+    <h2 class="empresa-subtitulo" style="margin-top: 40px;">Encuéntranos</h2>
+    <div class="divider-gold"></div>
+    
+    <div id="contenedor-mapa">
+        <iframe 
+            id="google-map-iframe" 
+            width="100%" 
+            height="400" 
+            style="border:0; margin-top: 20px;" 
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="no-referrer-when-downgrade"
+            src="">
+        </iframe>
+    </div>
+</section>
 
     <section class="empresa-section">
         <h2 class="empresa-subtitulo">Pagos Seguros</h2>
@@ -1907,7 +1946,14 @@ function llenarPestañaEmpresa(data) {
         descripcion.innerText = data.descripcionEmpresa || '';
     }
 
-   // --- DENTRO DE TU FUNCIÓN llenarPestañaEmpresa(data) ---
+  const iframe = document.getElementById('google-map-iframe');
+    if (iframe && direccion) {
+        // Codificamos la dirección para que Google la entienda
+        const direccionCompleta = `${direccion}, ${ciudad || ''}, Colombia`;
+        const urlMapa = `https://www.google.com/maps?q=${encodeURIComponent(direccionCompleta)}&output=embed`;
+        
+        iframe.src = urlMapa;
+    }
 
 const contenedorPagos = document.getElementById('perfil-medios-pago');
 
