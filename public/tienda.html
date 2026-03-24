@@ -1579,34 +1579,45 @@ set(nuevoRef, pedidoData).then(() => {
         });
     });
 
-    // --- 1. FUNCIÓN PARA CAMBIAR ENTRE PESTAÑAS ---
-// La declaramos en window para que el HTML pueda verla desde el 'onclick'
-window.cambiarPestaña = function(tabId, elemento) {
-    // Ocultar todos los contenidos de pestañas
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.style.display = 'none';
+   window.cambiarPestaña = function(tabId, elemento) {
+    // 1. Ocultar todas las secciones de contenido
+    // Esto busca cualquier div que tenga la clase 'tab-content'
+    const todasLasPestañas = document.querySelectorAll('.tab-content');
+    todasLasPestañas.forEach(div => {
+        div.style.display = 'none';
     });
-    
-    // Quitar la clase 'active' de todos los botones del menú
-    document.querySelectorAll('.tab-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    // Mostrar solo la pestaña seleccionada
-    document.getElementById(tabId).style.display = 'block';
-    
-    // Marcar el botón actual como activo
-    elemento.classList.add('active');
 
-    // Opcional: Si vas a la pestaña empresa, ocultar el buscador flotante
-    const buscador = document.getElementById('contenedorBusqueda');
-    if (tabId === 'empresa-tab') {
-        buscador.style.display = 'none';
-    } else {
-        buscador.style.display = 'flex';
+    // 2. Mostrar la sección que pediste (productos-tab o empresa-tab)
+    const seccionActiva = document.getElementById(tabId);
+    if (seccionActiva) {
+        seccionActiva.style.display = 'block';
+    }
+
+    // 3. Quitar el color dorado de todos los botones
+    const todosLosBotones = document.querySelectorAll('.tab-item');
+    todosLosBotones.forEach(boton => {
+        boton.classList.remove('active');
+    });
+
+    // 4. Ponerle el color dorado al botón que tocaste
+    if (elemento) {
+        elemento.classList.add('active');
+    }
+
+    // 5. Lógica del Buscador en la barra
+    const buscador = document.querySelector('.search-nav-container');
+    if (buscador) {
+        // Si entramos a 'empresa-tab', ocultamos el buscador para que no estorbe
+        if (tabId === 'empresa-tab') {
+            buscador.style.opacity = '0';
+            buscador.style.pointerEvents = 'none';
+        } else {
+            // Si volvemos a 'productos-tab', lo mostramos
+            buscador.style.opacity = '1';
+            buscador.style.pointerEvents = 'auto';
+        }
     }
 };
-
 // --- 2. FUNCIÓN PARA CARGAR DATOS EN LA PESTAÑA EMPRESA ---
 // Esta función toma los datos que ya recibes de Firebase y los pone en la nueva pestaña
 function llenarPestañaEmpresa(data) {
