@@ -995,20 +995,6 @@ body {
     </div>
 </div>
 
-    <div id="empresa-tab" class="tab-content" style="display: none; padding: 20px;">
-        <div class="perfil-empresa-card">
-            <img id="perfil-logo" src="" alt="Logo" style="max-width: 120px; display: block; margin: 0 auto 15px; border-radius: 10px;">
-            <h2 id="perfil-nombre" style="text-align: center; margin-bottom: 5px; color: #1a1a1a;"></h2>
-            <p id="perfil-eslogan" style="text-align: center; font-style: italic; color: #666; font-size: 14px;"></p>
-            
-            <div style="background: #f9f9f9; padding: 20px; border-radius: 12px; margin-top: 20px;">
-                <p style="margin-bottom: 10px;"><strong><i class="fas fa-map-marker-alt" style="color: #E5C453;"></i> Dirección:</strong> <br><span id="perfil-direccion"></span></p>
-                <p style="margin-bottom: 10px;"><strong><i class="fas fa-phone" style="color: #E5C453;"></i> Teléfono:</strong> <br><span id="perfil-telefono"></span></p>
-                <p><strong><i class="fas fa-info-circle" style="color: #E5C453;"></i> Sobre nosotros:</strong> <br><span id="perfil-descripcion"></span></p>
-            </div>
-        </div>
-    </div>
-
     <div id="productos-tab" class="tab-content">
         <div class="header">
             <div class="marca-principal">
@@ -1092,52 +1078,48 @@ body {
         </div>
     </div>
 
-<div id="empresa-tab" class="tab-content" style="display: none;">
-  <div class="empresa-full">
+<div id="empresa-tab" class="tab-content" style="display: none; padding: 20px;">
+    <div class="empresa-full">
 
-    <!-- HEADER -->
-    <div class="empresa-header">
-        <div class="empresa-center">
-
-            <div class="divider-gold"></div>
-
+        <div class="empresa-header" style="text-align: center; margin-bottom: 20px;">
+            <div class="divider-gold" style="height: 2px; background: #E5C453; width: 50px; margin: 10px auto;"></div>
             <div class="empresa-logo">
-                <img id="perfil-logo" src="">
+                <img id="perfil-logo" src="" style="max-width: 120px; border-radius: 10px; display: block; margin: 0 auto;">
             </div>
-
-            <h1 id="perfil-nombre" class="empresa-titulo"></h1>
-            <p id="perfil-eslogan" class="empresa-eslogan"></p>
-
+            <h1 id="perfil-nombre" class="empresa-titulo" style="color: #1a1a1a; margin-top: 15px;"></h1>
+            <p id="perfil-eslogan" class="empresa-eslogan" style="font-style: italic; color: #666;"></p>
         </div>
-    </div>
 
-    <!-- DESCRIPCIÓN -->
-    <div class="empresa-section">
-        <div class="divider-gold"></div>
-        <p id="perfil-descripcion" class="empresa-descripcion"></p>
-    </div>
+        <div class="empresa-section" style="margin-bottom: 25px;">
+            <div class="divider-gold" style="height: 1px; background: #eee; margin-bottom: 15px;"></div>
+            <p id="perfil-descripcion" class="empresa-descripcion" style="color: #444; line-height: 1.6;"></p>
+        </div>
 
-    <!-- UBICACIÓN -->
-    <div class="empresa-section">
-        <h2 class="empresa-subtitulo">Ubicación</h2>
-        <p id="perfil-direccion" class="empresa-texto"></p>
-    </div>
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
+            
+            <h2 class="empresa-subtitulo" style="font-size: 16px; color: #1a1a1a; border-bottom: 2px solid #E5C453; display: inline-block; margin-bottom: 15px;">Información de Contacto</h2>
+            
+            <p style="margin-bottom: 12px;">
+                <strong><i class="fas fa-map-marker-alt" style="color: #E5C453;"></i> Ubicación:</strong><br>
+                <span id="perfil-direccion" class="empresa-texto"></span>
+            </p>
+            
+            <p style="margin-bottom: 15px;">
+                <strong><i class="fas fa-phone" style="color: #E5C453;"></i> WhatsApp:</strong><br>
+                <span id="perfil-telefono" class="empresa-texto"></span>
+            </p>
 
-    <!-- CONTACTO -->
-    <div class="empresa-section">
-        <h2 class="empresa-subtitulo">Contacto</h2>
-        <p class="empresa-texto" id="perfil-telefono"></p>
-        <a id="btn-llamar" href="#" class="empresa-btn">CONTACTAR AHORA</a>
+            <a id="btn-llamar" href="#" class="empresa-btn" style="display: block; background: #25d366; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-bottom: 25px;">
+                <i class="fab fa-whatsapp"></i> CONTACTAR AHORA
+            </a>
+
+            <h2 class="empresa-subtitulo" style="font-size: 16px; color: #1a1a1a; border-bottom: 2px solid #E5C453; display: inline-block; margin-bottom: 15px;">Medios de Pago Disponibles</h2>
+            <div id="perfil-medios-pago" class="contenedor-pagos-dinamico" style="display: flex; flex-direction: column; gap: 8px;">
+                </div>
+        </div>
+
     </div>
- <!-- pago -->
-   <div class="empresa-section">
-    <h2 class="empresa-subtitulo" style="color: #E5C453;">Medios de Pago Disponibles</h2>
-    <div id="perfil-medios-pago" class="contenedor-pagos-dinamico"></div>
 </div>
-
-  </div>
-</div>
-
     <div class="footer">
             <p id="direccion" class="info-footer-elegante"></p>
         <p id="ciudad" class="info-footer-elegante"></p>
