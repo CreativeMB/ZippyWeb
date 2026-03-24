@@ -1116,8 +1116,7 @@ body {
 </div>
 
     <div class="footer">
-       
-        <p id="direccion" class="info-footer-elegante"></p>
+            <p id="direccion" class="info-footer-elegante"></p>
         <p id="ciudad" class="info-footer-elegante"></p>
         <p id="telefono" class="info-footer-elegante"></p>
         <p id="correo" class="info-footer-elegante"></p>
@@ -1866,10 +1865,6 @@ if (inputBusquedaNav) {
 function llenarPestañaEmpresa(data) {
     if (!data) return;
 
-    // ===== VARIABLES GLOBALES =====
-  telefonoEmpresa = data.WhatsApp || "";
-    empresaId = data.id || empresaId;
-
     // ===== LOGO =====
     const img = document.getElementById('perfil-logo');
     if (img && data.urlLogo) {
@@ -1897,20 +1892,22 @@ function llenarPestañaEmpresa(data) {
     if (direccion) direccion.innerText = direccionFull;
 
     const map = document.getElementById('google-map-iframe');
-   if (map && direccionFull.trim() !== '') {
+    if (map && direccionFull !== '') {
         const query = encodeURIComponent(direccionFull + ', Colombia');
         map.src = `https://maps.google.com/maps?q=${query}&z=15&output=embed`;
     }
 
-    // ===== TELÉFONO =====
+    // ===== TELÉFONO (WHATSAPP) =====
+    const telefono = data.WhatsApp || '';
+
     const tel = document.getElementById('perfil-telefono');
     const btn = document.getElementById('btn-llamar');
 
-    if (tel) tel.innerText = telefonoEmpresa || '';
+    if (tel) tel.innerText = telefono;
 
     if (btn) {
-        if (telefonoEmpresa) {
-            const numeroLimpio = telefonoEmpresa.replace(/\D/g, '');
+        if (telefono) {
+            const numeroLimpio = telefono.replace(/\D/g, '');
             btn.href = `https://wa.me/${numeroLimpio}`;
             btn.style.display = 'inline-block';
         } else {
