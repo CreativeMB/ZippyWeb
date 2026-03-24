@@ -1891,19 +1891,30 @@ function llenarPestañaEmpresa(data) {
         descripcion.innerText = data.descripcionEmpresa || '';
     }
 
-    // ===== DIRECCIÓN + MAPA =====
-   const direccionTexto = data.direccion || '';
-const ciudadTexto = data.ciudad || '';
+    // 3. --- LÓGICA DEL MAPA (CORRECCIÓN CRÍTICA) ---
+    const calle = data.direccion || "";
+    const ciudad = data.ciudad || "Bogotá"; // Ciudad por defecto si no viene
+    const elDireccion = document.getElementById('perfil-direccion');
+    const mapIframe = document.getElementById('google-map-iframe');
 
-const direccion = document.getElementById('perfil-direccion');
-if (direccion) direccion.innerText = `${direccionTexto}, ${ciudadTexto}`;
+    if (elDireccion) elDireccion.innerText = calle;
 
-const map = document.getElementById('google-map-iframe');
-
-if (map) {
-    const query = encodeURIComponent("Calle 132#103a-30, Bogotá, Colombia");
-    map.src = `https://www.google.com/maps?q=${query}&output=embed`;
-}
+    if (mapIframe) {
+        if (calle.trim() !== "") {
+            // Construimos la dirección completa para el buscador de Google
+            const direccionFull = `${calle}, ${ciudad}, Colombia`;
+            const queryUrl = encodeURIComponent(direccionFull);
+            
+            // IMPORTANTE: Esta es la URL de Embed que NO falla
+            mapIframe.src = `https://maps.google.com/maps?q=${queryUrl}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+            
+            // Aseguramos que el iframe sea visible
+            mapIframe.style.display = 'block';
+        } else {
+            // Si no hay dirección, ocultamos el mapa para que no se vea el error
+            mapIframe.style.display = 'none';
+        }
+    }
 
     // ===== TELÉFONO (WHATSAPP) =====
     const telefono = data.WhatsApp || '';
