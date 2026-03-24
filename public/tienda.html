@@ -1916,26 +1916,26 @@ function llenarPestañaEmpresa(data) {
         descripcion.innerText = data.descripcionEmpresa || '';
     }
 
-    // --- 2. LÓGICA DE MEDIOS DE PAGO (NUEVA) ---
+    // --- LÓGICA DE MEDIOS DE PAGO (INTEGRADA) ---
     const contenedorPagos = document.getElementById('perfil-medios-pago');
     if (contenedorPagos) {
         contenedorPagos.innerHTML = ""; // Limpiar contenido previo
         
-        const mediosStr = data.mediosPago || ""; // Ejemplo: "Nequi, Daviplata, Efectivo"
+        // Capturamos la variable desde Realtime Database
+        const mediosStr = data.mediosPago || ""; 
         
         if (mediosStr.trim() !== "") {
-            // Convertimos el string en Array usando la coma como separador
+            // Separamos por comas
             const listaMedios = mediosStr.split(',');
 
             listaMedios.forEach(medio => {
-                const medioLimpio = medio.trim(); // Quitar espacios sobrantes
+                const medioLimpio = medio.trim(); 
                 
                 if (medioLimpio !== "") {
-                    // Creamos un div para que cada uno ocupe una nueva línea
+                    // Creamos el div que activará la nueva línea según tu CSS
                     const linea = document.createElement('div');
-                    linea.style.marginBottom = "5px";
                     
-                    // Opcional: Añadir un icono de check dorado antes de cada medio
+                    // Icono de check y el texto del medio de pago
                     linea.innerHTML = `<i class="fas fa-check-circle" style="color: #E5C453; margin-right: 10px; font-size: 14px;"></i> ${medioLimpio}`;
                     
                     contenedorPagos.appendChild(linea);
@@ -1945,16 +1945,19 @@ function llenarPestañaEmpresa(data) {
             contenedorPagos.innerText = "Consultar con el establecimiento.";
         }
     }
- // ===== DIRECION =====
-  const direccionTexto = data.direccion || '';
-const ciudadTexto = data.ciudad || '';
 
-const direccion = document.getElementById('perfil-direccion');
-if (direccion) direccion.innerText = `${direccionTexto}, ${ciudadTexto}`;
+    // ===== DIRECCIÓN (CONCATENADA) =====
+    const direccionTexto = data.direccion || '';
+    const ciudadTexto = data.ciudad || '';
+    const direccion = document.getElementById('perfil-direccion');
+    
+    if (direccion) {
+        // Concatenamos dirección y ciudad tal cual pediste
+        direccion.innerText = (direccionTexto && ciudadTexto) ? `${direccionTexto}, ${ciudadTexto}` : (direccionTexto || ciudadTexto);
+    }
 
     // ===== TELÉFONO (WHATSAPP) =====
     const telefono = data.WhatsApp || '';
-
     const tel = document.getElementById('perfil-telefono');
     const btn = document.getElementById('btn-llamar');
 
