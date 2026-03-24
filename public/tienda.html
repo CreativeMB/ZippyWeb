@@ -151,6 +151,29 @@
         }
 
         /* ========================================= */
+        /* 6. REDES SOCIALES                         */
+        /* ========================================= */
+        .redes-header {
+            margin-top: 10px;
+        }
+
+        .icono-red {
+            color: white;
+            font-size: 1.2rem;
+            margin: 0 10px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .whatsapp-share:hover {
+            color: #25D366;
+        }
+
+        .facebook:hover {
+            color: #1877F2;
+        }
+
+        /* ========================================= */
         /* 7. DEFINICIÓN DE TODAS LAS ANIMACIONES    */
         /* ========================================= */
 
@@ -508,52 +531,24 @@
             border-radius: 4px;
         }
 
-      /* --- NUEVA BARRA DE NAVEGACIÓN UNIFICADA --- */
+       /* --- NUEVA BARRA DE NAVEGACIÓN UNIFICADA --- */
+/* --- AJUSTES AL CONTENEDOR PRINCIPAL --- */
 .tabs-container {
     display: flex;
-    align-items: center; 
+    align-items: center; /* Alinea todo verticalmente */
     background: #1a1a1a;
     border-bottom: 2px solid #E5C453;
     position: sticky;
     top: 0;
     z-index: 1100;
-    padding: 0 10px;
-    height: 60px; /* Altura fija para consistencia */
+    padding: 0 10px; /* Espacio a los lados */
 }
 
-/* --- ESTILOS DE LAS PESTAÑAS (LO QUE FALTABA) --- */
-.tab-item {
-    flex: 1;
-    text-align: center;
-    padding: 10px 5px;
-    color: #ffffff;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
-    text-transform: uppercase;
-    display: flex;
-    flex-direction: column; /* Icono arriba, texto abajo */
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-}
-
-.tab-item i {
-    font-size: 18px;
-}
-
-.tab-item.active {
-    background: #E5C453;
-    color: #000;
-}
-
-/* --- ESTILO DEL BUSCADOR --- */
+/* --- ESTILO DEL BUSCADOR EN LA BARRA --- */
 .search-wrapper-nav {
-    flex: 2; 
+    flex: 2; /* Toma más espacio que los iconos */
     position: relative;
-    margin: 0 10px;
+    margin-right: 10px;
 }
 
 .search-wrapper-nav input {
@@ -575,34 +570,47 @@
     color: #E5C453;
 }
 
-/* --- ICONOS REDES --- */
+/* --- ESTILO DE ICONOS DE REDES EN LA BARRA --- */
 .compartir-nav {
     display: flex;
-    gap: 5px;
+    gap: 8px;
+    margin-left: 10px;
 }
 
 .compartir-nav .icono-red {
-    width: 32px;
+    width: 32px; /* Más pequeños para la barra */
     height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
-    color: white !important;
+    color: white;
     text-decoration: none;
+    transition: 0.3s;
     border: 1px solid rgba(255, 255, 255, 0.2);
     font-size: 14px;
 }
 
-.compartir-nav .facebook:hover { background: #1877F2; }
-.compartir-nav .whatsapp-share:hover { background: #25D366; }
+.compartir-nav .facebook:hover { background: #1877F2; border-color: #1877F2; }
+.compartir-nav .whatsapp-share:hover { background: #25D366; border-color: #25D366; }
 
-/* --- AJUSTE MÓVIL --- */
+/* --- RESPONSIVE PARA MÓVILES --- */
 @media screen and (max-width: 600px) {
-    .tab-item span { display: none; } /* En móvil solo iconos para ahorrar espacio */
-    .tab-item { padding: 15px 5px; }
-    .search-wrapper-nav { flex: 1.5; }
+    .tab-item span { display: none; } /* Oculta texto, deja solo iconos en pestañas */
+    .search-wrapper-nav { flex: 1; }
+    .search-wrapper-nav input { font-size: 12px; }
+}
+
+/* --- ESTILOS DE LA TARJETA DE EMPRESA --- */
+.perfil-empresa-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 40px auto;
+    border: 1px solid #eee;
 }
 
         /* ========================================= */
@@ -670,6 +678,67 @@
             }
         }
 
+        /* ========================================= */
+        /* 9. BUSCADOR FLOTANTE                      */
+        /* ========================================= */
+        .search-flotante {
+            position: fixed;
+            bottom: 90px;
+            /* Lo ubicamos justo arriba del botón de WhatsApp */
+            right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            z-index: 999;
+        }
+
+        .search-input {
+            width: 0;
+            opacity: 0;
+            padding: 0;
+            border: none;
+            border-radius: 30px;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .15);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.4s ease;
+            height: 45px;
+            pointer-events: none;
+            /* Evita clics cuando está oculto */
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Estado activo: cuando el buscador se expande */
+        .search-flotante.activo .search-input {
+            width: 220px;
+            opacity: 1;
+            padding: 0 15px;
+            margin-right: 10px;
+            pointer-events: auto;
+        }
+
+        .search-btn {
+            background: #000000;
+            /* Color oscuro y elegante */
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .3);
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            font-size: 22px;
+        }
+
+        .search-btn:hover {
+            background: #333333;
+            transform: scale(1.05);
+            /* Pequeño efecto al pasar el mouse */
+        }
 
         /* Ajuste sutil para celulares */
         @media screen and (max-width: 767px) {
@@ -688,24 +757,25 @@
         <p style="margin-top:15px; font-weight:bold; color:#202020;">Cargando...</p>
     </div>
 
-   <div class="tabs-container">
-    <div class="search-wrapper-nav">
-        <i class="fas fa-search"></i>
-        <input type="text" id="busqueda-productos" placeholder="Buscar...">
+    <div class="tabs-container">
+        <div style="display: flex; flex: 1;">
+            <div class="tab-item active" onclick="cambiarPestaña('productos-tab', this)">
+                <i class="fas fa-store"></i> Tienda
+            </div>
+            <div class="tab-item" onclick="cambiarPestaña('empresa-tab', this)">
+                <i class="fas fa-building"></i> Empresa
+            </div>
+        </div>
+        
+        <div class="redes-nav">
+            <a href="#" id="shareFB_nav" target="_blank" class="icono-nav facebook">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" id="shareWA_nav" target="_blank" class="icono-nav whatsapp">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+        </div>
     </div>
-
-  <div class="tab-item active" onclick="cambiarTab('productos-tab')">
-    <i class="fas fa-home"></i> <span>Inicio</span>
-</div>
-<div class="tab-item" onclick="cambiarTab('empresa-tab')">
-    <i class="fas fa-store"></i> <span>Tienda</span>
-</div>
-
-    <div class="compartir-nav">
-        <a href="#" class="icono-red facebook"><i class="fab fa-facebook-f"></i></a>
-        <a href="#" class="icono-red whatsapp-share"><i class="fab fa-whatsapp"></i></a>
-    </div>
-</div>
 
     <div id="empresa-tab" class="tab-content" style="display: none; padding: 20px;">
         <div class="perfil-empresa-card">
@@ -802,6 +872,13 @@
                 </div>
                 <button id="enviarPedidoBtn" onclick="enviarPedido()">Enviar pedido</button>
             </div>
+        </div>
+    </div>
+
+    <div class="search-flotante" id="contenedorBusqueda">
+        <input type="text" id="inputBusqueda" class="search-input" placeholder="Buscar producto...">
+        <div class="search-btn" id="btnBusqueda">
+            <i class="fas fa-search"></i>
         </div>
     </div>
 
@@ -1468,8 +1545,9 @@ set(nuevoRef, pedidoData).then(() => {
         });
     });
 
-   // --- 1. FUNCIÓN PARA CAMBIAR ENTRE PESTAÑAS ---
-window.cambiarTab = function(tabId) { // Cambiado a 'cambiarTab' para que coincida con el HTML
+    // --- 1. FUNCIÓN PARA CAMBIAR ENTRE PESTAÑAS ---
+// La declaramos en window para que el HTML pueda verla desde el 'onclick'
+window.cambiarPestaña = function(tabId, elemento) {
     // Ocultar todos los contenidos de pestañas
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.style.display = 'none';
@@ -1480,23 +1558,18 @@ window.cambiarTab = function(tabId) { // Cambiado a 'cambiarTab' para que coinci
         item.classList.remove('active');
     });
     
-    // Mostrar la pestaña seleccionada
-    const pestañaDestino = document.getElementById(tabId);
-    if (pestañaDestino) {
-        pestañaDestino.style.display = 'block';
-    }
+    // Mostrar solo la pestaña seleccionada
+    document.getElementById(tabId).style.display = 'block';
     
-    // Marcar el botón actual como activo (usando event.currentTarget)
-    if (event && event.currentTarget) {
-        event.currentTarget.classList.add('active');
-    }
+    // Marcar el botón actual como activo
+    elemento.classList.add('active');
 
-    // El buscador de la barra: 
-    // Si estamos en 'empresa-tab', lo ocultamos para que no estorbe
-    const buscadorNav = document.querySelector('.search-wrapper-nav');
-    if (buscadorNav) {
-        buscadorNav.style.opacity = (tabId === 'empresa-tab') ? "0" : "1";
-        buscadorNav.style.pointerEvents = (tabId === 'empresa-tab') ? "none" : "auto";
+    // Opcional: Si vas a la pestaña empresa, ocultar el buscador flotante
+    const buscador = document.getElementById('contenedorBusqueda');
+    if (tabId === 'empresa-tab') {
+        buscador.style.display = 'none';
+    } else {
+        buscador.style.display = 'flex';
     }
 };
 
