@@ -531,75 +531,101 @@
             border-radius: 4px;
         }
 
-       /* --- NUEVA BARRA DE NAVEGACIÓN UNIFICADA --- */
-/* --- AJUSTES AL CONTENEDOR PRINCIPAL --- */
+        /* ========================================= */
+        /* redes sociales */
+        /* ========================================= */
+        .compartir-contenedor {
+            margin: 10px 0 20px 0;
+        }
+
+        .texto-compartir {
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.7);
+            /* Blanco suave para que no compita con el título */
+            margin-bottom: 8px;
+        }
+
+        .redes-header {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .icono-red {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Asegura que el icono de la cadena se vea blanco */
+        .icono-red i {
+            color: white !important;
+        }
+
+        /* Colores de marca al pasar el mouse */
+        .facebook:hover {
+            background: #1877F2;
+            border-color: #1877F2;
+        }
+
+        .whatsapp-share:hover {
+            background: #25D366;
+            border-color: #25D366;
+        }
+
+        /* Ajuste para celular */
+        @media screen and (max-width: 767px) {
+            .icono-red {
+                width: 42px;
+                height: 42px;
+            }
+        }
+
+        /* --- ESTILOS DEL NUEVO MENÚ --- */
 .tabs-container {
     display: flex;
-    align-items: center; /* Alinea todo verticalmente */
-    background: #1a1a1a;
-    border-bottom: 2px solid #E5C453;
+    background: #1a1a1a; /* Fondo oscuro elegante */
+    border-bottom: 2px solid #E5C453; /* Línea dorada que combina con Zippy */
     position: sticky;
     top: 0;
-    z-index: 1100;
-    padding: 0 10px; /* Espacio a los lados */
+    z-index: 1100; /* Por encima de todo */
 }
 
-/* --- ESTILO DEL BUSCADOR EN LA BARRA --- */
-.search-wrapper-nav {
-    flex: 2; /* Toma más espacio que los iconos */
-    position: relative;
-    margin-right: 10px;
-}
-
-.search-wrapper-nav input {
-    width: 100%;
-    padding: 8px 10px 8px 35px;
-    border-radius: 20px;
-    border: 1px solid #444;
-    background: #2a2a2a;
-    color: white;
-    font-size: 13px;
-    outline: none;
-}
-
-.search-wrapper-nav i {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #E5C453;
-}
-
-/* --- ESTILO DE ICONOS DE REDES EN LA BARRA --- */
-.compartir-nav {
-    display: flex;
-    gap: 8px;
-    margin-left: 10px;
-}
-
-.compartir-nav .icono-red {
-    width: 32px; /* Más pequeños para la barra */
-    height: 32px;
+.tab-item {
+    flex: 1;
+    text-align: center;
+    padding: 15px;
+    color: #ffffff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    text-decoration: none;
-    transition: 0.3s;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 14px;
+    gap: 8px;
 }
 
-.compartir-nav .facebook:hover { background: #1877F2; border-color: #1877F2; }
-.compartir-nav .whatsapp-share:hover { background: #25D366; border-color: #25D366; }
+.tab-item i {
+    font-size: 18px;
+}
 
-/* --- RESPONSIVE PARA MÓVILES --- */
-@media screen and (max-width: 600px) {
-    .tab-item span { display: none; } /* Oculta texto, deja solo iconos en pestañas */
-    .search-wrapper-nav { flex: 1; }
-    .search-wrapper-nav input { font-size: 12px; }
+.tab-item.active {
+    background: #E5C453; /* Color dorado activo */
+    color: #000;
 }
 
 /* --- ESTILOS DE LA TARJETA DE EMPRESA --- */
@@ -611,6 +637,20 @@
     max-width: 600px;
     margin: 40px auto;
     border: 1px solid #eee;
+}
+
+.tab-content {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ajuste para que el buscador no tape el menú */
+.search-flotante {
+    z-index: 1050;
 }
 
         /* ========================================= */
@@ -1058,7 +1098,6 @@ function iniciarCargaBase(slugBusqueda) {
         }
     }).catch(err => console.error("Error en conexión Realtime:", err));
 }
-
     // --- 2. VALIDACIÓN DE EXPIRACIÓN ---
     function validarYContinuar(perfil, data) {
         if (!perfil.fechaExpiracion) {
