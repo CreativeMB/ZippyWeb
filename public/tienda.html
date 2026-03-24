@@ -1863,71 +1863,68 @@ if (inputBusquedaNav) {
     }
 };
 
-// --- FUNCIÓN PRINCIPAL DE LLENADO (CORREGIDA) ---
-
 function llenarPestañaEmpresa(data) {
     if (!data) return;
 
-    // 0. ACTUALIZACIÓN DE VARIABLES GLOBALES
-    // Usamos el operador de asignación para que esté disponible en toda la App
+    // ===== VARIABLES GLOBALES =====
     telefonoEmpresa = data.telefono || "";
-    empresaId = data.id || empresaId; // Por si necesitas rastrear el ID actual
+    empresaId = data.id || empresaId;
 
-    // 1. CARGA DEL LOGO (Efecto suave y Proxy de seguridad)
-    const imgElement = document.getElementById('perfil-logo');
-    if (imgElement && data.urlLogo) {
-        const urlDrive = `https://drive.google.com/uc?export=view&id=${data.urlLogo}`;
-        // Usamos el proxy para evitar bloqueos de Google Drive
-        imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlDrive)}`;
-        imgElement.style.opacity = '1';
+    // ===== LOGO =====
+    const img = document.getElementById('perfil-logo');
+    if (img && data.urlLogo) {
+        const url = `https://drive.google.com/uc?export=view&id=${data.urlLogo}`;
+        img.src = `https://images.weserv.nl/?url=${encodeURIComponent(url)}`;
     }
 
-    // 2. TÍTULOS DE ALTO IMPACTO (Negrita extrema y Dorado)
-    // Usamos innerHTML en el nombre por si quieres meter un <span> dorado luego
-    const elNombre = document.getElementById('perfil-nombre');
-    if (elNombre) elNombre.innerText = data.nombreEmpresa || 'Zippy Store';
+    // ===== NOMBRE Y ESLOGAN =====
+    const nombre = document.getElementById('perfil-nombre');
+    const eslogan = document.getElementById('perfil-eslogan');
 
-    const elEslogan = document.getElementById('perfil-eslogan');
-    if (elEslogan) elEslogan.innerText = data.eslogan || '';
+    if (nombre) nombre.innerText = data.nombreEmpresa || '';
+    if (eslogan) eslogan.innerText = data.eslogan || '';
 
-    // 3. DESCRIPCIÓN ELEGANTE (Tipografía delgada y espaciada)
-    const elDesc = document.getElementById('perfil-descripcion');
-    if (elDesc) elDesc.innerText = data.descripcionEmpresa || 'Bienvenidos a nuestra experiencia premium.';
-
-    // 4. MAPA DE GOOGLE (Integración con filtro oscuro del CSS)
-    const direccionFull = `${data.direccion || ''}, ${data.ciudad || ''}`;
-    const elDireccion = document.getElementById('perfil-direccion');
-    const mapIframe = document.getElementById('google-map-iframe');
-    
-    if (elDireccion) elDireccion.innerText = direccionFull;
-
-    if (mapIframe && data.direccion) {
-        const queryMapa = encodeURIComponent(direccionFull);
-        // Generamos el mapa dinámico basado en la dirección de la base de datos
-        mapIframe.src = `https://maps.google.com/maps?q=${queryMapa}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+    // ===== DESCRIPCIÓN =====
+    const descripcion = document.getElementById('perfil-descripcion');
+    if (descripcion) {
+        descripcion.innerText = data.descripcionEmpresa || '';
     }
 
-    // 5. TELÉFONO Y BOTÓN DE LLAMADA (Acción Rápida)
-    const elTelefono = document.getElementById('perfil-telefono');
-    const btnLlamar = document.getElementById('btn-llamar');
+    // ===== DIRECCIÓN + MAPA =====
+    const direccionFull = `${data.direccion || ''}, ${data.ciudad || ''}`.trim();
 
-    if (elTelefono) elTelefono.innerText = telefonoEmpresa || 'Contacto Privado';
-    
-    if (btnLlamar) {
+    const direccion = document.getElementById('perfil-direccion');
+    if (direccion) direccion.innerText = direccionFull;
+
+    const map = document.getElementById('google-map-iframe');
+    if (map && direccionFull !== ',') {
+        const query = encodeURIComponent(direccionFull + ', Colombia');
+        map.src = `https://maps.google.com/maps?q=${query}&z=15&output=embed`;
+    }
+
+    // ===== TELÉFONO =====
+    const tel = document.getElementById('perfil-telefono');
+    const btn = document.getElementById('btn-llamar');
+
+    if (tel) tel.innerText = telefonoEmpresa || '';
+
+    if (btn) {
         if (telefonoEmpresa) {
-            btnLlamar.href = `tel:${telefonoEmpresa}`;
-            btnLlamar.style.display = 'inline-block';
+            const numeroLimpio = telefonoEmpresa.replace(/\D/g, '');
+            btn.href = `https://wa.me/${numeroLimpio}`;
+            btn.style.display = 'inline-block';
         } else {
-            btnLlamar.style.display = 'none';
+            btn.style.display = 'none';
         }
     }
 
-    // 6. DATOS LEGALES Y DE RESPALDO
-    const elNit = document.getElementById('perfil-nit');
-    if (elNit) elNit.innerText = data.nit || 'NIT Verificado';
+    // ===== CORREO =====
+    const correo = document.getElementById('perfil-correo');
+    if (correo) correo.innerText = data.correo || '';
 
-    const elCorreo = document.getElementById('perfil-correo');
-    if (elCorreo) elCorreo.innerText = data.correo || 'contacto@zippy.com';
+    // ===== NIT =====
+    const nit = document.getElementById('perfil-nit');
+    if (nit) nit.innerText = data.nit || '';
 }
 </script>
 </body>
