@@ -807,34 +807,36 @@ body {
             }
         }
       /* 1. CONTENEDOR pagina empresas */
+/* 1. CONFIGURACIÓN DE FONDO Y CUERPO */
 #empresa-tab {
-    background: #050505; /* Fondo negro profundo */
+    background: #0f1115; /* Gris oscuro moderno, no negro total */
+    color: #e2e8f0;
+    font-family: 'Poppins', sans-serif;
     min-height: 100vh;
-    padding: 40px 20px !important;
+    padding: 0 !important; /* Quitamos padding para que las cintas toquen la orilla */
+    overflow-x: hidden;
 }
 
 .empresa-full {
-    max-width: 800px;
-    margin: 0 auto;
-    font-family: 'Poppins', sans-serif;
-    color: #F8F9FA;
+    width: 100%;
 }
 
-/* 2. HEADER: LOGO, NOMBRE Y ESLOGAN */
+/* 2. HEADER (CINTA DE BIENVENIDA) */
 .empresa-header {
+    background: linear-gradient(180deg, #161920 0%, #0f1115 100%);
+    padding: 60px 20px;
     text-align: center;
-    padding: 40px 0;
-    background: radial-gradient(circle, rgba(229,196,83,0.05) 0%, rgba(0,0,0,0) 70%);
+    border-bottom: 1px solid rgba(229, 196, 83, 0.1);
 }
 
 .empresa-logo {
-    width: 130px;
-    height: 130px;
-    margin: 0 auto 20px;
-    border: 2px solid #E5C453;
-    padding: 5px;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 25px;
     border-radius: 50%;
-    box-shadow: 0 0 20px rgba(229,196,83,0.2);
+    padding: 8px;
+    background: linear-gradient(135deg, #E5C453, #161920);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .empresa-logo img {
@@ -842,15 +844,15 @@ body {
     height: 100%;
     object-fit: contain;
     border-radius: 50%;
+    background: #0f1115;
 }
 
 .empresa-titulo {
     font-family: 'Montserrat', sans-serif;
-    font-size: clamp(1.8rem, 5vw, 2.8rem);
-    font-weight: 900;
-    margin: 10px 0;
-    /* Animación de brillo */
-    background: linear-gradient(to right, #ffffff 20%, #E5C453 50%, #ffffff 80%);
+    font-weight: 800;
+    font-size: 2.8rem;
+    margin-bottom: 10px;
+    background: linear-gradient(to right, #fff, #E5C453, #fff);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -858,106 +860,117 @@ body {
 }
 
 .empresa-eslogan {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.3rem;
+    color: #94a3b8;
     font-style: italic;
-    color: #E5C453;
+    font-size: 1.1rem;
     letter-spacing: 1px;
 }
 
-/* 3. SECCIONES Y BLOQUES */
+/* 3. SECCIONES TIPO "CINTA" (ANCHO COMPLETO) */
 .empresa-section {
-    padding: 30px 0;
-    border-bottom: 1px solid rgba(229,196,83,0.1);
+    width: 100%;
+    padding: 50px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+/* Alternamos colores de cinta para dar ritmo visual */
+.empresa-section:nth-child(even) {
+    background: #161920; /* Un tono un poco más claro */
+}
+
+.empresa-section:nth-child(odd) {
+    background: #0f1115;
 }
 
 .empresa-subtitulo {
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.2rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 15px;
     color: #E5C453;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 25px;
+    font-weight: 600;
 }
 
 .empresa-descripcion {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    color: #bbb;
+    max-width: 800px;
+    text-align: center;
     line-height: 1.8;
-    text-align: justify;
+    color: #cbd5e1;
+    font-size: 1.05rem;
 }
 
-/* 4. MEDIOS DE PAGO (LISTA VERTICAL) */
+/* 4. MEDIOS DE PAGO (DISEÑO LIMPIO) */
 #perfil-medios-pago {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 12px;
-    margin-top: 15px;
+    width: 100%;
+    max-width: 600px;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 10px;
 }
 
 #perfil-medios-pago div {
     background: rgba(255, 255, 255, 0.03);
-    border-left: 3px solid #E5C453;
-    padding: 14px 20px;
-    border-radius: 0 10px 10px 0;
-    color: #FFFFFF !important;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    transition: 0.3s;
-}
-
-#perfil-medios-pago div:hover {
-    background: rgba(229, 196, 83, 0.1);
-    transform: translateX(10px);
-}
-
-#perfil-medios-pago div i {
-    margin-right: 15px;
-    color: #E5C453;
-    font-size: 1.1rem;
-}
-
-/* 5. BOTÓN DE CONTACTO */
-.empresa-btn {
+    border: 1px solid rgba(229, 196, 83, 0.2);
+    padding: 15px;
+    border-radius: 12px;
+    color: #f1f5f9 !important;
+    font-weight: 500;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    width: 100%;
-    max-width: 300px;
-    margin: 30px auto;
-    padding: 16px;
-    border-radius: 50px;
-    background: linear-gradient(135deg, #E5C453, #b89c2f);
-    color: #000 !important;
-    font-weight: 800;
+    transition: 0.3s ease;
+}
+
+#perfil-medios-pago div i {
+    color: #E5C453;
+    margin-right: 10px;
+}
+
+/* 5. SECCIÓN DE CONTACTO Y BOTÓN SEPARADO */
+.contacto-container {
+    text-align: center;
+    color: #94a3b8;
+}
+
+.empresa-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: #25d366;
+    color: #fff !important;
+    padding: 18px 40px;
+    border-radius: 100px;
+    font-weight: 700;
     text-decoration: none;
+    margin-top: 30px;
+    box-shadow: 0 15px 30px rgba(37, 211, 102, 0.2);
+    transition: all 0.3s ease;
     text-transform: uppercase;
-    transition: 0.4s;
+    letter-spacing: 1px;
 }
 
 .empresa-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(229,196,83,0.4);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(37, 211, 102, 0.3);
 }
 
-/* 6. ANIMACIONES */
+/* 6. ANIMACIONES Y DECORACIÓN */
 @keyframes shineSweep {
     0% { background-position: -200% center; }
     100% { background-position: 200% center; }
 }
 
-/* DIVIDER */
 .divider-gold {
-    width: 50px;
-    height: 2px;
+    width: 40px;
+    height: 3px;
     background: #E5C453;
-    margin: 20px auto;
+    margin: 15px auto;
+    border-radius: 10px;
 }
     </style>
 </head>
@@ -1074,46 +1087,38 @@ body {
     </div>
 
 <div id="empresa-tab" class="tab-content" style="display: none; padding: 20px;">
-    <div class="empresa-full">
+   <div class="empresa-full">
+    <header class="empresa-header">
+        <div class="empresa-logo"><img id="perfil-logo" src=""></div>
+        <h1 id="perfil-nombre" class="empresa-titulo"></h1>
+        <p id="perfil-eslogan" class="empresa-eslogan"></p>
+    </header>
 
-        <div class="empresa-header" style="text-align: center; margin-bottom: 20px;">
-            <div class="divider-gold" style="height: 2px; background: #E5C453; width: 50px; margin: 10px auto;"></div>
-            <div class="empresa-logo">
-                <img id="perfil-logo" src="" style="max-width: 120px; border-radius: 10px; display: block; margin: 0 auto;">
-            </div>
-            <h1 id="perfil-nombre" class="empresa-titulo" style="color: #1a1a1a; margin-top: 15px;"></h1>
-            <p id="perfil-eslogan" class="empresa-eslogan" style="font-style: italic; color: #666;"></p>
+    <section class="empresa-section">
+        <h2 class="empresa-subtitulo">Nuestra Historia</h2>
+        <div class="divider-gold"></div>
+        <p id="perfil-descripcion" class="empresa-descripcion"></p>
+    </section>
+
+    <section class="empresa-section">
+        <h2 class="empresa-subtitulo">Encuéntranos</h2>
+        <div class="contacto-container">
+            <p><i class="fas fa-map-marker-alt"></i> <span id="perfil-direccion"></span></p>
+            <p><i class="fas fa-phone"></i> <span id="perfil-telefono"></span></p>
         </div>
+    </section>
 
-        <div class="empresa-section" style="margin-bottom: 25px;">
-            <div class="divider-gold" style="height: 1px; background: #eee; margin-bottom: 15px;"></div>
-            <p id="perfil-descripcion" class="empresa-descripcion" style="color: #444; line-height: 1.6;"></p>
-        </div>
+    <section class="empresa-section">
+        <h2 class="empresa-subtitulo">Pagos Seguros</h2>
+        <div id="perfil-medios-pago"></div>
+    </section>
 
-        <div style="background: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
-            
-            <h2 class="empresa-subtitulo" style="font-size: 16px; color: #1a1a1a; border-bottom: 2px solid #E5C453; display: inline-block; margin-bottom: 15px;">Información de Contacto</h2>
-            
-            <p style="margin-bottom: 12px;">
-                <strong><i class="fas fa-map-marker-alt" style="color: #E5C453;"></i> Ubicación:</strong><br>
-                <span id="perfil-direccion" class="empresa-texto"></span>
-            </p>
-            
-            <p style="margin-bottom: 15px;">
-                <strong><i class="fas fa-phone" style="color: #E5C453;"></i> WhatsApp:</strong><br>
-                <span id="perfil-telefono" class="empresa-texto"></span>
-            </p>
-
-            <a id="btn-llamar" href="#" class="empresa-btn" style="display: block; background: #25d366; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-bottom: 25px;">
-                <i class="fab fa-whatsapp"></i> CONTACTAR AHORA
-            </a>
-
-            <h2 class="empresa-subtitulo" style="font-size: 16px; color: #1a1a1a; border-bottom: 2px solid #E5C453; display: inline-block; margin-bottom: 15px;">Medios de Pago Disponibles</h2>
-            <div id="perfil-medios-pago" class="contenedor-pagos-dinamico" style="display: flex; flex-direction: column; gap: 8px;">
-                </div>
-        </div>
-
-    </div>
+    <section class="empresa-section" style="border-bottom: none; padding-bottom: 100px;">
+        <h2 class="empresa-subtitulo">¿Listo para pedir?</h2>
+        <a id="btn-llamar" href="#" class="empresa-btn">
+            <i class="fab fa-whatsapp"></i> Chatear con nosotros
+        </a>
+    </section>
 </div>
     <div class="footer">
             <p id="direccion" class="info-footer-elegante"></p>
