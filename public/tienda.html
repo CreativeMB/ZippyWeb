@@ -1075,22 +1075,56 @@ function iniciarCargaBase(slugBusqueda) {
     if (!slugBusqueda) return;
     
     const empresasRef = ref(db);
-    // Usamos get() primero para una carga rápida y luego onValue si es necesario
+    
     get(empresasRef).then((snapshot) => {
         let empresaEncontrada = false;
+        
         snapshot.forEach((child) => {
             const data = child.val();
+            
+            // Verificamos si el slug coincide
             if (data.perfilempresa?.slug === slugBusqueda) {
                 empresaId = child.key;
                 empresaEncontrada = true;
+
+                // 1. Lógica existente de Zippy
                 validarYContinuar(data.perfilempresa, data);
+
+                // 2. NUEVO: Llenar la pestaña de información de empresa
+                // Le pasamos 'data.perfilempresa' que contiene nombre, logo, etc.
+                llenarPestañaEmpresa(data.perfilempresa);
+
+                // 3. NUEVO: Configurar los enlaces de redes sociales de la barra
+                configurarRedesNav(data.perfilempresa);
+                
+                // 4. Ocultar el loader una vez todo está mapeado
+                const loader = document.getElementById('loader');
+                if(loader) loader.style.display = 'none';
             }
         });
         
         if (!empresaEncontrada) {
-            console.error("🚫 Slug no encontrado en Realtime Database:", slugBusqueda);
+            console.error("🚫 Slug no encontrado:", slugBusqueda);
+            // Si no hay empresa, podrías mostrar un mensaje o redirigir
         }
     }).catch(err => console.error("Error en conexión Realtime:", err));
+}
+
+// --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
+function configurarRedesNav(perfil) {
+    const fbLink = document.getElementById('shareFB');
+    const waLink = document.getElementById('shareWA');
+    const urlActual = window.location.href;
+
+    if (fbLink) {
+        fbLink.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlActual)}`;
+    }
+
+    if (waLink && perfil.telefono) {
+        // Configuramos el WhatsApp de la barra para que escriba al dueño de la tienda
+        const textoWA = `Hola! Estoy viendo tu tienda *${perfil.nombre}* y me gustaría hacer una consulta: ${urlActual}`;
+        waLink.href = `https://wa.me/${perfil.telefono.replace(/\s+/g, '')}?text=${encodeURIComponent(textoWA)}`;
+    }
 }
 
     // --- 2. VALIDACIÓN DE EXPIRACIÓN ---
@@ -1565,19 +1599,33 @@ set(nuevoRef, pedidoData).then(() => {
         if (document.getElementById('shareWA')) document.getElementById('shareWA').href = `https://api.whatsapp.com/send?text=${msg}`;
     });
 
-    document.getElementById('btnBusqueda').addEventListener('click', () => {
-        const cont = document.getElementById('contenedorBusqueda');
-        cont.classList.toggle('activo');
-        if (cont.classList.contains('activo')) document.getElementById('inputBusqueda').focus();
-    });
+    // --- 3. LÓGICA DE BÚSQUEDA INTEGRADA EN LA NAV ---
+// Seleccionamos el input que está dentro de la barra negra
+const inputBusquedaNav = document.getElementById('contenedorBusqueda');
 
-    document.getElementById('inputBusqueda').addEventListener('input', (e) => {
-        const texto = e.target.value.toLowerCase();
+if (inputBusquedaNav) {
+    inputBusquedaNav.addEventListener('input', (e) => {
+        const texto = e.target.value.toLowerCase().trim();
+        
+        // Buscamos todas las tarjetas de productos
         document.querySelectorAll('.producto').forEach(card => {
-            const nombre = card.querySelector('.nombre').innerText.toLowerCase();
-            card.style.display = nombre.includes(texto) ? 'flex' : 'none';
+            // Buscamos el nombre dentro de la tarjeta
+            const nombreElemento = card.querySelector('.nombre');
+            
+            if (nombreElemento) {
+                const nombre = nombreElemento.innerText.toLowerCase();
+                
+                // Si el nombre incluye lo que escribimos, mostramos la tarjeta
+                // Usamos 'flex' porque tus productos suelen usar ese display para alinearse
+                if (nombre.includes(texto)) {
+                    card.style.display = 'flex'; 
+                } else {
+                    card.style.display = 'none';
+                }
+            }
         });
     });
+}
 
    window.cambiarPestaña = function(tabId, elemento) {
     // 1. Ocultar todas las secciones de contenido
@@ -1618,32 +1666,32 @@ set(nuevoRef, pedidoData).then(() => {
         }
     }
 };
-// --- 2. FUNCIÓN PARA CARGAR DATOS EN LA PESTAÑA EMPRESA ---
-// Esta función toma los datos que ya recibes de Firebase y los pone en la nueva pestaña
+
 function llenarPestañaEmpresa(data) {
     if (!data) return;
 
-    // Llenamos los campos de la nueva pestaña 'Empresa'
+    // Mapeo de IDs de HTML con las llaves de tu Firebase
     const campos = {
-        'perfil-logo': data.logo,
-        'perfil-nombre': data.nombre,
-        'perfil-eslogan': data.eslogan,
-        'perfil-direccion': data.direccion,
-        'perfil-telefono': data.telefono,
-        'perfil-correo': data.correo,
-        'perfil-descripcion': data.descripcion
+        'perfil-logo': data.logo || data.logoURL, // Por si acaso usas logoURL
+        'perfil-nombre': data.nombre || data.nombreEmpresa,
+        'perfil-eslogan': data.eslogan || 'Bienvenidos',
+        'perfil-direccion': data.direccion || 'Consultar por interno',
+        'perfil-telefono': data.telefono || data.celular,
+        'perfil-correo': data.correo || data.email,
+        'perfil-descripcion': data.descripcion || data.sobreNosotros
     };
 
-    for (const id in campos) {
+    Object.entries(campos).forEach(([id, valor]) => {
         const elemento = document.getElementById(id);
         if (elemento) {
             if (elemento.tagName === 'IMG') {
-                elemento.src = campos[id] || '';
+                elemento.src = valor || 'https://via.placeholder.com/150'; // Imagen por defecto
+                elemento.style.display = valor ? 'block' : 'none';
             } else {
-                elemento.innerText = campos[id] || 'No disponible';
+                elemento.innerText = valor || 'No disponible';
             }
         }
-    }
+    });
 }
 </script>
 </body>
