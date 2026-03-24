@@ -531,101 +531,75 @@
             border-radius: 4px;
         }
 
-        /* ========================================= */
-        /* redes sociales */
-        /* ========================================= */
-        .compartir-contenedor {
-            margin: 10px 0 20px 0;
-        }
-
-        .texto-compartir {
-            font-family: 'Poppins', sans-serif;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: rgba(255, 255, 255, 0.7);
-            /* Blanco suave para que no compita con el título */
-            margin-bottom: 8px;
-        }
-
-        .redes-header {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .icono-red {
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        /* Asegura que el icono de la cadena se vea blanco */
-        .icono-red i {
-            color: white !important;
-        }
-
-        /* Colores de marca al pasar el mouse */
-        .facebook:hover {
-            background: #1877F2;
-            border-color: #1877F2;
-        }
-
-        .whatsapp-share:hover {
-            background: #25D366;
-            border-color: #25D366;
-        }
-
-        /* Ajuste para celular */
-        @media screen and (max-width: 767px) {
-            .icono-red {
-                width: 42px;
-                height: 42px;
-            }
-        }
-
-        /* --- ESTILOS DEL NUEVO MENÚ --- */
+       /* --- NUEVA BARRA DE NAVEGACIÓN UNIFICADA --- */
+/* --- AJUSTES AL CONTENEDOR PRINCIPAL --- */
 .tabs-container {
     display: flex;
-    background: #1a1a1a; /* Fondo oscuro elegante */
-    border-bottom: 2px solid #E5C453; /* Línea dorada que combina con Zippy */
+    align-items: center; /* Alinea todo verticalmente */
+    background: #1a1a1a;
+    border-bottom: 2px solid #E5C453;
     position: sticky;
     top: 0;
-    z-index: 1100; /* Por encima de todo */
+    z-index: 1100;
+    padding: 0 10px; /* Espacio a los lados */
 }
 
-.tab-item {
-    flex: 1;
-    text-align: center;
-    padding: 15px;
-    color: #ffffff;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    text-transform: uppercase;
+/* --- ESTILO DEL BUSCADOR EN LA BARRA --- */
+.search-wrapper-nav {
+    flex: 2; /* Toma más espacio que los iconos */
+    position: relative;
+    margin-right: 10px;
+}
+
+.search-wrapper-nav input {
+    width: 100%;
+    padding: 8px 10px 8px 35px;
+    border-radius: 20px;
+    border: 1px solid #444;
+    background: #2a2a2a;
+    color: white;
+    font-size: 13px;
+    outline: none;
+}
+
+.search-wrapper-nav i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #E5C453;
+}
+
+/* --- ESTILO DE ICONOS DE REDES EN LA BARRA --- */
+.compartir-nav {
+    display: flex;
+    gap: 8px;
+    margin-left: 10px;
+}
+
+.compartir-nav .icono-red {
+    width: 32px; /* Más pequeños para la barra */
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 14px;
 }
 
-.tab-item i {
-    font-size: 18px;
-}
+.compartir-nav .facebook:hover { background: #1877F2; border-color: #1877F2; }
+.compartir-nav .whatsapp-share:hover { background: #25D366; border-color: #25D366; }
 
-.tab-item.active {
-    background: #E5C453; /* Color dorado activo */
-    color: #000;
+/* --- RESPONSIVE PARA MÓVILES --- */
+@media screen and (max-width: 600px) {
+    .tab-item span { display: none; } /* Oculta texto, deja solo iconos en pestañas */
+    .search-wrapper-nav { flex: 1; }
+    .search-wrapper-nav input { font-size: 12px; }
 }
 
 /* --- ESTILOS DE LA TARJETA DE EMPRESA --- */
@@ -639,44 +613,6 @@
     border: 1px solid #eee;
 }
 
-.tab-content {
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Ajuste para que el buscador no tape el menú */
-.search-flotante {
-    z-index: 1050;
-}
-.tabs-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #000;
-    border-bottom: 2px solid #E5C453;
-    position: sticky;
-    top: 0;
-    z-index: 1100;
-}
-
-.redes-nav {
-    display: flex;
-    padding-right: 15px;
-    gap: 15px;
-}
-
-.icono-nav {
-    color: white;
-    font-size: 18px;
-    transition: 0.3s;
-}
-
-.icono-nav.facebook:hover { color: #1877f2; }
-.icono-nav.whatsapp:hover { color: #25d366; }
         /* ========================================= */
         /* 8 DISEÑO PARA MÓVIL (PANTALLAS PEQUEÑAS)    */
         /* ========================================= */
@@ -742,67 +678,6 @@
             }
         }
 
-        /* ========================================= */
-        /* 9. BUSCADOR FLOTANTE                      */
-        /* ========================================= */
-        .search-flotante {
-            position: fixed;
-            bottom: 90px;
-            /* Lo ubicamos justo arriba del botón de WhatsApp */
-            right: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            z-index: 999;
-        }
-
-        .search-input {
-            width: 0;
-            opacity: 0;
-            padding: 0;
-            border: none;
-            border-radius: 30px;
-            background: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, .15);
-            font-size: 14px;
-            outline: none;
-            transition: all 0.4s ease;
-            height: 45px;
-            pointer-events: none;
-            /* Evita clics cuando está oculto */
-            font-family: 'Poppins', sans-serif;
-        }
-
-        /* Estado activo: cuando el buscador se expande */
-        .search-flotante.activo .search-input {
-            width: 220px;
-            opacity: 1;
-            padding: 0 15px;
-            margin-right: 10px;
-            pointer-events: auto;
-        }
-
-        .search-btn {
-            background: #000000;
-            /* Color oscuro y elegante */
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, .3);
-            cursor: pointer;
-            transition: background 0.3s, transform 0.3s;
-            font-size: 22px;
-        }
-
-        .search-btn:hover {
-            background: #333333;
-            transform: scale(1.05);
-            /* Pequeño efecto al pasar el mouse */
-        }
 
         /* Ajuste sutil para celulares */
         @media screen and (max-width: 767px) {
@@ -831,14 +706,14 @@
             </div>
         </div>
         
-        <div class="redes-nav">
-            <a href="#" id="shareFB_nav" target="_blank" class="icono-nav facebook">
-                <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="#" id="shareWA_nav" target="_blank" class="icono-nav whatsapp">
-                <i class="fab fa-whatsapp"></i>
-            </a>
-        </div>
+       <div class="compartir-nav">
+        <a href="#" class="icono-red facebook" title="Compartir en Facebook">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="#" class="icono-red whatsapp-share" title="Compartir por WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
     </div>
 
     <div id="empresa-tab" class="tab-content" style="display: none; padding: 20px;">
