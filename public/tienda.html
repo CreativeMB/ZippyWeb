@@ -1891,7 +1891,7 @@ function llenarPestañaEmpresa(data) {
         descripcion.innerText = data.descripcionEmpresa || '';
     }
 
-   // 2. Lógica del Mapa
+  // 2. Lógica del Mapa (CORREGIDA)
     const calle = data.direccion || "";
     const ciudad = data.ciudad || "Bogotá";
     const elDireccion = document.getElementById('perfil-direccion');
@@ -1901,17 +1901,15 @@ function llenarPestañaEmpresa(data) {
 
     if (mapIframe) {
         if (calle.trim() !== "") {
-            // Construcción de búsqueda limpia
-            const direccionCompleta = `${calle}, ${ciudad}, Colombia`;
-            const query = encodeURIComponent(direccionCompleta);
+            // CONSTRUCCIÓN DE BÚSQUEDA SEGURA
+            const direccionFull = `${calle}, ${ciudad}, Colombia`;
+            const queryUrl = encodeURIComponent(direccionFull);
             
-            // URL con HTTPS y parámetro de salida EMBED (Obligatorio)
-            const urlMapa = `https://maps.google.com/maps?q=${query}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+            // USAREMOS ESTA URL EXACTA (HTTPS y con el parámetro q)
+            const urlFinal = `https://maps.google.com/maps?q=${queryUrl}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
             
-            // INYECTAR URL Y FORZAR VISIBILIDAD
-            mapIframe.src = urlMapa;
-            mapIframe.style.display = "block"; 
-            mapIframe.style.height = "300px"; // Esto fuerza que el contenedor se abra
+            mapIframe.src = urlFinal;
+            mapIframe.style.display = "block"; // Forzamos a que se muestre
         } else {
             mapIframe.style.display = "none";
         }
