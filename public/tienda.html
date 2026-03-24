@@ -835,82 +835,84 @@
             }
         }
         /* --- DISEÑO PREMIUM PESTAÑA EMPRESA --- */
-/* FONDO Y TIPOGRAFÍA */
-#empresa-tab { background: #0a0a0a !important; color: white; }
-
-.zippy-premium-full {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding-bottom: 60px;
-    font-family: 'Montserrat', sans-serif;
+/* ELIMINAR LÍMITES DE LA PÁGINA */
+#empresa-tab {
+    background: #080808 !important;
+    width: 100vw !important;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    min-height: 100vh;
+    padding: 0 !important;
+    overflow-x: hidden;
 }
 
-/* HEADER GLASSMORPISM */
-.z-header-hero { padding: 60px 20px; text-align: center; }
-.z-glass-wrapper {
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(229, 196, 83, 0.1);
+.zippy-modern-full {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* BANNER SUPERIOR (Como el del link) */
+.z-banner-header {
+    width: 100%;
+    height: 350px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), #080808), 
+                url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=2000&auto=format&fit=crop'); /* Imagen de fondo elegante */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.z-glass-identity {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(229, 196, 83, 0.2);
+    padding: 40px;
     border-radius: 40px;
-    padding: 50px 20px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+    width: 90%;
+    max-width: 800px;
 }
 
-.z-logo-border {
-    width: 130px; height: 130px; background: white;
-    border-radius: 50%; margin: 0 auto 20px; padding: 8px;
-    box-shadow: 0 0 25px rgba(229, 196, 83, 0.3);
+/* TARJETAS ESTILO DASHBOARD */
+.z-container-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 40px;
+    max-width: 1300px;
+    margin: 0 auto;
 }
 
-.z-logo-border img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
-
-.z-main-title { font-size: 35px; font-weight: 800; margin: 0; color: #fff; }
-.z-sub-gold { color: #E5C453; letter-spacing: 5px; text-transform: uppercase; font-size: 13px; margin-top: 10px; }
-
-/* BOTONES DORADOS */
-.z-btn-gold {
-    display: inline-block;
-    margin-top: 15px;
-    background: #E5C453;
-    color: #000;
-    padding: 10px 25px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 800;
-    font-size: 12px;
+.z-card-premium {
+    background: #121212;
+    border: 1px solid #1f1f1f;
+    border-radius: 25px;
+    padding: 30px;
     transition: 0.3s;
 }
-.z-btn-gold:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(229, 196, 83, 0.5); }
 
-/* SECCIÓN HISTORIA */
-.z-section-clean { padding: 40px 20px; text-align: center; }
-.z-divider { color: #444; font-size: 11px; letter-spacing: 6px; text-transform: uppercase; margin-bottom: 25px; }
-.z-text-container p { font-size: 18px; color: #bbb; line-height: 1.8; font-weight: 300; max-width: 800px; margin: 0 auto; }
-
-/* GRID DE TARJETAS */
-.z-grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    padding: 0 20px;
+.z-card-premium:hover {
+    border-color: #E5C453;
+    transform: translateY(-5px);
 }
 
-.z-card-large { grid-column: span 2; background: #141414; border-radius: 30px; padding: 25px; border: 1px solid #222; }
-.z-card-small { background: #141414; border-radius: 30px; padding: 30px; border: 1px solid #222; text-align: center; transition: 0.3s; }
-.z-card-small:hover { border-color: #E5C453; transform: translateY(-5px); }
-
-.z-card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-.z-card-header i, .z-card-small i { color: #E5C453; font-size: 24px; }
-
-.z-card-titles label, .z-card-small label { display: block; color: #555; font-size: 10px; font-weight: 800; letter-spacing: 2px; }
-.z-card-titles span, .z-card-small span { font-size: 16px; color: #fff; font-weight: 500; }
-
-/* MAPA */
-.z-map-frame { margin-top: 15px; background: #000; border-radius: 15px; overflow: hidden; border: 1px solid #333; }
-
-.z-footer-verify { text-align: center; margin-top: 60px; color: #333; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; }
-
-@media (max-width: 800px) { .z-card-large { grid-column: span 1; } }
+.z-btn-action {
+    background: #E5C453;
+    color: #000;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-weight: 800;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 15px;
+}
     </style>
 </head>
 
@@ -1041,66 +1043,50 @@
     </div>
 
 <div id="empresa-tab" class="tab-content" style="display: none;">
-    <div class="zippy-premium-full">
-        
-        <header class="z-header-hero">
-            <div class="z-glass-wrapper">
-                <div class="z-logo-border">
-                    <img id="perfil-logo" src="" alt="Logo" referrerpolicy="no-referrer">
-                </div>
-                <h1 id="perfil-nombre" class="z-main-title"></h1>
-                <p id="perfil-eslogan" class="z-sub-gold"></p>
-                <div id="perfil-publicidad" class="z-banner-promo"></div>
+   <div class="zippy-modern-full">
+    <div class="z-banner-header">
+        <div class="z-glass-identity">
+            <div style="width: 120px; height: 120px; background: white; border-radius: 50%; margin: 0 auto 20px; padding: 10px;">
+                <img id="perfil-logo" src="" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;">
             </div>
-        </header>
-
-        <section class="z-section-clean">
-            <div class="z-divider"><span>Nuestra Esencia</span></div>
-            <div class="z-text-container">
-                <p id="perfil-descripcion"></p>
-            </div>
-        </section>
-
-        <section class="z-grid-container">
-            
-            <div class="z-card-large">
-                <div class="z-card-header">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div class="z-card-titles">
-                        <label>Ubicación Física</label>
-                        <span id="perfil-direccion"></span>
-                    </div>
-                </div>
-                <div id="mapa-google-container" class="z-map-frame">
-                    <iframe id="google-map-iframe" width="100%" height="250" frameborder="0" style="border:0; border-radius: 15px;" allowfullscreen="" loading="lazy"></iframe>
-                </div>
-            </div>
-
-            <div class="z-card-small">
-                <i class="fas fa-phone-alt"></i>
-                <label>Línea Directa</label>
-                <span id="perfil-telefono">Cargando...</span>
-                <a id="btn-llamar" href="#" class="z-btn-gold">Llamar Ahora</a>
-            </div>
-
-            <div class="z-card-small">
-                <i class="fas fa-id-badge"></i>
-                <label>NIT / Identificación</label>
-                <span id="perfil-nit"></span>
-            </div>
-
-            <div class="z-card-small">
-                <i class="fas fa-envelope-open-text"></i>
-                <label>Email Oficial</label>
-                <span id="perfil-correo"></span>
-            </div>
-
-        </section>
-
-        <footer class="z-footer-verify">
-            <p><i class="fas fa-check-circle"></i> Establecimiento Verificado por Zippy</p>
-        </footer>
+            <h1 id="perfil-nombre" class="brand-title"></h1>
+            <p id="perfil-eslogan" class="glow-text"></p>
+        </div>
     </div>
+
+    <div style="padding: 60px 20px; text-align: center; background: #080808;">
+        <label style="color: #444; letter-spacing: 5px; font-size: 12px; font-weight: bold;">NUESTRA EMPRESA</label>
+        <p id="perfil-descripcion" style="max-width: 900px; margin: 20px auto; color: #ccc; font-size: 18px; line-height: 1.8; font-weight: 300;"></p>
+    </div>
+
+    <div class="z-container-cards">
+        <div class="z-card-premium" style="grid-column: span 2;">
+            <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
+                <i class="fas fa-map-marked-alt" style="color: #E5C453; font-size: 24px;"></i>
+                <div>
+                    <label style="color: #555; font-size: 10px; font-weight: 800; display: block;">DIRECCIÓN</label>
+                    <span id="perfil-direccion" style="color: white; font-weight: 600;"></span>
+                </div>
+            </div>
+            <iframe id="google-map-iframe" width="100%" height="300" frameborder="0" style="border-radius: 20px; border: 1px solid #333;"></iframe>
+        </div>
+
+        <div class="z-card-premium">
+            <i class="fas fa-phone-alt" style="color: #E5C453; font-size: 24px; margin-bottom: 15px;"></i>
+            <label style="color: #555; font-size: 10px; font-weight: 800; display: block;">CONTACTO</label>
+            <span id="perfil-telefono" style="color: white; font-size: 20px; font-weight: 800; display: block; margin: 10px 0;"></span>
+            <a id="btn-llamar" href="#" class="z-btn-action">LLAMAR AHORA</a>
+        </div>
+        
+        <div class="z-card-premium">
+            <i class="fas fa-file-contract" style="color: #E5C453; font-size: 24px; margin-bottom: 15px;"></i>
+            <label style="color: #555; font-size: 10px; font-weight: 800; display: block;">NIT REGISTRO</label>
+            <span id="perfil-nit" style="color: white; font-size: 18px; font-weight: 600;"></span>
+            <label style="color: #555; font-size: 10px; font-weight: 800; display: block; margin-top: 20px;">CORREO</label>
+            <span id="perfil-correo" style="color: white; font-size: 14px;"></span>
+        </div>
+    </div>
+</div>
 </div>
 
     <div class="footer">
@@ -1855,72 +1841,46 @@ if (inputBusquedaNav) {
 function llenarPestañaEmpresa(data) {
     if (!data) return;
 
-    // 1. GESTIÓN DEL LOGO (Mantiene tu lógica de seguridad y proxy)
+    // Actualizamos variable global por si la necesitas en pedidos
+    telefonoEmpresa = data.telefono || "";
+
+    // 1. LOGO Y TEXTOS PRINCIPALES
     const imgElement = document.getElementById('perfil-logo');
-    if (imgElement) {
-        const idLogo = data.urlLogo || ""; 
-        if (idLogo.trim() !== "") {
-            const urlFinal = `https://drive.google.com/uc?export=view&id=${idLogo}`;
-            imgElement.setAttribute('referrerpolicy', 'no-referrer');
-            imgElement.src = urlFinal;
-            imgElement.onload = () => { imgElement.style.opacity = '1'; };
-            imgElement.onerror = () => { 
-                imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`; 
-            };
-        }
+    if (imgElement && data.urlLogo) {
+        const urlFinal = `https://drive.google.com/uc?export=view&id=${data.urlLogo}`;
+        imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`;
     }
 
-    // 2. TEXTOS BÁSICOS (Títulos y Subtítulos)
-    document.getElementById('perfil-nombre').innerText = data.nombreEmpresa || '';
+    document.getElementById('perfil-nombre').innerText = data.nombreEmpresa || 'Mi Tienda';
     document.getElementById('perfil-eslogan').innerText = data.eslogan || '';
     document.getElementById('perfil-descripcion').innerText = data.descripcionEmpresa || '';
-    
-    // 3. DATOS TÉCNICOS (NIT, Admin, Correo)
-    document.getElementById('perfil-nit').innerText = data.nit || 'N/A';
-    document.getElementById('perfil-admin').innerText = data.administrador || 'No asignado';
-    document.getElementById('perfil-correo').innerText = data.correo || '';
 
-    // 4. MAPA DE GOOGLE DINÁMICO
-    // Tomamos dirección y ciudad para generar el mapa automáticamente
-    const direccionCompleta = `${data.direccion || ''}, ${data.ciudad || ''}`;
-    const elDireccion = document.getElementById('perfil-direccion');
+    // 2. MAPA DE GOOGLE (Caja con dirección)
+    const direccionFull = `${data.direccion || ''}, ${data.ciudad || ''}`;
+    const mapIframe = document.getElementById('google-map-iframe');
     
-    if (elDireccion) {
-        elDireccion.innerText = direccionCompleta;
-        
-        // Solo cargamos el mapa si hay una dirección válida
-        if (data.direccion) {
-            const mapaIframe = document.getElementById('google-map-iframe');
-            if (mapaIframe) {
-                const query = encodeURIComponent(direccionCompleta);
-                // URL oficial de Google Maps para embeber sin API Key
-                mapaIframe.src = `https://maps.google.com/maps?q=${query}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-            }
-        }
+    if (mapIframe && data.direccion) {
+        const query = encodeURIComponent(direccionFull);
+        mapIframe.src = `https://www.google.com/maps/embed/v1/place?key=TU_API_KEY_AQUI&q=${query}`;
+        // Nota: Si no tienes API Key de Maps, usa esta alternativa gratuita:
+        mapIframe.src = `https://maps.google.com/maps?q=${query}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
     }
+    
+    document.getElementById('perfil-direccion').innerText = direccionFull;
 
-    // 5. TELÉFONO Y BOTÓN DE LLAMADA
-    const telefono = data.telefono || "";
+    // 3. BOTÓN DE TELÉFONO (Estilo Premium)
     const elTelefono = document.getElementById('perfil-telefono');
     const btnLlamar = document.getElementById('btn-llamar');
-
-    if (elTelefono) elTelefono.innerText = telefono || 'Sin teléfono';
     
-    if (btnLlamar) {
-        if (telefono) {
-            btnLlamar.href = `tel:${telefono}`;
-            btnLlamar.style.display = 'inline-block';
-        } else {
-            btnLlamar.style.display = 'none';
-        }
+    if (elTelefono) elTelefono.innerText = telefonoEmpresa || 'No disponible';
+    if (btnLlamar && telefonoEmpresa) {
+        btnLlamar.href = `tel:${telefonoEmpresa}`;
+        btnLlamar.style.display = 'inline-block';
     }
 
-    // 6. BANNER DE PUBLICIDAD
-    const elPublicidad = document.getElementById('perfil-publicidad');
-    if (elPublicidad) {
-        elPublicidad.innerText = data.publicidad || '';
-        elPublicidad.style.display = data.publicidad ? 'inline-block' : 'none';
-    }
+    // 4. OTROS DATOS
+    document.getElementById('perfil-nit').innerText = data.nit || 'N/A';
+    document.getElementById('perfil-correo').innerText = data.correo || '';
 }
 </script>
 </body>
