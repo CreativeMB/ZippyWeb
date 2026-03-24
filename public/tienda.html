@@ -574,31 +574,42 @@
             }
         }
 
-        /* --- ESTILOS DEL NUEVO MENÚ --- */
+/* --- 1. BARRA PRINCIPAL (NAV) --- */
 .tabs-container {
     display: flex;
-    background: #1a1a1a; /* Fondo oscuro elegante */
-    border-bottom: 2px solid #E5C453; /* Línea dorada que combina con Zippy */
+    align-items: center;
+    justify-content: space-between;
+    background: #1a1a1a;
+    border-bottom: 2px solid #E5C453;
     position: sticky;
     top: 0;
-    z-index: 1100; /* Por encima de todo */
+    z-index: 1100;
+    padding: 0 15px;
+    height: 65px;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* --- 2. GRUPO DE PESTAÑAS (IZQUIERDA) --- */
+.tabs-left {
+    display: flex;
+    flex: 0 0 auto;
+    height: 100%;
 }
 
 .tab-item {
-    flex: 1;
-    text-align: center;
-    padding: 15px;
+    padding: 0 15px;
     color: #ffffff;
     font-weight: bold;
     cursor: pointer;
     transition: 0.3s;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     text-transform: uppercase;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    height: 100%;
 }
 
 .tab-item i {
@@ -606,11 +617,76 @@
 }
 
 .tab-item.active {
-    background: #E5C453; /* Color dorado activo */
+    background: #E5C453;
     color: #000;
 }
 
-/* --- ESTILOS DE LA TARJETA DE EMPRESA --- */
+/* --- 3. BUSCADOR INTEGRADO (CENTRO) --- */
+.search-nav-container {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+    margin: 0 15px;
+    min-width: 120px;
+}
+
+.search-input-nav {
+    width: 100%;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 20px;
+    padding: 8px 15px 8px 35px;
+    color: white;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    transition: 0.3s;
+}
+
+.search-input-nav:focus {
+    border-color: #E5C453;
+    background: #333;
+}
+
+.search-icon-nav {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 14px;
+}
+
+/* --- 4. REDES SOCIALES (DERECHA) --- */
+.redes-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.icono-nav {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.icono-nav i {
+    font-size: 16px;
+    color: white;
+}
+
+.icono-nav.facebook:hover { background: #1877F2; border-color: #1877F2; transform: translateY(-2px); }
+.icono-nav.whatsapp:hover { background: #25D366; border-color: #25D366; transform: translateY(-2px); }
+
+/* --- 5. TARJETA DE EMPRESA Y CONTENIDOS --- */
 .perfil-empresa-card {
     background: white;
     border-radius: 20px;
@@ -630,62 +706,91 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Ajuste para que el buscador no tape el menú */
-.search-flotante {
-    z-index: 1050;
-}
-/* --- CONTENEDOR DE REDES EN LA NAV --- */
-.redes-nav {
-    display: flex;
-    align-items: center;
-    gap: 10px;          /* Espacio entre los dos iconos */
-    padding-right: 15px; /* Separación del borde derecho */
-}
+/* --- 6. RESPONSIVE (MÓVILES) --- */
+@media screen and (max-width: 600px) {
+    .tabs-container {
+        padding: 0 10px;
+    }
+    
+    .tab-item span { 
+        display: none; /* Solo iconos en móvil para ahorrar espacio */
+    }
 
-/* --- ESTILO DE CADA ICONO INDIVIDUAL --- */
-.icono-nav {
-    width: 34px;
-    height: 34px;
+    .tab-item {
+        padding: 0 12px;
+    }
+
+    .search-nav-container {
+        margin: 0 8px;
+        min-width: 80px;
+    }
+
+    .search-input-nav {
+        font-size: 12px;
+        padding-left: 30px;
+    }
+}
+        
+        /* --- BOTÓN FLOTANTE DE WHATSAPP --- */
+.whatsappbtnflotante {
+    position: fixed;
+    bottom: 20px;       /* Distancia desde abajo */
+    right: 20px;        /* Distancia desde la derecha */
+    width: 60px;
+    height: 60px;
+    background-color: #25d366; /* Verde oficial de WhatsApp */
+    color: #fff;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 30px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Sombra elegante */
+    z-index: 2000;      /* Asegura que esté por encima de todo */
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    text-decoration: none;
     transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.1); /* Círculo sutil */
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: pulse-green 2s infinite; /* Animación de pulso */
 }
 
-.icono-nav i {
-    font-size: 16px;
-    color: white; /* Icono blanco por defecto */
+/* Efecto al pasar el mouse */
+.whatsappbtnflotante:hover {
+    transform: scale(1.1); /* Agranda un poquito */
+    background-color: #20ba5a;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* --- COLORES DE MARCA AL PASAR EL MOUSE (HOVER) --- */
-.icono-nav.facebook:hover {
-    background: #1877F2;
-    border-color: #1877F2;
-    transform: translateY(-2px); /* Pequeño salto hacia arriba */
+/* Estilo de la imagen dentro del botón */
+.whatsappbtnflotante img {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
 }
 
-.icono-nav.whatsapp:hover {
-    background: #25D366;
-    border-color: #25D366;
-    transform: translateY(-2px);
+/* Animación de pulso sutil */
+@keyframes pulse-green {
+    0% {
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+    }
 }
 
-/* --- AJUSTE PARA LA BARRA PRINCIPAL --- */
-.tabs-container {
-    display: flex;
-    justify-content: space-between; /* Empuja las pestañas a un lado y redes al otro */
-    align-items: center;
-    background: #1a1a1a;
-    height: 60px;
-    position: sticky;
-    top: 0;
-    z-index: 1100;
+/* Ajuste para móviles (opcional, por si quieres que sea más pequeño) */
+@media screen and (max-width: 767px) {
+    .whatsappbtnflotante {
+        width: 55px;
+        height: 55px;
+        bottom: 15px;
+        right: 15px;
+    }
+    .whatsappbtnflotante img {
+        width: 30px;
+    }
 }
-
         /* ========================================= */
         /* 8 DISEÑO PARA MÓVIL (PANTALLAS PEQUEÑAS)    */
         /* ========================================= */
@@ -750,131 +855,6 @@
                 border-radius: 10px !important;
             }
         }
-
-     /* --- BARRA PRINCIPAL --- */
-.tabs-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Distribuye: Izquierda, Centro, Derecha */
-    background: #1a1a1a;
-    border-bottom: 2px solid #E5C453;
-    position: sticky;
-    top: 0;
-    z-index: 1100;
-    padding: 0 15px;
-    height: 65px;
-    box-sizing: border-box; /* Evita que el padding sume al ancho */
-}
-
-/* --- GRUPO DE PESTAÑAS (IZQUIERDA) --- */
-.tabs-left {
-    display: flex;
-    flex: 0 0 auto; /* No crece, no se encoge */
-}
-
-/* --- ESTILO DEL BUSCADOR (CENTRO) --- */
-.search-nav-container {
-    position: relative;
-    flex: 1;           /* Toma el espacio sobrante en medio */
-    max-width: 400px;  /* Pero no más de 400px en PC */
-    margin: 0 20px;    /* Espacio a los lados para no chocar */
-    min-width: 150px;  /* Para que no desaparezca en pantallas medianas */
-}
-
-.search-input-nav {
-    width: 100%;
-    background: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 20px;
-    padding: 8px 15px 8px 35px;
-    color: white;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-/* --- REDES NAV (DERECHA) --- */
-.redes-nav {
-    display: flex;
-    flex: 0 0 auto; /* Se queda fijo a la derecha */
-    gap: 10px;
-}
-
-/* --- RESPONSIVE PARA CELULARES --- */
-@media screen and (max-width: 600px) {
-    .tabs-container {
-        padding: 0 8px; /* Menos padding en los bordes */
-    }
-    
-    .tab-item span { 
-        display: none; /* Oculta texto 'Tienda'/'Empresa' para ganar espacio */
-    }
-
-    .search-nav-container {
-        margin: 0 10px;
-        max-width: none; /* Deja que el flex:1 controle el tamaño */
-    }
-}
-        
-        /* --- BOTÓN FLOTANTE DE WHATSAPP --- */
-.whatsappbtnflotante {
-    position: fixed;
-    bottom: 20px;       /* Distancia desde abajo */
-    right: 20px;        /* Distancia desde la derecha */
-    width: 60px;
-    height: 60px;
-    background-color: #25d366; /* Verde oficial de WhatsApp */
-    color: #fff;
-    border-radius: 50px;
-    text-align: center;
-    font-size: 30px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Sombra elegante */
-    z-index: 2000;      /* Asegura que esté por encima de todo */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    animation: pulse-green 2s infinite; /* Animación de pulso */
-}
-
-/* Efecto al pasar el mouse */
-.whatsappbtnflotante:hover {
-    transform: scale(1.1); /* Agranda un poquito */
-    background-color: #20ba5a;
-    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* Estilo de la imagen dentro del botón */
-.whatsappbtnflotante img {
-    width: 35px;
-    height: 35px;
-    object-fit: contain;
-}
-
-/* Animación de pulso sutil */
-@keyframes pulse-green {
-    0% {
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
-    }
-    70% {
-        box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
-    }
-}
-
-/* Ajuste para móviles (opcional, por si quieres que sea más pequeño) */
-@media screen and (max-width: 767px) {
-    .whatsappbtnflotante {
-        width: 55px;
-        height: 55px;
-        bottom: 15px;
-        right: 15px;
-    }
-    .whatsappbtnflotante img {
-        width: 30px;
-    }
-}
     </style>
 </head>
 
