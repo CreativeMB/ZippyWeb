@@ -514,8 +514,9 @@
         }
 
        
-
+/* ========================================= */
 /* --- 1. BARRA PRINCIPAL (NAV) --- */
+/* ========================================= */
 .tabs-container {
     display: flex;
     align-items: center;
@@ -526,7 +527,7 @@
     top: 0;
     z-index: 1100;
     padding: 0 15px;
-    height: 65px;
+    height: 75px; /* Barra más alta para dar aire al buscador */
     box-sizing: border-box;
     font-family: 'Montserrat', sans-serif;
 }
@@ -539,12 +540,12 @@
 }
 
 .tab-item {
-    padding: 0 15px;
+    padding: 0 20px;
     color: #ffffff;
     font-weight: bold;
     cursor: pointer;
     transition: 0.3s;
-    font-size: 13px;
+    font-size: 14px;
     text-transform: uppercase;
     display: flex;
     align-items: center;
@@ -562,14 +563,26 @@
     color: #000;
 }
 
+/* --- 3. BUSCADOR INTEGRADO (CENTRO) --- */
+.search-nav-container {
+    position: relative;
+    flex: 1 1 auto; /* Elástico: se acomoda al espacio disponible */
+    max-width: 500px;
+    margin: 0 15px;
+    height: 50px; /* Altura grande para el buscador */
+    display: flex;
+    align-items: center;
+}
+
 .search-input-nav {
     width: 100%;
+    height: 100%; /* Ocupa todo el alto del contenedor */
     background: #2a2a2a;
     border: 1px solid #444;
-    border-radius: 20px;
-    padding: 8px 15px 8px 35px;
+    border-radius: 12px;
+    padding: 0 15px 0 45px;
     color: white;
-    font-size: 14px;
+    font-size: 18px; /* Texto grande y legible */
     box-sizing: border-box;
     outline: none;
     transition: 0.3s;
@@ -578,28 +591,29 @@
 .search-input-nav:focus {
     border-color: #E5C453;
     background: #333;
+    box-shadow: 0 0 10px rgba(229, 196, 83, 0.2);
 }
 
 .search-icon-nav {
     position: absolute;
-    left: 12px;
+    left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #888;
-    font-size: 14px;
+    color: #E5C453; /* Lupa dorada */
+    font-size: 18px;
 }
 
 /* --- 4. REDES SOCIALES (DERECHA) --- */
 .redes-nav {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     flex: 0 0 auto;
 }
 
 .icono-nav {
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -611,7 +625,7 @@
 }
 
 .icono-nav i {
-    font-size: 16px;
+    font-size: 18px;
     color: white;
 }
 
@@ -637,72 +651,62 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
-/* --- 3. BUSCADOR INTEGRADO (CENTRO) --- */
-.search-nav-container {
-    position: relative;
-    /* flex-grow: 1 (crece), flex-shrink: 1 (se encoge), flex-basis: auto */
-    flex: 1 1 auto; 
-    max-width: 400px;  /* No deja que se vea gigante en monitores grandes */
-    min-width: 150px;  /* Espacio mínimo para que sea funcional en PC */
-    margin: 0 15px;
-    transition: all 0.3s ease; /* Para que el cambio de tamaño sea suave */
-}
 
+/* ========================================= */
 /* --- 6. RESPONSIVE (MÓVILES) --- */
+/* ========================================= */
 @media screen and (max-width: 600px) {
     .tabs-container {
-        padding: 0 5px; /* Reducimos padding lateral al mínimo */
-        height: 60px;   /* Un poco más compacta */
+        padding: 0 8px;
+        height: 70px; /* Mantener altura cómoda en móvil */
     }
     
-    /* Prioridad a las pestañas */
     .tabs-left {
-        flex: 2; /* Ocupa el doble de espacio que el buscador */
+        flex: 0 0 auto; /* Las pestañas ocupan solo lo que necesitan sus títulos */
     }
 
     .tab-item {
-        padding: 0 8px; /* Espacio mínimo entre pestañas */
-        gap: 4px;       /* Pegamos el icono al texto */
-    }
-
-    /* FORZAMOS QUE EL TEXTO SE VEA */
-    .tab-item span { 
-        display: inline-block !important; 
-        font-size: 11px; /* Letra pequeña para que quepa */
-        white-space: nowrap; /* Evita que el texto salte de línea */
-    }
-
-    .tab-item i {
-        font-size: 15px; /* Iconos un poco más pequeños */
-    }
-
-    /* BUSCADOR ULTRA COMPACTO */
-    .search-nav-container {
-        flex: 1; /* Se encoge para dar paso a los títulos */
-        margin: 0 5px;
-        min-width: 70px; /* Tamaño mínimo para que no desaparezca */
-        max-width: 110px; /* No dejamos que crezca más de esto */
-    }
-
-    .search-input-nav {
-        font-size: 11px;
-        padding: 6px 5px 6px 25px; /* Reducimos padding interno */
-        height: 32px;
-    }
-
-    .search-icon-nav {
-        left: 8px;
-        font-size: 11px;
-    }
-
-    /* REDES SOCIALES MÁS PEQUEÑAS */
-    .redes-nav {
+        padding: 0 10px;
         gap: 4px;
     }
 
+    /* Mantenemos el texto de las pestañas visible */
+    .tab-item span { 
+        display: inline-block !important; 
+        font-size: 12px;
+        white-space: nowrap; 
+    }
+
+    .tab-item i {
+        font-size: 16px;
+    }
+
+    /* BUSCADOR ELÁSTICO EN MÓVIL */
+    .search-nav-container {
+        flex: 1; /* Toma el espacio que dejen las pestañas y redes */
+        margin: 0 8px;
+        height: 45px; 
+        min-width: 80px; 
+        max-width: 160px; /* No deja que tape los títulos */
+    }
+
+    .search-input-nav {
+        font-size: 15px; /* Texto grande para evitar zoom en iPhone */
+        padding: 0 10px 0 35px;
+    }
+
+    .search-icon-nav {
+        left: 10px;
+        font-size: 14px;
+    }
+
+    .redes-nav {
+        gap: 5px;
+    }
+
     .icono-nav {
-        width: 28px;
-        height: 28px;
+        width: 32px;
+        height: 32px;
     }
 }
         
