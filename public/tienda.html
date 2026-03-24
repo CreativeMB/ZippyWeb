@@ -806,30 +806,26 @@
         <p style="margin-top:15px; font-weight:bold; color:#202020;">Cargando...</p>
     </div>
 
-    <div class="tabs-container">
-        <div style="display: flex; flex: 1;">
-            <div class="tab-item active" onclick="cambiarPestaña('productos-tab', this)">
-                <i class="fas fa-store"></i> Tienda
-            </div>
-            <div class="tab-item" onclick="cambiarPestaña('empresa-tab', this)">
-                <i class="fas fa-building"></i> Empresa
-            </div>
+   <div class="tabs-container">
+    <div class="tabs-left">
+        <div class="tab-item active" onclick="cambiarPestaña('productos-tab', this)">
+            <i class="fas fa-store"></i> <span>Tienda</span>
         </div>
+        <div class="tab-item" onclick="cambiarPestaña('empresa-tab', this)">
+            <i class="fas fa-building"></i> <span>Empresa</span>
+        </div>
+    </div>
 
-        <div class="search-nav-container">
+    <div class="search-nav-container">
         <i class="fas fa-search search-icon-nav"></i>
         <input type="text" id="contenedorBusqueda" class="search-input-nav" placeholder="Buscar...">
     </div>
 
-        <div class="redes-nav">
-            <a href="#" id="shareFB" target="_blank" class="icono-nav facebook">
-                <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="#" id="shareWA" target="_blank" class="icono-nav whatsapp">
-                <i class="fab fa-whatsapp"></i>
-            </a>
-        </div>
+    <div class="redes-nav">
+        <a href="#" id="shareFB" target="_blank" class="icono-nav facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" id="shareWA" target="_blank" class="icono-nav whatsapp"><i class="fab fa-whatsapp"></i></a>
     </div>
+</div>
 
     <div id="empresa-tab" class="tab-content" style="display: none; padding: 20px;">
         <div class="perfil-empresa-card">
