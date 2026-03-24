@@ -1071,24 +1071,14 @@ function iniciarCargaBase(slugBusqueda) {
     if (!slugBusqueda) return;
     
     const empresasRef = ref(db);
+    // Usamos get() primero para una carga rápida y luego onValue si es necesario
     get(empresasRef).then((snapshot) => {
         let empresaEncontrada = false;
         snapshot.forEach((child) => {
             const data = child.val();
-            
-            // Verificamos si este es el comercio que buscamos
             if (data.perfilempresa?.slug === slugBusqueda) {
                 empresaId = child.key;
                 empresaEncontrada = true;
-
-                // --- AGREGAR ESTO AQUÍ ---
-                // Enviamos los datos a la función que llena la nueva pestaña
-                llenarPestañaEmpresa(data.perfilempresa);
-                
-                // También actualizamos los links de compartir de la BARRA NUEVA
-                actualizarRedesNav(data.perfilempresa);
-                // -------------------------
-
                 validarYContinuar(data.perfilempresa, data);
             }
         });
@@ -1098,6 +1088,7 @@ function iniciarCargaBase(slugBusqueda) {
         }
     }).catch(err => console.error("Error en conexión Realtime:", err));
 }
+
     // --- 2. VALIDACIÓN DE EXPIRACIÓN ---
     function validarYContinuar(perfil, data) {
         if (!perfil.fechaExpiracion) {
