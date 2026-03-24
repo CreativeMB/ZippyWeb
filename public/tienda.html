@@ -834,6 +834,127 @@
                 border-radius: 10px !important;
             }
         }
+        /* --- DISEÑO PREMIUM PESTAÑA EMPRESA --- */
+.perfil-empresa-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 0 20px 50px 20px;
+}
+
+/* Tarjeta de Cabecera */
+.perfil-header-card {
+    background: #fff;
+    border-radius: 25px;
+    padding: 40px 20px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+    border-bottom: 5px solid #E5C453;
+    margin-bottom: 25px;
+}
+
+.perfil-logo-wrapper {
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 20px;
+    background: #fff;
+    border-radius: 50%;
+    padding: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
+}
+
+.perfil-logo-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.perfil-header-card h2 {
+    font-size: 28px;
+    color: #1a1a1a;
+    margin: 0;
+    font-weight: 800;
+}
+
+.eslogan-texto {
+    color: #888;
+    font-style: italic;
+    margin-top: 8px;
+    font-size: 16px;
+}
+
+/* Grid de Información */
+.perfil-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.info-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #f0f0f0;
+    transition: 0.3s;
+}
+
+.info-card.wide {
+    grid-column: 1 / -1;
+}
+
+.info-icon {
+    width: 45px;
+    height: 45px;
+    background: #fdf8e6;
+    color: #E5C453;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.info-text h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #aaa;
+    margin: 0 0 4px 0;
+    letter-spacing: 1px;
+}
+
+.info-text p {
+    font-size: 15px;
+    color: #333;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Sello de Seguridad Especial */
+.sello-zippy {
+    background: #1a1a1a !important;
+    border: none !important;
+}
+
+.sello-zippy .info-text h3, .sello-zippy .info-text p {
+    color: #fff;
+}
+
+.sello-zippy .info-icon {
+    background: #E5C453;
+    color: #000;
+}
+
+/* Ajustes para Móvil */
+@media (max-width: 600px) {
+    .perfil-header-card { padding: 30px 15px; }
+    .perfil-logo-wrapper { width: 100px; height: 100px; }
+    .perfil-header-card h2 { font-size: 22px; }
+}
     </style>
 </head>
 
@@ -962,7 +1083,62 @@
             </div>
         </div>
     </div>
+<div id="empresa-tab" class="tab-content" style="display: none;">
+    <div class="perfil-empresa-container">
+        
+        <div class="perfil-header-card">
+            <div class="perfil-logo-wrapper">
+                <img id="perfil-logo" src="" alt="Logo Empresa">
+            </div>
+            <h2 id="perfil-nombre">Cargando...</h2>
+            <p id="perfil-eslogan" class="eslogan-texto"></p>
+        </div>
 
+        <div class="perfil-info-grid">
+            
+            <div class="info-card wide">
+                <div class="info-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="info-text">
+                    <h3>Nuestra Historia</h3>
+                    <p id="perfil-descripcion">Cargando descripción detallada...</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="info-text">
+                    <h3>Ubicación</h3>
+                    <p id="perfil-direccion">Dirección no especificada</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
+                <div class="info-text">
+                    <h3>Línea de Atención</h3>
+                    <p id="perfil-telefono">Sin teléfono</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                <div class="info-text">
+                    <h3>Correo Electrónico</h3>
+                    <p id="perfil-correo">Sin correo</p>
+                </div>
+            </div>
+
+            <div class="info-card sello-zippy">
+                <div class="info-icon"><i class="fas fa-check-shield"></i></div>
+                <div class="info-text">
+                    <h3>Comercio Verificado</h3>
+                    <p>Esta tienda opera bajo la plataforma tecnológica de <strong>Zippy</strong>, garantizando la gestión de su pedido.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
     <div class="footer">
         <p id="descripcion" class="info-footer-elegante"></p>
         <p id="direccion" class="info-footer-elegante"></p>
