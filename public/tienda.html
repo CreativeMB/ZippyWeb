@@ -1226,10 +1226,20 @@ Swal.fire({
     return;
 }
 
-        const cliente = document.getElementById("celularComprador").value.trim();
-        const direccion = document.getElementById("direccionEntrega").value.trim();
-        const nombreComprador = document.getElementById("nombreComprador").value.trim();
-        const fechaOriginal = document.getElementById("fechaEntrega").value;
+       // --- 1. CAPTURAR TODOS LOS CAMPOS ---
+    const cliente = document.getElementById("celularComprador").value.trim();
+    const direccion = document.getElementById("direccionEntrega").value.trim();
+    const nombreComprador = document.getElementById("nombreComprador").value.trim();
+    const fechaOriginal = document.getElementById("fechaEntrega").value;
+    
+    const nombreDestinatario = document.getElementById("nombreDestinatario").value.trim();
+    const celularDestinatario = document.getElementById("celularDestinatario").value.trim();
+    const medioPago = document.getElementById("medioPago").value;
+    const horaEntrega = document.getElementById("horaEntrega").value;
+    const notasPedido = document.getElementById("notasPedido").value.trim();
+    const mensajeTarjeta = document.getElementById("mensajeTarjeta").value.trim();
+    const deTarjeta = document.getElementById("deTarjeta").value.trim();
+    const paraTarjeta = document.getElementById("paraTarjeta").value.trim();
 
         let fechaFormateada = "";
         if (fechaOriginal) {
