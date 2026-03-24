@@ -1638,30 +1638,36 @@ set(nuevoRef, pedidoData).then(() => {
     });
 
     // --- 3. LÓGICA DE BÚSQUEDA INTEGRADA EN LA NAV ---
-// Seleccionamos el input que está dentro de la barra negra
+let timeoutBusqueda;
 const inputBusquedaNav = document.getElementById('contenedorBusqueda');
 
 if (inputBusquedaNav) {
     inputBusquedaNav.addEventListener('input', (e) => {
-        const texto = e.target.value.toLowerCase().trim();
+        // DEBOUNCE: Espera 100ms después de que dejas de escribir para procesar
+        // Esto evita que el navegador se trabe en cada tecla
+        clearTimeout(timeoutBusqueda);
         
-        // Buscamos todas las tarjetas de productos
-        document.querySelectorAll('.producto').forEach(card => {
-            // Buscamos el nombre dentro de la tarjeta
-            const nombreElemento = card.querySelector('.nombre');
-            
-            if (nombreElemento) {
-                const nombre = nombreElemento.innerText.toLowerCase();
-                
-                // Si el nombre incluye lo que escribimos, mostramos la tarjeta
-                // Usamos 'flex' porque tus productos suelen usar ese display para alinearse
-                if (nombre.includes(texto)) {
-                    card.style.display = 'flex'; 
-                } else {
-                    card.style.display = 'none';
-                }
-            }
-        });
+        timeoutBusqueda = setTimeout(() => {
+            const texto = e.target.value.toLowerCase().trim();
+            const productos = document.querySelectorAll('.producto');
+
+            // Usamos un fragmento de memoria para que sea más rápido
+            requestAnimationFrame(() => {
+                productos.forEach(card => {
+                    const nombreElemento = card.querySelector('.nombre');
+                    if (nombreElemento) {
+                        const coincide = nombreElemento.innerText.toLowerCase().includes(texto);
+                        
+                        // Solo cambiamos el estilo si es estrictamente necesario
+                        // (esto ahorra mucha energía al procesador)
+                        const displayActual = coincide ? 'flex' : 'none';
+                        if (card.style.display !== displayActual) {
+                            card.style.display = displayActual;
+                        }
+                    }
+                });
+            });
+        }, 100); // 100 milisegundos de espera
     });
 }
 
