@@ -1724,7 +1724,7 @@ function enviarPedido() {
     // 3. PROCESAMIENTO DE DATOS
     let fechaFormateada = "";
     if (campos.fechaOriginal) {
-        const partes = campos.fechaOriginal.split("-"); 
+        const partes = campos.fechaOriginal.split("/"); 
         fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
 
