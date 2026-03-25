@@ -1418,49 +1418,30 @@ function procesarProductoDirecto() {
     const productoUrl = urlParams.get('producto'); 
     if (!productoUrl) return;
 
-    // 1. Limpieza de URL
     const buscadoOriginal = decodeURIComponent(productoUrl).trim().toLowerCase();
     const buscadoADN = buscadoOriginal.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
 
-    if (buscadoADN.length < 2) return; // Evitamos búsquedas vacías
-
-    console.log("🔍 Buscando match para:", buscadoOriginal);
+    if (buscadoADN.length < 2) return;
 
     let mejorMatch = null;
-
-    // 2. BUSQUEDA EN DOS PASOS
     const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
 
-    // PASO A: Intentar coincidencia EXACTA (para evitar confundir 'est' con 'estuche')
-    let matchExacto = listaRefs.find(ref => {
-        const refLimpia = ref.trim().toLowerCase();
-        return refLimpia === buscadoOriginal;
-    });
+    let matchExacto = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
 
     if (matchExacto) {
         mejorMatch = matchExacto;
-        console.log("🎯 Coincidencia exacta encontrada!");
     } else {
-        // PASO B: Si no hay exacta, buscamos por ADN (pero con filtro de longitud)
         mejorMatch = listaRefs.find(ref => {
             const refADN = ref.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
-            
-            // Si lo que buscamos es muy corto (ej: "est"), pedimos que sean IGUALES
-            if (buscadoADN.length <= 3) {
-                return refADN === buscadoADN;
-            }
-            // Si es largo (ej: "estuche a4"), permitimos que esté contenido
+            if (buscadoADN.length <= 3) return refADN === buscadoADN;
             return refADN.includes(buscadoADN) || buscadoADN.includes(refADN);
         });
     }
 
-    // 3. DISPARAR MODAL
     if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
         const refFinal = mejorMatch;
         const real = productosRealtime[refFinal.trim().toLowerCase()];
         const imgOriginal = productosJson[refFinal];
-
-        console.log("✅ Abriendo producto correcto:", refFinal);
 
         setTimeout(() => {
             if (typeof abrirProducto === 'function') {
@@ -1472,10 +1453,14 @@ function procesarProductoDirecto() {
 
                 const modal = document.getElementById('modalPedido');
                 if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // --- SOLUCIÓN: LIMPIAR LA URL DESPUÉS DE ABRIR ---
+                // Esto quita el "?producto=..." de la barra de direcciones sin recargar la página
+                const nuevaUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, nuevaUrl);
+                console.log("🧹 URL Limpiada para evitar re-apertura.");
             }
         }, 1800);
-    } else {
-        console.warn("❌ No se encontró un match confiable para:", buscadoOriginal);
     }
 }
 
