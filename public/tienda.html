@@ -1800,7 +1800,7 @@ function enviarPedido() {
             );
 
             const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
-// 3. Disparamos la Alerta Persistente
+    // 3. Disparamos la Alerta Persistente
             Swal.fire({
                 icon: 'success',
                 title: `Señor(a) ${campos.nombreComprador || 'Cliente'}`,
@@ -1843,21 +1843,6 @@ function enviarPedido() {
                         }
                     });
 
-                    // Desbloqueo y reset de variables
-                    document.body.style.overflow = 'auto';
-                    document.body.style.pointerEvents = 'auto';
-                    productoSeleccionado = "";
-                    imagenProducto = "";
-                    btn.disabled = false;
-                    btn.innerText = "Enviar Pedido";
-                }
-            });
-
-        }).catch(err => {
-            btn.disabled = false;
-            btn.innerText = "Enviar Pedido";
-            alert("Error al guardar: " + err.message);
-        });
                     // Desbloqueo de interfaz
                     document.body.style.overflow = 'auto';
                     document.body.style.pointerEvents = 'auto';
