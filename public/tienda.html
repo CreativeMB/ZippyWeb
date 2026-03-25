@@ -1417,7 +1417,6 @@ function iniciarCargaBase(slugDesdeURL) {
         if(loader) loader.style.display = 'none';
     });
 }
-
 function procesarProductoDirecto(productosRecibidos) {
     if (!productosRecibidos) return;
 
@@ -1429,45 +1428,43 @@ function procesarProductoDirecto(productosRecibidos) {
     const buscado = String(productoUrl).trim().toLowerCase();
     const listaProductos = Object.values(productosRecibidos);
     
-    // 1. Buscamos el match
+    // 1. Buscamos el objeto real en la data de Firebase
     const encontrado = listaProductos.find(p => {
         const refProd = String(p.referencia || p.Referencia || "").toLowerCase();
         const nomProd = String(p.nombre || "").toLowerCase();
-        return (refProd.includes(buscado) || nomProd.includes(buscado));
+        return (refProd === buscado || nomProd === buscado);
     });
 
     if (encontrado) {
-        console.log("✅ Match Real:", encontrado.nombre);
+        console.log("🚀 Producto detectado en URL. Activando Modal para:", encontrado.nombre);
         
-        // --- LA MAGIA PARA QUE SE VEA COMO EL BUSCADOR ---
-        // Buscamos tu input de búsqueda por su ID (cámbialo si es diferente)
-        const inputBuscador = document.getElementById('buscar-producto') || 
-                              document.getElementById('input-search') ||
-                              document.querySelector('input[type="text"]');
-
-        if (inputBuscador) {
-            // Ponemos el código A012 en la cajita de búsqueda
-            inputBuscador.value = productoUrl; 
-            
-            // DISPARAMOS EL EVENTO 'input' para que tu lógica de filtrado se active sola
-            inputBuscador.dispatchEvent(new Event('input', { bubbles: true }));
-            inputBuscador.dispatchEvent(new Event('keyup', { bubbles: true }));
-        }
-
+        // 2. Tiempo de espera (Importante para que el DOM esté construido)
         setTimeout(() => {
-            // 2. Ejecutar la apertura del formulario (seleccionar)
+            
+            // LLAMADA AL MODAL / FORMULARIO
+            // Aquí usamos la función que ya tienes vinculada a los clics de la tienda
             if (typeof seleccionarProducto === 'function') {
+                
+                // Ejecutamos la función como si el usuario hubiera hecho clic
                 seleccionarProducto(encontrado);
+                
+                console.log("✅ Modal activado correctamente.");
+
+                // 3. SCROLL SUAVE AL FORMULARIO
+                // Para que el usuario vea que algo se abrió abajo o el modal suba
+                const destino = document.getElementById('contenedor-formulario') || 
+                                document.getElementById('formulario') ||
+                                document.getElementById('detalle-producto');
+                                
+                if (destino) {
+                    destino.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+
+            } else {
+                console.error("❌ Error: La función 'seleccionarProducto' no está disponible.");
             }
 
-            // 3. Scroll automático
-            const destino = document.getElementById('contenedor-formulario') || 
-                            document.getElementById('formulario');
-                            
-            if (destino) {
-                destino.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 1200); 
+        }, 1500); // 1.5 segundos es el tiempo ideal para que cargue el catálogo
     }
 }
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
