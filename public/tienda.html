@@ -1417,6 +1417,7 @@ function iniciarCargaBase(slugDesdeURL) {
         if(loader) loader.style.display = 'none';
     });
 }
+
 function procesarProductoDirecto(productosRecibidos) {
     if (!productosRecibidos) return;
 
@@ -1426,52 +1427,58 @@ function procesarProductoDirecto(productosRecibidos) {
     if (!productoUrl) return;
 
     const buscado = String(productoUrl).trim().toLowerCase();
-    const listaProductos = Object.values(productosRecibidos);
     
-    // Buscamos el producto
-    const encontrado = listaProductos.find(p => {
-        const refProd = String(p.referencia || p.Referencia || p.referenciaReal || "").toLowerCase();
-        const nomProd = String(p.nombre || "").toLowerCase();
-        return (refProd === buscado || nomProd === buscado);
-    });
+    // 1. Buscamos la referencia en el JSON de imágenes (productosJson)
+    // para obtener la URL exacta que usa el render
+    let imgUrlFinal = "";
+    let referenciaExacta = "";
 
-    if (encontrado) {
-        console.log("🚀 Producto detectado: " + (encontrado.nombre || buscado));
-        
+    for (const refP in productosJson) {
+        if (refP === "images") continue;
+        if (refP.trim().toLowerCase() === buscado) {
+            imgUrlFinal = productosJson[refP];
+            referenciaExacta = refP;
+            break;
+        }
+    }
+
+    // 2. Buscamos los datos técnicos (precio, desc) en productosRealtime
+    const real = productosRealtime[buscado];
+
+    if (imgUrlFinal && real) {
+        console.log("🚀 Auto-seleccionando producto:", referenciaExacta);
+
         setTimeout(() => {
             if (typeof abrirProducto === 'function') {
                 
-                // --- CORRECCIÓN DE LA IMAGEN ---
-                // 1. Buscamos la URL en todas las posibles propiedades de tu objeto
-                let rutaImagen = encontrado.url || encontrado.imagen || encontrado.img || "";
-                
-                // 2. IMPORTANTE: Aplicamos 'normalizarImagen' igual que lo haces en el render()
-                // Esto asegura que la URL sea válida para el modal
-                if (typeof normalizarImagen === 'function' && rutaImagen) {
-                    rutaImagen = normalizarImagen(rutaImagen);
+                // Calculamos el precio igual que en tu render
+                let precioFinal = 0;
+                if (real.promocion && real.valorPromocion > 0) {
+                    precioFinal = real.valorPromocion;
+                } else {
+                    precioFinal = real.valor || 0;
                 }
 
-                // 3. Preparamos el resto de los datos
-                const refParaModal = encontrado.referenciaReal || encontrado.referencia || encontrado.Referencia || "Producto";
-                const precioParaModal = encontrado.valorPromocion || encontrado.valor || 0;
-                const descParaModal = (encontrado.descripcion || "Sin descripción").replace(/'/g, "\\'");
+                // Limpiamos descripción para evitar errores de JS
+                const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
+                const refProd = (real.referenciaReal || referenciaExacta).replace(/'/g, "\\'");
 
-                console.log("📸 Cargando imagen en modal:", rutaImagen);
+                // LLAMADA CLAVE: Usamos normalizarImagen igual que el render
+                const imgNormalizada = normalizarImagen(imgUrlFinal);
                 
-                // LLAMADA FINAL CON DATOS NORMALIZADOS
-                abrirProducto(refParaModal, rutaImagen, precioParaModal, descParaModal);
+                console.log("📸 Pasando imagen al modal:", imgNormalizada);
 
-                // 4. Scroll al modal para asegurar visibilidad
+                // Disparamos el modal con los 4 parámetros exactos
+                abrirProducto(refProd, imgNormalizada, precioFinal, descProd);
+
+                // Scroll para asegurar que el usuario vea el modal abierto
                 const modal = document.getElementById('modalPedido');
-                if (modal) {
-                    modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
+                if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            } else {
-                console.error("❌ La función 'abrirProducto' no está lista.");
             }
-
-        }, 2200); 
+        }, 2000);
+    } else {
+        console.warn("⚠️ No se pudo sincronizar la imagen con los datos de Realtime para:", buscado);
     }
 }
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
