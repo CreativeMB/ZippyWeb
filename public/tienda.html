@@ -1426,50 +1426,52 @@ function procesarProductoDirecto(productosRecibidos) {
     if (!productoUrl) return;
 
     const buscado = String(productoUrl).trim().toLowerCase();
-    
-    // 1. Buscamos el producto en el listado de Realtime
     const listaProductos = Object.values(productosRecibidos);
+    
+    // Buscamos el producto
     const encontrado = listaProductos.find(p => {
-        const refProd = String(p.referencia || p.Referencia || "").toLowerCase();
+        const refProd = String(p.referencia || p.Referencia || p.referenciaReal || "").toLowerCase();
         const nomProd = String(p.nombre || "").toLowerCase();
         return (refProd === buscado || nomProd === buscado);
     });
 
     if (encontrado) {
-        console.log("🚀 Producto detectado: " + encontrado.nombre);
+        console.log("🚀 Producto detectado: " + (encontrado.nombre || buscado));
         
-        // 2. Esperamos a que el render termine (2 segundos es ideal)
         setTimeout(() => {
-            
-            // Verificamos si la función abrirProducto existe
             if (typeof abrirProducto === 'function') {
                 
-                // Extraemos los datos exactos que tu función 'abrirProducto' necesita:
-                // abrirProducto(referencia, imgUrl, precio, descripcion)
+                // --- CORRECCIÓN DE LA IMAGEN ---
+                // 1. Buscamos la URL en todas las posibles propiedades de tu objeto
+                let rutaImagen = encontrado.url || encontrado.imagen || encontrado.img || "";
                 
-                const refParaModal = encontrado.referencia || encontrado.Referencia || "Producto";
-                const imgParaModal = encontrado.url || encontrado.imagen || ""; 
+                // 2. IMPORTANTE: Aplicamos 'normalizarImagen' igual que lo haces en el render()
+                // Esto asegura que la URL sea válida para el modal
+                if (typeof normalizarImagen === 'function' && rutaImagen) {
+                    rutaImagen = normalizarImagen(rutaImagen);
+                }
+
+                // 3. Preparamos el resto de los datos
+                const refParaModal = encontrado.referenciaReal || encontrado.referencia || encontrado.Referencia || "Producto";
                 const precioParaModal = encontrado.valorPromocion || encontrado.valor || 0;
-                const descParaModal = encontrado.descripcion || "Sin descripción";
+                const descParaModal = (encontrado.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
-                console.log("✅ Disparando modal de:", refParaModal);
+                console.log("📸 Cargando imagen en modal:", rutaImagen);
                 
-                // LLAMADA EXACTA A TU FUNCIÓN
-                abrirProducto(refParaModal, imgParaModal, precioParaModal, descParaModal);
+                // LLAMADA FINAL CON DATOS NORMALIZADOS
+                abrirProducto(refParaModal, rutaImagen, precioParaModal, descParaModal);
 
-                // 3. Scroll para que el usuario vea el modal o el formulario
-                const formulario = document.getElementById('modalPedido') || document.getElementById('formulario');
-                if (formulario) {
-                    formulario.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // 4. Scroll al modal para asegurar visibilidad
+                const modal = document.getElementById('modalPedido');
+                if (modal) {
+                    modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
 
             } else {
-                console.error("❌ La función 'abrirProducto' no existe en el scope global.");
+                console.error("❌ La función 'abrirProducto' no está lista.");
             }
 
-        }, 2000); 
-    } else {
-        console.warn("❌ No se encontró el producto: " + buscado);
+        }, 2200); 
     }
 }
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
