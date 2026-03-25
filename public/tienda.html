@@ -2011,37 +2011,70 @@ function llenarPestañaEmpresa(data) {
         }
     }
 
-   // 5. REDES SOCIALES (Detectando URL completa)
-    const contenedorRedes = document.getElementById('perfil-redes');
-    if (contenedorRedes) {
-        contenedorRedes.innerHTML = "";
-        
-        // Creamos un array con las redes que existan en tu data
-        // Ajusta los nombres de los campos según los tengas en Firebase
-        const redesDisponibles = [
-            { nombre: 'Facebook', url: data.linkFacebook },
-            { nombre: 'Instagram', url: data.linkInstagram },
-            { nombre: 'TikTok', url: data.linkTikTok }
-        ];
+   // ===== SECCIÓN REDES SOCIALES (Procesando lista de URLs) =====
+const contenedorRedes = document.getElementById('perfil-redes');
 
-        redesDisponibles.forEach(red => {
-            if (red.url && red.url.trim() !== "") {
+if (contenedorRedes) {
+    contenedorRedes.innerHTML = ""; // Limpiar antes de llenar
+    
+    // Obtenemos el string: "https://facebook.com/..., https://instagram.com/..."
+    const redesStr = data.redesSociales || ""; 
+
+    if (redesStr.trim() !== "") {
+        // Separamos por la coma para tener un array de enlaces
+        const listaEnlaces = redesStr.split(',');
+
+        listaEnlaces.forEach(enlace => {
+            const url = enlace.trim();
+            if (url !== "") {
                 const aRed = document.createElement('a');
-                aRed.className = `red-item ${red.nombre.toLowerCase()}`;
-                aRed.href = red.url;
+                aRed.href = url;
                 aRed.target = "_blank";
                 
-                // Asignación de iconos de marca
-                let icono = "fa-share-alt";
-                if (red.nombre === 'Facebook') icono = "fab fa-facebook-f";
-                if (red.nombre === 'Instagram') icono = "fab fa-instagram";
-                if (red.nombre === 'TikTok') icono = "fab fa-tiktok";
+                // --- DETECCIÓN AUTOMÁTICA DE ICONO Y NOMBRE ---
+                let icono = "fa-link"; // Icono por defecto (un eslabón)
+                let nombreRed = "Enlace";
+                let claseRed = "generica";
 
-                aRed.innerHTML = `<i class="${icono}"></i> ${red.nombre}`;
+                const urlLower = url.toLowerCase();
+
+                if (urlLower.includes("facebook.com")) {
+                    icono = "fab fa-facebook-f";
+                    nombreRed = "Facebook";
+                    claseRed = "facebook";
+                } 
+                else if (urlLower.includes("instagram.com")) {
+                    icono = "fab fa-instagram";
+                    nombreRed = "Instagram";
+                    claseRed = "instagram";
+                } 
+                else if (urlLower.includes("tiktok.com")) {
+                    icono = "fab fa-tiktok";
+                    nombreRed = "TikTok";
+                    claseRed = "tiktok";
+                }
+                else if (urlLower.includes("youtube.com")) {
+                    icono = "fab fa-youtube";
+                    nombreRed = "YouTube";
+                    claseRed = "youtube";
+                }
+
+                // Asignamos la clase para el CSS
+                aRed.className = `red-item ${claseRed}`;
+                
+                // Estructura interna
+                aRed.innerHTML = `<i class="${icono}"></i> ${nombreRed}`;
+                
                 contenedorRedes.appendChild(aRed);
             }
         });
+    } else {
+        // Si no hay nada, ocultamos el título de la sección
+        if(contenedorRedes.parentElement) {
+            contenedorRedes.parentElement.style.display = "none";
+        }
     }
+}
 
     // ===== DIRECCIÓN Y CIUDAD =====
     const direccionTexto = data.direccion || '';
