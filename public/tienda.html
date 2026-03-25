@@ -1413,23 +1413,25 @@ function iniciarCargaBase(slugDesdeURL) {
     });
 }
 
-
 function procesarProductoDirecto() {
     const urlParams = new URLSearchParams(window.location.search);
     const productoUrl = urlParams.get('producto'); 
 
     if (!productoUrl) return;
 
-    // 1. Limpiamos la clave de la URL
-    const claveBusqueda = String(productoUrl).trim().toLowerCase();
+    // 1. DECODIFICAMOS: Convierte %20 en espacios, %C3%B3 en ó, etc.
+    // Luego limpiamos espacios al inicio/final y pasamos a minúsculas
+    const claveBusqueda = decodeURIComponent(productoUrl).trim().toLowerCase();
     
-    // 2. BUSQUEDA DINÁMICA (No solo A012)
+    console.log("🔍 Buscando producto decodificado:", claveBusqueda);
+
+    // 2. Buscamos la imagen en productosJson
     let imgUrlOriginal = "";
     let referenciaEncontrada = "";
 
-    // Buscamos en el JSON de imágenes que ya cargaste
     for (const refP in productosJson) {
         if (refP === "images") continue;
+        // También limpiamos la referencia de la base de datos para comparar
         if (refP.trim().toLowerCase() === claveBusqueda) {
             imgUrlOriginal = productosJson[refP];
             referenciaEncontrada = refP;
@@ -1437,36 +1439,35 @@ function procesarProductoDirecto() {
         }
     }
 
-    // 3. Buscamos los datos técnicos
+    // 3. Buscamos los datos en productosRealtime
     const real = productosRealtime[claveBusqueda];
 
-    // VERIFICACIÓN DE SEGURIDAD
-    if (!real || !imgUrlOriginal) {
-        console.warn("⚠️ Los datos de '" + claveBusqueda + "' aún no están listos en memoria.");
-        return; 
-    }
-
-    console.log("🚀 Producto detectado: " + referenciaEncontrada);
-
-    // 4. Disparamos el Modal
-    if (typeof abrirProducto === 'function') {
-        let precioFinal = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
-        const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
-        const refProd = (real.referenciaReal || referenciaEncontrada).replace(/'/g, "\\'");
-
-        // USAMOS TU NORMALIZADOR
-        const imgNormalizada = normalizarImagen(imgUrlOriginal);
-
-        // Llamada idéntica al onclick del render
-        abrirProducto(refProd, imgNormalizada, precioFinal, descProd);
-
-        // Scroll suave
+    if (imgUrlOriginal && real) {
         setTimeout(() => {
-            const modal = document.getElementById('modalPedido');
-            if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 500);
+            if (typeof abrirProducto === 'function') {
+                
+                let precioFinal = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
+                const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
+                const refProd = real.referenciaReal || referenciaEncontrada;
+                
+                // Normalizamos la imagen igual que en el render
+                const imgParaModal = normalizarImagen(imgUrlOriginal);
+
+                console.log("✅ ¡Match encontrado! Abriendo:", refProd);
+                abrirProducto(refProd, imgParaModal, precioFinal, descProd);
+
+                // Scroll al modal
+                const modal = document.getElementById('modalPedido');
+                if (modal) {
+                    modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }, 1500); 
+    } else {
+        console.warn("⚠️ No se encontró match para:", claveBusqueda);
     }
 }
+
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
 function configurarRedesNav(perfil) {
     const fbLink = document.getElementById('shareFB');
