@@ -684,23 +684,18 @@ body {
         
         /* --- BOTÓN FLOTANTE DE WHATSAPP --- */
 .whatsappbtnflotante {
-    position: fixed;
-    bottom: 20px;       /* Distancia desde abajo */
-    right: 20px;        /* Distancia desde la derecha */
+    position: fixed !important; /* Mantiene el botón en la esquina de la pantalla */
+    bottom: 20px;
+    right: 20px;
     width: 60px;
     height: 60px;
-    background-color: #25d366; /* Verde oficial de WhatsApp */
-    color: #fff;
-    border-radius: 50px;
-    text-align: center;
-    font-size: 30px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Sombra elegante */
-    z-index: 2000;      /* Asegura que esté por encima de todo */
-    display: flex;
-    align-items: center;
+    background-color: #25d366;
+    border-radius: 50%;
+    display: flex !important; /* Obligatorio para que se vea */
     justify-content: center;
-    transition: all 0.3s ease;
-    animation: pulse-green 2s infinite; /* Animación de pulso */
+    align-items: center;
+    z-index: 999999; /* Por encima de todo */
+    animation: pulse-green 2s infinite;
 }
 
 /* Efecto al pasar el mouse */
@@ -1968,17 +1963,6 @@ if (inputBusquedaNav) {
         } else {
             buscador.style.opacity = '1';
             buscador.style.pointerEvents = 'auto';
-        }
-    }
-// 5. CONTROL DEL BOTÓN WHATSAPP (Ajuste de Seguridad)
-    const btnFlotante = document.getElementById('btnWhats'); 
-    if (btnFlotante) {
-        if (tabId === 'productos-tab') {
-            // FORZAMOS QUE APAREZCA EN TIENDA
-            btnFlotante.style.setProperty('display', 'flex', 'important');
-        } else {
-            // LO OCULTAMOS EN EMPRESA
-            btnFlotante.style.setProperty('display', 'none', 'important');
         }
     }
 };
