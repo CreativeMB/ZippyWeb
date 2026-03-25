@@ -1386,7 +1386,8 @@ function iniciarCargaBase(slugBusqueda) {
                 console.log("🎯 Empresa encontrada en Firebase:", data.perfilempresa.nombreEmpresa);
                 empresaId = child.key;
                 empresaEncontrada = true;
-
+// LLAMADA A LA NUEVA FUNCIÓN
+    procesarProductoDirecto(data.productos);
                 // --- DISPARO DEL SEO ---
                 aplicarSEO(data.perfilempresa);
 
@@ -1405,7 +1406,35 @@ function iniciarCargaBase(slugBusqueda) {
         }
     }).catch(err => console.error("❌ Error en conexión Realtime:", err));
 }
+function procesarProductoDirecto(productosRecibidos) {
+    // 1. Capturamos el parámetro "producto" de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productoURL = urlParams.get('producto');
 
+    if (productoURL) {
+        // Limpiamos el nombre: cambiamos guiones por espacios y pasamos a minúsculas
+        const nombreBuscado = productoURL.replace(/-/g, ' ').toLowerCase();
+
+        // 2. Buscamos el producto en el objeto que llegó de Firebase
+        const encontrado = Object.values(productosRecibidos).find(p => 
+            p.nombreProducto.toLowerCase() === nombreBuscado
+        );
+
+        if (encontrado) {
+            console.log("✅ Producto auto-seleccionado:", encontrado.nombreProducto);
+            
+            // 3. Ejecutamos la función que ya usas cuando alguien toca la imagen
+            // Cámbiala por el nombre exacto de tu función (ej: verDetalle, seleccionar, etc.)
+            abrirDetalleProducto(encontrado);
+
+            // 4. Scroll automático para que el cliente vea el formulario de datos
+            setTimeout(() => {
+                const seccionForm = document.getElementById('contenedor-formulario'); 
+                if(seccionForm) seccionForm.scrollIntoView({ behavior: 'smooth' });
+            }, 500);
+        }
+    }
+}
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
 function configurarRedesNav(perfil) {
     const fbLink = document.getElementById('shareFB');
