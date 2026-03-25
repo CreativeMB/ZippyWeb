@@ -2009,9 +2009,16 @@ function formatearFechaBD(fechaHora) {
 
     let date;
 
-    // 1. PROCESAMIENTO DE ENTRADA (Mantenemos tu lógica intacta)
-    // YYYY-MM-DD HH:mm
-    if (typeof fechaHora === 'string' && fechaHora.includes(' ')) {
+    // --- 1. PROCESAMIENTO DE ENTRADA (Lectura) ---
+    
+    // NUEVO: Si la fecha ya viene con barras (ej: "25/03/2026")
+    if (typeof fechaHora === 'string' && fechaHora.includes('/') && !fechaHora.includes('-')) {
+        const [d, m, y] = fechaHora.split('/');
+        // Creamos el objeto fecha (Mes - 1 porque en JS enero es 0)
+        date = new Date(y, m - 1, d);
+    }
+    // YYYY-MM-DD HH:mm (Mantenemos tu lógica original)
+    else if (typeof fechaHora === 'string' && fechaHora.includes(' ')) {
         const [f, h] = fechaHora.split(' ');
         const [y, m, d] = f.split('-');
         const [hh = '00', mm = '00'] = h.split(':');
@@ -2029,18 +2036,17 @@ function formatearFechaBD(fechaHora) {
 
     if (isNaN(date)) return '';
 
-    // 2. EXTRACCIÓN DE COMPONENTES
+    // --- 2. FORMATEO DE SALIDA (Visualización) ---
+    
     const diaNombre = date.toLocaleDateString('es-CO', { weekday: 'long' });
 
-    // Obtenemos la fecha base (aquí es donde pueden aparecer guiones)
     const fechaBase = date.toLocaleDateString('es-CO', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
     });
 
-    // FORZAMOS EL SEPARADOR /
-    // El replace con /-/g busca todos los guiones y los cambia por barras
+    // Aseguramos que la salida siempre use barras
     const fechaConBarras = fechaBase.replace(/-/g, '/');
 
     const hora = date.toLocaleTimeString('es-CO', {
@@ -2049,7 +2055,6 @@ function formatearFechaBD(fechaHora) {
         hour12: true
     });
 
-    // 3. RETORNO (Usando la variable con barras)
     return `${diaNombre} ${fechaConBarras} ${hora}`;
 }
 function actualizarTotales(pos, neg) {
