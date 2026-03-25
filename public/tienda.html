@@ -1641,28 +1641,29 @@ Swal.fire({
     return;
 }
 // --- 1. CAPTURAR TODOS LOS CAMPOS ---
-    const cliente = document.getElementById("celularComprador").value.trim();
-    const direccion = document.getElementById("direccionEntrega").value.trim();
-    const nombreComprador = document.getElementById("nombreComprador").value.trim();
-    const fechaOriginal = document.getElementById("fechaEntrega").value;
-    
-    const nombreDestinatario = document.getElementById("nombreDestinatario").value.trim();
-    const celularDestinatario = document.getElementById("celularDestinatario").value.trim();
-    const medioPago = document.getElementById("medioPago").value;
-    const horaEntrega = document.getElementById("horaEntrega").value;
-    const notasPedido = document.getElementById("notasPedido").value.trim();
-    const mensajeTarjeta = document.getElementById("mensajeTarjeta").value.trim();
-    const deTarjeta = document.getElementById("deTarjeta").value.trim();
-    const paraTarjeta = document.getElementById("paraTarjeta").value.trim();
-
+const campos = {
+    cliente: document.getElementById("celularComprador").value.trim(),
+    direccion: document.getElementById("direccionEntrega").value.trim(),
+    nombreComprador: document.getElementById("nombreComprador").value.trim(),
+    fechaOriginal: document.getElementById("fechaEntrega").value,
+    nombreDestinatario: document.getElementById("nombreDestinatario").value.trim(),
+    celularDestinatario: document.getElementById("celularDestinatario").value.trim(),
+    medioPago: document.getElementById("medioPago").value,
+    horaEntrega: document.getElementById("horaEntrega").value,
+    notasPedido: document.getElementById("notasPedido").value.trim(),
+    mensajeTarjeta: document.getElementById("mensajeTarjeta").value.trim(),
+    deTarjeta: document.getElementById("deTarjeta").value.trim(),
+    paraTarjeta: document.getElementById("paraTarjeta").value.trim()
+};
         let fechaFormateada = "";
         if (fechaOriginal) {
             const partes = fechaOriginal.split("-"); 
             fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
         }
 
-        if (!direccion || !nombreComprador || !fechaFormateada || !cliente) {
+       const camposVacios = Object.keys(campos).filter(key => !campos[key]);
     // --- DISEÑO SWEETALERT2 PARA VALIDACIÓN ---
+    if (camposVacios.length > 0) {
 Swal.fire({
     icon: 'warning',
     title: 'Campos Incompletos',
