@@ -1985,27 +1985,24 @@ function obtenerColorPedido(color) {
 
     return '#ffffff';
 }
-function convertirFecha(fecha) {
-    if (!fecha) return new Date(); // Evita errores si la fecha viene vacía
-
-    // El split(/[-/]/) divide la cadena si encuentra "-" O "/"
-    const partes = fecha.split(/[-/]/);
-    const d = partes[0];
-    const m = partes[1];
-    const y = partes[2];
-
-    return new Date(y, m - 1, d);
-}
 
 function formatearFechaBonita(fecha) {
-
     const perfil = window.perfilEmpresa;
     if (!perfil || !perfil.nombreEmpresa) {
         return `Pedidos para entrega`;
     }
 
-    const [d, m, y] = fecha.split('-');
+    // CORRECCIÓN: Cambiamos '-' por '/' porque así viene en diaEntrega
+    const partes = fecha.split('/');
+    if (partes.length < 3) return `Pedidos para entrega`; // Validación de seguridad
+
+    const d = partes[0];
+    const m = partes[1];
+    const y = partes[2];
+
     const date = new Date(y, m - 1, d);
+
+    if (isNaN(date)) return `Pedidos para entrega ➤ Fecha Inválida`;
 
     let fechaTexto = date.toLocaleDateString('es-CO', {
         weekday: 'long',
@@ -2024,60 +2021,42 @@ function formatearFechaBonita(fecha) {
 
     return `🎁 Pedidos para entrega ➤ ${fechaTexto} ➡️ ${nombreEmpresa}`;
 }
+// Convertir: acepta tanto / como - por seguridad
+function convertirFecha(fecha) {
+    if (!fecha) return new Date();
+    const partes = fecha.split(/[-/]/); 
+    return new Date(partes[2], partes[1] - 1, partes[0]);
+}
 
+// Formatear para BD/Lista: prioridad a las barras
 function formatearFechaBD(fechaHora) {
     if (!fechaHora) return '';
-
     let date;
 
-    // --- 1. PROCESAMIENTO DE ENTRADA (Lectura) ---
-    
-    // NUEVO: Si la fecha ya viene con barras (ej: "25/03/2026")
-    if (typeof fechaHora === 'string' && fechaHora.includes('/') && !fechaHora.includes('-')) {
+    if (typeof fechaHora === 'string' && fechaHora.includes('/')) {
         const [d, m, y] = fechaHora.split('/');
-        // Creamos el objeto fecha (Mes - 1 porque en JS enero es 0)
-        date = new Date(y, m - 1, d);
-    }
-    // YYYY-MM-DD HH:mm (Mantenemos tu lógica original)
-    else if (typeof fechaHora === 'string' && fechaHora.includes(' ')) {
-        const [f, h] = fechaHora.split(' ');
-        const [y, m, d] = f.split('-');
-        const [hh = '00', mm = '00'] = h.split(':');
-        date = new Date(y, m - 1, d, hh, mm);
-    }
-    // YYYY-MM-DD
-    else if (typeof fechaHora === 'string' && fechaHora.includes('-')) {
-        const [y, m, d] = fechaHora.split('-');
-        date = new Date(y, m - 1, d);
-    }
-    // ISO / timestamp
-    else {
+        // Manejar si viene con hora "25/03/2026 15:30"
+        if (y.includes(' ')) {
+            const [anio, tiempo] = y.split(' ');
+            const [hh, mm] = tiempo.split(':');
+            date = new Date(anio, m - 1, d, hh, mm);
+        } else {
+            date = new Date(y, m - 1, d);
+        }
+    } else {
         date = new Date(fechaHora);
     }
 
     if (isNaN(date)) return '';
 
-    // --- 2. FORMATEO DE SALIDA (Visualización) ---
-    
     const diaNombre = date.toLocaleDateString('es-CO', { weekday: 'long' });
-
-    const fechaBase = date.toLocaleDateString('es-CO', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-
-    // Aseguramos que la salida siempre use barras
+    const fechaBase = date.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const fechaConBarras = fechaBase.replace(/-/g, '/');
+    const hora = date.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit', hour12: true });
 
-    const hora = date.toLocaleTimeString('es-CO', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-    });
-
-    return `${diaNombre} ${fechaConBarras} ${hora}`;
+    return `${diaNombre.charAt(0).toUpperCase() + diaNombre.slice(1)} ${fechaConBarras} ${hora}`;
 }
+
 function actualizarTotales(pos, neg) {
     const totalPos = document.getElementById('totalPositivo');
     const totalNeg = document.getElementById('totalNegativo');
