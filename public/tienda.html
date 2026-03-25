@@ -1721,12 +1721,14 @@ function enviarPedido() {
         return; // Detiene la función si falta información
     }
 
-    // 3. PROCESAMIENTO DE DATOS
-    let fechaFormateada = "";
-    if (campos.fechaOriginal) {
-        const partes = campos.fechaOriginal.split("/"); 
-        fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-    }
+  let fechaFormateada = "";
+if (campos.fechaOriginal) {
+    // Esto divide la cadena ya sea que tenga / , - o .
+    const partes = campos.fechaOriginal.split(/[-./]/); 
+    
+    // Unimos las partes con la barra
+    fechaFormateada = partes.reverse().join("/");
+}
 
     // Bloqueo del botón para evitar múltiples clics
     btn.disabled = true;
