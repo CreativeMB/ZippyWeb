@@ -1417,7 +1417,6 @@ function iniciarCargaBase(slugDesdeURL) {
         if(loader) loader.style.display = 'none';
     });
 }
-
 function procesarProductoDirecto(productosRecibidos) {
     if (!productosRecibidos) return;
 
@@ -1428,57 +1427,59 @@ function procesarProductoDirecto(productosRecibidos) {
 
     const buscado = String(productoUrl).trim().toLowerCase();
     
-    // 1. Buscamos la referencia en el JSON de imágenes (productosJson)
-    // para obtener la URL exacta que usa el render
-    let imgUrlFinal = "";
-    let referenciaExacta = "";
+    // 1. Buscamos la URL original en productosJson (IGUAL QUE EN TU RENDER)
+    let imgUrlOriginal = "";
+    let referenciaEncontrada = "";
 
     for (const refP in productosJson) {
         if (refP === "images") continue;
         if (refP.trim().toLowerCase() === buscado) {
-            imgUrlFinal = productosJson[refP];
-            referenciaExacta = refP;
+            imgUrlOriginal = productosJson[refP]; // Sacamos la URL cruda
+            referenciaEncontrada = refP;
             break;
         }
     }
 
-    // 2. Buscamos los datos técnicos (precio, desc) en productosRealtime
+    // 2. Buscamos los datos de precio/descripción en productosRealtime
     const real = productosRealtime[buscado];
 
-    if (imgUrlFinal && real) {
-        console.log("🚀 Auto-seleccionando producto:", referenciaExacta);
+    if (imgUrlOriginal && real) {
+        console.log("🚀 Sincronizando datos para el modal de:", referenciaEncontrada);
 
         setTimeout(() => {
             if (typeof abrirProducto === 'function') {
                 
-                // Calculamos el precio igual que en tu render
+                // --- LÓGICA DE PRECIO (Copiada de tu render) ---
                 let precioFinal = 0;
                 if (real.promocion && real.valorPromocion > 0) {
                     precioFinal = real.valorPromocion;
-                } else {
-                    precioFinal = real.valor || 0;
+                } else if (real.valor > 0) {
+                    precioFinal = real.valor;
                 }
 
-                // Limpiamos descripción para evitar errores de JS
-                const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
-                const refProd = (real.referenciaReal || referenciaExacta).replace(/'/g, "\\'");
-
-                // LLAMADA CLAVE: Usamos normalizarImagen igual que el render
-                const imgNormalizada = normalizarImagen(imgUrlFinal);
+                // --- NORMALIZACIÓN DE IMAGEN (Copiada de tu render) ---
+                // Aquí es donde estaba el error: hay que usar tu función normalizarImagen
+                const imgParaModal = normalizarImagen(imgUrlOriginal);
                 
-                console.log("📸 Pasando imagen al modal:", imgNormalizada);
+                // --- LIMPIEZA DE TEXTOS ---
+                const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
+                const refProd = (real.referenciaReal || referenciaEncontrada).replace(/'/g, "\\'");
 
-                // Disparamos el modal con los 4 parámetros exactos
-                abrirProducto(refProd, imgNormalizada, precioFinal, descProd);
+                console.log("📸 Imagen normalizada lista:", imgParaModal);
 
-                // Scroll para asegurar que el usuario vea el modal abierto
+                // 3. LLAMADA AL MODAL CON LOS 4 PARÁMETROS
+                abrirProducto(refProd, imgParaModal, precioFinal, descProd);
+
+                // 4. Asegurar que el modal sea visible
                 const modal = document.getElementById('modalPedido');
                 if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
+            } else {
+                console.error("❌ La función 'abrirProducto' no está definida.");
             }
-        }, 2000);
+        }, 2000); // Esperamos 2 segundos para que el render() termine
     } else {
-        console.warn("⚠️ No se pudo sincronizar la imagen con los datos de Realtime para:", buscado);
+        console.warn("⚠️ No se encontró la imagen en productosJson para el código:", buscado);
     }
 }
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
