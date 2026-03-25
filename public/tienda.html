@@ -1725,7 +1725,7 @@ function enviarPedido() {
     let fechaFormateada = "";
     if (campos.fechaOriginal) {
         const partes = campos.fechaOriginal.split("-"); 
-        fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+        fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
 
     // Bloqueo del botón para evitar múltiples clics
