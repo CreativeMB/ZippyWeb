@@ -1426,9 +1426,9 @@ function procesarProductoDirecto(productosRecibidos) {
     if (!productoUrl) return;
 
     const buscado = String(productoUrl).trim().toLowerCase();
-    const listaProductos = Object.values(productosRecibidos);
     
-    // 1. Buscamos el objeto real en la data de Firebase
+    // 1. Buscamos el producto en el listado de Realtime
+    const listaProductos = Object.values(productosRecibidos);
     const encontrado = listaProductos.find(p => {
         const refProd = String(p.referencia || p.Referencia || "").toLowerCase();
         const nomProd = String(p.nombre || "").toLowerCase();
@@ -1436,35 +1436,40 @@ function procesarProductoDirecto(productosRecibidos) {
     });
 
     if (encontrado) {
-        console.log("🚀 Producto detectado en URL. Activando Modal para:", encontrado.nombre);
+        console.log("🚀 Producto detectado: " + encontrado.nombre);
         
-        // 2. Tiempo de espera (Importante para que el DOM esté construido)
+        // 2. Esperamos a que el render termine (2 segundos es ideal)
         setTimeout(() => {
             
-            // LLAMADA AL MODAL / FORMULARIO
-            // Aquí usamos la función que ya tienes vinculada a los clics de la tienda
-            if (typeof seleccionarProducto === 'function') {
+            // Verificamos si la función abrirProducto existe
+            if (typeof abrirProducto === 'function') {
                 
-                // Ejecutamos la función como si el usuario hubiera hecho clic
-                seleccionarProducto(encontrado);
+                // Extraemos los datos exactos que tu función 'abrirProducto' necesita:
+                // abrirProducto(referencia, imgUrl, precio, descripcion)
                 
-                console.log("✅ Modal activado correctamente.");
+                const refParaModal = encontrado.referencia || encontrado.Referencia || "Producto";
+                const imgParaModal = encontrado.url || encontrado.imagen || ""; 
+                const precioParaModal = encontrado.valorPromocion || encontrado.valor || 0;
+                const descParaModal = encontrado.descripcion || "Sin descripción";
 
-                // 3. SCROLL SUAVE AL FORMULARIO
-                // Para que el usuario vea que algo se abrió abajo o el modal suba
-                const destino = document.getElementById('contenedor-formulario') || 
-                                document.getElementById('formulario') ||
-                                document.getElementById('detalle-producto');
-                                
-                if (destino) {
-                    destino.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                console.log("✅ Disparando modal de:", refParaModal);
+                
+                // LLAMADA EXACTA A TU FUNCIÓN
+                abrirProducto(refParaModal, imgParaModal, precioParaModal, descParaModal);
+
+                // 3. Scroll para que el usuario vea el modal o el formulario
+                const formulario = document.getElementById('modalPedido') || document.getElementById('formulario');
+                if (formulario) {
+                    formulario.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
 
             } else {
-                console.error("❌ Error: La función 'seleccionarProducto' no está disponible.");
+                console.error("❌ La función 'abrirProducto' no existe en el scope global.");
             }
 
-        }, 1500); // 1.5 segundos es el tiempo ideal para que cargue el catálogo
+        }, 2000); 
+    } else {
+        console.warn("❌ No se encontró el producto: " + buscado);
     }
 }
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
