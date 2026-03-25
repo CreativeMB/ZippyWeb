@@ -1789,59 +1789,75 @@ function enviarPedido() {
                 document.body.classList.remove('modal-open');
                 document.body.style.overflow = 'auto';
             }
-// 1. Definimos el enlace de WhatsApp
-const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
-            // 2. Disparamos la Alerta Persistente
-Swal.fire({
-    icon: 'success',
-    title: `Señor(a) ${campos.nombreComprador || 'Cliente'}`,
-    html: `
-        <div style="text-align: center;">
-            <p style="font-size: 1.1em; color: #2d2d2d;"><b>¡Compra registrada exitosamente!</b></p>
-            <p style="margin-top: 10px; color: #555;">
-                Tus datos ya están guardados en nuestro sistema.<br><br>
-                Ahora, por favor, <b>haz clic en el botón verde</b> para confirmar tu pedido por WhatsApp y coordinar la entrega.
-            </p>
-        </div>
-    `,
-    confirmButtonText: 'Confirmar en WhatsApp 📱',
-    confirmButtonColor: '#25D366',
-    
-    // Configuraciones de persistencia
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    showConfirmButton: true,
+// 2. CONSTRUIMOS EL MENSAJE PARA WHATSAPP (Lo que faltaba)
+            const mensajeWa = encodeURIComponent(
+                `*NUEVO PEDIDO REGISTRADO*\n\n` +
+                `*Cliente:* ${campos.nombreComprador}\n` +
+                `*Producto:* ${productoSeleccionado || 'Pedido Web'}\n` +
+                `*Fecha Entrega:* ${fechaFormateada}\n` +
+                `*Medio de Pago:* ${campos.medioPago}\n\n` +
+                `_Por favor confirma mi pedido._`
+            );
 
-    target: 'body',
-    didOpen: () => {
-        const container = document.querySelector('.swal2-container');
-        if (container) container.style.zIndex = '10005';
-    }
-}).then((result) => {
-    // 3. Cuando el usuario hace clic en el botón
-    if (result.isConfirmed) {
-        
-        // Abrimos WhatsApp
-        window.open(linkWa, '_blank');
-
-        // 4. LIMPIEZA TOTAL (Se ejecuta al cerrar la alerta)
-        const idsParaLimpiar = [
-            "celularComprador", "direccionEntrega", "nombreComprador", "fechaEntrega",
-            "nombreDestinatario", "celularDestinatario", "productoAdicional", "medioPago",
-            "horaEntrega", "notasPedido", "mensajeTarjeta", "deTarjeta", "paraTarjeta"
-        ];
-
-        idsParaLimpiar.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                if (el.tagName === "SELECT") {
-                    el.selectedIndex = 0;
-                } else {
-                    el.value = "";
+            const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
+// 3. Disparamos la Alerta Persistente
+            Swal.fire({
+                icon: 'success',
+                title: `Señor(a) ${campos.nombreComprador || 'Cliente'}`,
+                html: `
+                    <div style="text-align: center;">
+                        <p style="font-size: 1.1em; color: #2d2d2d;"><b>¡Compra registrada exitosamente!</b></p>
+                        <p style="margin-top: 10px; color: #555;">
+                            Tus datos ya están guardados en nuestro sistema.<br><br>
+                            Ahora, por favor, <b>haz clic en el botón verde</b> para confirmar tu pedido por WhatsApp y coordinar la entrega.
+                        </p>
+                    </div>
+                `,
+                confirmButtonText: 'Confirmar en WhatsApp 📱',
+                confirmButtonColor: '#25D366',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: true,
+                target: 'body',
+                didOpen: () => {
+                    const container = document.querySelector('.swal2-container');
+                    if (container) container.style.zIndex = '10005';
                 }
-            }
-        });
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Abrimos WhatsApp
+                    window.open(linkWa, '_blank');
 
+                    // 4. LIMPIEZA TOTAL
+                    const idsParaLimpiar = [
+                        "celularComprador", "direccionEntrega", "nombreComprador", "fechaEntrega",
+                        "nombreDestinatario", "celularDestinatario", "productoAdicional", "medioPago",
+                        "horaEntrega", "notasPedido", "mensajeTarjeta", "deTarjeta", "paraTarjeta"
+                    ];
+
+                    idsParaLimpiar.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                            if (el.tagName === "SELECT") el.selectedIndex = 0;
+                            else el.value = "";
+                        }
+                    });
+
+                    // Desbloqueo y reset de variables
+                    document.body.style.overflow = 'auto';
+                    document.body.style.pointerEvents = 'auto';
+                    productoSeleccionado = "";
+                    imagenProducto = "";
+                    btn.disabled = false;
+                    btn.innerText = "Enviar Pedido";
+                }
+            });
+
+        }).catch(err => {
+            btn.disabled = false;
+            btn.innerText = "Enviar Pedido";
+            alert("Error al guardar: " + err.message);
+        });
                     // Desbloqueo de interfaz
                     document.body.style.overflow = 'auto';
                     document.body.style.pointerEvents = 'auto';
