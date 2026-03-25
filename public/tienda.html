@@ -1370,76 +1370,69 @@ function mostrarPantallaCargaYSalir() {
     window.location.replace("https://www.floristerialoslirios.com/");
 }
 
-function iniciarCargaBase(slugBusqueda) {
-    if (!slugBusqueda) return;
-    
-    const empresasRef = ref(db);
+function iniciarCargaBase(slugDesdeURL) {
     const loader = document.getElementById('loader');
+    const empresasRef = ref(db);
     
-    // 1. Extraemos los parámetros de la URL de una vez
+    // 1. Convertimos el dominio real (punto) al formato de tu DB (guion bajo)
+    // Ejemplo: "floristerialoslirios.com.co" -> "floristerialoslirios_com_co"
+    const dominioLimpioDB = window.location.hostname.replace(/\./g, '_');
+    
     const urlParams = new URLSearchParams(window.location.search);
-    const productoUrl = urlParams.get('producto'); // Captura "A012"
+    const productoCodigo = urlParams.get('producto'); 
 
     get(empresasRef).then((snapshot) => {
         let empresaEncontrada = false;
         
         snapshot.forEach((child) => {
             const data = child.val();
-            
-            if (data.perfilempresa?.slug === slugBusqueda) {
+            const perfil = data.perfilempresa;
+
+            // BUSQUEDA DINÁMICA: Por Slug o por el Dominio formateado
+            if (perfil?.slug === slugDesdeURL || (perfil?.dominio === dominioLimpioDB)) {
+                
                 empresaId = child.key;
                 empresaEncontrada = true;
 
-                // 2. Cargamos la configuración de la empresa
-                aplicarSEO(data.perfilempresa);
-                validarYContinuar(data.perfilempresa, data);
-                llenarPestañaEmpresa(data.perfilempresa);
-                configurarRedesNav(data.perfilempresa);
+                // Configuración de la tienda
+                aplicarSEO(perfil);
+                validarYContinuar(perfil, data);
+                llenarPestañaEmpresa(perfil);
 
-                // 3. LÓGICA CRÍTICA: Buscar el producto A012
-                if (productoUrl && data.productos) {
-                    const codigoBuscado = productoUrl.trim().toLowerCase();
+                // 2. Lógica para abrir el producto A012 directamente
+                if (productoCodigo && data.productos) {
+                    const buscado = productoCodigo.trim().toLowerCase();
                     
-                    // Buscamos el producto en el listado de Firebase
+                    // Buscamos el producto por referencia o nombre
                     const encontrado = Object.values(data.productos).find(p => {
                         const refP = p.referencia || p.Referencia || p.nombre || "";
-                        return refP.trim().toLowerCase() === codigoBuscado;
+                        return refP.trim().toLowerCase() === buscado;
                     });
 
                     if (encontrado) {
-                        console.log("✅ Auto-seleccionando producto:", encontrado.referencia);
-                        
-                        // Esperamos un momento a que el HTML se dibuje (render)
                         setTimeout(() => {
-                            // LLAMADA A TU FUNCIÓN DE CLIC:
-                            // Asegúrate de usar el nombre exacto de la función que abre el formulario
+                            // Cambia 'seleccionarProducto' por tu función real de clic
                             if (typeof seleccionarProducto === 'function') {
                                 seleccionarProducto(encontrado);
                             }
-
-                            // Scroll automático al formulario para que el cliente no se pierda
-                            const formulario = document.getElementById('seccion-datos-envio') || document.getElementById('formulario');
-                            if(formulario) formulario.scrollIntoView({ behavior: 'smooth' });
                             
-                        }, 1000); // 1 segundo de delay para asegurar que el render() terminó
+                            // Scroll al formulario de datos de envío
+                            const form = document.getElementById('seccion-datos') || document.getElementById('formulario');
+                            if(form) form.scrollIntoView({ behavior: 'smooth' });
+                        }, 1200);
                     }
                 }
 
-                // 4. Ocultamos el loader al final
                 if(loader) loader.style.display = 'none';
             }
         });
-        
+
         if (!empresaEncontrada) {
-            aplicarSEO({});
+            console.error("🚫 Empresa no encontrada.");
             if(loader) loader.style.display = 'none';
         }
-    }).catch(err => {
-        console.error("❌ Error:", err);
-        if(loader) loader.style.display = 'none';
     });
 }
-
 /**
  * Función auxiliar para detectar el producto en la URL y auto-seleccionarlo
  */
