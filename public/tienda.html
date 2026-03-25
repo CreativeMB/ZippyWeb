@@ -1597,215 +1597,188 @@ const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '
         }, 500);
     }
 
-    // --- 5. SISTEMA DE PEDIDOS ---
-    function enviarPedido() {
-        const btn = document.getElementById("enviarPedidoBtn");
-        if (!idDomiciliarioAsignado) {
-   // --- DISEÑO SWEETALERT2 PARA ADVERTENCIA ---
-// 1. Cerramos el modal/formulario inmediatamente
-const modal = document.getElementById("modalPedido"); // <--- Asegúrate de que este sea el ID de tu ventana
-if (modal) {
-    modal.style.display = "none";
-    
-    // Si usas Bootstrap, eliminamos el fondo oscuro
-    const backdrop = document.querySelector('.modal-backdrop');
-    if (backdrop) backdrop.remove();
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = 'auto';
-}
+   // --- 5. SISTEMA DE PEDIDOS ---
+function enviarPedido() {
+    const btn = document.getElementById("enviarPedidoBtn");
 
-// Tambien puedes usar Swal.close() si el formulario es otro SweetAlert
-Swal.close(); 
-
-// 2. Lanzamos la alerta informativa
-Swal.fire({
-    icon: 'info',
-    title: '📍 Sin Domiciliarios',
-    text: 'Lo sentimos, no hay domiciliarios activos en este momento. Por favor, contacta a la tienda directamente para coordinar tu entrega.',
-    confirmButtonText: 'Entendido',
-    confirmButtonColor: '#FF6600',
-    target: 'body',
-    didOpen: () => {
-        const container = document.querySelector('.swal2-container');
-        if (container) {
-            container.style.zIndex = '10001';
+    // 1. VALIDACIÓN DE DOMICILIARIOS
+    if (!idDomiciliarioAsignado) {
+        const modal = document.getElementById("modalPedido");
+        if (modal) {
+            modal.style.display = "none";
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = 'auto';
         }
-    },
-    showClass: {
-        popup: 'animate__animated animate__fadeInDown'
-    },
-    hideClass: {
-        popup: 'animate__animated animate__fadeOutUp'
-    }
-});
-    return;
-}
-// --- 1. CAPTURAR TODOS LOS CAMPOS ---
-const campos = {
-    cliente: document.getElementById("celularComprador").value.trim(),
-    direccion: document.getElementById("direccionEntrega").value.trim(),
-    nombreComprador: document.getElementById("nombreComprador").value.trim(),
-    fechaOriginal: document.getElementById("fechaEntrega").value,
-    nombreDestinatario: document.getElementById("nombreDestinatario").value.trim(),
-    celularDestinatario: document.getElementById("celularDestinatario").value.trim(),
-    medioPago: document.getElementById("medioPago").value,
-    horaEntrega: document.getElementById("horaEntrega").value,
-    notasPedido: document.getElementById("notasPedido").value.trim(),
-    mensajeTarjeta: document.getElementById("mensajeTarjeta").value.trim(),
-    deTarjeta: document.getElementById("deTarjeta").value.trim(),
-    paraTarjeta: document.getElementById("paraTarjeta").value.trim()
-};
 
-// 2. FORMATEAR FECHA (Usando el valor del objeto)
-let fechaFormateada = "";
-if (campos.fechaOriginal) {
-    const partes = campos.fechaOriginal.split("-"); 
-    fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
-}
-
-// 3. VALIDACIÓN: Revisar si hay campos vacíos
-const camposVacios = Object.keys(campos).filter(key => !campos[key]);
-
-if (camposVacios.length > 0) {
-Swal.fire({
-    icon: 'warning',
-    title: 'Campos Incompletos',
-    text: 'Por favor, rellena todos los datos de envío para continuar con tu pedido.',
-    confirmButtonText: 'Revisar Formulario',
-    confirmButtonColor: '#FF6600',
-    // --- ESTO ASEGURA QUE SE VEA ENCIMA DEL FORMULARIO ---
-    target: 'body', 
-    didOpen: () => {
-        // Forzamos que la nueva alerta esté en la capa más alta (Z-index)
-        const container = document.querySelector('.swal2-container');
-        if (container) {
-            container.style.zIndex = '10000'; 
-        }
-    },
-    showClass: {
-        popup: 'animate__animated animate__shakeX'
-    }
-});
-    return;
-}
-
-        btn.disabled = true;
-        btn.innerText = "Enviando...";
-
-        const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
-        get(pedidosRef).then((snapshot) => {
-            let maxPos = 0;
-          if (snapshot.exists()) {
-
-    console.log("🔥 SNAPSHOT RAW:", snapshot);
-    console.log("🔥 EXISTS:", snapshot.exists());
-    console.log("🔥 VAL:", snapshot.val());
-
-                snapshot.forEach(c => {
-                    const pos = parseInt(c.val().posicion) || 0;
-                    if (pos > maxPos) maxPos = pos;
-                });
+        Swal.close(); 
+        Swal.fire({
+            icon: 'info',
+            title: '📍 Sin Domiciliarios',
+            text: 'Lo sentimos, no hay domiciliarios activos en este momento. Por favor, contacta a la tienda directamente para coordinar tu entrega.',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#FF6600',
+            target: 'body',
+            didOpen: () => {
+                const container = document.querySelector('.swal2-container');
+                if (container) container.style.zIndex = '10001';
             }
-            const nuevoRef = push(pedidosRef);
-            const hoy = new Date();
-            const fechaReg = hoy.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/-/g, '/');
-            const horaReg = hoy.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-
-            const pedidoData = {
-                idPedido: nuevoRef.key,
-                idEmpresa: empresaId,
-                idDomiciliario: idDomiciliarioAsignado,
-                nombreDomiciliario: nombreDomiciliarioAsignado,
-                direccion: direccion,
-                imagenUrl: imagenProducto || "",
-                nombreCliente: nombreComprador,
-                cliente: cliente,
-                nombreDestinatario: document.getElementById("nombreDestinatario").value.trim() || nombreComprador,
-                destinatario: document.getElementById("celularDestinatario").value.trim() || cliente,
-                referencia: productoSeleccionado || "Pedido Web",
-                adicional: document.getElementById("productoAdicional").value.trim(),
-                banco: document.getElementById("medioPago").value,
-                diaEntrega: fechaFormateada,
-                horaEntrega: document.getElementById("horaEntrega").value,
-                notas: document.getElementById("notasPedido").value.trim(),
-                mensaje: document.getElementById("mensajeTarjeta").value.trim(),
-                de: document.getElementById("deTarjeta").value.trim(),
-                para: document.getElementById("paraTarjeta").value.trim(),
-                posicion: maxPos + 1,
-                notificado: false,
-                color: "",
-                fechaRegistro: fechaReg,
-                horaRegistro: horaReg
-            };
-
-set(nuevoRef, pedidoData).then(() => {
-    
-    // 1. FORZAR CIERRE DEL MODAL/VENTANA (Sustituye 'modalPedido' por el ID de tu div)
-    const modal = document.getElementById("modalPedido"); // <--- PON AQUÍ EL ID DE TU VENTANA
-    if (modal) {
-        modal.style.display = "none"; // Desaparece de la vista
-        
-        // Si usas Bootstrap, esto también quita el fondo oscuro (backdrop)
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) backdrop.remove(); 
-        
-        // Quitar la clase que bloquea el scroll en el body
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = 'auto';
+        });
+        return;
     }
 
-    // 2. LANZAR ALERTA DE ÉXITO
-    Swal.fire({
-        icon: 'success',
-        title: '¡Pedido Enviado!',
-        text: 'Tu orden fue registrada correctamente Confirma por WhatsApp.',
-        timer: 5000,
-        timerProgressBar: true,
-        confirmButtonColor: '#ff6600',
-        target: 'body',
-        didOpen: () => {
-            const container = document.querySelector('.swal2-container');
-            if (container) container.style.zIndex = '10005';
-        },
-        willClose: () => {
-           // 1. Limpieza total de IDs
-    const idsParaLimpiar = [
-        "celularComprador", "direccionEntrega", "nombreComprador", "fechaEntrega",
-        "nombreDestinatario", "celularDestinatario", "productoAdicional", "medioPago",
-        "horaEntrega", "notasPedido", "mensajeTarjeta", "deTarjeta", "paraTarjeta"
-    ];
-    idsParaLimpiar.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            if (el.tagName === "SELECT") el.selectedIndex = 0;
-            else el.value = "";
-        }
-    });
+    // 2. CAPTURA Y VALIDACIÓN DE CAMPOS OBLIGATORIOS
+    const campos = {
+        cliente: document.getElementById("celularComprador").value.trim(),
+        direccion: document.getElementById("direccionEntrega").value.trim(),
+        nombreComprador: document.getElementById("nombreComprador").value.trim(),
+        fechaOriginal: document.getElementById("fechaEntrega").value,
+        nombreDestinatario: document.getElementById("nombreDestinatario").value.trim(),
+        celularDestinatario: document.getElementById("celularDestinatario").value.trim(),
+        medioPago: document.getElementById("medioPago").value,
+        horaEntrega: document.getElementById("horaEntrega").value,
+        notasPedido: document.getElementById("notasPedido").value.trim(),
+        mensajeTarjeta: document.getElementById("mensajeTarjeta").value.trim(),
+        deTarjeta: document.getElementById("deTarjeta").value.trim(),
+        paraTarjeta: document.getElementById("paraTarjeta").value.trim()
+    };
 
-    // 2. DESBLOQUEO DE MOUSE Y SCROLL (Vital para Creative M)
-    document.body.style.overflow = 'auto'; // Devuelve el scroll
-    document.body.style.pointerEvents = 'auto'; // Devuelve los clics
-    document.body.classList.remove('modal-open');
+    // Buscamos si hay algún campo vacío en el objeto anterior
+    const camposVacios = Object.keys(campos).filter(key => !campos[key]);
+
+    if (camposVacios.length > 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campos Incompletos',
+            text: 'Por favor, rellena todos los datos de envío, fecha, hora y tarjeta para continuar. Solo el campo "Adicionales" es opcional.',
+            confirmButtonText: 'Revisar Formulario',
+            confirmButtonColor: '#FF6600',
+            target: 'body', 
+            didOpen: () => {
+                const container = document.querySelector('.swal2-container');
+                if (container) container.style.zIndex = '10000'; 
+            },
+            showClass: { popup: 'animate__animated animate__shakeX' }
+        });
+        return; // Detiene la función si falta información
+    }
+
+    // 3. PROCESAMIENTO DE DATOS
+    let fechaFormateada = "";
+    if (campos.fechaOriginal) {
+        const partes = campos.fechaOriginal.split("-"); 
+        fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+    }
+
+    // Bloqueo del botón para evitar múltiples clics
+    btn.disabled = true;
+    btn.innerText = "Enviando...";
+
+    // 4. CONEXIÓN CON FIREBASE
+    const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
     
-    // Quitar cualquier rastro de fondo oscuro
-    const backdrop = document.querySelector('.modal-backdrop');
-    if (backdrop) backdrop.remove();
-
-    // 3. Reset de variables y botón
-    productoSeleccionado = "";
-    imagenProducto = "";
-    btn.disabled = false;
-    btn.innerText = "Enviar Pedido";
+    get(pedidosRef).then((snapshot) => {
+        let maxPos = 0;
+        if (snapshot.exists()) {
+            snapshot.forEach(c => {
+                const pos = parseInt(c.val().posicion) || 0;
+                if (pos > maxPos) maxPos = pos;
+            });
         }
-    });
 
-}).catch(err => {
-    btn.disabled = false;
-    btn.innerText = "Enviar Pedido";
-    alert("Error: " + err.message);
-});
-});
-} 
+        const nuevoRef = push(pedidosRef);
+        const hoy = new Date();
+        const fechaReg = hoy.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/-/g, '/');
+        const horaReg = hoy.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+        // Estructura del pedido (usando los datos capturados en 'campos')
+        const pedidoData = {
+            idPedido: nuevoRef.key,
+            idEmpresa: empresaId,
+            idDomiciliario: idDomiciliarioAsignado,
+            nombreDomiciliario: nombreDomiciliarioAsignado,
+            direccion: campos.direccion,
+            imagenUrl: imagenProducto || "",
+            nombreCliente: campos.nombreComprador,
+            cliente: campos.cliente,
+            nombreDestinatario: campos.nombreDestinatario,
+            destinatario: campos.celularDestinatario,
+            referencia: productoSeleccionado || "Pedido Web",
+            adicional: document.getElementById("productoAdicional").value.trim(), // Este sí puede ser vacío
+            banco: campos.medioPago,
+            diaEntrega: fechaFormateada,
+            horaEntrega: campos.horaEntrega,
+            notas: campos.notasPedido,
+            mensaje: campos.mensajeTarjeta,
+            de: campos.deTarjeta,
+            para: campos.paraTarjeta,
+            posicion: maxPos + 1,
+            notificado: false,
+            color: "",
+            fechaRegistro: fechaReg,
+            horaRegistro: horaReg
+        };
+
+        // Guardar en la base de datos
+        set(nuevoRef, pedidoData).then(() => {
+            
+            // Cierre manual del modal
+            const modal = document.getElementById("modalPedido");
+            if (modal) {
+                modal.style.display = "none";
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.remove(); 
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = 'auto';
+            }
+
+            // Alerta de éxito
+            Swal.fire({
+                icon: 'success',
+                title: '¡Pedido Enviado!',
+                text: 'Tu orden fue registrada correctamente. Confirma por WhatsApp.',
+                timer: 5000,
+                timerProgressBar: true,
+                confirmButtonColor: '#ff6600',
+                target: 'body',
+                didOpen: () => {
+                    const container = document.querySelector('.swal2-container');
+                    if (container) container.style.zIndex = '10005';
+                },
+                willClose: () => {
+                    // Limpieza y reset
+                    const idsParaLimpiar = [
+                        "celularComprador", "direccionEntrega", "nombreComprador", "fechaEntrega",
+                        "nombreDestinatario", "celularDestinatario", "productoAdicional", "medioPago",
+                        "horaEntrega", "notasPedido", "mensajeTarjeta", "deTarjeta", "paraTarjeta"
+                    ];
+                    idsParaLimpiar.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                            if (el.tagName === "SELECT") el.selectedIndex = 0;
+                            else el.value = "";
+                        }
+                    });
+
+                    // Desbloqueo de interfaz
+                    document.body.style.overflow = 'auto';
+                    document.body.style.pointerEvents = 'auto';
+                    
+                    productoSeleccionado = "";
+                    imagenProducto = "";
+                    btn.disabled = false;
+                    btn.innerText = "Enviar Pedido";
+                }
+            });
+
+        }).catch(err => {
+            btn.disabled = false;
+            btn.innerText = "Enviar Pedido";
+            alert("Error al guardar: " + err.message);
+        });
+    });
+}
     // --- 6. UTILIDADES ---
     function obtenerLinkDirecto(entrada) {
         if (!entrada) return "";
