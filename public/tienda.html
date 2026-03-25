@@ -1422,46 +1422,48 @@ function procesarProductoDirecto(productosRecibidos) {
     if (!productosRecibidos) return;
 
     const urlParams = new URLSearchParams(window.location.search);
-    const codigoURL = urlParams.get('producto'); 
+    const productoUrl = urlParams.get('producto'); 
 
-    // Si no hay código en la URL, salimos de inmediato
-    if (!codigoURL) return;
+    if (!productoUrl) return;
 
-    const buscado = String(codigoURL).trim().toLowerCase();
-    console.log("📦 Buscando en URL el código:", buscado);
-
-    // CONVERTIMOS A ARRAY Y BUSCAMOS DE FORMA ESTRICTA
+    const buscado = String(productoUrl).trim().toLowerCase();
     const listaProductos = Object.values(productosRecibidos);
     
+    // Búsqueda inteligente (tipo buscador)
     const encontrado = listaProductos.find(p => {
-        // Extraemos los valores y nos aseguramos de que existan antes de comparar
-        const ref1 = p.referencia ? String(p.referencia).trim().toLowerCase() : null;
-        const ref2 = p.Referencia ? String(p.Referencia).trim().toLowerCase() : null;
-        const nom = p.nombre ? String(p.nombre).trim().toLowerCase() : null;
-
-        // SOLO retorna true si el código buscado es EXACTAMENTE igual a uno de estos
-        return (ref1 === buscado || ref2 === buscado || nom === buscado);
+        const refProd = String(p.referencia || p.Referencia || "").toLowerCase();
+        const nomProd = String(p.nombre || "").toLowerCase();
+        return (refProd.includes(buscado) || nomProd.includes(buscado));
     });
 
     if (encontrado) {
-        console.log("✅ ¡MATCH REAL! Producto:", encontrado.nombre || encontrado.referencia);
+        console.log("✅ Match Real:", encontrado.nombre);
         
+        // 1. FORZAR AL BUSCADOR: 
+        // Si tienes un input de buscador, le ponemos el texto para que la lógica de la tienda filtre
+        const inputBuscador = document.getElementById('buscar-producto') || document.getElementById('input-search');
+        if (inputBuscador) {
+            inputBuscador.value = productoUrl; 
+            // Disparamos el evento de escritura para que la tienda se filtre sola
+            inputBuscador.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
         setTimeout(() => {
-            // Aquí ejecutamos tu función de apertura
+            // 2. EJECUTAR APERTURA
+            // Aquí llamamos a la función que abre el formulario de datos
             if (typeof seleccionarProducto === 'function') {
                 seleccionarProducto(encontrado);
-            } else if (typeof abrirDetalle === 'function') {
-                abrirDetalle(encontrado);
             }
 
-            // Scroll al formulario
-            const seccion = document.getElementById('contenedor-formulario') || document.getElementById('formulario');
-            if(seccion) seccion.scrollIntoView({ behavior: 'smooth' });
-        }, 2000); 
-
-    } else {
-        // Si no existe, ahora sí te dirá la verdad en la consola
-        console.warn("❌ El producto '" + buscado + "' NO existe en esta tienda.");
+            // 3. SCROLL AUTOMÁTICO
+            const destino = document.getElementById('contenedor-formulario') || 
+                            document.getElementById('seccion-datos') || 
+                            document.getElementById('formulario');
+                            
+            if (destino) {
+                destino.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 1500); 
     }
 }
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
