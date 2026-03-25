@@ -1086,10 +1086,6 @@ body {
     </div>
 </div>
  
-    <div id="productos-tab" class="tab-content">
-        <a id="btnWhats" class="whatsappbtnflotante" href="#" target="_blank">
-        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
-    </a>
         <div class="header">
             <div class="marca-principal">
                 <img id="logoEmpresa" src="" alt="" class="logo-estilo">
@@ -1105,6 +1101,63 @@ body {
 
         <div id="productos" class="productos"></div>
     </div>
+<div id="empresa-tab" class="tab-content" style="display: none; padding: 20px;">
+   <div class="empresa-full">
+    <header class="empresa-header">
+        <div class="empresa-logo"><img id="perfil-logo" src=""></div>
+        <h1 id="perfil-nombre" class="empresa-titulo"></h1>
+        <p id="perfil-eslogan" class="empresa-eslogan"></p>
+    </header>
+<section class="empresa-section" style="background: #161920;">
+    <h2 class="empresa-subtitulo">Síguenos</h2>
+    <div class="divider-gold"></div>
+    <div id="perfil-redes" class="grid-redes">
+        </div>
+</section>
+    <section class="empresa-section">
+        <h2 class="empresa-subtitulo">Nuestra Historia</h2>
+        <div class="divider-gold"></div>
+        <p id="perfil-descripcion" class="empresa-descripcion"></p>
+    </section>
+
+    <section class="empresa-section">
+        <h2 class="empresa-subtitulo">Encuéntranos</h2>
+        <div class="contacto-container">
+            <p><i class="fas fa-map-marker-alt"></i> <span id="perfil-direccion"></span></p>
+            <p><i class="fas fa-phone"></i> <span id="perfil-telefono"></span></p>
+        </div>
+    </section>
+
+    <section class="empresa-section" style="background: #161920; padding: 0;">
+    <h2 class="empresa-subtitulo" style="margin-top: 40px;">Encuéntranos</h2>
+    <div class="divider-gold"></div>
+    
+    <div id="contenedor-mapa">
+        <iframe 
+            id="google-map-iframe" 
+            width="100%" 
+            height="400" 
+            style="border:0; margin-top: 20px;" 
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="no-referrer-when-downgrade"
+            src="">
+        </iframe>
+    </div>
+</section>
+
+    <section class="empresa-section">
+        <h2 class="empresa-subtitulo">Pagos Seguros</h2>
+        <div id="perfil-medios-pago"></div>
+    </section>
+
+    <section class="empresa-section" style="border-bottom: none; padding-bottom: 100px;">
+        <h2 class="empresa-subtitulo">¿Listo para pedir?</h2>
+        <a id="btn-llamar" href="#" class="empresa-btn">
+            <i class="fab fa-whatsapp"></i> Chatear con nosotros
+        </a>
+    </section>
+</div>
 
     <div id="modalPedido" class="modal">
         <div class="modal-contenido">
@@ -1171,73 +1224,21 @@ body {
             </div>
         </div>
     </div>
+
 <div class="footer">
-            <p id="direccion" class="info-footer-elegante"></p>
+        <p id="direccion" class="info-footer-elegante"></p>
         <p id="ciudad" class="info-footer-elegante"></p>
         <p id="telefono" class="info-footer-elegante"></p>
         <p id="correo" class="info-footer-elegante"></p>
         <p style="margin-top:25px; font-size:13px; opacity:.8; border-top: 1px solid #333; padding-top: 20px;">
-            © 2026 - <a href="https://zippy-727d5.web.app/empresa.html" target="_blank"
-                style="color:#fbbf24; text-decoration:none; font-weight:bold;">Creado con Zippy</a>
+            © 2026 - <a href="https://zippy-727d5.web.app/" target="_blank" style="color:#fbbf24; text-decoration:none; font-weight:bold;">Creado con Zippy</a>
         </p>
     </div>
-<div id="empresa-tab" class="tab-content" style="display: none; padding: 20px;">
-   <div class="empresa-full">
-    <header class="empresa-header">
-        <div class="empresa-logo"><img id="perfil-logo" src=""></div>
-        <h1 id="perfil-nombre" class="empresa-titulo"></h1>
-        <p id="perfil-eslogan" class="empresa-eslogan"></p>
-    </header>
-<section class="empresa-section" style="background: #161920;">
-    <h2 class="empresa-subtitulo">Síguenos</h2>
-    <div class="divider-gold"></div>
-    <div id="perfil-redes" class="grid-redes">
-        </div>
-</section>
-    <section class="empresa-section">
-        <h2 class="empresa-subtitulo">Nuestra Historia</h2>
-        <div class="divider-gold"></div>
-        <p id="perfil-descripcion" class="empresa-descripcion"></p>
-    </section>
 
-    <section class="empresa-section">
-        <h2 class="empresa-subtitulo">Encuéntranos</h2>
-        <div class="contacto-container">
-            <p><i class="fas fa-map-marker-alt"></i> <span id="perfil-direccion"></span></p>
-            <p><i class="fas fa-phone"></i> <span id="perfil-telefono"></span></p>
-        </div>
-    </section>
+    <a id="btnWhats" class="whatsappbtnflotante" href="#" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
+    </a>
 
-    <section class="empresa-section" style="background: #161920; padding: 0;">
-    <h2 class="empresa-subtitulo" style="margin-top: 40px;">Encuéntranos</h2>
-    <div class="divider-gold"></div>
-    
-    <div id="contenedor-mapa">
-        <iframe 
-            id="google-map-iframe" 
-            width="100%" 
-            height="400" 
-            style="border:0; margin-top: 20px;" 
-            allowfullscreen="" 
-            loading="lazy" 
-            referrerpolicy="no-referrer-when-downgrade"
-            src="">
-        </iframe>
-    </div>
-</section>
-
-    <section class="empresa-section">
-        <h2 class="empresa-subtitulo">Pagos Seguros</h2>
-        <div id="perfil-medios-pago"></div>
-    </section>
-
-    <section class="empresa-section" style="border-bottom: none; padding-bottom: 100px;">
-        <h2 class="empresa-subtitulo">¿Listo para pedir?</h2>
-        <a id="btn-llamar" href="#" class="empresa-btn">
-            <i class="fab fa-whatsapp"></i> Chatear con nosotros
-        </a>
-    </section>
-</div>
    
    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
