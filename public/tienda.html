@@ -1413,35 +1413,36 @@ function iniciarCargaBase(slugDesdeURL) {
     });
 }
 
+
 function procesarProductoDirecto() {
     const urlParams = new URLSearchParams(window.location.search);
     const productoUrl = urlParams.get('producto'); 
     if (!productoUrl) return;
 
-    // 1. LIMPIEZA TOTAL DE LA URL:
-    // Decodificamos, quitamos acentos, quitamos todo lo que no sea letra/número
+    // 1. LIMPIEZA EXTREMA DE LA URL
+    // Quitamos tildes, pasamos a minúsculas y BORRAMOS todo lo que no sea letra o número
     const buscadoLimpio = decodeURIComponent(productoUrl)
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quita tildes
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
         .toLowerCase()
-        .replace(/[^a-z0-9]/g, ""); // Quita puntos, espacios, guiones, etc.
+        .replace(/[^a-z0-9]/g, ""); 
 
-    console.log("🔍 Buscando (ID Limpio):", buscadoLimpio);
+    console.log("🔍 Buscando (ID Ultra-Limpio):", buscadoLimpio);
 
     let imgUrlOriginal = "";
     let datosRealtime = null;
     let referenciaFinal = "";
 
-    // 2. Buscamos en el catálogo de imágenes con la misma limpieza
+    // 2. Buscamos en el catálogo barriendo los productos
     for (const refP in productosJson) {
         if (refP === "images") continue;
         
-        // Limpiamos la referencia de la base de datos igual que la URL
+        // Limpiamos la referencia de la DB igual que la de la URL
         const refLimpiaDB = refP
             .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             .toLowerCase()
             .replace(/[^a-z0-9]/g, "");
 
-        // COMPARACIÓN RELAX: Si uno contiene al otro, es un match
+        // COMPARACIÓN DE "ADN": Si el texto limpio coincide o está contenido
         if (refLimpiaDB.includes(buscadoLimpio) || buscadoLimpio.includes(refLimpiaDB)) {
             imgUrlOriginal = productosJson[refP];
             
@@ -1452,7 +1453,7 @@ function procesarProductoDirecto() {
         }
     }
 
-    // 3. Si hay éxito, disparamos el modal
+    // 3. Si hay match, disparamos el modal
     if (imgUrlOriginal && datosRealtime) {
         console.log("✅ Match encontrado: " + referenciaFinal);
 
@@ -1465,12 +1466,12 @@ function procesarProductoDirecto() {
                 const descProd = (datosRealtime.descripcion || "Sin descripción").replace(/'/g, "\\'");
                 const refProd = datosRealtime.referenciaReal || referenciaFinal;
 
-                // Normalizamos la imagen para que NO salga rota
+                // NORMALIZAR IMAGEN (Vital para Los Lirios)
                 const imgParaModal = normalizarImagen(imgUrlOriginal);
 
                 abrirProducto(refProd, imgParaModal, precioFinal, descProd);
 
-                // Scroll suave al modal
+                // Scroll al modal
                 const modal = document.getElementById('modalPedido');
                 if (modal) {
                     modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1478,7 +1479,7 @@ function procesarProductoDirecto() {
             }
         }, 1800); 
     } else {
-        console.warn("❌ No se encontró nada para el ID:", buscadoLimpio);
+        console.warn("❌ No se encontró nada para el ID limpio:", buscadoLimpio);
     }
 }
 
