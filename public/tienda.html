@@ -2011,41 +2011,36 @@ function llenarPestañaEmpresa(data) {
         }
     }
 
-    // ===== REDES SOCIALES (NUEVA SECCIÓN) =====
+   // 5. REDES SOCIALES (Detectando URL completa)
     const contenedorRedes = document.getElementById('perfil-redes');
     if (contenedorRedes) {
-        contenedorRedes.innerHTML = ""; 
-        const redesStr = data.redesSociales || ""; 
+        contenedorRedes.innerHTML = "";
         
-        if (redesStr.trim() !== "") {
-            const listaRedes = redesStr.split(',');
-            listaRedes.forEach(red => {
-                const nombreRed = red.trim();
-                if (nombreRed !== "") {
-                    const aRed = document.createElement('a');
-                    // Usamos la misma lógica de clases que medios de pago para el diseño
-                    aRed.className = `red-item ${nombreRed.toLowerCase()}`;
-                    aRed.target = "_blank";
-                    
-                    // Asignar Icono según el nombre
-                    let icono = "fa-share-alt";
-                    const r = nombreRed.toLowerCase();
-                    if(r.includes("instagram")) icono = "fab fa-instagram";
-                    else if(r.includes("facebook")) icono = "fab fa-facebook-f";
-                    else if(r.includes("tiktok")) icono = "fab fa-tiktok";
-                    else if(r.includes("youtube")) icono = "fab fa-youtube";
+        // Creamos un array con las redes que existan en tu data
+        // Ajusta los nombres de los campos según los tengas en Firebase
+        const redesDisponibles = [
+            { nombre: 'Facebook', url: data.linkFacebook },
+            { nombre: 'Instagram', url: data.linkInstagram },
+            { nombre: 'TikTok', url: data.linkTikTok }
+        ];
 
-                    aRed.innerHTML = `<i class="${icono}"></i> ${nombreRed}`;
-                    
-                    // Aquí asignas el link que venga de tu base de datos
-                    // Si el link es data.linkInstagram, etc:
-                    const linkKey = `link${nombreRed.replace(/\s+/g, '')}`;
-                    aRed.href = data[linkKey] || "#"; 
-                    
-                    contenedorRedes.appendChild(aRed);
-                }
-            });
-        }
+        redesDisponibles.forEach(red => {
+            if (red.url && red.url.trim() !== "") {
+                const aRed = document.createElement('a');
+                aRed.className = `red-item ${red.nombre.toLowerCase()}`;
+                aRed.href = red.url;
+                aRed.target = "_blank";
+                
+                // Asignación de iconos de marca
+                let icono = "fa-share-alt";
+                if (red.nombre === 'Facebook') icono = "fab fa-facebook-f";
+                if (red.nombre === 'Instagram') icono = "fab fa-instagram";
+                if (red.nombre === 'TikTok') icono = "fab fa-tiktok";
+
+                aRed.innerHTML = `<i class="${icono}"></i> ${red.nombre}`;
+                contenedorRedes.appendChild(aRed);
+            }
+        });
     }
 
     // ===== DIRECCIÓN Y CIUDAD =====
