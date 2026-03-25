@@ -2009,45 +2009,34 @@ function formatearFechaBD(fechaHora) {
 
     let date;
 
-    // --- 1. PROCESAMIENTO DE ENTRADA (Lectura) ---
-    
-    // NUEVO: Si la fecha ya viene con barras (ej: "25/03/2026")
-    if (typeof fechaHora === 'string' && fechaHora.includes('/') && !fechaHora.includes('-')) {
+    // 1. PROCESAMIENTO DE ENTRADA (Lectura de DD/MM/YYYY)
+    if (typeof fechaHora === 'string' && fechaHora.includes('/')) {
+        // Separamos por "/" asumiendo que el orden es [Día, Mes, Año]
         const [d, m, y] = fechaHora.split('/');
-        // Creamos el objeto fecha (Mes - 1 porque en JS enero es 0)
-        date = new Date(y, m - 1, d);
-    }
-    // YYYY-MM-DD HH:mm (Mantenemos tu lógica original)
-    else if (typeof fechaHora === 'string' && fechaHora.includes(' ')) {
-        const [f, h] = fechaHora.split(' ');
-        const [y, m, d] = f.split('-');
-        const [hh = '00', mm = '00'] = h.split(':');
-        date = new Date(y, m - 1, d, hh, mm);
-    }
-    // YYYY-MM-DD
-    else if (typeof fechaHora === 'string' && fechaHora.includes('-')) {
-        const [y, m, d] = fechaHora.split('-');
-        date = new Date(y, m - 1, d);
-    }
-    // ISO / timestamp
+        
+        // El formato puede traer hora: "25/03/2026 15:30"
+        if (y.includes(' ')) {
+            const [anio, tiempo] = y.split(' ');
+            const [hh, mm] = tiempo.split(':');
+            date = new Date(anio, m - 1, d, hh, mm);
+        } else {
+            // Solo fecha: "25/03/2026"
+            date = new Date(y, m - 1, d);
+        }
+    } 
+    // Por si acaso llega un objeto Date directo o un timestamp
     else {
         date = new Date(fechaHora);
     }
 
     if (isNaN(date)) return '';
 
-    // --- 2. FORMATEO DE SALIDA (Visualización) ---
-    
+    // 2. EXTRACCIÓN DE COMPONENTES PARA MOSTRAR
     const diaNombre = date.toLocaleDateString('es-CO', { weekday: 'long' });
 
-    const fechaBase = date.toLocaleDateString('es-CO', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-
-    // Aseguramos que la salida siempre use barras
-    const fechaConBarras = fechaBase.replace(/-/g, '/');
+    // Forzamos que la salida sea siempre con barras
+    const opcionesFecha = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    const fechaConBarras = date.toLocaleDateString('es-CO', opcionesFecha).replace(/-/g, '/');
 
     const hora = date.toLocaleTimeString('es-CO', {
         hour: 'numeric',
@@ -2055,6 +2044,8 @@ function formatearFechaBD(fechaHora) {
         hour12: true
     });
 
+    // 3. RETORNO FINAL
+    // Ejemplo: "miércoles 25/03/2026 05:33 p. m."
     return `${diaNombre} ${fechaConBarras} ${hora}`;
 }
 function actualizarTotales(pos, neg) {
