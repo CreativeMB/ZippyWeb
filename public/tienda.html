@@ -1429,7 +1429,7 @@ function procesarProductoDirecto(productosRecibidos) {
     const buscado = String(productoUrl).trim().toLowerCase();
     const listaProductos = Object.values(productosRecibidos);
     
-    // Búsqueda inteligente (tipo buscador)
+    // 1. Buscamos el match
     const encontrado = listaProductos.find(p => {
         const refProd = String(p.referencia || p.Referencia || "").toLowerCase();
         const nomProd = String(p.nombre || "").toLowerCase();
@@ -1439,31 +1439,35 @@ function procesarProductoDirecto(productosRecibidos) {
     if (encontrado) {
         console.log("✅ Match Real:", encontrado.nombre);
         
-        // 1. FORZAR AL BUSCADOR: 
-        // Si tienes un input de buscador, le ponemos el texto para que la lógica de la tienda filtre
-        const inputBuscador = document.getElementById('buscar-producto') || document.getElementById('input-search');
+        // --- LA MAGIA PARA QUE SE VEA COMO EL BUSCADOR ---
+        // Buscamos tu input de búsqueda por su ID (cámbialo si es diferente)
+        const inputBuscador = document.getElementById('buscar-producto') || 
+                              document.getElementById('input-search') ||
+                              document.querySelector('input[type="text"]');
+
         if (inputBuscador) {
+            // Ponemos el código A012 en la cajita de búsqueda
             inputBuscador.value = productoUrl; 
-            // Disparamos el evento de escritura para que la tienda se filtre sola
+            
+            // DISPARAMOS EL EVENTO 'input' para que tu lógica de filtrado se active sola
             inputBuscador.dispatchEvent(new Event('input', { bubbles: true }));
+            inputBuscador.dispatchEvent(new Event('keyup', { bubbles: true }));
         }
 
         setTimeout(() => {
-            // 2. EJECUTAR APERTURA
-            // Aquí llamamos a la función que abre el formulario de datos
+            // 2. Ejecutar la apertura del formulario (seleccionar)
             if (typeof seleccionarProducto === 'function') {
                 seleccionarProducto(encontrado);
             }
 
-            // 3. SCROLL AUTOMÁTICO
+            // 3. Scroll automático
             const destino = document.getElementById('contenedor-formulario') || 
-                            document.getElementById('seccion-datos') || 
                             document.getElementById('formulario');
                             
             if (destino) {
                 destino.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-        }, 1500); 
+        }, 1200); 
     }
 }
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
