@@ -1416,44 +1416,57 @@ function iniciarCargaBase(slugDesdeURL) {
 function procesarProductoDirecto() {
     const urlParams = new URLSearchParams(window.location.search);
     const productoUrl = urlParams.get('producto'); 
-
     if (!productoUrl) return;
 
-    // 1. DECODIFICAMOS: Convierte %20 en espacios, %C3%B3 en ó, etc.
-    // Luego limpiamos espacios al inicio/final y pasamos a minúsculas
-    const claveBusqueda = decodeURIComponent(productoUrl).trim().toLowerCase();
+    // 1. Decodificamos y limpiamos el texto de la URL
+    // Esto convierte %20 en espacios reales
+    const buscado = decodeURIComponent(productoUrl).trim().toLowerCase().replace(/\s+/g, ' ');
     
-    console.log("🔍 Buscando producto decodificado:", claveBusqueda);
+    console.log("🔍 Buscando en catálogo:", buscado);
 
-    // 2. Buscamos la imagen en productosJson
     let imgUrlOriginal = "";
-    let referenciaEncontrada = "";
+    let datosRealtime = null;
+    let referenciaFinal = "";
 
+    // 2. Buscamos el producto recorriendo el JSON de imágenes
+    // Esto es más seguro para nombres con espacios
     for (const refP in productosJson) {
         if (refP === "images") continue;
-        // También limpiamos la referencia de la base de datos para comparar
-        if (refP.trim().toLowerCase() === claveBusqueda) {
+        
+        // Limpiamos la referencia de la base de datos para comparar igual que la URL
+        const refLimpiaDB = refP.trim().toLowerCase().replace(/\s+/g, ' ');
+
+        if (refLimpiaDB === buscado) {
             imgUrlOriginal = productosJson[refP];
             referenciaEncontrada = refP;
+            
+            // Traemos los datos de Realtime usando la misma clave que usa tu render
+            const claveRender = refP.trim().toLowerCase();
+            datosRealtime = productosRealtime[claveRender];
+            referenciaFinal = refP;
             break;
         }
     }
 
-    // 3. Buscamos los datos en productosRealtime
-    const real = productosRealtime[claveBusqueda];
+    // 3. Si encontramos la imagen y los datos, disparamos
+    if (imgUrlOriginal && datosRealtime) {
+        console.log("✅ ¡Producto localizado!: " + referenciaFinal);
 
-    if (imgUrlOriginal && real) {
         setTimeout(() => {
             if (typeof abrirProducto === 'function') {
                 
-                let precioFinal = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
-                const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
-                const refProd = real.referenciaReal || referenciaEncontrada;
-                
-                // Normalizamos la imagen igual que en el render
+                // Lógica de precio de tu render
+                let precioFinal = (datosRealtime.promocion && datosRealtime.valorPromocion > 0) 
+                                  ? datosRealtime.valorPromocion 
+                                  : (datosRealtime.valor || 0);
+
+                const descProd = (datosRealtime.descripcion || "Sin descripción").replace(/'/g, "\\'");
+                const refProd = datosRealtime.referenciaReal || referenciaFinal;
+
+                // NORMALIZAR IMAGEN (Vital para que no salga rota)
                 const imgParaModal = normalizarImagen(imgUrlOriginal);
 
-                console.log("✅ ¡Match encontrado! Abriendo:", refProd);
+                // LLAMADA AL MODAL
                 abrirProducto(refProd, imgParaModal, precioFinal, descProd);
 
                 // Scroll al modal
@@ -1462,9 +1475,9 @@ function procesarProductoDirecto() {
                     modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
-        }, 1500); 
+        }, 1800); 
     } else {
-        console.warn("⚠️ No se encontró match para:", claveBusqueda);
+        console.warn("❌ No se encontró coincidencia exacta para: " + buscado);
     }
 }
 
