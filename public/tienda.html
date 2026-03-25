@@ -1374,8 +1374,7 @@ function iniciarCargaBase(slugDesdeURL) {
     const loader = document.getElementById('loader');
     const empresasRef = ref(db);
     
-    // 1. Limpieza del dominio (floristerialoslirios.com.co -> floristerialoslirios_com_co)
-    // Usamos 'hostname' para ignorar el 'https://' y el puerto.
+    // Tu lógica de dominio original (MANTENIDA)
     const dominioLimpioDB = window.location.hostname.replace(/\./g, '_');
     
     const urlParams = new URLSearchParams(window.location.search);
@@ -1388,49 +1387,21 @@ function iniciarCargaBase(slugDesdeURL) {
             const data = child.val();
             const perfil = data.perfilempresa;
 
-            // COMPARACIÓN DINÁMICA
-            // Verificamos si coincide el SLUG o el DOMINIO formateado
+            // Tu lógica de comparación original (MANTENIDA)
             if (perfil?.slug === slugDesdeURL || perfil?.dominio === dominioLimpioDB) {
                 
                 empresaId = child.key;
                 empresaEncontrada = true;
 
-                // Cargar la configuración de la empresa encontrada
+                // --- TUS FUNCIONES ORIGINALES (INTACTAS) ---
                 aplicarSEO(perfil);
                 validarYContinuar(perfil, data);
                 llenarPestañaEmpresa(perfil);
+                // -------------------------------------------
 
-                // 2. Lógica de Producto Directo integrada aquí mismo
+                // AGREGADO: Conexión con el link del producto
                 if (productoCodigo && data.productos) {
-                    const buscado = String(productoCodigo).trim().toLowerCase();
-                    console.log("🔍 Buscando producto en URL:", buscado);
-
-                    // Buscamos en el objeto de productos de esta empresa específica
-                    const encontrado = Object.values(data.productos).find(p => {
-                        // Importante: revisar cómo guardas el código (referencia o nombre)
-                        const refP = String(p.referencia || p.Referencia || p.nombre || "").trim().toLowerCase();
-                        return refP === buscado;
-                    });
-
-                    if (encontrado) {
-                        console.log("✅ ¡Producto encontrado! Auto-seleccionando...");
-                        
-                        // Esperamos a que renderice el HTML para poder hacer scroll y clic
-                        setTimeout(() => {
-                            // Cambia 'seleccionarProducto' por el nombre de tu función real
-                            if (typeof seleccionarProducto === 'function') {
-                                seleccionarProducto(encontrado);
-                            }
-                            
-                            // Scroll al formulario (Asegúrate que el ID sea correcto en tu HTML)
-                            const form = document.getElementById('seccion-datos') || 
-                                         document.getElementById('formulario') || 
-                                         document.getElementById('contenedor-formulario');
-                            if(form) form.scrollIntoView({ behavior: 'smooth' });
-                        }, 1500); // 1.5 seg para dar tiempo a que carguen las imágenes
-                    } else {
-                        console.warn("❌ No se encontró el producto con código:", buscado);
-                    }
+                    procesarProductoDirecto(data.productos);
                 }
 
                 if(loader) loader.style.display = 'none';
@@ -1446,40 +1417,46 @@ function iniciarCargaBase(slugDesdeURL) {
         if(loader) loader.style.display = 'none';
     });
 }
-/**
- * Función auxiliar para detectar el producto en la URL y auto-seleccionarlo
- */
+
 function procesarProductoDirecto(productosRecibidos) {
+    // Esta función solo se activa si hay un ?producto= en la URL
     const urlParams = new URLSearchParams(window.location.search);
     const codigoURL = urlParams.get('producto'); 
 
     if (!codigoURL) return;
 
-    const codigoBuscado = String(codigoURL).trim().toLowerCase();
-    console.log("📦 Buscando producto para auto-selección:", codigoBuscado);
+    const buscado = String(codigoURL).trim().toLowerCase();
+    console.log("📦 Buscando producto para auto-selección:", buscado);
 
-    // Buscamos en el listado de productos usando tus criterios de referencia
+    // Buscamos el objeto del producto
     const encontrado = Object.values(productosRecibidos).find(p => {
-        const refP = p.referencia || p.Referencia || p.nombre || "";
-        return refP.trim().toLowerCase() === codigoBuscado;
+        const refP = String(p.referencia || p.Referencia || p.nombre || "").trim().toLowerCase();
+        return refP === buscado;
     });
 
     if (encontrado) {
-        console.log("✅ Auto-seleccionando:", encontrado.referencia || encontrado.nombre);
+        console.log("✅ ¡Encontrado! Programando apertura de formulario...");
         
-        // Esperamos un momento a que el DOM se renderice (importante para el scroll)
+        // Delay de seguridad para que el DOM (imágenes/botones) esté listo
         setTimeout(() => {
-            // REEMPLAZA 'seleccionarProducto' por el nombre de tu función que abre el formulario
+            // RECUERDA: Verifica si tu función es 'seleccionarProducto' o 'abrirDetalle'
             if (typeof seleccionarProducto === 'function') {
                 seleccionarProducto(encontrado);
+            } else if (typeof abrirDetalle === 'function') {
+                abrirDetalle(encontrado);
             }
             
-            // Scroll suave hacia el formulario o detalle
-            const seccionDestino = document.getElementById('contenedor-formulario') || document.getElementById('detalle-producto');
-            if(seccionDestino) seccionDestino.scrollIntoView({ behavior: 'smooth' });
-        }, 800);
+            // Scroll automático al formulario
+            const seccionDestino = document.getElementById('seccion-datos') || 
+                                   document.getElementById('contenedor-formulario') || 
+                                   document.getElementById('formulario');
+                                   
+            if(seccionDestino) {
+                seccionDestino.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 1800); 
     } else {
-        console.warn("⚠️ El producto '" + codigoBuscado + "' no existe en este catálogo.");
+        console.warn("⚠️ El código '" + buscado + "' no existe en este catálogo.");
     }
 }
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
