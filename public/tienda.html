@@ -1418,27 +1418,33 @@ function procesarProductoDirecto() {
     const productoUrl = urlParams.get('producto'); 
     if (!productoUrl) return;
 
-    // 1. Limpiamos y decodificamos la URL (ej: est.cono expresionesx66grs)
-    const buscado = decodeURIComponent(productoUrl).trim().toLowerCase();
-    console.log("🔍 Buscando coincidencia para:", buscado);
+    // 1. LIMPIEZA TOTAL DE LA URL:
+    // Decodificamos, quitamos acentos, quitamos todo lo que no sea letra/número
+    const buscadoLimpio = decodeURIComponent(productoUrl)
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quita tildes
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, ""); // Quita puntos, espacios, guiones, etc.
+
+    console.log("🔍 Buscando (ID Limpio):", buscadoLimpio);
 
     let imgUrlOriginal = "";
     let datosRealtime = null;
     let referenciaFinal = "";
 
-    // 2. Buscamos en el catálogo de imágenes
+    // 2. Buscamos en el catálogo de imágenes con la misma limpieza
     for (const refP in productosJson) {
         if (refP === "images") continue;
         
-        const refLimpiaDB = refP.trim().toLowerCase();
+        // Limpiamos la referencia de la base de datos igual que la URL
+        const refLimpiaDB = refP
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "");
 
-        // CAMBIO CLAVE: Si el nombre de la DB contiene lo que buscamos en la URL
-        // o si la URL contiene el nombre de la DB, ¡ES UN MATCH!
-        if (refLimpiaDB.includes(buscado) || buscado.includes(refLimpiaDB)) {
+        // COMPARACIÓN RELAX: Si uno contiene al otro, es un match
+        if (refLimpiaDB.includes(buscadoLimpio) || buscadoLimpio.includes(refLimpiaDB)) {
             imgUrlOriginal = productosJson[refP];
-            referenciaEncontrada = refP;
             
-            // Traemos los datos técnicos
             const claveRender = refP.trim().toLowerCase();
             datosRealtime = productosRealtime[claveRender];
             referenciaFinal = refP;
@@ -1448,11 +1454,10 @@ function procesarProductoDirecto() {
 
     // 3. Si hay éxito, disparamos el modal
     if (imgUrlOriginal && datosRealtime) {
-        console.log("✅ Match encontrado por similitud: " + referenciaFinal);
+        console.log("✅ Match encontrado: " + referenciaFinal);
 
         setTimeout(() => {
             if (typeof abrirProducto === 'function') {
-                
                 let precioFinal = (datosRealtime.promocion && datosRealtime.valorPromocion > 0) 
                                   ? datosRealtime.valorPromocion 
                                   : (datosRealtime.valor || 0);
@@ -1460,12 +1465,12 @@ function procesarProductoDirecto() {
                 const descProd = (datosRealtime.descripcion || "Sin descripción").replace(/'/g, "\\'");
                 const refProd = datosRealtime.referenciaReal || referenciaFinal;
 
-                // Importante: Normalizar para que la imagen cargue
+                // Normalizamos la imagen para que NO salga rota
                 const imgParaModal = normalizarImagen(imgUrlOriginal);
 
                 abrirProducto(refProd, imgParaModal, precioFinal, descProd);
 
-                // Scroll para que el cliente vea el formulario
+                // Scroll suave al modal
                 const modal = document.getElementById('modalPedido');
                 if (modal) {
                     modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1473,7 +1478,7 @@ function procesarProductoDirecto() {
             }
         }, 1800); 
     } else {
-        console.warn("⚠️ No se encontró nada parecido a: " + buscado);
+        console.warn("❌ No se encontró nada para el ID:", buscadoLimpio);
     }
 }
 
