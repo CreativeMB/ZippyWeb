@@ -1201,45 +1201,59 @@ function insertarItemOrdenado(separador, li, timestamp) {
     separador.parentNode.insertBefore(li, nodo);
 }
 
-
 function crearSeparadorDiaEditable(fechaObj, fechaDia) {
     const li = document.createElement('li');
 
-    // 🔑 guardar fecha para orden
+    // 🔑 Guardar fecha para orden (Ej: "2026/03/25")
     li.dataset.fecha = fechaDia;
+    li.dataset.pos = "0";
+    li.dataset.neg = "0";
 
-    li.dataset.pos = 0;
-    li.dataset.neg = 0;
-
-    const fechaTexto = fechaObj.toLocaleDateString('es-CO', {
+    // Generar el texto largo: "miércoles, 25 de marzo de 2026"
+    let fechaTextoLargo = fechaObj.toLocaleDateString('es-CO', {
         weekday: 'long',
         day: '2-digit',
         month: 'long',
         year: 'numeric'
     });
 
+    // Opcional: Poner la primera letra en Mayúscula (ej: Miércoles)
+    fechaTextoLargo = fechaTextoLargo.charAt(0).toUpperCase() + fechaTextoLargo.slice(1);
+
     li.actualizar = function () {
         const pos = Number(this.dataset.pos);
         const neg = Number(this.dataset.neg);
         const restante = pos + neg;
 
+        // Aquí usamos la variable fechaDia que ya trae las barras "/"
+        // pero para el título principal usamos el texto largo más amigable.
         this.innerHTML = `
-            <strong>📅 ${fechaTexto}</strong><br>
-            ➕ $${pos.toLocaleString('es-CO')} |
-            ➖ $${Math.abs(neg).toLocaleString('es-CO')} |
-            💰 <strong>$${restante.toLocaleString('es-CO')}</strong>
+            <div style="margin-bottom: 4px;">
+                <strong>📅 ${fechaTextoLargo}</strong> 
+                <small style="opacity: 0.8;">(${fechaDia})</small>
+            </div>
+            <div style="font-size: 0.9em;">
+                <span>➕ $${pos.toLocaleString('es-CO')}</span> |
+                <span>➖ $${Math.abs(neg).toLocaleString('es-CO')}</span> |
+                <span>💰 <strong>$${restante.toLocaleString('es-CO')}</strong></span>
+            </div>
         `;
 
-        this.style.padding = '10px';
-        this.style.marginBottom = '6px';
-        this.style.borderRadius = '6px';
+        // Estilos de la tarjeta del separador
+        this.style.padding = '12px';
+        this.style.marginBottom = '10px';
+        this.style.borderRadius = '8px';
+        this.style.listStyle = 'none';
+        this.style.borderLeft = '5px solid'; // Un toque estético lateral
 
         if (restante < 0) {
             this.style.backgroundColor = '#FFCDD2';
             this.style.color = '#B71C1C';
+            this.style.borderLeftColor = '#B71C1C';
         } else {
             this.style.backgroundColor = '#C8E6C9';
             this.style.color = '#1B5E20';
+            this.style.borderLeftColor = '#2E7D32';
         }
     };
 
