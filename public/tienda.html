@@ -2108,6 +2108,69 @@ if (contenedorRedes) {
         }
     }
 }
+// Actualiza etiquetas <meta name="...">
+function actualizarMeta(name, content) {
+  if (!content) return; // Si no hay contenido, no hace nada
+
+  let meta = document.querySelector(`meta[name="${name}"]`);
+
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.setAttribute("name", name);
+    document.head.appendChild(meta);
+  }
+
+  meta.setAttribute("content", content);
+}
+
+// Actualiza etiquetas <meta property="..."> (Open Graph)
+function actualizarMetaProp(property, content) {
+  if (!content) return;
+
+  let meta = document.querySelector(`meta[property="${property}"]`);
+
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.setAttribute("property", property);
+    document.head.appendChild(meta);
+  }
+
+  meta.setAttribute("content", content);
+}
+function aplicarSEO(data) {
+  // 1. Validaciones seguras con fallback (||)
+  const nombre = data.nombre || "Catálogo online";
+  const descripcion = data.descripcion || "Compra productos online fácil y rápido";
+  const ciudad = data.ciudad || ""; 
+  const imagen = data.imagen || ""; // Asegúrate de que Firebase devuelva una URL válida
+
+  // 2. Construcción condicional del TITLE
+  // Si hay ciudad, muestra "Nombre | Ciudad". Si no, solo "Nombre"
+  const tituloFinal = ciudad ? `${nombre} | ${ciudad}` : nombre;
+  document.title = tituloFinal;
+
+  // 3. DESCRIPCIÓN SEO (optimizada para lectura)
+  const textoCiudad = ciudad ? ` en ${ciudad}` : "";
+  const metaDesc = `${nombre}${textoCiudad}. ${descripcion}. Pedidos fáciles por WhatsApp.`;
+  actualizarMeta("description", metaDesc);
+
+  // 4. KEYWORDS
+  const keywords = ciudad 
+    ? `${nombre}, ${ciudad}, catálogo, tienda online, compras`
+    : `${nombre}, catálogo, tienda online, compras`;
+  actualizarMeta("keywords", keywords);
+
+  // 5. OPEN GRAPH (para WhatsApp, Facebook, etc.)
+  actualizarMetaProp("og:title", tituloFinal);
+  actualizarMetaProp("og:description", metaDesc);
+  actualizarMetaProp("og:type", "website");
+  actualizarMetaProp("og:url", window.location.href);
+
+  // Solo actualiza la imagen si realmente viene una URL de Firebase
+  if (imagen) {
+    actualizarMetaProp("og:image", imagen);
+  }
+}
 </script>
 </body>
 
