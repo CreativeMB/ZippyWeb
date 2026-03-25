@@ -1107,106 +1107,82 @@ function mostrarDatos(base) {
         if (elemento) elemento.remove();
     });
 
- // --- FUNCIÓN INTERNA ---
-function procesarItem(item) {
-    // Usamos item.diaEntrega que trae "25/03/2026"
-    const fechaTexto = item.diaEntrega || ""; 
-    if (itemsMostrados.has(item.key) || !fechaTexto) return;
-    itemsMostrados.add(item.key);
+    // --- FUNCIÓN INTERNA ---
+    function procesarItem(item) {
+        if (itemsMostrados.has(item.key)) return;
+        itemsMostrados.add(item.key);
 
-    let fechaObj;
-    let partes;
+        const fechaObj = new Date(item.fechaHora);
+        const timestamp = fechaObj.getTime();
 
-    // 1. PROCESAR EL STRING "25/03/2026" PARA EVITAR EL "Invalid Date"
-    if (typeof fechaTexto === 'string' && fechaTexto.includes('/')) {
-        partes = fechaTexto.split('/'); // [25, 03, 2026]
-        // Creamos la fecha: new Date(año, mes-1, día)
-        // El mes en JS es 0-11, por eso restamos 1 al mes
-        fechaObj = new Date(partes[2], partes[1] - 1, partes[0]);
-    } else {
-        fechaObj = new Date(fechaTexto);
-    }
+        // Formato YYYY-MM-DD para comparar fechas
+     
+const fechaDia = `${fechaObj.getFullYear()}/${String(fechaObj.getMonth() + 1).padStart(2, '0')}/${String(fechaObj.getDate()).padStart(2, '0')}`;
 
-    // Si la fecha sigue siendo inválida por algún motivo, detenemos
-    if (isNaN(fechaObj.getTime())) {
-        console.error("Fecha no válida detectada:", fechaTexto);
-        return;
-    }
+        // 1. Obtener o crear el separador del día
+        let separadorActual = separadoresPorDia[fechaDia];
+        if (!separadorActual) {
+            separadorActual = crearSeparadorDiaEditable(fechaObj, fechaDia);
+            separadorActual.classList.add('separador-dia'); 
+            separadorActual.dataset.fecha = fechaDia; 
+            separadorActual.dataset.pos = "0";
+            separadorActual.dataset.neg = "0";
+            separadoresPorDia[fechaDia] = separadorActual;
 
-    const timestamp = fechaObj.getTime();
-
-    // 2. Formato YYYY/MM/DD para los IDs de los separadores (para ordenar)
-    const año = partes[2];
-    const mes = partes[1].padStart(2, '0');
-    const día = partes[0].padStart(2, '0');
-    const fechaDiaId = `${año}/${mes}/${día}`;
-
-    // --- 1. Obtener o crear el separador del día ---
-    let separadorActual = separadoresPorDia[fechaDiaId];
-    if (!separadorActual) {
-        // Pasamos el objeto fecha real y el ID con barras
-        separadorActual = crearSeparadorDiaEditable(fechaObj, fechaDiaId);
-        separadorActual.classList.add('separador-dia'); 
-        separadorActual.dataset.fecha = fechaDiaId; 
-        separadorActual.dataset.pos = "0";
-        separadorActual.dataset.neg = "0";
-        separadoresPorDia[fechaDiaId] = separadorActual;
-
-        // Insertar el separador en orden (más reciente arriba)
-        let insertado = false;
-        const separadoresExistentes = sidebarList.querySelectorAll('.separador-dia');
-        
-        for (let sep of separadoresExistentes) {
-            if (fechaDiaId > sep.dataset.fecha) {
-                sidebarList.insertBefore(separadorActual, sep);
-                insertado = true;
-                break;
+            // Insertar el separador en la posición correcta (más reciente arriba)
+            let insertado = false;
+            const separadoresExistentes = sidebarList.querySelectorAll('.separador-dia');
+            
+            for (let sep of separadoresExistentes) {
+                if (fechaDia > sep.dataset.fecha) {
+                    sidebarList.insertBefore(separadorActual, sep);
+                    insertado = true;
+                    break;
+                }
             }
+            if (!insertado) sidebarList.appendChild(separadorActual);
         }
-        if (!insertado) sidebarList.appendChild(separadorActual);
+
+        // 2. Calcular valores
+        const valor = Number(item.valor) || 0;
+        if (valor > 0) {
+            totalPositivo += valor;
+            separadorActual.dataset.pos = (Number(separadorActual.dataset.pos) + valor).toString();
+        } else {
+            totalNegativo += valor;
+            separadorActual.dataset.neg = (Number(separadorActual.dataset.neg) + valor).toString();
+        }
+
+        // 3. Actualizar visualmente el separador
+        if (typeof separadorActual.actualizar === 'function') {
+            separadorActual.actualizar();
+        }
+
+        // 4. Crear el elemento de la lista (el registro)
+        const li = document.createElement('li');
+        li.dataset.key = item.key;
+        li.dataset.timestamp = timestamp;
+        li.className = "item-dato";
+
+        const fFormateada = typeof formatearFechaBD === 'function' ? formatearFechaBD(item.fechaHora) : item.fechaHora;
+        li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${fFormateada}`;
+
+        // Estilos básicos (puedes moverlos a CSS)
+        li.style.padding = '10px';
+        li.style.marginBottom = '5px';
+        li.style.borderRadius = '6px';
+        li.style.listStyle = 'none';
+        li.style.color = valor < 0 ? '#D32F2F' : '#388E3C';
+        li.style.backgroundColor = valor < 0 ? '#FFCDD2' : '#C8E6C9';
+
+        // 5. Insertar el dato debajo de su separador en orden
+        insertarItemOrdenado(separadorActual, li, timestamp);
+
+        // 6. Actualizar totales generales arriba
+        if (typeof actualizarTotales === 'function') {
+            actualizarTotales(totalPositivo, totalNegativo);
+        }
     }
-
-    // --- 2. Calcular valores ---
-    const valor = Number(item.valor) || 0;
-    if (valor > 0) {
-        totalPositivo += valor;
-        separadorActual.dataset.pos = (Number(separadorActual.dataset.pos) + valor).toString();
-    } else {
-        totalNegativo += valor;
-        separadorActual.dataset.neg = (Number(separadorActual.dataset.neg) + valor).toString();
-    }
-
-    // --- 3. Actualizar visualmente el separador ---
-    if (typeof separadorActual.actualizar === 'function') {
-        separadorActual.actualizar();
-    }
-
-    // --- 4. Crear el elemento de la lista (Visual) ---
-    const li = document.createElement('li');
-    li.dataset.key = item.key;
-    li.dataset.timestamp = timestamp;
-    li.className = "item-dato";
-
-    // Formateamos la fecha para mostrarla bonito
-    const fFormateada = typeof formatearFechaBD === 'function' ? formatearFechaBD(fechaTexto) : fechaTexto;
-    li.textContent = `${item.nombre} : $${valor.toLocaleString('es-CO')} ${fFormateada}`;
-
-    // Estilos
-    li.style.padding = '10px';
-    li.style.marginBottom = '5px';
-    li.style.borderRadius = '6px';
-    li.style.listStyle = 'none';
-    li.style.color = valor < 0 ? '#D32F2F' : '#388E3C';
-    li.style.backgroundColor = valor < 0 ? '#FFCDD2' : '#C8E6C9';
-
-    // --- 5. Insertar debajo de su separador ---
-    insertarItemOrdenado(separadorActual, li, timestamp);
-
-    // --- 6. Actualizar totales generales ---
-    if (typeof actualizarTotales === 'function') {
-        actualizarTotales(totalPositivo, totalNegativo);
-    }
-}
 } 
 
 
@@ -2033,34 +2009,45 @@ function formatearFechaBD(fechaHora) {
 
     let date;
 
-    // 1. PROCESAMIENTO DE ENTRADA (Lectura de DD/MM/YYYY)
-    if (typeof fechaHora === 'string' && fechaHora.includes('/')) {
-        // Separamos por "/" asumiendo que el orden es [Día, Mes, Año]
+    // --- 1. PROCESAMIENTO DE ENTRADA (Lectura) ---
+    
+    // NUEVO: Si la fecha ya viene con barras (ej: "25/03/2026")
+    if (typeof fechaHora === 'string' && fechaHora.includes('/') && !fechaHora.includes('-')) {
         const [d, m, y] = fechaHora.split('/');
-        
-        // El formato puede traer hora: "25/03/2026 15:30"
-        if (y.includes(' ')) {
-            const [anio, tiempo] = y.split(' ');
-            const [hh, mm] = tiempo.split(':');
-            date = new Date(anio, m - 1, d, hh, mm);
-        } else {
-            // Solo fecha: "25/03/2026"
-            date = new Date(y, m - 1, d);
-        }
-    } 
-    // Por si acaso llega un objeto Date directo o un timestamp
+        // Creamos el objeto fecha (Mes - 1 porque en JS enero es 0)
+        date = new Date(y, m - 1, d);
+    }
+    // YYYY-MM-DD HH:mm (Mantenemos tu lógica original)
+    else if (typeof fechaHora === 'string' && fechaHora.includes(' ')) {
+        const [f, h] = fechaHora.split(' ');
+        const [y, m, d] = f.split('-');
+        const [hh = '00', mm = '00'] = h.split(':');
+        date = new Date(y, m - 1, d, hh, mm);
+    }
+    // YYYY-MM-DD
+    else if (typeof fechaHora === 'string' && fechaHora.includes('-')) {
+        const [y, m, d] = fechaHora.split('-');
+        date = new Date(y, m - 1, d);
+    }
+    // ISO / timestamp
     else {
         date = new Date(fechaHora);
     }
 
     if (isNaN(date)) return '';
 
-    // 2. EXTRACCIÓN DE COMPONENTES PARA MOSTRAR
+    // --- 2. FORMATEO DE SALIDA (Visualización) ---
+    
     const diaNombre = date.toLocaleDateString('es-CO', { weekday: 'long' });
 
-    // Forzamos que la salida sea siempre con barras
-    const opcionesFecha = { day: '2-digit', month: '2-digit', year: 'numeric' };
-    const fechaConBarras = date.toLocaleDateString('es-CO', opcionesFecha).replace(/-/g, '/');
+    const fechaBase = date.toLocaleDateString('es-CO', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+
+    // Aseguramos que la salida siempre use barras
+    const fechaConBarras = fechaBase.replace(/-/g, '/');
 
     const hora = date.toLocaleTimeString('es-CO', {
         hour: 'numeric',
@@ -2068,8 +2055,6 @@ function formatearFechaBD(fechaHora) {
         hour12: true
     });
 
-    // 3. RETORNO FINAL
-    // Ejemplo: "miércoles 25/03/2026 05:33 p. m."
     return `${diaNombre} ${fechaConBarras} ${hora}`;
 }
 function actualizarTotales(pos, neg) {
