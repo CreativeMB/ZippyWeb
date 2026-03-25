@@ -1374,8 +1374,8 @@ function iniciarCargaBase(slugDesdeURL) {
     const loader = document.getElementById('loader');
     const empresasRef = ref(db);
     
-    // 1. Convertimos el dominio real (punto) al formato de tu DB (guion bajo)
-    // Ejemplo: "floristerialoslirios.com.co" -> "floristerialoslirios_com_co"
+    // 1. Limpieza del dominio (floristerialoslirios.com.co -> floristerialoslirios_com_co)
+    // Usamos 'hostname' para ignorar el 'https://' y el puerto.
     const dominioLimpioDB = window.location.hostname.replace(/\./g, '_');
     
     const urlParams = new URLSearchParams(window.location.search);
@@ -1388,38 +1388,48 @@ function iniciarCargaBase(slugDesdeURL) {
             const data = child.val();
             const perfil = data.perfilempresa;
 
-            // BUSQUEDA DINÁMICA: Por Slug o por el Dominio formateado
-            if (perfil?.slug === slugDesdeURL || (perfil?.dominio === dominioLimpioDB)) {
+            // COMPARACIÓN DINÁMICA
+            // Verificamos si coincide el SLUG o el DOMINIO formateado
+            if (perfil?.slug === slugDesdeURL || perfil?.dominio === dominioLimpioDB) {
                 
                 empresaId = child.key;
                 empresaEncontrada = true;
 
-                // Configuración de la tienda
+                // Cargar la configuración de la empresa encontrada
                 aplicarSEO(perfil);
                 validarYContinuar(perfil, data);
                 llenarPestañaEmpresa(perfil);
 
-                // 2. Lógica para abrir el producto A012 directamente
+                // 2. Lógica de Producto Directo integrada aquí mismo
                 if (productoCodigo && data.productos) {
-                    const buscado = productoCodigo.trim().toLowerCase();
-                    
-                    // Buscamos el producto por referencia o nombre
+                    const buscado = String(productoCodigo).trim().toLowerCase();
+                    console.log("🔍 Buscando producto en URL:", buscado);
+
+                    // Buscamos en el objeto de productos de esta empresa específica
                     const encontrado = Object.values(data.productos).find(p => {
-                        const refP = p.referencia || p.Referencia || p.nombre || "";
-                        return refP.trim().toLowerCase() === buscado;
+                        // Importante: revisar cómo guardas el código (referencia o nombre)
+                        const refP = String(p.referencia || p.Referencia || p.nombre || "").trim().toLowerCase();
+                        return refP === buscado;
                     });
 
                     if (encontrado) {
+                        console.log("✅ ¡Producto encontrado! Auto-seleccionando...");
+                        
+                        // Esperamos a que renderice el HTML para poder hacer scroll y clic
                         setTimeout(() => {
-                            // Cambia 'seleccionarProducto' por tu función real de clic
+                            // Cambia 'seleccionarProducto' por el nombre de tu función real
                             if (typeof seleccionarProducto === 'function') {
                                 seleccionarProducto(encontrado);
                             }
                             
-                            // Scroll al formulario de datos de envío
-                            const form = document.getElementById('seccion-datos') || document.getElementById('formulario');
+                            // Scroll al formulario (Asegúrate que el ID sea correcto en tu HTML)
+                            const form = document.getElementById('seccion-datos') || 
+                                         document.getElementById('formulario') || 
+                                         document.getElementById('contenedor-formulario');
                             if(form) form.scrollIntoView({ behavior: 'smooth' });
-                        }, 1200);
+                        }, 1500); // 1.5 seg para dar tiempo a que carguen las imágenes
+                    } else {
+                        console.warn("❌ No se encontró el producto con código:", buscado);
                     }
                 }
 
@@ -1428,9 +1438,12 @@ function iniciarCargaBase(slugDesdeURL) {
         });
 
         if (!empresaEncontrada) {
-            console.error("🚫 Empresa no encontrada.");
+            console.error("🚫 No se detectó ninguna empresa para:", dominioLimpioDB);
             if(loader) loader.style.display = 'none';
         }
+    }).catch(err => {
+        console.error("❌ Error Firebase:", err);
+        if(loader) loader.style.display = 'none';
     });
 }
 /**
