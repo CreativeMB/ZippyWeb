@@ -1972,9 +1972,14 @@ function obtenerColorPedido(color) {
     return '#ffffff';
 }
 function convertirFecha(fecha) {
-    // Cambiamos '-' por '/'
-    const [d, m, y] = fecha.split('/');
-    // JS usa meses de 0 a 11, por eso restamos 1 al mes (m)
+    if (!fecha) return new Date(); // Evita errores si la fecha viene vacía
+
+    // El split(/[-/]/) divide la cadena si encuentra "-" O "/"
+    const partes = fecha.split(/[-/]/);
+    const d = partes[0];
+    const m = partes[1];
+    const y = partes[2];
+
     return new Date(y, m - 1, d);
 }
 
