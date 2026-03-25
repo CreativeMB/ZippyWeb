@@ -1927,15 +1927,14 @@ if (inputBusquedaNav) {
     });
 }
 
-   window.cambiarPestaña = function(tabId, elemento) {
+  window.cambiarPestaña = function(tabId, elemento) {
     // 1. Ocultar todas las secciones de contenido
-    // Esto busca cualquier div que tenga la clase 'tab-content'
     const todasLasPestañas = document.querySelectorAll('.tab-content');
     todasLasPestañas.forEach(div => {
         div.style.display = 'none';
     });
 
-    // 2. Mostrar la sección que pediste (productos-tab o empresa-tab)
+    // 2. Mostrar la sección activa
     const seccionActiva = document.getElementById(tabId);
     if (seccionActiva) {
         seccionActiva.style.display = 'block';
@@ -1947,22 +1946,33 @@ if (inputBusquedaNav) {
         boton.classList.remove('active');
     });
 
-    // 4. Ponerle el color dorado al botón que tocaste
+    // 4. Ponerle el color dorado al botón tocado
     if (elemento) {
         elemento.classList.add('active');
     }
 
-    // 5. Lógica del Buscador en la barra
+    // 5. Lógica del Buscador
     const buscador = document.querySelector('.search-nav-container');
     if (buscador) {
-        // Si entramos a 'empresa-tab', ocultamos el buscador para que no estorbe
         if (tabId === 'empresa-tab') {
             buscador.style.opacity = '0';
             buscador.style.pointerEvents = 'none';
         } else {
-            // Si volvemos a 'productos-tab', lo mostramos
             buscador.style.opacity = '1';
             buscador.style.pointerEvents = 'auto';
+        }
+    }
+
+    // 6. CONTROL DEL BOTÓN WHATSAPP FLOTANTE
+    // Cambia 'btnWhats' por el ID real de tu botón si es distinto
+    const btnFlotante = document.getElementById('btnWhats'); 
+    if (btnFlotante) {
+        if (tabId === 'productos-tab') {
+            // Se muestra SOLO en la tienda
+            btnFlotante.style.setProperty('display', 'flex', 'important');
+        } else {
+            // Se oculta en Empresa y cualquier otra pestaña
+            btnFlotante.style.setProperty('display', 'none', 'important');
         }
     }
 };
