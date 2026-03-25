@@ -721,9 +721,10 @@ body {
     display: flex !important; /* Fuerza la visibilidad inicial */
 }
 
-/* Si por alguna razón algo lo tapa, subimos el z-index */
 .whatsappbtnflotante {
-    z-index: 99999 !important; 
+    /* ... tus otros estilos ... */
+    z-index: 99999 !important; /* Súbelo al máximo */
+    display: flex; /* Asegúrate de que no empiece en none */
 }
 /* Animación de pulso sutil */
 @keyframes pulse-green {
@@ -1970,15 +1971,14 @@ if (inputBusquedaNav) {
             buscador.style.pointerEvents = 'auto';
         }
     }
-
-   // 5. CONTROL DEL BOTÓN WHATSAPP (CORREGIDO)
+// 5. CONTROL DEL BOTÓN WHATSAPP (Ajuste de Seguridad)
     const btnFlotante = document.getElementById('btnWhats'); 
     if (btnFlotante) {
         if (tabId === 'productos-tab') {
-            // Lo mostramos con flex para que respete tu CSS
+            // FORZAMOS QUE APAREZCA EN TIENDA
             btnFlotante.style.setProperty('display', 'flex', 'important');
         } else {
-            // Lo ocultamos totalmente en Empresa
+            // LO OCULTAMOS EN EMPRESA
             btnFlotante.style.setProperty('display', 'none', 'important');
         }
     }
