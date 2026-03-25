@@ -1936,7 +1936,6 @@ function llenarPestañaEmpresa(data) {
     // ===== NOMBRE Y ESLOGAN =====
     const nombre = document.getElementById('perfil-nombre');
     const eslogan = document.getElementById('perfil-eslogan');
-
     if (nombre) nombre.innerText = data.nombreEmpresa || '';
     if (eslogan) eslogan.innerText = data.eslogan || '';
 
@@ -1946,57 +1945,46 @@ function llenarPestañaEmpresa(data) {
         descripcion.innerText = data.descripcionEmpresa || '';
     }
 
-  const iframe = document.getElementById('google-map-iframe');
-    if (iframe && direccion) {
-        // Codificamos la dirección para que Google la entienda
-        const direccionCompleta = `${direccion}, ${ciudad || ''}, Colombia`;
-        const urlMapa = `https://www.google.com/maps?q=${encodeURIComponent(direccionCompleta)}&output=embed`;
-        
-        iframe.src = urlMapa;
+    // ===== MEDIOS DE PAGO =====
+    const contenedorPagos = document.getElementById('perfil-medios-pago');
+    if (contenedorPagos) {
+        contenedorPagos.innerHTML = ""; 
+        const mediosStr = data.mediosPago || ""; 
+        if (mediosStr.trim() !== "") {
+            const lista = mediosStr.split(',');
+            lista.forEach(medio => {
+                const nombreMedio = medio.trim();
+                if (nombreMedio !== "") {
+                    const divMedio = document.createElement('div');
+                    divMedio.className = "medio-item";
+                    divMedio.innerHTML = `<i class="fas fa-check-circle"></i> ${nombreMedio}`;
+                    contenedorPagos.appendChild(divMedio);
+                }
+            });
+            contenedorPagos.style.display = "flex";
+        } else {
+            contenedorPagos.innerHTML = "<p style='color: #888;'>Consultar medios de pago.</p>";
+        }
     }
 
-const contenedorPagos = document.getElementById('perfil-medios-pago');
-
-if (contenedorPagos) {
-    contenedorPagos.innerHTML = ""; // Limpiamos
-    
-    const mediosStr = data.mediosPago || ""; 
-    
-    if (mediosStr.trim() !== "") {
-        // Rompemos por la coma
-        const lista = mediosStr.split(',');
-
-        lista.forEach(medio => {
-            const nombre = medio.trim();
-            if (nombre !== "") {
-                // Creamos el elemento
-                const divMedio = document.createElement('div');
-                
-                // Le asignamos la clase para que el CSS lo pinte
-                divMedio.className = "medio-item";
-                
-                // Le ponemos el contenido
-                divMedio.innerHTML = `<i class="fas fa-check-circle"></i> ${nombre}`;
-                
-                // Lo metemos al contenedor
-                contenedorPagos.appendChild(divMedio);
-            }
-        });
-        
-        // FORZAMOS VISIBILIDAD por si el padre está oculto
-        contenedorPagos.style.display = "flex";
-    } else {
-        contenedorPagos.innerHTML = "<p style='color: #888;'>Consultar medios de pago.</p>";
-    }
-}
-    // ===== DIRECCIÓN (CONCATENADA) =====
+    // ===== DIRECCIÓN Y CIUDAD (DEFINIR VARIABLES PRIMERO) =====
     const direccionTexto = data.direccion || '';
     const ciudadTexto = data.ciudad || '';
-    const direccion = document.getElementById('perfil-direccion');
+    const elDireccion = document.getElementById('perfil-direccion');
     
-    if (direccion) {
-        // Concatenamos dirección y ciudad tal cual pediste
-        direccion.innerText = (direccionTexto && ciudadTexto) ? `${direccionTexto}, ${ciudadTexto}` : (direccionTexto || ciudadTexto);
+    if (elDireccion) {
+        elDireccion.innerText = (direccionTexto && ciudadTexto) ? `${direccionTexto}, ${ciudadTexto}` : (direccionTexto || ciudadTexto);
+    }
+
+    // ===== MAPA (AHORA SÍ TIENE LAS VARIABLES) =====
+    const iframe = document.getElementById('google-map-iframe');
+    if (iframe && direccionTexto) {
+        const consulta = encodeURIComponent(`${direccionTexto}, ${ciudadTexto}, Colombia`);
+        // URL oficial de Google Maps Embed
+        iframe.src = `https://www.google.com/maps/embed/v1/place?key=TU_API_KEY_AQUÍ&q=${consulta}`;
+        
+        // NOTA: Si no usas API KEY, puedes usar esta alternativa gratuita:
+        iframe.src = `https://maps.google.com/maps?q=${consulta}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
     }
 
     // ===== TELÉFONO (WHATSAPP) =====
@@ -2005,7 +1993,6 @@ if (contenedorPagos) {
     const btn = document.getElementById('btn-llamar');
 
     if (tel) tel.innerText = telefono;
-
     if (btn) {
         if (telefono) {
             const numeroLimpio = telefono.replace(/\D/g, '');
