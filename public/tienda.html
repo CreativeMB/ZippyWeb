@@ -1419,44 +1419,49 @@ function iniciarCargaBase(slugDesdeURL) {
 }
 
 function procesarProductoDirecto(productosRecibidos) {
-    // Esta función solo se activa si hay un ?producto= en la URL
+    if (!productosRecibidos) return;
+
     const urlParams = new URLSearchParams(window.location.search);
     const codigoURL = urlParams.get('producto'); 
 
+    // Si no hay código en la URL, salimos de inmediato
     if (!codigoURL) return;
 
     const buscado = String(codigoURL).trim().toLowerCase();
-    console.log("📦 Buscando producto para auto-selección:", buscado);
+    console.log("📦 Buscando en URL el código:", buscado);
 
-    // Buscamos el objeto del producto
-    const encontrado = Object.values(productosRecibidos).find(p => {
-        const refP = String(p.referencia || p.Referencia || p.nombre || "").trim().toLowerCase();
-        return refP === buscado;
+    // CONVERTIMOS A ARRAY Y BUSCAMOS DE FORMA ESTRICTA
+    const listaProductos = Object.values(productosRecibidos);
+    
+    const encontrado = listaProductos.find(p => {
+        // Extraemos los valores y nos aseguramos de que existan antes de comparar
+        const ref1 = p.referencia ? String(p.referencia).trim().toLowerCase() : null;
+        const ref2 = p.Referencia ? String(p.Referencia).trim().toLowerCase() : null;
+        const nom = p.nombre ? String(p.nombre).trim().toLowerCase() : null;
+
+        // SOLO retorna true si el código buscado es EXACTAMENTE igual a uno de estos
+        return (ref1 === buscado || ref2 === buscado || nom === buscado);
     });
 
     if (encontrado) {
-        console.log("✅ ¡Encontrado! Programando apertura de formulario...");
+        console.log("✅ ¡MATCH REAL! Producto:", encontrado.nombre || encontrado.referencia);
         
-        // Delay de seguridad para que el DOM (imágenes/botones) esté listo
         setTimeout(() => {
-            // RECUERDA: Verifica si tu función es 'seleccionarProducto' o 'abrirDetalle'
+            // Aquí ejecutamos tu función de apertura
             if (typeof seleccionarProducto === 'function') {
                 seleccionarProducto(encontrado);
             } else if (typeof abrirDetalle === 'function') {
                 abrirDetalle(encontrado);
             }
-            
-            // Scroll automático al formulario
-            const seccionDestino = document.getElementById('seccion-datos') || 
-                                   document.getElementById('contenedor-formulario') || 
-                                   document.getElementById('formulario');
-                                   
-            if(seccionDestino) {
-                seccionDestino.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 1800); 
+
+            // Scroll al formulario
+            const seccion = document.getElementById('contenedor-formulario') || document.getElementById('formulario');
+            if(seccion) seccion.scrollIntoView({ behavior: 'smooth' });
+        }, 2000); 
+
     } else {
-        console.warn("⚠️ El código '" + buscado + "' no existe en este catálogo.");
+        // Si no existe, ahora sí te dirá la verdad en la consola
+        console.warn("❌ El producto '" + buscado + "' NO existe en esta tienda.");
     }
 }
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
