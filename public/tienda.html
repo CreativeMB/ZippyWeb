@@ -1372,11 +1372,14 @@ function mostrarPantallaCargaYSalir() {
 
 function iniciarCargaBase(slugBusqueda) {
     if (!slugBusqueda) return;
-    console.log("🔍 Iniciando búsqueda para el slug:", slugBusqueda);
     
     const empresasRef = ref(db);
     const loader = document.getElementById('loader');
     
+    // 1. Extraemos los parámetros de la URL de una vez
+    const urlParams = new URLSearchParams(window.location.search);
+    const productoUrl = urlParams.get('producto'); // Captura "A012"
+
     get(empresasRef).then((snapshot) => {
         let empresaEncontrada = false;
         
@@ -1384,40 +1387,55 @@ function iniciarCargaBase(slugBusqueda) {
             const data = child.val();
             
             if (data.perfilempresa?.slug === slugBusqueda) {
-                console.log("🎯 Empresa encontrada en Firebase:", data.perfilempresa.nombreEmpresa);
                 empresaId = child.key;
                 empresaEncontrada = true;
 
-                try {
-                    // 1. Configuraciones base y visuales
-                    aplicarSEO(data.perfilempresa);
-                    validarYContinuar(data.perfilempresa, data);
-                    llenarPestañaEmpresa(data.perfilempresa);
-                    configurarRedesNav(data.perfilempresa);
+                // 2. Cargamos la configuración de la empresa
+                aplicarSEO(data.perfilempresa);
+                validarYContinuar(data.perfilempresa, data);
+                llenarPestañaEmpresa(data.perfilempresa);
+                configurarRedesNav(data.perfilempresa);
 
-                    // 2. Procesar producto directo de la URL (Deep Linking)
-                    // Lo llamamos después de configurar todo para que los datos ya existan
-                    if (data.productos) {
-                        procesarProductoDirecto(data.productos);
+                // 3. LÓGICA CRÍTICA: Buscar el producto A012
+                if (productoUrl && data.productos) {
+                    const codigoBuscado = productoUrl.trim().toLowerCase();
+                    
+                    // Buscamos el producto en el listado de Firebase
+                    const encontrado = Object.values(data.productos).find(p => {
+                        const refP = p.referencia || p.Referencia || p.nombre || "";
+                        return refP.trim().toLowerCase() === codigoBuscado;
+                    });
+
+                    if (encontrado) {
+                        console.log("✅ Auto-seleccionando producto:", encontrado.referencia);
+                        
+                        // Esperamos un momento a que el HTML se dibuje (render)
+                        setTimeout(() => {
+                            // LLAMADA A TU FUNCIÓN DE CLIC:
+                            // Asegúrate de usar el nombre exacto de la función que abre el formulario
+                            if (typeof seleccionarProducto === 'function') {
+                                seleccionarProducto(encontrado);
+                            }
+
+                            // Scroll automático al formulario para que el cliente no se pierda
+                            const formulario = document.getElementById('seccion-datos-envio') || document.getElementById('formulario');
+                            if(formulario) formulario.scrollIntoView({ behavior: 'smooth' });
+                            
+                        }, 1000); // 1 segundo de delay para asegurar que el render() terminó
                     }
-
-                } catch (errorInterno) {
-                    console.error("⚠️ Error procesando datos de la empresa:", errorInterno);
-                } finally {
-                    // 3. OCULTAR LOADER: Pase lo que pase, quitamos la pantalla de carga
-                    if(loader) loader.style.display = 'none';
                 }
+
+                // 4. Ocultamos el loader al final
+                if(loader) loader.style.display = 'none';
             }
         });
         
         if (!empresaEncontrada) {
-            console.warn("🚫 No se encontró ninguna empresa con el slug:", slugBusqueda);
-            aplicarSEO({}); // Carga valores por defecto
+            aplicarSEO({});
             if(loader) loader.style.display = 'none';
         }
-
     }).catch(err => {
-        console.error("❌ Error en conexión Realtime:", err);
+        console.error("❌ Error:", err);
         if(loader) loader.style.display = 'none';
     });
 }
