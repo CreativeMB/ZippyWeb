@@ -1116,9 +1116,8 @@ function mostrarDatos(base) {
         const timestamp = fechaObj.getTime();
 
         // Formato YYYY-MM-DD para comparar fechas
-        const fechaDia = fechaObj.getFullYear() + '/' +
-            String(fechaObj.getMonth() + 1).padStart(2, '0') + '/' +
-            String(fechaObj.getDate()).padStart(2, '0');
+     
+const fechaDia = `${fechaObj.getFullYear()}/${String(fechaObj.getMonth() + 1).padStart(2, '0')}/${String(fechaObj.getDate()).padStart(2, '0')}`;
 
         // 1. Obtener o crear el separador del día
         let separadorActual = separadoresPorDia[fechaDia];
@@ -2005,12 +2004,12 @@ function formatearFechaBonita(fecha) {
     return `🎁 Pedidos para entrega ➤ ${fechaTexto} ➡️ ${nombreEmpresa}`;
 }
 
-
 function formatearFechaBD(fechaHora) {
     if (!fechaHora) return '';
 
     let date;
 
+    // 1. PROCESAMIENTO DE ENTRADA (Mantenemos tu lógica intacta)
     // YYYY-MM-DD HH:mm
     if (typeof fechaHora === 'string' && fechaHora.includes(' ')) {
         const [f, h] = fechaHora.split(' ');
@@ -2030,13 +2029,19 @@ function formatearFechaBD(fechaHora) {
 
     if (isNaN(date)) return '';
 
-    const dia = date.toLocaleDateString('es-CO', { weekday: 'long' });
+    // 2. EXTRACCIÓN DE COMPONENTES
+    const diaNombre = date.toLocaleDateString('es-CO', { weekday: 'long' });
 
-    const fecha = date.toLocaleDateString('es-CO', {
+    // Obtenemos la fecha base (aquí es donde pueden aparecer guiones)
+    const fechaBase = date.toLocaleDateString('es-CO', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
     });
+
+    // FORZAMOS EL SEPARADOR /
+    // El replace con /-/g busca todos los guiones y los cambia por barras
+    const fechaConBarras = fechaBase.replace(/-/g, '/');
 
     const hora = date.toLocaleTimeString('es-CO', {
         hour: 'numeric',
@@ -2044,7 +2049,8 @@ function formatearFechaBD(fechaHora) {
         hour12: true
     });
 
-    return `${dia} ${fecha}  ${hora}`;
+    // 3. RETORNO (Usando la variable con barras)
+    return `${diaNombre} ${fechaConBarras} ${hora}`;
 }
 function actualizarTotales(pos, neg) {
     const totalPos = document.getElementById('totalPositivo');
