@@ -1012,6 +1012,45 @@ body {
     margin: 15px auto;
     border-radius: 10px;
 }
+/* GRID DE REDES SOCIALES */
+.grid-redes {
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto 0;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.red-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(229, 196, 83, 0.2);
+    padding: 15px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.red-item i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+/* Colores de marca al pasar el mouse */
+.red-item:hover {
+    transform: translateY(-5px);
+    background: rgba(229, 196, 83, 0.1);
+    border-color: #E5C453;
+}
+
+.red-item.facebook:hover { color: #1877F2 !important; }
+.red-item.instagram:hover { color: #E4405F !important; }
+.red-item.tiktok:hover { color: #00f2ea !important; }
     </style>
 </head>
 
@@ -1133,7 +1172,12 @@ body {
         <h1 id="perfil-nombre" class="empresa-titulo"></h1>
         <p id="perfil-eslogan" class="empresa-eslogan"></p>
     </header>
-
+<section class="empresa-section" style="background: #161920;">
+    <h2 class="empresa-subtitulo">Síguenos</h2>
+    <div class="divider-gold"></div>
+    <div id="perfil-redes" class="grid-redes">
+        </div>
+</section>
     <section class="empresa-section">
         <h2 class="empresa-subtitulo">Nuestra Historia</h2>
         <div class="divider-gold"></div>
@@ -1967,23 +2011,57 @@ function llenarPestañaEmpresa(data) {
         }
     }
 
-    // ===== DIRECCIÓN Y CIUDAD (DEFINIR VARIABLES PRIMERO) =====
+    // ===== REDES SOCIALES (NUEVA SECCIÓN) =====
+    const contenedorRedes = document.getElementById('perfil-redes');
+    if (contenedorRedes) {
+        contenedorRedes.innerHTML = ""; 
+        const redesStr = data.redesSociales || ""; 
+        
+        if (redesStr.trim() !== "") {
+            const listaRedes = redesStr.split(',');
+            listaRedes.forEach(red => {
+                const nombreRed = red.trim();
+                if (nombreRed !== "") {
+                    const aRed = document.createElement('a');
+                    // Usamos la misma lógica de clases que medios de pago para el diseño
+                    aRed.className = `red-item ${nombreRed.toLowerCase()}`;
+                    aRed.target = "_blank";
+                    
+                    // Asignar Icono según el nombre
+                    let icono = "fa-share-alt";
+                    const r = nombreRed.toLowerCase();
+                    if(r.includes("instagram")) icono = "fab fa-instagram";
+                    else if(r.includes("facebook")) icono = "fab fa-facebook-f";
+                    else if(r.includes("tiktok")) icono = "fab fa-tiktok";
+                    else if(r.includes("youtube")) icono = "fab fa-youtube";
+
+                    aRed.innerHTML = `<i class="${icono}"></i> ${nombreRed}`;
+                    
+                    // Aquí asignas el link que venga de tu base de datos
+                    // Si el link es data.linkInstagram, etc:
+                    const linkKey = `link${nombreRed.replace(/\s+/g, '')}`;
+                    aRed.href = data[linkKey] || "#"; 
+                    
+                    contenedorRedes.appendChild(aRed);
+                }
+            });
+        }
+    }
+
+    // ===== DIRECCIÓN Y CIUDAD =====
     const direccionTexto = data.direccion || '';
     const ciudadTexto = data.ciudad || '';
     const elDireccion = document.getElementById('perfil-direccion');
-    
     if (elDireccion) {
         elDireccion.innerText = (direccionTexto && ciudadTexto) ? `${direccionTexto}, ${ciudadTexto}` : (direccionTexto || ciudadTexto);
     }
 
-    // ===== MAPA (AHORA SÍ TIENE LAS VARIABLES) =====
+    // ===== MAPA =====
     const iframe = document.getElementById('google-map-iframe');
     if (iframe && direccionTexto) {
         const consulta = encodeURIComponent(`${direccionTexto}, ${ciudadTexto}, Colombia`);
-        // URL oficial de Google Maps Embed
-        iframe.src = `https://www.google.com/maps/embed/v1/place?key=TU_API_KEY_AQUÍ&q=${consulta}`;
-        
-        // NOTA: Si no usas API KEY, puedes usar esta alternativa gratuita:
+        iframe.src = `https://www.google.com/maps/embed/v1/place?key=TU_API_KEY&q=${consulta}`;
+        // Alternativa sin API Key:
         iframe.src = `https://maps.google.com/maps?q=${consulta}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
     }
 
