@@ -1112,7 +1112,16 @@ body {
     color: #000 !important;
     border: none !important;
     box-shadow: 0 6px 20px rgba(229, 196, 83, 0.4) !important;
-    width: 240px; /* Ligeramente más ancho para resaltar */
+    
+    /* 🔥 ELIMINAMOS EL WIDTH FIJO DE 240px */
+    width: fit-content !important; 
+    min-width: 150px; /* Mismo mínimo que los otros botones */
+    align-self: flex-end; /* Lo mantiene pegado a la derecha */
+}
+
+/* Ajuste adicional para que el icono y el texto no queden pegados */
+.cat-main {
+    padding-left: 25px !important; /* Un poco más de aire a la izquierda */
 }
 
 /* CONTENEDOR DEL ACORDEÓN (Wrapper) */
