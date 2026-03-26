@@ -1137,15 +1137,27 @@ body {
     text-align: right; /* 👈 porque están a la derecha */
     padding: 6px 12px;
 }
-/* WRAPPER (ACORDEÓN) */
 .cat-wrapper {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
+    width: 100%;
+    /* Importante para el scroll */
+    overflow-y: auto; 
+    overflow-x: hidden;
+    transition: max-height 0.3s ease-out;
+    
+    /* Estilo opcional para que el scroll sea más fino en móviles */
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+}
 
-    overflow: hidden;
-    transition: max-height 0.3s ease;
+/* Para navegadores Chrome/Safari */
+.cat-wrapper::-webkit-scrollbar {
+    width: 4px;
+}
+.cat-wrapper::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
 }
 
 /* CATEGORÍAS */
@@ -1912,7 +1924,13 @@ if (!menuCategoriasAbierto) {
     wrapper.style.maxHeight = "1000px"; 
     wrapper.style.opacity = "1";
 }
-
+if (!menuCategoriasAbierto) {
+    wrapper.style.maxHeight = "0px";
+} else {
+    // Definimos un máximo para que no se salga de la pantalla del celular
+    // 60vh significa el 60% de la altura de la ventana (viewport height)
+    wrapper.style.maxHeight = "60vh"; 
+}
     // 🔥 CATEGORÍAS
     categorias.forEach((cat, i) => {
         const boton = document.createElement("button");
