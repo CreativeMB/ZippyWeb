@@ -1056,6 +1056,42 @@ body {
 .red-item.facebook:hover { color: #1877F2 !important; }
 .red-item.instagram:hover { color: #E4405F !important; }
 .red-item.tiktok:hover { color: #00f2ea !important; }
+
+
+/* Categorias flotantes */
+.menu-categorias {
+    position: fixed;
+    bottom: 90px; /* Ajusta esto para que quede arriba del botón de WA */
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+    z-index: 10000;
+    pointer-events: none; /* Permite que no bloquee clics accidentales */
+}
+
+.cat-btn {
+    pointer-events: auto; /* Reactiva clics para los botones */
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 10px 18px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.cat-btn.activo {
+    background-color: #1a472a; /* Un verde bosque elegante */
+    color: white;
+    border-color: #1a472a;
+    transform: scale(1.05);
+}
     </style>
 </head>
 
@@ -1240,7 +1276,7 @@ body {
         </a>
     </section>
 </div>
-  
+  <div id="menu-categorias-flotante" class="menu-categorias"></div>
    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
      import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -1668,54 +1704,28 @@ function configurarRedesNav(perfil) {
 }
 
 function renderizarMenuCategorias() {
-    const categorias = obtenerCategoriasUnicas();
-    if (categorias.length <= 1) return; // No mostrar si solo existe "Todas"
+    const contenedor = document.getElementById("menu-categorias-flotante");
+    if (!contenedor) return;
 
-    let contenedorCategorias = document.getElementById("menu-categorias-flotante");
-    
-    if (!contenedorCategorias) {
-        contenedorCategorias = document.createElement("div");
-        contenedorCategorias.id = "menu-categorias-flotante";
-        // Estilos para que flote sobre el botón de WhatsApp o a un lado
-        contenedorCategorias.style = `
-            position: fixed;
-            bottom: 85px; 
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: flex-end;
-            z-index: 999;
-        `;
-        document.body.appendChild(contenedorCategorias);
+    const categorias = obtenerCategoriasUnicas();
+    if (categorias.length <= 1) {
+        contenedor.style.display = "none";
+        return;
     }
 
-    contenedorCategorias.innerHTML = "";
+    contenedor.style.display = "flex";
+    contenedor.innerHTML = "";
     
     categorias.forEach(cat => {
         const boton = document.createElement("button");
         boton.innerText = cat;
-        const esActivo = categoriaSeleccionada === cat;
-        
-        boton.style = `
-            padding: 8px 15px;
-            border-radius: 20px;
-            border: none;
-            background: ${esActivo ? '#004d40' : '#ffffff'};
-            color: ${esActivo ? 'white' : '#333'};
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.3s;
-            font-family: sans-serif;
-        `;
+        boton.className = `cat-btn ${categoriaSeleccionada === cat ? 'activo' : ''}`;
         
         boton.onclick = () => {
             categoriaSeleccionada = cat;
-            render(); // Re-renderiza al filtrar
-            renderizarMenuCategorias(); // Actualiza visual del botón activo
+            render(); // Al llamar a render, se filtrarán los productos
         };
-        contenedorCategorias.appendChild(boton);
+        contenedor.appendChild(boton);
     });
 }
 
