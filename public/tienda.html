@@ -1764,7 +1764,7 @@ if (categoriaSeleccionada !== null && categoriaSeleccionada !== "") {
 
         const card = document.createElement("div");
         // PRIORIDAD: Las primeras 4 son visibles desde el nacimiento del elemento
-        card.className = `producto ${real.agotado ? 'agotado' : ''} ${indice < 4 ? 'visible' : ''}`;
+       card.className = `producto ${real.agotado ? 'agotado' : ''} visible`;
 
         const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
         const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
@@ -1805,21 +1805,14 @@ if (categoriaSeleccionada !== null && categoriaSeleccionada !== "") {
         indice++;
     }
 
-    // Animación para el resto y gestión del loader
-    setTimeout(() => {
-        if (bloqueoActivo) return;
-        
-        // Solo animamos los que NO se marcaron como visibles al inicio
-        document.querySelectorAll(".producto:not(.visible)").forEach((el, i) => {
-            setTimeout(() => el.classList.add("visible"), i * 30);
-        });
-        
-        const ld = document.getElementById("loader");
-        if (ld) { 
-            ld.style.opacity = "0"; 
-            setTimeout(() => ld.style.display = "none", 500); 
-        }
-    }, 100); 
+    // Gestión del loader
+setTimeout(() => {
+    const ld = document.getElementById("loader");
+    if (ld) { 
+        ld.style.opacity = "0"; 
+        setTimeout(() => ld.style.display = "none", 500); 
+    }
+}, 100);
 }
 
 function obtenerCategoriasUnicas() {
