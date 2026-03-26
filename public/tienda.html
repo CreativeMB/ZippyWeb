@@ -1648,10 +1648,9 @@ function configurarRedesNav(perfil) {
         const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
         
 // --- LÓGICA DE FILTRADO NUEVA ---
-        if (categoriaSeleccionada !== "Todas" && real.categoria !== categoriaSeleccionada) {
-            continue; // Salta este producto si no coincide con la categoría
-        }
-
+  if (categoriaSeleccionada !== "Todas" && real.categoria !== categoriaSeleccionada) {
+    continue;
+}
         const imgUrl = productosJson[refP];
         let precioHTML = "";
         let precioFinal = 0;
@@ -1729,30 +1728,24 @@ function configurarRedesNav(perfil) {
 function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
     categoriasSet.add("Todas");
-    
-    for (const refP in productosJson) {
-        if (refP === "images") continue;
-        const claveBusqueda = refP.trim().toLowerCase();
-        const real = productosRealtime[claveBusqueda];
-        
-        // Verificamos que 'categoria' exista en Realtime Database
-        if (real && real.categoria) {
-            categoriasSet.add(real.categoria.trim());
+
+    for (const key in productosRealtime) {
+        const producto = productosRealtime[key];
+
+        if (producto && producto.categoria) {
+            categoriasSet.add(producto.categoria.trim());
         }
     }
-    
+
     categoriasDisponibles = Array.from(categoriasSet);
     return categoriasDisponibles;
 }
-
 function renderizarMenuCategorias() {
-    // Buscamos por el ID que definiste en el HTML
     const contenedor = document.getElementById("menu-categorias-flotante");
     if (!contenedor) return;
 
     const categorias = obtenerCategoriasUnicas();
 
-    // Si solo está "Todas", no mostramos nada
     if (categorias.length <= 1) {
         contenedor.style.display = "none";
         return;
@@ -1760,21 +1753,23 @@ function renderizarMenuCategorias() {
 
     contenedor.style.display = "flex";
     contenedor.innerHTML = "";
-    
+
     categorias.forEach(cat => {
         const boton = document.createElement("button");
         boton.innerText = cat;
-        
-        // IMPORTANTE: Usamos la clase 'cat-btn' y 'activo' de tu CSS
         boton.className = "cat-btn";
+
         if (categoriaSeleccionada === cat) {
             boton.classList.add("activo");
         }
-        
+
         boton.onclick = () => {
             categoriaSeleccionada = cat;
-            render(); // Llama a tu función principal para filtrar
+
+            // 🔥 Solo filtra cuando el usuario toca
+            render();
         };
+
         contenedor.appendChild(boton);
     });
 }
