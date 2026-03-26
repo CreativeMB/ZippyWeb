@@ -1059,52 +1059,55 @@ body {
 
 
 /* Contenedor principal categoria flotante */
-/* CONTENEDOR FLOTANTE */
+/* CONTENEDOR */
 .menu-categorias {
     position: fixed;
-    bottom: 90px; /* arriba del botón de WhatsApp */
+    bottom: 90px;
     right: 15px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 8px;
+    gap: 6px;
     z-index: 999999;
 
-    pointer-events: none; /* importante */
+    pointer-events: none;
 }
 
-/* BOTONES */
+/* ETIQUETAS */
 .cat-btn {
     pointer-events: auto;
 
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.95);
     color: #1a472a;
 
-    border: 2px solid #1a472a;
-    border-radius: 25px;
+    border: 1.5px solid rgba(26, 71, 42, 0.2);
+    border-radius: 20px;
 
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight: 600;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    font-weight: 500;
 
     cursor: pointer;
 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    backdrop-filter: blur(6px);
+
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
 
     transition: all 0.25s ease;
 
     white-space: nowrap;
 
+    /* ANIMACIÓN SUAVE */
     opacity: 0;
-    transform: translateX(30px) scale(0.9);
-    animation: aparecerBtn 0.3s forwards;
+    transform: translateX(40px);
+    animation: slideIn 0.3s forwards;
 }
 
-/* ANIMACIÓN ENTRADA */
-@keyframes aparecerBtn {
+/* ANIMACIÓN */
+@keyframes slideIn {
     to {
         opacity: 1;
-        transform: translateX(0) scale(1);
+        transform: translateX(0);
     }
 }
 
@@ -1112,18 +1115,20 @@ body {
 .cat-btn:hover {
     background: #1a472a;
     color: #fff;
-    transform: scale(1.05);
+    border-color: #1a472a;
+    transform: translateX(-3px) scale(1.05);
 }
 
-/* ACTIVO (SELECCIONADO) */
+/* ACTIVO */
 .cat-btn.activo {
     background: #1a472a !important;
     color: #fff !important;
     border-color: #1a472a;
+    font-weight: 600;
     transform: scale(1.08);
 }
 
-/* EFECTO CLICK */
+/* CLICK */
 .cat-btn:active {
     transform: scale(0.95);
 }
@@ -1754,6 +1759,7 @@ function obtenerCategoriasUnicas() {
     categoriasDisponibles = Array.from(categoriasSet);
     return categoriasDisponibles;
 }
+
 function renderizarMenuCategorias() {
     const contenedor = document.getElementById("menu-categorias-flotante");
     if (!contenedor) return;
@@ -1768,10 +1774,13 @@ function renderizarMenuCategorias() {
     contenedor.style.display = "flex";
     contenedor.innerHTML = "";
 
-    categorias.forEach(cat => {
+    categorias.forEach((cat, i) => {
         const boton = document.createElement("button");
         boton.innerText = cat;
         boton.className = "cat-btn";
+
+        // 🔥 ANIMACIÓN PRO (aquí va)
+        boton.style.animationDelay = `${i * 0.05}s`;
 
         if (categoriaSeleccionada === cat) {
             boton.classList.add("activo");
@@ -1779,9 +1788,10 @@ function renderizarMenuCategorias() {
 
         boton.onclick = () => {
             categoriaSeleccionada = cat;
-
-            // 🔥 Solo filtra cuando el usuario toca
             render();
+
+            // 🔥 UX PRO (opcional)
+            window.scrollTo({ top: 0, behavior: "smooth" });
         };
 
         contenedor.appendChild(boton);
