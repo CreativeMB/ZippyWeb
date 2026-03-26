@@ -1058,21 +1058,22 @@ body {
 .red-item.tiktok:hover { color: #00f2ea !important; }
 
 
-/* Categorias flotantes */
+/* Contenedor principal categoria flotante */
 .menu-categorias {
     position: fixed;
-    bottom: 90px; /* Ajusta esto para que quede arriba del botón de WA */
+    bottom: 90px; 
     right: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
     align-items: flex-end;
     z-index: 10000;
-    pointer-events: none; /* Permite que no bloquee clics accidentales */
+    /* Importante: el contenedor no captura clics, pero los botones sí */
+    pointer-events: none; 
 }
 
 .cat-btn {
-    pointer-events: auto; /* Reactiva clics para los botones */
+    pointer-events: auto; /* Permite clics en los botones */
     background-color: #ffffff;
     color: #333;
     border: 1px solid #ddd;
@@ -1084,11 +1085,13 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     transition: all 0.3s ease;
     white-space: nowrap;
+    display: block; /* Asegura que ocupen su espacio */
 }
 
+/* Clase para el botón seleccionado */
 .cat-btn.activo {
-    background-color: #1a472a; /* Un verde bosque elegante */
-    color: white;
+    background-color: #1a472a; 
+    color: white !important;
     border-color: #1a472a;
     transform: scale(1.05);
 }
@@ -1276,7 +1279,7 @@ body {
         </a>
     </section>
 </div>
-  <div id="menu-categorias-flotante" class="menu-categorias"></div>
+<div id="menu-categorias-flotante" class="menu-categorias"></div>
    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
      import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -1710,39 +1713,27 @@ function obtenerCategoriasUnicas() {
     
     for (const refP in productosJson) {
         if (refP === "images") continue;
-        
         const claveBusqueda = refP.trim().toLowerCase();
-        // Accedemos a la data de Realtime donde está el campo 'categoria'
         const real = productosRealtime[claveBusqueda];
         
+        // Verificamos que 'categoria' exista en Realtime Database
         if (real && real.categoria) {
-            const nombreCat = real.categoria.trim();
-            if (nombreCat !== "") {
-                categoriasSet.add(nombreCat);
-            }
+            categoriasSet.add(real.categoria.trim());
         }
     }
-
-    // Actualizamos la variable global con el array final
+    
     categoriasDisponibles = Array.from(categoriasSet);
     return categoriasDisponibles;
 }
 
 function renderizarMenuCategorias() {
-    // Buscamos el div en el HTML
-    let contenedor = document.getElementById("menu-categorias-flotante");
-    
-    // Si no existe, lo creamos para que no de error
-    if (!contenedor) {
-        contenedor = document.createElement("div");
-        contenedor.id = "menu-categorias-flotante";
-        document.body.appendChild(contenedor);
-    }
+    // Buscamos por el ID que definiste en el HTML
+    const contenedor = document.getElementById("menu-categorias-flotante");
+    if (!contenedor) return;
 
-    // Obtenemos las categorías (esto actualiza la variable global automaticamente)
     const categorias = obtenerCategoriasUnicas();
-    
-    // Si solo hay "Todas", ocultamos el menú
+
+    // Si solo está "Todas", no mostramos nada
     if (categorias.length <= 1) {
         contenedor.style.display = "none";
         return;
@@ -1755,12 +1746,15 @@ function renderizarMenuCategorias() {
         const boton = document.createElement("button");
         boton.innerText = cat;
         
-        // Aplicamos la clase activo si coincide con la seleccionada
-        boton.className = `cat-btn ${categoriaSeleccionada === cat ? 'activo' : ''}`;
+        // IMPORTANTE: Usamos la clase 'cat-btn' y 'activo' de tu CSS
+        boton.className = "cat-btn";
+        if (categoriaSeleccionada === cat) {
+            boton.classList.add("activo");
+        }
         
         boton.onclick = () => {
             categoriaSeleccionada = cat;
-            render(); // Al filtrar, render() redibuja los productos
+            render(); // Llama a tu función principal para filtrar
         };
         contenedor.appendChild(boton);
     });
