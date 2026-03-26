@@ -1268,7 +1268,7 @@ body {
     let imagenProducto = "";
     let slug = "";
     let bloqueoActivo = false;
-
+let categoriaSeleccionada = "Todas";
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
@@ -1578,14 +1578,22 @@ function configurarRedesNav(perfil) {
     if (!contenedor) return;
     contenedor.innerHTML = "";
     
+    renderizarMenuCategorias();
+
     let indice = 0;
 
     for (const refP in productosJson) {
         if (refP === "images") continue;
-        const imgUrl = productosJson[refP];
+       
         const claveBusqueda = refP.trim().toLowerCase();
         const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
+        
+// --- LÓGICA DE FILTRADO NUEVA ---
+        if (categoriaSeleccionada !== "Todas" && real.categoria !== categoriaSeleccionada) {
+            continue; // Salta este producto si no coincide con la categoría
+        }
 
+        const imgUrl = productosJson[refP];
         let precioHTML = "";
         let precioFinal = 0;
         
@@ -1657,6 +1665,73 @@ function configurarRedesNav(perfil) {
             setTimeout(() => ld.style.display = "none", 500); 
         }
     }, 100); 
+}
+
+function renderizarMenuCategorias() {
+    const categorias = obtenerCategoriasUnicas();
+    if (categorias.length <= 1) return; // No mostrar si solo existe "Todas"
+
+    let contenedorCategorias = document.getElementById("menu-categorias-flotante");
+    
+    if (!contenedorCategorias) {
+        contenedorCategorias = document.createElement("div");
+        contenedorCategorias.id = "menu-categorias-flotante";
+        // Estilos para que flote sobre el botón de WhatsApp o a un lado
+        contenedorCategorias.style = `
+            position: fixed;
+            bottom: 85px; 
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+            z-index: 999;
+        `;
+        document.body.appendChild(contenedorCategorias);
+    }
+
+    contenedorCategorias.innerHTML = "";
+    
+    categorias.forEach(cat => {
+        const boton = document.createElement("button");
+        boton.innerText = cat;
+        const esActivo = categoriaSeleccionada === cat;
+        
+        boton.style = `
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: none;
+            background: ${esActivo ? '#004d40' : '#ffffff'};
+            color: ${esActivo ? 'white' : '#333'};
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+            font-family: sans-serif;
+        `;
+        
+        boton.onclick = () => {
+            categoriaSeleccionada = cat;
+            render(); // Re-renderiza al filtrar
+            renderizarMenuCategorias(); // Actualiza visual del botón activo
+        };
+        contenedorCategorias.appendChild(boton);
+    });
+}
+
+function obtenerCategoriasUnicas() {
+    const categorias = new Set();
+    categorias.add("Todas");
+    
+    for (const refP in productosJson) {
+        if (refP === "images") continue;
+        const claveBusqueda = refP.trim().toLowerCase();
+        const real = productosRealtime[claveBusqueda];
+        if (real && real.categoria) {
+            categorias.add(real.categoria);
+        }
+    }
+    return Array.from(categorias);
 }
 
    // --- 5. SISTEMA DE PEDIDOS ---
