@@ -1690,9 +1690,15 @@ function configurarRedesNav(perfil) {
         const claveBusqueda = refP.trim().toLowerCase();
         const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
         
-// --- LÓGICA DE FILTRADO NUEVA ---
-  if (categoriaSeleccionada !== "Todas" && real.categoria !== categoriaSeleccionada) {
-    continue;
+// --- LÓGICA DE FILTRADO categorias ---
+ if (categoriaSeleccionada) {
+    const categoriasProducto = (real.categoria || "")
+        .split(",")
+        .map(c => c.trim().toLowerCase());
+
+    if (!categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
+        continue;
+    }
 }
         const imgUrl = productosJson[refP];
         let precioHTML = "";
@@ -1770,7 +1776,7 @@ function configurarRedesNav(perfil) {
 
 function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
-   categoriasSet.add("Todas");
+
     for (const refP in productosJson) {
         if (refP === "images") continue;
 
@@ -1778,11 +1784,18 @@ function obtenerCategoriasUnicas() {
         const real = productosRealtime[claveBusqueda];
 
         if (real && real.categoria) {
-            const cat = real.categoria.trim();
+            
+            // 🔥 SEPARAR POR COMA
+            const categoriasArray = real.categoria.split(",");
 
-            console.log("Categoria válida:", cat, "Producto:", refP);
+            categoriasArray.forEach(cat => {
+                const limpia = cat.trim();
 
-            categoriasSet.add(cat);
+                if (limpia) {
+                    console.log("Categoria detectada:", limpia);
+                    categoriasSet.add(limpia);
+                }
+            });
         }
     }
 
