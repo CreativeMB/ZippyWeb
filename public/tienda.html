@@ -1203,10 +1203,16 @@ body {
     }
 
     .cat-wrapper {
-        flex-direction: column-reverse; /* Las categorías salen hacia arriba */
-        margin-bottom: 4px;
-        max-height: 45vh; /* Altura cómoda para no tapar todo el móvil */
-        align-items: flex-end;
+        pointer-events: none; 
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    /* Solo cuando el menú está abierto activamos los clics de las categorías */
+    .menu-categorias.abierto .cat-wrapper {
+        pointer-events: auto;
+        opacity: 1;
+        max-height: 45vh;
     }
 }
     </style>
@@ -1904,11 +1910,13 @@ function renderizarMenuCategorias() {
 
     btnMain.innerHTML = `☰ Categorías`;
 
-    btnMain.onclick = (e) => {
-        e.stopPropagation();
-        menuCategoriasAbierto = !menuCategoriasAbierto;
-        renderizarMenuCategorias();
-    };
+   btnMain.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // 🔥 Crucial: evita que el toque "atraviese" al fondo
+
+    menuCategoriasAbierto = !menuCategoriasAbierto;
+    renderizarMenuCategorias(); // Redibuja el menú (abrir o cerrar)
+};
 
     contenedor.appendChild(btnMain);
 
@@ -1944,24 +1952,23 @@ if (!menuCategoriasAbierto) {
         boton.classList.add("activo");
     }
 
-    boton.onclick = (e) => {
-        e.stopPropagation();
+   boton.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-        // 1. Cambiamos la categoría seleccionada
-        if (categoriaSeleccionada === cat) {
-            categoriaSeleccionada = null;
-        } else {
-            categoriaSeleccionada = cat;
-        }
+    // Solo permitimos seleccionar si el menú ya estaba visualmente abierto
+    if (!menuCategoriasAbierto) return; 
 
-        // 🔥 2. CERRAMOS EL MENÚ AUTOMÁTICAMENTE
-        menuCategoriasAbierto = false; 
+    if (categoriaSeleccionada === cat) {
+        categoriaSeleccionada = null;
+    } else {
+        categoriaSeleccionada = cat;
+    }
 
-        // 3. Ejecutamos el render para filtrar los productos y redibujar el menú cerrado
-        render(); 
-        renderizarMenuCategorias(); 
-    };
-
+    menuCategoriasAbierto = false; // Cerramos al elegir
+    render(); 
+    renderizarMenuCategorias();
+};
     wrapper.appendChild(boton);
 });
 
