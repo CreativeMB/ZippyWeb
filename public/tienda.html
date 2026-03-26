@@ -1172,31 +1172,26 @@ body {
 @media (max-width: 768px) {
 
     .menu-categorias {
-        /* 1. Lo fijamos a la pantalla, no al contenido */
-        position: fixed;
+        position: fixed; /* Cambiamos a fixed para que siempre esté visible en la mitad */
+        right: 0; /* Pegado al borde derecho */
         
-        /* 2. Centrado vertical perfecto */
-        top: 50%;
-        transform: translateY(-50%); /* Ajuste para que el centro del menú sea el centro de la pantalla */
+        /* Ubicación en la mitad de la pantalla */
+        top: 50%; 
+        transform: translateY(-50%); /* Este truco lo centra perfectamente según su propio tamaño */
         
-        /* 3. Pegado a la derecha */
-        right: 0;
-        z-index: 9999; /* Máxima prioridad visual */
-        
-        /* 4. Layout de botones */
-        display: flex;
-        flex-direction: column;
-        gap: 8px; /* Espacio entre botones si lo deseas */
         padding-right: 0;
+        z-index: 9999; /* Para que no lo tape el contenido del scroll */
+        
+        /* Animación que ya tenías */
+        animation: fadeInCat 0.4s ease-out;
     }
 
     .cat-btn {
+        display: block; /* Asegura que se apilen uno debajo de otro */
         margin-right: 0;
-        /* Redondeamos solo el lado izquierdo para el efecto de "pestaña" */
-        border-radius: 20px 0 0 20px; 
-        padding: 10px 15px;
-        box-shadow: -2px 4px 10px rgba(0,0,0,0.2);
-        white-space: nowrap; /* Evita que el texto se rompa en dos líneas */
+        margin-bottom: 5px; /* Espaciado entre botones */
+        border-radius: 6px 0 0 6px; 
+        box-shadow: -2px 2px 8px rgba(0,0,0,0.3); /* Sombra para que resalte sobre el fondo */
     }
 
 }
