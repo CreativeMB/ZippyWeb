@@ -1068,7 +1068,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 8px;
+    gap: 6px;
 
     z-index: 999999;
 
@@ -1081,68 +1081,87 @@ body {
 
     font-family: 'Montserrat', sans-serif;
 
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.88);
     color: #E5C453;
 
-    border: 1px solid rgba(229, 196, 83, 0.3);
-    border-radius: 20px;
+    border: 1px solid rgba(229, 196, 83, 0.25);
+    border-radius: 10px; /* 🔥 menos redondo, más moderno */
 
-    padding: 7px 14px;
-    font-size: 12.5px;
+    padding: 6px 12px;
+    font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
 
     cursor: pointer;
 
     backdrop-filter: blur(6px);
 
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
 
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
 
     white-space: nowrap;
 
-    /* ANIMACIÓN */
+    /* 🔥 ANIMACIÓN LIMPIA (SIN MOVIMIENTO) */
     opacity: 0;
-    transform: translateX(30px);
-    animation: slideIn 0.35s ease forwards;
+    transform: scale(0.96);
+    animation: fadeInCat 0.25s ease forwards;
 }
 
-/* ANIMACIÓN SUAVE */
-@keyframes slideIn {
+/* 🔥 APARECE EN MISMA POSICIÓN */
+@keyframes fadeInCat {
     from {
         opacity: 0;
-        transform: translateX(30px);
+        transform: scale(0.96);
     }
     to {
         opacity: 1;
-        transform: translateX(0);
+        transform: scale(1);
     }
 }
 
-/* HOVER */
+/* HOVER (sutil, no exagerado) */
 .cat-btn:hover {
-    background: linear-gradient(135deg, #1a1a1a, #000);
-    color: #fff;
+    background: rgba(20, 20, 20, 0.95);
+    color: #ffffff;
+
     border-color: #E5C453;
 
-    box-shadow: 0 6px 18px rgba(229, 196, 83, 0.25);
+    box-shadow: 0 4px 16px rgba(229, 196, 83, 0.2);
 
-    transform: translateX(-3px);
+    transform: scale(1.03);
 }
 
-/* ACTIVO (SELECCIONADO) */
+/* ACTIVO */
 .cat-btn.activo {
-    background: linear-gradient(135deg, #E5C453, #b8962e);
-    color: #000;
-
-    border-color: #E5C453;
-
-    box-shadow: 0 8px 25px rgba(229, 196, 83, 0.4);
-
-    transform: scale(1.05);
+    position: relative;
 }
 
+.cat-btn.activo::after {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: 20%;
+    height: 60%;
+    width: 3px;
+    background: #E5C453;
+    border-radius: 2px;
+}
+/* BOTÓN PRINCIPAL */
+.cat-main {
+    background: linear-gradient(135deg, #E5C453, #caa93a);
+    color: #000;
+    border: none;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+
+    box-shadow: 0 6px 20px rgba(229, 196, 83, 0.4);
+}
+
+/* EFECTO ACTIVO */
+.cat-main:active {
+    transform: scale(0.95);
+}
 /* CLICK */
 .cat-btn:active {
     transform: scale(0.95);
@@ -1361,6 +1380,7 @@ body {
     let bloqueoActivo = false;
     let categoriasDisponibles = [];
     let categoriaSeleccionada = null;
+    let menuCategoriasAbierto = false;
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
@@ -1820,30 +1840,42 @@ function renderizarMenuCategorias() {
     contenedor.style.display = "flex";
     contenedor.innerHTML = "";
 
+    // 🔥 BOTÓN PRINCIPAL
+    const btnMain = document.createElement("button");
+    btnMain.innerText = "Categorías";
+    btnMain.className = "cat-btn cat-main";
+
+    btnMain.onclick = () => {
+        menuCategoriasAbierto = !menuCategoriasAbierto;
+        renderizarMenuCategorias(); // re-render
+    };
+
+    contenedor.appendChild(btnMain);
+
+    // 🔥 SI ESTÁ CERRADO → NO MOSTRAR NADA MÁS
+    if (!menuCategoriasAbierto) return;
+
+    // 🔥 CATEGORÍAS
     categorias.forEach((cat, i) => {
         const boton = document.createElement("button");
         boton.innerText = cat;
         boton.className = "cat-btn";
 
-        // Animación escalonada
-        boton.style.animationDelay = `${i * 0.05}s`;
+        boton.style.animationDelay = `${i * 0.04}s`;
 
-        // Activo si está seleccionada
         if (categoriaSeleccionada === cat) {
             boton.classList.add("activo");
         }
 
         boton.onclick = () => {
-            // 🔥 TOGGLE PRO
             if (categoriaSeleccionada === cat) {
-                categoriaSeleccionada = null; // quita filtro
+                categoriaSeleccionada = null;
             } else {
-                categoriaSeleccionada = cat; // aplica filtro
+                categoriaSeleccionada = cat;
             }
 
             render();
 
-            // UX suave
             window.scrollTo({ top: 0, behavior: "smooth" });
         };
 
