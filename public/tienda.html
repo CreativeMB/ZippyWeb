@@ -1764,7 +1764,7 @@ if (categoriaSeleccionada !== null && categoriaSeleccionada !== "") {
 
         const card = document.createElement("div");
         // PRIORIDAD: Las primeras 4 son visibles desde el nacimiento del elemento
-       card.className = `producto ${real.agotado ? 'agotado' : ''} visible`;
+      card.className = `producto ${real.agotado ? 'agotado' : ''} visible`;
 
         const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
         const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
