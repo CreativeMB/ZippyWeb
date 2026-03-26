@@ -1359,8 +1359,8 @@ body {
     let imagenProducto = "";
     let slug = "";
     let bloqueoActivo = false;
-    let categoriaSeleccionada = "Todas";
     let categoriasDisponibles = [];
+    let categoriaSeleccionada = null;
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
@@ -1691,7 +1691,8 @@ function configurarRedesNav(perfil) {
         const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
         
 // --- LÓGICA DE FILTRADO categorias ---
- if (categoriaSeleccionada) {
+if (categoriaSeleccionada !== null && categoriaSeleccionada !== "") {
+    
     const categoriasProducto = (real.categoria || "")
         .split(",")
         .map(c => c.trim().toLowerCase());
