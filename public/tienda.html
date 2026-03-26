@@ -1060,58 +1060,31 @@ body {
 
 /* Contenedor principal categoria flotante */
 .menu-categorias {
-    position: fixed;
-    bottom: 90px; 
-    right: 20px;
+    position: fixed !important;
+    bottom: 100px !important;
+    right: 20px !important;
+    z-index: 10001 !important; /* Más alto que las cards de productos */
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    align-items: flex-end;
-    z-index: 10000;
-    /* Importante: el contenedor no captura clics, pero los botones sí */
-    pointer-events: none; 
-}
-
-.cat-btn {
-    pointer-events: auto; /* Permite clics en los botones */
-    background-color: #ffffff;
-    color: #333;
-    border: 1px solid #ddd;
-    padding: 10px 18px;
-    border-radius: 25px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    display: block; /* Asegura que ocupen su espacio */
-}
-
-/* Clase para el botón seleccionado */
-.cat-btn.activo {
-    background-color: #1a472a; 
-    color: white !important;
-    border-color: #1a472a;
-    transform: scale(1.05);
-}
-#menu-categorias-flotante {
-    position: fixed !important;
-    bottom: 100px !important; /* Ajustado para que no tape el botón de WhatsApp */
-    right: 20px !important;
-    z-index: 999999 !important; /* Forzamos que esté al frente de todo */
-    pointer-events: none; /* El contenedor no bloquea, los botones sí */
+    gap: 8px;
+    pointer-events: none;
 }
 
 .cat-btn {
     pointer-events: auto !important;
-    margin-bottom: 5px;
-    background: #fff !important;
-    border: 2px solid #1a472a !important;
+    background-color: white !important;
     color: #1a472a !important;
-    /* Aseguramos que el botón tenga dimensiones reales */
-    display: inline-block !important; 
-    min-width: 80px;
+    border: 2px solid #1a472a !important;
+    padding: 8px 15px !important;
+    border-radius: 20px !important;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.cat-btn.activo {
+    background-color: #1a472a !important;
+    color: white !important;
 }
     </style>
 </head>
@@ -1325,8 +1298,9 @@ body {
     let imagenProducto = "";
     let slug = "";
     let bloqueoActivo = false;
-window.categoriaSeleccionada = "Todas";
-window.categoriasDisponibles = [];
+// 1. Aseguramos que las variables existan en el espacio global
+window.categoriaSeleccionada = window.categoriaSeleccionada || "Todas";
+window.categoriasDisponibles = window.categoriasDisponibles || [];
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
@@ -1439,7 +1413,10 @@ function iniciarCargaBase(slugDesdeURL) {
                 
                 empresaId = child.key;
                 empresaEncontrada = true;
-
+productosRealtime = data.productos || {}; 
+        
+        // También lo hacemos global para la consola (Debug)
+        window.productosRealtime = productosRealtime;
                 // --- TUS FUNCIONES ORIGINALES (INTACTAS) ---
                 aplicarSEO(perfil);
                 validarYContinuar(perfil, data);
@@ -1726,25 +1703,19 @@ function configurarRedesNav(perfil) {
     }, 100); 
 }
 
-// Estas funciones deben ir después de tus variables globales
 function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
     categoriasSet.add("Todas");
     
-    // Verificamos que productosRealtime tenga datos
-    if (!productosRealtime || Object.keys(productosRealtime).length === 0) {
-        console.warn("Zippy App: Esperando datos de productosRealtime...");
-        return ["Todas"];
-    }
+    // Usamos la variable global que llenamos en iniciarCargaBase
+    const datos = window.productosRealtime || productosRealtime;
 
-    // Recorremos productosRealtime directamente
-    for (const id in productosRealtime) {
-        const p = productosRealtime[id];
-        // Buscamos el campo 'categoria' que me dijiste que está en Realtime Database
-        if (p && p.categoria) {
-            const nombreCat = p.categoria.trim();
-            if (nombreCat !== "") {
-                categoriasSet.add(nombreCat);
+    if (datos) {
+        for (const id in datos) {
+            const p = datos[id];
+            // Si el producto tiene el campo 'categoria' en Realtime Database
+            if (p && p.categoria) {
+                categoriasSet.add(p.categoria.trim());
             }
         }
     }
@@ -1753,13 +1724,13 @@ function obtenerCategoriasUnicas() {
     return window.categoriasDisponibles;
 }
 
-function renderizarMenuCategorias() {
+// 3. Definimos la función visual
+window.renderizarMenuCategorias = function() {
     const contenedor = document.getElementById("menu-categorias-flotante");
     if (!contenedor) return;
 
-    const categorias = obtenerCategoriasUnicas();
+    const categorias = window.obtenerCategoriasUnicas();
 
-    // Si solo hay "Todas", no mostramos el menú flotante
     if (categorias.length <= 1) {
         contenedor.style.display = "none";
         return;
@@ -1771,21 +1742,21 @@ function renderizarMenuCategorias() {
     categorias.forEach(cat => {
         const boton = document.createElement("button");
         boton.innerText = cat;
-        
-        // Usamos tus clases de CSS: .cat-btn y .activo
-        boton.className = "cat-btn";
-        if (window.categoriaSeleccionada === cat) {
-            boton.classList.add("activo");
-        }
+        boton.className = `cat-btn ${window.categoriaSeleccionada === cat ? 'activo' : ''}`;
         
         boton.onclick = () => {
             window.categoriaSeleccionada = cat;
-            render(); // Al filtrar, render() redibuja los productos
-            renderizarMenuCategorias(); // Actualiza cuál botón se ve verde
+            // Llamamos a render() de forma segura
+            if (typeof render === 'function') {
+                render(); 
+            } else if (window.render) {
+                window.render();
+            }
+            window.renderizarMenuCategorias();
         };
         contenedor.appendChild(boton);
     });
-}
+};
 
    // --- 5. SISTEMA DE PEDIDOS ---
 function enviarPedido() {
