@@ -1062,16 +1062,17 @@ body {
 /* CONTENEDOR */
 .menu-categorias {
     position: fixed;
- align-items: stretch; /* 🔥 IMPORTANTE */
-    top: 75px; /* 🔥 EXACTO a la altura del header */
-    right: 15px;
+
+    top: 75px; /* altura del header */
+    right: 0; /* 🔥 pegado totalmente */
 
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 6px;
 
-    z-index: 1090; /* 👈 debajo del nav (1100) */
+    z-index: 1090;
+
     pointer-events: none;
 }
 
@@ -1086,13 +1087,15 @@ body {
     color: #E5C453;
 
     border: 1px solid rgba(229, 196, 83, 0.25);
-    border-radius: 6px; /* 🔥 más cuadrado */
 
-    padding: 6px 10px;
+    /* 🔥 SOLO REDONDEADO IZQUIERDA */
+    border-radius: 6px 0 0 6px;
 
-    font-size: 14px; /* 🔥 igual a tabs */
+    padding: 6px 12px;
+
+    font-size: 14px;
     font-weight: bold;
- 
+
     cursor: pointer;
 
     box-shadow: 0 3px 10px rgba(0,0,0,0.3);
@@ -1109,7 +1112,6 @@ body {
 .cat-btn:hover {
     background: #2a2a2a;
     color: #fff;
-    border-color: #E5C453;
 }
 /* BOTÓN PRINCIPAL */
 .cat-main {
@@ -1150,16 +1152,10 @@ body {
     animation: fadeInCat 0.25s ease forwards;
 }
 
-/* ACTIVO PRO 🔥 */
 .cat-btn.activo {
     background: #E5C453;
     color: #000;
-
     border-color: #E5C453;
-
-    box-shadow: 0 4px 12px rgba(229, 196, 83, 0.3);
-
-    transform: scale(1.03);
 }
 
 /* ANIMACIÓN */
