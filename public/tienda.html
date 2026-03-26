@@ -1305,6 +1305,7 @@ body {
     let slug = "";
     let bloqueoActivo = false;
 let categoriaSeleccionada = "Todas";
+let categoriasDisponibles = [];
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
@@ -1703,11 +1704,45 @@ function configurarRedesNav(perfil) {
     }, 100); 
 }
 
-function renderizarMenuCategorias() {
-    const contenedor = document.getElementById("menu-categorias-flotante");
-    if (!contenedor) return;
+function obtenerCategoriasUnicas() {
+    const categoriasSet = new Set();
+    categoriasSet.add("Todas");
+    
+    for (const refP in productosJson) {
+        if (refP === "images") continue;
+        
+        const claveBusqueda = refP.trim().toLowerCase();
+        // Accedemos a la data de Realtime donde está el campo 'categoria'
+        const real = productosRealtime[claveBusqueda];
+        
+        if (real && real.categoria) {
+            const nombreCat = real.categoria.trim();
+            if (nombreCat !== "") {
+                categoriasSet.add(nombreCat);
+            }
+        }
+    }
 
+    // Actualizamos la variable global con el array final
+    categoriasDisponibles = Array.from(categoriasSet);
+    return categoriasDisponibles;
+}
+
+function renderizarMenuCategorias() {
+    // Buscamos el div en el HTML
+    let contenedor = document.getElementById("menu-categorias-flotante");
+    
+    // Si no existe, lo creamos para que no de error
+    if (!contenedor) {
+        contenedor = document.createElement("div");
+        contenedor.id = "menu-categorias-flotante";
+        document.body.appendChild(contenedor);
+    }
+
+    // Obtenemos las categorías (esto actualiza la variable global automaticamente)
     const categorias = obtenerCategoriasUnicas();
+    
+    // Si solo hay "Todas", ocultamos el menú
     if (categorias.length <= 1) {
         contenedor.style.display = "none";
         return;
@@ -1719,29 +1754,16 @@ function renderizarMenuCategorias() {
     categorias.forEach(cat => {
         const boton = document.createElement("button");
         boton.innerText = cat;
+        
+        // Aplicamos la clase activo si coincide con la seleccionada
         boton.className = `cat-btn ${categoriaSeleccionada === cat ? 'activo' : ''}`;
         
         boton.onclick = () => {
             categoriaSeleccionada = cat;
-            render(); // Al llamar a render, se filtrarán los productos
+            render(); // Al filtrar, render() redibuja los productos
         };
         contenedor.appendChild(boton);
     });
-}
-
-function obtenerCategoriasUnicas() {
-    const categorias = new Set();
-    categorias.add("Todas");
-    
-    for (const refP in productosJson) {
-        if (refP === "images") continue;
-        const claveBusqueda = refP.trim().toLowerCase();
-        const real = productosRealtime[claveBusqueda];
-        if (real && real.categoria) {
-            categorias.add(real.categoria);
-        }
-    }
-    return Array.from(categorias);
 }
 
    // --- 5. SISTEMA DE PEDIDOS ---
