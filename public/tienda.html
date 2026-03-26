@@ -1777,7 +1777,6 @@ if (categoriaSeleccionada !== null && categoriaSeleccionada !== "") {
 
 function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
-categoriasSet.add("Todas");
     for (const refP in productosJson) {
         if (refP === "images") continue;
 
@@ -1813,7 +1812,7 @@ function renderizarMenuCategorias() {
 
     const categorias = obtenerCategoriasUnicas();
 
-    if (categorias.length <= 1) {
+    if (categorias.length === 0) {
         contenedor.style.display = "none";
         return;
     }
@@ -1826,18 +1825,25 @@ function renderizarMenuCategorias() {
         boton.innerText = cat;
         boton.className = "cat-btn";
 
-        // 🔥 ANIMACIÓN PRO (aquí va)
+        // Animación escalonada
         boton.style.animationDelay = `${i * 0.05}s`;
 
+        // Activo si está seleccionada
         if (categoriaSeleccionada === cat) {
             boton.classList.add("activo");
         }
 
         boton.onclick = () => {
-            categoriaSeleccionada = cat;
+            // 🔥 TOGGLE PRO
+            if (categoriaSeleccionada === cat) {
+                categoriaSeleccionada = null; // quita filtro
+            } else {
+                categoriaSeleccionada = cat; // aplica filtro
+            }
+
             render();
 
-            // 🔥 UX PRO (opcional)
+            // UX suave
             window.scrollTo({ top: 0, behavior: "smooth" });
         };
 
