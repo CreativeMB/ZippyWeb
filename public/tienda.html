@@ -1071,44 +1071,73 @@ body {
     gap: 6px;
 
     z-index: 999999;
-
     pointer-events: none;
 }
 
-/* ETIQUETAS */
+/* BOTÓN BASE */
 .cat-btn {
     pointer-events: auto;
 
     font-family: 'Montserrat', sans-serif;
 
-    background: rgba(0, 0, 0, 0.88);
-    color: #E5C453;
-
-    border: 1px solid rgba(229, 196, 83, 0.25);
-    border-radius: 10px; /* 🔥 menos redondo, más moderno */
-
-    padding: 6px 12px;
+    border-radius: 10px;
+    padding: 7px 12px;
     font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.4px;
 
     cursor: pointer;
 
-    backdrop-filter: blur(6px);
-
-    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
-
     transition: all 0.2s ease;
-
     white-space: nowrap;
+}
 
-    /* 🔥 ANIMACIÓN LIMPIA (SIN MOVIMIENTO) */
+/* BOTÓN PRINCIPAL */
+.cat-main {
+    background: linear-gradient(135deg, #E5C453, #caa93a);
+    color: #000;
+    border: none;
+
+    box-shadow: 0 6px 20px rgba(229, 196, 83, 0.4);
+}
+
+/* WRAPPER (ACORDEÓN) */
+.cat-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+/* CATEGORÍAS */
+.cat-wrapper .cat-btn {
+    background: rgba(0, 0, 0, 0.9);
+    color: #E5C453;
+
+    border: 1px solid rgba(229, 196, 83, 0.2);
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
     opacity: 0;
     transform: scale(0.96);
     animation: fadeInCat 0.25s ease forwards;
 }
 
-/* 🔥 APARECE EN MISMA POSICIÓN */
+/* ACTIVO PRO 🔥 */
+.cat-btn.activo {
+    background: linear-gradient(135deg, #E5C453, #b8962e);
+    color: #000;
+
+    border: none;
+
+    box-shadow: 0 6px 18px rgba(229, 196, 83, 0.35);
+
+    transform: scale(1.05);
+}
+
+/* ANIMACIÓN */
 @keyframes fadeInCat {
     from {
         opacity: 0;
@@ -1118,53 +1147,6 @@ body {
         opacity: 1;
         transform: scale(1);
     }
-}
-
-/* HOVER (sutil, no exagerado) */
-.cat-btn:hover {
-    background: rgba(20, 20, 20, 0.95);
-    color: #ffffff;
-
-    border-color: #E5C453;
-
-    box-shadow: 0 4px 16px rgba(229, 196, 83, 0.2);
-
-    transform: scale(1.03);
-}
-
-/* ACTIVO */
-.cat-btn.activo {
-    position: relative;
-}
-
-.cat-btn.activo::after {
-    content: "";
-    position: absolute;
-    left: -4px;
-    top: 20%;
-    height: 60%;
-    width: 3px;
-    background: #E5C453;
-    border-radius: 2px;
-}
-/* BOTÓN PRINCIPAL */
-.cat-main {
-    background: linear-gradient(135deg, #E5C453, #caa93a);
-    color: #000;
-    border: none;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-
-    box-shadow: 0 6px 20px rgba(229, 196, 83, 0.4);
-}
-
-/* EFECTO ACTIVO */
-.cat-main:active {
-    transform: scale(0.95);
-}
-/* CLICK */
-.cat-btn:active {
-    transform: scale(0.95);
 }
     </style>
 </head>
@@ -1825,7 +1807,22 @@ categoriasDisponibles.sort((a, b) => a.localeCompare(b, 'es'));
 
     return categoriasDisponibles;
 }
+window.addEventListener("scroll", () => {
+    if (menuCategoriasAbierto) {
+        menuCategoriasAbierto = false;
+        renderizarMenuCategorias();
+    }
+});
+document.addEventListener("click", (e) => {
+    const contenedor = document.getElementById("menu-categorias-flotante");
 
+    if (!contenedor.contains(e.target)) {
+        if (menuCategoriasAbierto) {
+            menuCategoriasAbierto = false;
+            renderizarMenuCategorias();
+        }
+    }
+});
 function renderizarMenuCategorias() {
     const contenedor = document.getElementById("menu-categorias-flotante");
     if (!contenedor) return;
@@ -1842,18 +1839,27 @@ function renderizarMenuCategorias() {
 
     // 🔥 BOTÓN PRINCIPAL
     const btnMain = document.createElement("button");
-    btnMain.innerText = "Categorías";
     btnMain.className = "cat-btn cat-main";
 
-    btnMain.onclick = () => {
+    btnMain.innerHTML = `☰ Categorías`;
+
+    btnMain.onclick = (e) => {
+        e.stopPropagation();
         menuCategoriasAbierto = !menuCategoriasAbierto;
-        renderizarMenuCategorias(); // re-render
+        renderizarMenuCategorias();
     };
 
     contenedor.appendChild(btnMain);
 
-    // 🔥 SI ESTÁ CERRADO → NO MOSTRAR NADA MÁS
-    if (!menuCategoriasAbierto) return;
+    // 🔥 CONTENEDOR INTERNO (ACORDEÓN)
+    const wrapper = document.createElement("div");
+    wrapper.className = "cat-wrapper";
+
+    if (!menuCategoriasAbierto) {
+        wrapper.style.maxHeight = "0px";
+    } else {
+        wrapper.style.maxHeight = "300px";
+    }
 
     // 🔥 CATEGORÍAS
     categorias.forEach((cat, i) => {
@@ -1861,13 +1867,17 @@ function renderizarMenuCategorias() {
         boton.innerText = cat;
         boton.className = "cat-btn";
 
+        // delay animación
         boton.style.animationDelay = `${i * 0.04}s`;
 
+        // 🔥 ACTIVO PRO
         if (categoriaSeleccionada === cat) {
             boton.classList.add("activo");
         }
 
-        boton.onclick = () => {
+        boton.onclick = (e) => {
+            e.stopPropagation();
+
             if (categoriaSeleccionada === cat) {
                 categoriaSeleccionada = null;
             } else {
@@ -1875,12 +1885,12 @@ function renderizarMenuCategorias() {
             }
 
             render();
-
-            window.scrollTo({ top: 0, behavior: "smooth" });
         };
 
-        contenedor.appendChild(boton);
+        wrapper.appendChild(boton);
     });
+
+    contenedor.appendChild(wrapper);
 }
    // --- 5. SISTEMA DE PEDIDOS ---
 function enviarPedido() {
