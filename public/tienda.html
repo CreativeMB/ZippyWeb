@@ -1757,13 +1757,16 @@ function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
     categoriasSet.add("Todas");
 
-    for (const key in productosRealtime) {
-        const producto = productosRealtime[key];
+    for (const refP in productosJson) {
+        if (refP === "images") continue;
 
-        if (producto && producto.categoria) {
-            const cat = producto.categoria.trim();
+        const claveBusqueda = refP.trim().toLowerCase();
+        const real = productosRealtime[claveBusqueda];
 
-            console.log("Categoria detectada:", cat);
+        if (real && real.categoria) {
+            const cat = real.categoria.trim();
+
+            console.log("Categoria válida:", cat, "Producto:", refP);
 
             categoriasSet.add(cat);
         }
