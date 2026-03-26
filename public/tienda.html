@@ -1760,23 +1760,36 @@ function configurarRedesNav(perfil) {
 
 function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
+
+    // Siempre incluir "Todas"
     categoriasSet.add("Todas");
 
     for (const key in productosRealtime) {
         const producto = productosRealtime[key];
 
         if (producto && producto.categoria) {
-            console.log("Categoria encontrada:", producto.categoria); // 👈 DEBUG
-            categoriasSet.add(producto.categoria.trim());
+
+            let cat = producto.categoria.trim();
+
+            // 🔥 Normalizar (clave)
+            const catNormalizada = cat.toLowerCase();
+
+            // 🔥 Convertir a formato bonito
+            const catBonita = catNormalizada.charAt(0).toUpperCase() + catNormalizada.slice(1);
+
+            console.log("Original:", producto.categoria, "→ Normalizada:", catBonita);
+
+            categoriasSet.add(catBonita);
         }
     }
 
     categoriasDisponibles = Array.from(categoriasSet);
 
-    console.log("Categorias finales:", categoriasDisponibles); // 👈 DEBUG FINAL
+    console.log("Categorias finales:", categoriasDisponibles);
 
     return categoriasDisponibles;
 }
+
 function renderizarMenuCategorias() {
     const contenedor = document.getElementById("menu-categorias-flotante");
     if (!contenedor) return;
