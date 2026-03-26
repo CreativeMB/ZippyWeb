@@ -1076,20 +1076,36 @@ body {
 }
 
 /* BOTÓN BASE */
+/* ETIQUETAS MÁS CUADRADAS Y CONSISTENTES */
 .cat-btn {
     pointer-events: auto;
 
     font-family: 'Montserrat', sans-serif;
 
-    border-radius: 10px;
-    padding: 7px 12px;
-    font-size: 12px;
-    font-weight: 600;
+    background: rgba(0, 0, 0, 0.9);
+    color: #E5C453;
+
+    border: 1px solid rgba(229, 196, 83, 0.25);
+    border-radius: 6px; /* 🔥 más cuadrado */
+
+    padding: 6px 10px;
+
+    font-size: 14px; /* 🔥 igual a tabs */
+    font-weight: bold;
+    text-transform: uppercase; /* 🔥 igual a tabs */
 
     cursor: pointer;
 
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+
     transition: all 0.2s ease;
+
     white-space: nowrap;
+
+    /* ANIMACIÓN LIMPIA */
+    opacity: 0;
+    transform: scale(0.97);
+    animation: fadeInCat 0.2s ease forwards;
 }
 
 /* BOTÓN PRINCIPAL */
@@ -1128,16 +1144,20 @@ body {
 
 /* ACTIVO PRO 🔥 */
 .cat-btn.activo {
-    background: linear-gradient(135deg, #E5C453, #b8962e);
+    background: #E5C453;
     color: #000;
 
-    border: none;
+    border-color: #E5C453;
 
-    box-shadow: 0 6px 18px rgba(229, 196, 83, 0.35);
+    box-shadow: 0 4px 12px rgba(229, 196, 83, 0.3);
 
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
-
+.cat-btn:hover {
+    background: #2a2a2a;
+    color: #fff;
+    border-color: #E5C453;
+}
 /* ANIMACIÓN */
 @keyframes fadeInCat {
     from {
