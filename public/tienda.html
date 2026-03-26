@@ -1062,7 +1062,7 @@ body {
 /* CONTENEDOR */
 .menu-categorias {
     position: fixed;
-
+ align-items: stretch; /* 🔥 IMPORTANTE */
     top: 75px; /* 🔥 EXACTO a la altura del header */
     right: 15px;
 
@@ -1092,8 +1092,7 @@ body {
 
     font-size: 14px; /* 🔥 igual a tabs */
     font-weight: bold;
-    text-transform: uppercase; /* 🔥 igual a tabs */
-
+ 
     cursor: pointer;
 
     box-shadow: 0 3px 10px rgba(0,0,0,0.3);
@@ -1107,7 +1106,11 @@ body {
     transform: scale(0.97);
     animation: fadeInCat 0.2s ease forwards;
 }
-
+.cat-btn:hover {
+    background: #2a2a2a;
+    color: #fff;
+    border-color: #E5C453;
+}
 /* BOTÓN PRINCIPAL */
 .cat-main {
     background: linear-gradient(135deg, #E5C453, #caa93a);
@@ -1117,6 +1120,11 @@ body {
     box-shadow: 0 6px 20px rgba(229, 196, 83, 0.4);
 }
 
+.cat-btn {
+    width: 100%; /* 🔥 todas mismo ancho */
+    text-align: right; /* 👈 porque están a la derecha */
+    padding: 6px 12px;
+}
 /* WRAPPER (ACORDEÓN) */
 .cat-wrapper {
     display: flex;
@@ -1153,11 +1161,7 @@ body {
 
     transform: scale(1.03);
 }
-.cat-btn:hover {
-    background: #2a2a2a;
-    color: #fff;
-    border-color: #E5C453;
-}
+
 /* ANIMACIÓN */
 @keyframes fadeInCat {
     from {
