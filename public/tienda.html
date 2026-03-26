@@ -1630,7 +1630,7 @@ function configurarRedesNav(perfil) {
         } catch (e) { productosJson = {}; render(); }
     }
 
-  function escucharCambios(id) {
+ function escucharCambios(id) {
     if (bloqueoActivo) return;
 
     const productosRef = ref(db, id + "/productos");
@@ -1642,7 +1642,6 @@ function configurarRedesNav(perfil) {
 
         snapshot.forEach((child) => {
             const p = child.val();
-
             const refOriginal = p.referencia || p.Referencia || p.nombre || "";
 
             if (refOriginal) {
@@ -1650,20 +1649,16 @@ function configurarRedesNav(perfil) {
 
                 productosRealtime[claveLimpia] = p;
                 productosRealtime[claveLimpia].referenciaReal = refOriginal;
-
-                // 🔥 DEBUG POR PRODUCTO
-                console.log("Producto cargado:", p);
-                console.log("Categoria:", p.categoria);
             }
         });
 
-        // 🔥 DEBUG GLOBAL
-        console.log("OBJETO FINAL REALTIME:", productosRealtime);
+        // 🔥 AGREGA ESTO AQUÍ
+        console.log("YA CARGÓ TODO REALTIME:", productosRealtime);
 
-        render();
-        procesarProductoDirecto();
+        render(); // ← AQUÍ se generan categorías correctamente
     });
 }
+
  function render() {
     if (bloqueoActivo) return;
     const contenedor = document.getElementById("productos");
@@ -1760,26 +1755,17 @@ function configurarRedesNav(perfil) {
 
 function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
-
-    // Siempre incluir "Todas"
     categoriasSet.add("Todas");
 
     for (const key in productosRealtime) {
         const producto = productosRealtime[key];
 
         if (producto && producto.categoria) {
+            const cat = producto.categoria.trim();
 
-            let cat = producto.categoria.trim();
+            console.log("Categoria detectada:", cat);
 
-            // 🔥 Normalizar (clave)
-            const catNormalizada = cat.toLowerCase();
-
-            // 🔥 Convertir a formato bonito
-            const catBonita = catNormalizada.charAt(0).toUpperCase() + catNormalizada.slice(1);
-
-            console.log("Original:", producto.categoria, "→ Normalizada:", catBonita);
-
-            categoriasSet.add(catBonita);
+            categoriasSet.add(cat);
         }
     }
 
