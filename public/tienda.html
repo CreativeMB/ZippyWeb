@@ -1059,7 +1059,7 @@ body {
 
 
 /* Contenedor principal categoria flotante */
-/* CONTENEDOR FLOTANTE */
+/* CONTENEDOR */
 .menu-categorias {
     position: fixed;
     bottom: 90px;
@@ -1079,33 +1079,36 @@ body {
 .cat-btn {
     pointer-events: auto;
 
-    background: rgba(255, 255, 255, 0.92);
-    color: #2c2c2c;
+    font-family: 'Montserrat', sans-serif;
 
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #E5C453;
+
+    border: 1px solid rgba(229, 196, 83, 0.3);
+    border-radius: 20px;
 
     padding: 7px 14px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 
     cursor: pointer;
 
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(6px);
 
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 
     transition: all 0.25s ease;
 
     white-space: nowrap;
 
-    /* ANIMACIÓN SUAVE */
+    /* ANIMACIÓN */
     opacity: 0;
     transform: translateX(30px);
     animation: slideIn 0.35s ease forwards;
 }
 
-/* ANIMACIÓN */
+/* ANIMACIÓN SUAVE */
 @keyframes slideIn {
     from {
         opacity: 0;
@@ -1117,20 +1120,25 @@ body {
     }
 }
 
-/* HOVER (sutil, elegante) */
+/* HOVER */
 .cat-btn:hover {
-    background: #1a472a;
+    background: linear-gradient(135deg, #1a1a1a, #000);
     color: #fff;
-    transform: translateX(-2px);
+    border-color: #E5C453;
+
+    box-shadow: 0 6px 18px rgba(229, 196, 83, 0.25);
+
+    transform: translateX(-3px);
 }
 
-/* ACTIVO (seleccionado) */
+/* ACTIVO (SELECCIONADO) */
 .cat-btn.activo {
-    background: #1a472a;
-    color: #fff;
-    border-color: #1a472a;
+    background: linear-gradient(135deg, #E5C453, #b8962e);
+    color: #000;
 
-    box-shadow: 0 6px 20px rgba(26, 71, 42, 0.25);
+    border-color: #E5C453;
+
+    box-shadow: 0 8px 25px rgba(229, 196, 83, 0.4);
 
     transform: scale(1.05);
 }
@@ -1761,8 +1769,7 @@ function configurarRedesNav(perfil) {
 
 function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
-    categoriasSet.add("Todas");
-
+   
     for (const refP in productosJson) {
         if (refP === "images") continue;
 
