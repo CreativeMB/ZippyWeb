@@ -1776,7 +1776,7 @@ function configurarRedesNav(perfil) {
 
 function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
-
+categoriasSet.add("Todas");
     for (const refP in productosJson) {
         if (refP === "images") continue;
 
@@ -1800,7 +1800,7 @@ function obtenerCategoriasUnicas() {
     }
 
     categoriasDisponibles = Array.from(categoriasSet);
-
+categoriasDisponibles.sort((a, b) => a.localeCompare(b, 'es'));
     console.log("Categorias finales:", categoriasDisponibles);
 
     return categoriasDisponibles;
