@@ -1151,7 +1151,7 @@ body {
 </head>
 
 <body>
-<div id="menu-categorias-flotante" class="menu-categorias"></div>
+
     <div id="loader">
         <div class="spinner"></div>
         <p style="margin-top:15px; font-weight:bold; color:#202020;">Cargando...</p>
@@ -1179,6 +1179,7 @@ body {
 </div>
  
     <div id="productos-tab" class="tab-content">
+        <div id="menu-categorias-flotante" class="menu-categorias"></div>
         <a id="btnWhats" class="whatsappbtnflotante" href="#" target="_blank">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
     </a>
@@ -1769,7 +1770,7 @@ function configurarRedesNav(perfil) {
 
 function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
-   
+   categoriasSet.add("Todas");
     for (const refP in productosJson) {
         if (refP === "images") continue;
 
