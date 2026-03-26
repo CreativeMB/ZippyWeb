@@ -1715,7 +1715,13 @@ function configurarRedesNav(perfil) {
     if (bloqueoActivo) return;
     const contenedor = document.getElementById("productos");
     if (!contenedor) return;
+    contenedor.style.opacity = "0";
+
+setTimeout(() => {
     contenedor.innerHTML = "";
+    // aquí renderizas todo
+    contenedor.style.opacity = "1";
+}, 100);
     
     renderizarMenuCategorias();
 
