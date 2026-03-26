@@ -1075,6 +1075,17 @@ body {
 
     pointer-events: none;
 }
+.img-container {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+}
+
+.img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 /* BOTÓN BASE */
 /* ETIQUETAS MÁS CUADRADAS Y CONSISTENTES */
 .cat-btn {
@@ -1715,13 +1726,7 @@ function configurarRedesNav(perfil) {
     if (bloqueoActivo) return;
     const contenedor = document.getElementById("productos");
     if (!contenedor) return;
-    contenedor.style.opacity = "0";
-
-setTimeout(() => {
     contenedor.innerHTML = "";
-    // aquí renderizas todo
-    contenedor.style.opacity = "1";
-}, 100);
     
     renderizarMenuCategorias();
 
