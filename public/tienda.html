@@ -1074,23 +1074,28 @@ body {
     padding-right: 0;
 }
 
-/* BOTÓN BASE (Estilo unificado) */
+/* BOTÓN BASE (Ancho dinámico según el texto) */
 .cat-btn {
     pointer-events: auto;
     font-family: 'Montserrat', sans-serif;
     background: rgba(0, 0, 0, 0.9);
     color: #E5C453;
     border: 1px solid rgba(229, 196, 83, 0.25);
-    border-radius: 6px 0 0 6px; /* Solo redondeado izquierdo */
+    border-radius: 6px 0 0 6px; 
     padding: 10px 18px;
-    font-size: 16px; /* Bajado de 20px para que sea más elegante */
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 3px 10px rgba(0,0,0,0.3);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
+    
+    white-space: nowrap; /* Evita que el texto salte de línea */
     text-align: right;
-    width: 220px; /* Ancho fijo para consistencia visual */
+    
+    /* 🔥 CAMBIOS CLAVE AQUÍ */
+    width: fit-content;    /* Se ajusta al tamaño del texto */
+    min-width: 150px;      /* (Opcional) Un mínimo para que no se vea muy flaco */
+    align-self: flex-end;  /* Empuja el botón contra el borde derecho */
     display: block;
 }
 
@@ -1151,38 +1156,48 @@ body {
 /* ESTILOS ESPECÍFICOS PARA CELULARES */
 @media (max-width: 767px) {
     .menu-categorias {
-        /* Reset de la posición lateral */
         top: auto;
-        right: 20px; /* Separación del borde derecho */
-        bottom: 100px; /* Ajusta este valor para que quede arriba del botón de WhatsApp */
-        transform: none; /* Quitamos el centrado vertical */
+        right: 0; /* 🔥 Volvemos a pegarlo totalmente al borde derecho */
+        bottom: 80px; /* Ajusta este valor según la altura de tu botón de WhatsApp */
+        transform: none;
         
         position: fixed;
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
-        gap: 10px;
+        align-items: flex-end; /* Alinea los botones al borde derecho */
+        gap: 4px; /* Espacio más pequeño entre etiquetas */
         width: auto;
+        pointer-events: none; /* Evita que el contenedor vacío tape clics */
     }
 
     .cat-btn {
-        /* Botones un poco más pequeños para móvil pero fáciles de tocar */
-        width: 180px; 
+        pointer-events: auto;
+        /* Estilo de etiqueta: Solo redondeado a la izquierda */
+        border-radius: 6px 0 0 6px !important; 
+        
+        width: fit-content; /* Se ajusta a la palabra más larga */
+        min-width: 140px;
+        max-width: 80vw; /* Evita que ocupe toda la pantalla si el texto es muy largo */
+        
         font-size: 16px;
-        padding: 12px 15px;
-        border-radius: 8px; /* Redondeado completo para que parezcan burbujas flotantes */
-        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        padding: 10px 15px;
+        text-align: right;
+        box-shadow: -2px 3px 10px rgba(0,0,0,0.3);
+        margin-right: 0; /* Asegura que no haya margen a la derecha */
     }
 
     .cat-main {
-        width: 200px; /* El botón principal resalta un poco más */
+        width: fit-content;
+        min-width: 160px;
+        /* Un poco de margen extra abajo para separar del botón de WhatsApp */
+        margin-bottom: 5px; 
     }
 
     .cat-wrapper {
-        /* En móvil, que el menú crezca hacia ARRIBA */
-        flex-direction: column-reverse; 
-        margin-bottom: 8px;
-        max-height: 50vh; /* Que no tape toda la pantalla */
+        flex-direction: column-reverse; /* Las categorías salen hacia arriba */
+        margin-bottom: 4px;
+        max-height: 45vh; /* Altura cómoda para no tapar todo el móvil */
+        align-items: flex-end;
     }
 }
     </style>
