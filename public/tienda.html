@@ -1172,28 +1172,33 @@ body {
 @media (max-width: 768px) {
 
     .menu-categorias {
-        /* 1. Posicionamiento pegajoso */
-        position: -webkit-sticky; /* Soporte para Safari */
-        position: sticky;
-        top: 0; /* Se pegará al tope de la pantalla al hacer scroll */
-        z-index: 1000; /* Para que pase por encima de las fotos/contenido */
+        /* 1. Lo fijamos a la pantalla, no al contenido */
+        position: fixed;
         
-        /* 2. Estética que pediste */
-        right: 0; 
-        padding-right: 0;
+        /* 2. Centrado vertical perfecto */
+        top: 50%;
+        transform: translateY(-50%); /* Ajuste para que el centro del menú sea el centro de la pantalla */
+        
+        /* 3. Pegado a la derecha */
+        right: 0;
+        z-index: 9999; /* Máxima prioridad visual */
+        
+        /* 4. Layout de botones */
         display: flex;
         flex-direction: column;
-        align-items: flex-end; /* Alinea los botones a la derecha */
-        
-        /* Ajuste de margen superior inicial */
-        margin-top: 10px; 
+        gap: 8px; /* Espacio entre botones si lo deseas */
+        padding-right: 0;
     }
 
     .cat-btn {
         margin-right: 0;
-        border-radius: 6px 0 0 6px; 
-        box-shadow: -2px 2px 5px rgba(0,0,0,0.1); /* Opcional: para que resalte al pegarse */
+        /* Redondeamos solo el lado izquierdo para el efecto de "pestaña" */
+        border-radius: 20px 0 0 20px; 
+        padding: 10px 15px;
+        box-shadow: -2px 4px 10px rgba(0,0,0,0.2);
+        white-space: nowrap; /* Evita que el texto se rompa en dos líneas */
     }
+
 }
     </style>
 </head>
