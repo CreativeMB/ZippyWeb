@@ -1148,30 +1148,42 @@ body {
     border-radius: 10px;
 }
 /* ANIMACIÓN movil categoria */
-@keyframes fadeInCat {
-    from {
-        opacity: 0;
-        transform: scale(0.96);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-@media (max-width: 768px) {
-
+/* ESTILOS ESPECÍFICOS PARA CELULARES */
+@media (max-width: 767px) {
     .menu-categorias {
-        right: 0; /* 🔥 pegado totalmente al borde */
-        top: 50%; 
-        transform: translateY(-50%);
-        padding-right: 0;
+        /* Reset de la posición lateral */
+        top: auto;
+        right: 20px; /* Separación del borde derecho */
+        bottom: 100px; /* Ajusta este valor para que quede arriba del botón de WhatsApp */
+        transform: none; /* Quitamos el centrado vertical */
+        
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+        width: auto;
     }
 
     .cat-btn {
-        margin-right: 0;
-        border-radius: 6px 0 0 6px; /* 🔥 solo redondeado a la izquierda */
+        /* Botones un poco más pequeños para móvil pero fáciles de tocar */
+        width: 180px; 
+        font-size: 16px;
+        padding: 12px 15px;
+        border-radius: 8px; /* Redondeado completo para que parezcan burbujas flotantes */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
 
+    .cat-main {
+        width: 200px; /* El botón principal resalta un poco más */
+    }
+
+    .cat-wrapper {
+        /* En móvil, que el menú crezca hacia ARRIBA */
+        flex-direction: column-reverse; 
+        margin-bottom: 8px;
+        max-height: 50vh; /* Que no tape toda la pantalla */
+    }
 }
     </style>
 </head>
