@@ -1926,33 +1926,35 @@ if (!menuCategoriasAbierto) {
     wrapper.style.maxHeight = "60vh"; 
 }
     // 🔥 CATEGORÍAS
-    categorias.forEach((cat, i) => {
-        const boton = document.createElement("button");
-        boton.innerText = cat;
-        boton.className = "cat-btn";
+   categorias.forEach((cat, i) => {
+    const boton = document.createElement("button");
+    boton.innerText = cat;
+    boton.className = "cat-btn";
 
-        // delay animación
-        boton.style.animationDelay = `${i * 0.04}s`;
+    if (categoriaSeleccionada === cat) {
+        boton.classList.add("activo");
+    }
 
-        // 🔥 ACTIVO PRO
+    boton.onclick = (e) => {
+        e.stopPropagation();
+
+        // 1. Cambiamos la categoría seleccionada
         if (categoriaSeleccionada === cat) {
-            boton.classList.add("activo");
+            categoriaSeleccionada = null;
+        } else {
+            categoriaSeleccionada = cat;
         }
 
-        boton.onclick = (e) => {
-            e.stopPropagation();
+        // 🔥 2. CERRAMOS EL MENÚ AUTOMÁTICAMENTE
+        menuCategoriasAbierto = false; 
 
-            if (categoriaSeleccionada === cat) {
-                categoriaSeleccionada = null;
-            } else {
-                categoriaSeleccionada = cat;
-            }
+        // 3. Ejecutamos el render para filtrar los productos y redibujar el menú cerrado
+        render(); 
+        renderizarMenuCategorias(); 
+    };
 
-            render();
-        };
-
-        wrapper.appendChild(boton);
-    });
+    wrapper.appendChild(boton);
+});
 
     contenedor.appendChild(wrapper);
 }
