@@ -1897,15 +1897,21 @@ function renderizarMenuCategorias() {
 
     contenedor.appendChild(btnMain);
 
-    // 🔥 CONTENEDOR INTERNO (ACORDEÓN)
-    const wrapper = document.createElement("div");
-    wrapper.className = "cat-wrapper";
+   // 🔥 CONTENEDOR INTERNO (ACORDEÓN)
+const wrapper = document.createElement("div");
+wrapper.className = "cat-wrapper";
 
-    if (!menuCategoriasAbierto) {
-        wrapper.style.maxHeight = "0px";
-    } else {
-        wrapper.style.maxHeight = "300px";
-    }
+if (!menuCategoriasAbierto) {
+    wrapper.style.maxHeight = "0px";
+    wrapper.style.opacity = "0"; // Opcional: para que se vea más fluido
+} else {
+    // Primero añadimos los botones al wrapper (esto ya lo haces en tu bucle forEach)
+    // Pero el cálculo del alto debe hacerse DESPUÉS de que el wrapper tenga hijos
+    
+    // Usamos un pequeño truco: "1000px" o mejor aún, scrollHeight
+    wrapper.style.maxHeight = "1000px"; 
+    wrapper.style.opacity = "1";
+}
 
     // 🔥 CATEGORÍAS
     categorias.forEach((cat, i) => {
