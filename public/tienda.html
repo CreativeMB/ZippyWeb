@@ -1060,31 +1060,58 @@ body {
 
 /* Contenedor principal categoria flotante */
 .menu-categorias {
-    position: fixed !important;
-    bottom: 100px !important;
-    right: 20px !important;
-    z-index: 10001 !important; /* Más alto que las cards de productos */
+    position: fixed;
+    bottom: 90px; 
+    right: 20px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
+    gap: 10px;
+    align-items: flex-end;
+    z-index: 10000;
+    /* Importante: el contenedor no captura clics, pero los botones sí */
+    pointer-events: none; 
+}
+
+.cat-btn {
+    pointer-events: auto; /* Permite clics en los botones */
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 10px 18px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: block; /* Asegura que ocupen su espacio */
+}
+
+/* Clase para el botón seleccionado */
+.cat-btn.activo {
+    background-color: #1a472a; 
+    color: white !important;
+    border-color: #1a472a;
+    transform: scale(1.05);
+}
+#menu-categorias-flotante {
+    position: fixed !important;
+    bottom: 100px !important; /* Ajustado para que no tape el botón de WhatsApp */
+    right: 20px !important;
+    z-index: 999999 !important; /* Forzamos que esté al frente de todo */
+    pointer-events: none; /* El contenedor no bloquea, los botones sí */
 }
 
 .cat-btn {
     pointer-events: auto !important;
-    background-color: white !important;
-    color: #1a472a !important;
+    margin-bottom: 5px;
+    background: #fff !important;
     border: 2px solid #1a472a !important;
-    padding: 8px 15px !important;
-    border-radius: 20px !important;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-.cat-btn.activo {
-    background-color: #1a472a !important;
-    color: white !important;
+    color: #1a472a !important;
+    /* Aseguramos que el botón tenga dimensiones reales */
+    display: inline-block !important; 
+    min-width: 80px;
 }
     </style>
 </head>
@@ -1413,10 +1440,7 @@ function iniciarCargaBase(slugDesdeURL) {
                 
                 empresaId = child.key;
                 empresaEncontrada = true;
-productosRealtime = data.productos || {}; 
-        
-        // También lo hacemos global para la consola (Debug)
-        window.productosRealtime = productosRealtime;
+
                 // --- TUS FUNCIONES ORIGINALES (INTACTAS) ---
                 aplicarSEO(perfil);
                 validarYContinuar(perfil, data);
@@ -1703,26 +1727,30 @@ function configurarRedesNav(perfil) {
     }, 100); 
 }
 
-function obtenerCategoriasUnicas() {
+// 2. Definimos la función de obtención de datos
+window.obtenerCategoriasUnicas = function() {
     const categoriasSet = new Set();
     categoriasSet.add("Todas");
     
-    // Usamos la variable global que llenamos en iniciarCargaBase
+    // Usamos window.productosRealtime para asegurar que lo encuentre
     const datos = window.productosRealtime || productosRealtime;
 
-    if (datos) {
-        for (const id in datos) {
-            const p = datos[id];
-            // Si el producto tiene el campo 'categoria' en Realtime Database
-            if (p && p.categoria) {
-                categoriasSet.add(p.categoria.trim());
-            }
+    if (!datos || Object.keys(datos).length === 0) {
+        console.warn("Zippy App: Esperando datos de productosRealtime...");
+        return ["Todas"];
+    }
+
+    for (const id in datos) {
+        const p = datos[id];
+        // Buscamos el campo exacto que mencionaste
+        if (p && p.categoria) {
+            categoriasSet.add(p.categoria.trim());
         }
     }
     
     window.categoriasDisponibles = Array.from(categoriasSet);
     return window.categoriasDisponibles;
-}
+};
 
 // 3. Definimos la función visual
 window.renderizarMenuCategorias = function() {
