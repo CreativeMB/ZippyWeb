@@ -1095,6 +1095,24 @@ body {
     border-color: #1a472a;
     transform: scale(1.05);
 }
+#menu-categorias-flotante {
+    position: fixed !important;
+    bottom: 100px !important; /* Ajustado para que no tape el botón de WhatsApp */
+    right: 20px !important;
+    z-index: 999999 !important; /* Forzamos que esté al frente de todo */
+    pointer-events: none; /* El contenedor no bloquea, los botones sí */
+}
+
+.cat-btn {
+    pointer-events: auto !important;
+    margin-bottom: 5px;
+    background: #fff !important;
+    border: 2px solid #1a472a !important;
+    color: #1a472a !important;
+    /* Aseguramos que el botón tenga dimensiones reales */
+    display: inline-block !important; 
+    min-width: 80px;
+}
     </style>
 </head>
 
@@ -1708,39 +1726,40 @@ function configurarRedesNav(perfil) {
     }, 100); 
 }
 
-window.obtenerCategoriasUnicas = function() {
+// Estas funciones deben ir después de tus variables globales
+function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
     categoriasSet.add("Todas");
     
-    if (typeof productosJson === 'undefined' || typeof productosRealtime === 'undefined') {
-        console.error("Error: productosJson o productosRealtime no están definidos.");
+    // Verificamos que productosRealtime tenga datos
+    if (!productosRealtime || Object.keys(productosRealtime).length === 0) {
+        console.warn("Zippy App: Esperando datos de productosRealtime...");
         return ["Todas"];
     }
 
-    for (const refP in productosJson) {
-        if (refP === "images") continue;
-        const claveBusqueda = refP.trim().toLowerCase();
-        const real = productosRealtime[claveBusqueda];
-        
-        // IMPORTANTE: Verifica que en Firebase el campo sea 'categoria' exactamente
-        if (real && real.categoria) {
-            categoriasSet.add(real.categoria.trim());
+    // Recorremos productosRealtime directamente
+    for (const id in productosRealtime) {
+        const p = productosRealtime[id];
+        // Buscamos el campo 'categoria' que me dijiste que está en Realtime Database
+        if (p && p.categoria) {
+            const nombreCat = p.categoria.trim();
+            if (nombreCat !== "") {
+                categoriasSet.add(nombreCat);
+            }
         }
     }
     
     window.categoriasDisponibles = Array.from(categoriasSet);
     return window.categoriasDisponibles;
-};
+}
 
-window.renderizarMenuCategorias = function() {
+function renderizarMenuCategorias() {
     const contenedor = document.getElementById("menu-categorias-flotante");
-    if (!contenedor) {
-        console.warn("No se encontró el div #menu-categorias-flotante");
-        return;
-    }
+    if (!contenedor) return;
 
-    const categorias = window.obtenerCategoriasUnicas();
+    const categorias = obtenerCategoriasUnicas();
 
+    // Si solo hay "Todas", no mostramos el menú flotante
     if (categorias.length <= 1) {
         contenedor.style.display = "none";
         return;
@@ -1753,7 +1772,7 @@ window.renderizarMenuCategorias = function() {
         const boton = document.createElement("button");
         boton.innerText = cat;
         
-        // Usamos tus clases de CSS
+        // Usamos tus clases de CSS: .cat-btn y .activo
         boton.className = "cat-btn";
         if (window.categoriaSeleccionada === cat) {
             boton.classList.add("activo");
@@ -1761,15 +1780,12 @@ window.renderizarMenuCategorias = function() {
         
         boton.onclick = () => {
             window.categoriaSeleccionada = cat;
-            if (typeof render === 'function') {
-                render(); // Llama a tu función de dibujo de productos
-            } else {
-                console.error("La función render() no existe");
-            }
+            render(); // Al filtrar, render() redibuja los productos
+            renderizarMenuCategorias(); // Actualiza cuál botón se ve verde
         };
         contenedor.appendChild(boton);
     });
-};
+}
 
    // --- 5. SISTEMA DE PEDIDOS ---
 function enviarPedido() {
