@@ -1141,14 +1141,15 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    /* Importante para el scroll */
-    overflow-y: auto; 
-    overflow-x: hidden;
-    transition: max-height 0.3s ease-out;
+    max-height: 60vh; 
+    overflow-y: auto;
     
-    /* Estilo opcional para que el scroll sea más fino en móviles */
-    scrollbar-width: thin;
-    scrollbar-color: #888 transparent;
+    /* 🔥 ESTA ES LA CLAVE: Evita que el scroll pase al fondo del sitio */
+    overscroll-behavior: contain; 
+    
+    transition: max-height 0.3s ease;
+    background: white; /* Asegúrate de que tenga fondo para que no se trasluzca */
+    z-index: 1000;
 }
 
 /* Para navegadores Chrome/Safari */
@@ -2546,6 +2547,33 @@ function actualizarMetaProp(property, content) {
     }
     meta.setAttribute("content", content);
 }
+
+// Dentro de renderizarMenuCategorias, cambia el onclick del btnMain y añade eventos al contenedor
+const contenedorMenu = document.getElementById("menu-categorias-flotante");
+
+contenedorMenu.onmouseenter = () => {
+    if (!menuCategoriasAbierto) {
+        menuCategoriasAbierto = true;
+        renderizarMenuCategorias();
+    }
+};
+
+contenedorMenu.onmouseleave = () => {
+    if (menuCategoriasAbierto) {
+        menuCategoriasAbierto = false;
+        renderizarMenuCategorias();
+    }
+};
+window.addEventListener("scroll", (e) => {
+    // Solo cerramos si el menú está abierto Y el scroll NO es dentro del wrapper de categorías
+    const wrapper = document.querySelector(".cat-wrapper");
+    
+    // Si el menú está abierto pero el usuario hace scroll en el body (fondo)
+    if (menuCategoriasAbierto && e.target !== wrapper) {
+        menuCategoriasAbierto = false;
+        renderizarMenuCategorias();
+    }
+}, true); // El 'true' es para capturar el evento correctamente
 </script>
 </body>
 
