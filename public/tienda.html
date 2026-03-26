@@ -1630,26 +1630,40 @@ function configurarRedesNav(perfil) {
         } catch (e) { productosJson = {}; render(); }
     }
 
-    function escucharCambios(id) {
-        if (bloqueoActivo) return;
-        const productosRef = ref(db, id + "/productos");
-        onValue(productosRef, (snapshot) => {
-            if (bloqueoActivo) return;
-            productosRealtime = {};
-            snapshot.forEach((child) => {
-                const p = child.val();
-                const refOriginal = p.referencia || p.Referencia || p.nombre || "";
-                if (refOriginal) {
-                    const claveLimpia = String(refOriginal).trim().toLowerCase();
-                    productosRealtime[claveLimpia] = p;
-                    productosRealtime[claveLimpia].referenciaReal = refOriginal;
-                }
-            });
-            render();
-            procesarProductoDirecto();
-        });
-    }
+  function escucharCambios(id) {
+    if (bloqueoActivo) return;
 
+    const productosRef = ref(db, id + "/productos");
+
+    onValue(productosRef, (snapshot) => {
+        if (bloqueoActivo) return;
+
+        productosRealtime = {};
+
+        snapshot.forEach((child) => {
+            const p = child.val();
+
+            const refOriginal = p.referencia || p.Referencia || p.nombre || "";
+
+            if (refOriginal) {
+                const claveLimpia = String(refOriginal).trim().toLowerCase();
+
+                productosRealtime[claveLimpia] = p;
+                productosRealtime[claveLimpia].referenciaReal = refOriginal;
+
+                // 🔥 DEBUG POR PRODUCTO
+                console.log("Producto cargado:", p);
+                console.log("Categoria:", p.categoria);
+            }
+        });
+
+        // 🔥 DEBUG GLOBAL
+        console.log("OBJETO FINAL REALTIME:", productosRealtime);
+
+        render();
+        procesarProductoDirecto();
+    });
+}
  function render() {
     if (bloqueoActivo) return;
     const contenedor = document.getElementById("productos");
