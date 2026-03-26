@@ -1161,58 +1161,79 @@ body {
     background: rgba(229, 196, 83, 0.3); /* Color dorado suave */
     border-radius: 10px;
 }
-/* ANIMACIÓN movil categoria */
 /* ESTILOS ESPECÍFICOS PARA CELULARES */
 @media (max-width: 767px) {
     .menu-categorias {
         top: auto;
-        right: 0; /* 🔥 Volvemos a pegarlo totalmente al borde derecho */
-        bottom: 80px; /* Ajusta este valor según la altura de tu botón de WhatsApp */
+        right: 0 !important; /* Pegado total a la orilla */
+        bottom: 85px; /* Altura ideal sobre el botón de WhatsApp */
         transform: none;
-        
         position: fixed;
         display: flex;
-        flex-direction: column;
-        align-items: flex-end; /* Alinea los botones al borde derecho */
-        gap: 4px; /* Espacio más pequeño entre etiquetas */
+        flex-direction: column-reverse; /* 🔥 El menú crece hacia ARRIBA */
+        align-items: flex-end;
+        gap: 6px;
         width: auto;
-        pointer-events: none; /* Evita que el contenedor vacío tape clics */
+        pointer-events: none; /* Evita bloquear la pantalla */
+        z-index: 2000;
     }
 
+    /* Estilo de Etiqueta (botones individuales) */
     .cat-btn {
         pointer-events: auto;
-        /* Estilo de etiqueta: Solo redondeado a la izquierda */
-        border-radius: 6px 0 0 6px !important; 
-        
-        width: fit-content; /* Se ajusta a la palabra más larga */
-        min-width: 140px;
-        max-width: 80vw; /* Evita que ocupe toda la pantalla si el texto es muy largo */
-        
-        font-size: 16px;
-        padding: 10px 15px;
-        text-align: right;
-        box-shadow: -2px 3px 10px rgba(0,0,0,0.3);
-        margin-right: 0; /* Asegura que no haya margen a la derecha */
-    }
-
-    .cat-main {
+        border-radius: 8px 0 0 8px !important; /* Solo redondeado izquierdo */
         width: fit-content;
-        min-width: 160px;
-        /* Un poco de margen extra abajo para separar del botón de WhatsApp */
-        margin-bottom: 5px; 
+        min-width: 150px;
+        max-width: 85vw;
+        font-size: 16px;
+        padding: 12px 18px;
+        text-align: right;
+        border-right: none !important; /* Elimina borde en la orilla */
+        box-shadow: -3px 4px 12px rgba(0,0,0,0.4);
+        margin-right: 0 !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    /* Botón Dorado Principal */
+    .cat-main {
+        margin-top: 6px; /* Espacio cuando se despliegan las categorías arriba */
+        z-index: 2001;
+        box-shadow: -4px 6px 15px rgba(229, 196, 83, 0.3) !important;
+    }
+
+    /* Contenedor de Categorías (Acordeón hacia arriba) */
     .cat-wrapper {
-        pointer-events: none; 
+        display: flex;
+        flex-direction: column-reverse; /* Mantiene el orden hacia arriba */
+        gap: 4px;
+        width: auto;
+        max-height: 0; /* Cerrado por defecto */
         opacity: 0;
-        transition: all 0.3s ease;
+        visibility: hidden;
+        overflow-y: auto;
+        overflow-x: hidden;
+        pointer-events: none; /* Bloquea clics accidentales al estar cerrado */
+        transition: max-height 0.4s ease, opacity 0.3s ease, visibility 0.3s;
+        overscroll-behavior: contain;
+        padding-right: 0;
     }
 
-    /* Solo cuando el menú está abierto activamos los clics de las categorías */
-    .menu-categorias.abierto .cat-wrapper {
-        pointer-events: auto;
+    /* ESTADO ABIERTO (Se activa con la clase 'abierto' o 'menu-abierto') */
+    .menu-categorias.abierto .cat-wrapper,
+    .menu-categorias.menu-abierto .cat-wrapper {
+        max-height: 50vh; /* Altura máxima en móvil */
         opacity: 1;
-        max-height: 45vh;
+        visibility: visible;
+        pointer-events: auto; /* Habilita selección solo cuando es visible */
+        padding-bottom: 5px; /* Espacio sobre el botón principal */
+    }
+
+    /* Scrollbar invisible en móvil */
+    .cat-wrapper::-webkit-scrollbar {
+        width: 3px;
+    }
+    .cat-wrapper::-webkit-scrollbar-thumb {
+        background: rgba(229, 196, 83, 0.5);
     }
 }
     </style>
@@ -1890,9 +1911,18 @@ document.addEventListener("click", (e) => {
         }
     }
 });
+
 function renderizarMenuCategorias() {
     const contenedor = document.getElementById("menu-categorias-flotante");
     if (!contenedor) return;
+
+    // 🔥 SINCRONIZACIÓN DE CLASE PARA MÓVIL
+    // Esto es lo que activa el 'pointer-events: auto' en el CSS del móvil
+    if (menuCategoriasAbierto) {
+        contenedor.classList.add("abierto");
+    } else {
+        contenedor.classList.remove("abierto");
+    }
 
     const categorias = obtenerCategoriasUnicas();
 
@@ -1907,70 +1937,77 @@ function renderizarMenuCategorias() {
     // 🔥 BOTÓN PRINCIPAL
     const btnMain = document.createElement("button");
     btnMain.className = "cat-btn cat-main";
-
     btnMain.innerHTML = `☰ Categorías`;
 
-   btnMain.onclick = (e) => {
-    e.preventDefault();
-    e.stopPropagation(); // 🔥 Crucial: evita que el toque "atraviese" al fondo
+    btnMain.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        menuCategoriasAbierto = !menuCategoriasAbierto;
+        renderizarMenuCategorias();
+    };
 
-    menuCategoriasAbierto = !menuCategoriasAbierto;
-    renderizarMenuCategorias(); // Redibuja el menú (abrir o cerrar)
-};
+    // Mantener compatibilidad con Hover en Escritorio
+    contenedor.onmouseenter = () => {
+        if (window.innerWidth > 767) { // Solo en PC
+            clearTimeout(window.timerCierre);
+            if (!menuCategoriasAbierto) {
+                menuCategoriasAbierto = true;
+                renderizarMenuCategorias();
+            }
+        }
+    };
+
+    contenedor.onmouseleave = () => {
+        if (window.innerWidth > 767) { // Solo en PC
+            window.timerCierre = setTimeout(() => {
+                menuCategoriasAbierto = false;
+                renderizarMenuCategorias();
+            }, 500);
+        }
+    };
 
     contenedor.appendChild(btnMain);
 
-   // 🔥 CONTENEDOR INTERNO (ACORDEÓN)
-const wrapper = document.createElement("div");
-wrapper.className = "cat-wrapper";
+    // 🔥 CONTENEDOR INTERNO (ACORDEÓN)
+    const wrapper = document.createElement("div");
+    wrapper.className = "cat-wrapper";
 
-if (!menuCategoriasAbierto) {
-    wrapper.style.maxHeight = "0px";
-    wrapper.style.opacity = "0"; // Opcional: para que se vea más fluido
-} else {
-    // Primero añadimos los botones al wrapper (esto ya lo haces en tu bucle forEach)
-    // Pero el cálculo del alto debe hacerse DESPUÉS de que el wrapper tenga hijos
-    
-    // Usamos un pequeño truco: "1000px" o mejor aún, scrollHeight
-    wrapper.style.maxHeight = "1000px"; 
-    wrapper.style.opacity = "1";
-}
-if (!menuCategoriasAbierto) {
-    wrapper.style.maxHeight = "0px";
-} else {
-    // Definimos un máximo para que no se salga de la pantalla del celular
-    // 60vh significa el 60% de la altura de la ventana (viewport height)
-    wrapper.style.maxHeight = "60vh"; 
-}
-    // 🔥 CATEGORÍAS
-   categorias.forEach((cat, i) => {
-    const boton = document.createElement("button");
-    boton.innerText = cat;
-    boton.className = "cat-btn";
-
-    if (categoriaSeleccionada === cat) {
-        boton.classList.add("activo");
-    }
-
-   boton.onclick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Solo permitimos seleccionar si el menú ya estaba visualmente abierto
-    if (!menuCategoriasAbierto) return; 
-
-    if (categoriaSeleccionada === cat) {
-        categoriaSeleccionada = null;
+    // Lógica de altura dinámica
+    if (!menuCategoriasAbierto) {
+        wrapper.style.maxHeight = "0px";
+        wrapper.style.opacity = "0";
     } else {
-        categoriaSeleccionada = cat;
+        // En móvil el CSS ya limita a 50vh, aquí aseguramos que se vea
+        wrapper.style.maxHeight = window.innerWidth < 767 ? "50vh" : "60vh";
+        wrapper.style.opacity = "1";
     }
 
-    menuCategoriasAbierto = false; // Cerramos al elegir
-    render(); 
-    renderizarMenuCategorias();
-};
-    wrapper.appendChild(boton);
-});
+    // 🔥 RENDERIZADO DE BOTONES
+    categorias.forEach((cat, i) => {
+        const boton = document.createElement("button");
+        boton.innerText = cat;
+        boton.className = "cat-btn";
+
+        if (categoriaSeleccionada === cat) {
+            boton.classList.add("activo");
+        }
+
+        boton.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Bloqueo de seguridad: si no está abierto (clics fantasma), no hace nada
+            if (!menuCategoriasAbierto) return; 
+
+            categoriaSeleccionada = (categoriaSeleccionada === cat) ? null : cat;
+            
+            menuCategoriasAbierto = false; 
+            if (typeof render === "function") render(); // Llamar a tu función de filtrado
+            renderizarMenuCategorias();
+        };
+
+        wrapper.appendChild(boton);
+    });
 
     contenedor.appendChild(wrapper);
 }
