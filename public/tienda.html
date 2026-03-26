@@ -1168,31 +1168,32 @@ body {
     border-color: #E5C453;
 }
 
-/* ANIMACIÓN */
-@keyframes fadeInCat {
-    from {
-        opacity: 0;
-        transform: scale(0.96);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
+/* ANIMACIÓN movil categoria */
 @media (max-width: 768px) {
 
     .menu-categorias {
-        right: 0; /* 🔥 pegado totalmente al borde */
-        top: 200px; /* igual altura del header */
-
+        /* 1. Posicionamiento pegajoso */
+        position: -webkit-sticky; /* Soporte para Safari */
+        position: sticky;
+        top: 0; /* Se pegará al tope de la pantalla al hacer scroll */
+        z-index: 1000; /* Para que pase por encima de las fotos/contenido */
+        
+        /* 2. Estética que pediste */
+        right: 0; 
         padding-right: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end; /* Alinea los botones a la derecha */
+        
+        /* Ajuste de margen superior inicial */
+        margin-top: 10px; 
     }
 
     .cat-btn {
         margin-right: 0;
-        border-radius: 6px 0 0 6px; /* 🔥 solo redondeado a la izquierda */
+        border-radius: 6px 0 0 6px; 
+        box-shadow: -2px 2px 5px rgba(0,0,0,0.1); /* Opcional: para que resalte al pegarse */
     }
-
 }
     </style>
 </head>
