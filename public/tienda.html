@@ -1325,9 +1325,8 @@ body {
     let imagenProducto = "";
     let slug = "";
     let bloqueoActivo = false;
-// 1. Aseguramos que las variables existan en el espacio global
-window.categoriaSeleccionada = window.categoriaSeleccionada || "Todas";
-window.categoriasDisponibles = window.categoriasDisponibles || [];
+    let categoriaSeleccionada = "Todas";
+    let categoriasDisponibles = [];
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
@@ -1727,38 +1726,33 @@ function configurarRedesNav(perfil) {
     }, 100); 
 }
 
-// 2. Definimos la función de obtención de datos
-window.obtenerCategoriasUnicas = function() {
+function obtenerCategoriasUnicas() {
     const categoriasSet = new Set();
     categoriasSet.add("Todas");
     
-    // Usamos window.productosRealtime para asegurar que lo encuentre
-    const datos = window.productosRealtime || productosRealtime;
-
-    if (!datos || Object.keys(datos).length === 0) {
-        console.warn("Zippy App: Esperando datos de productosRealtime...");
-        return ["Todas"];
-    }
-
-    for (const id in datos) {
-        const p = datos[id];
-        // Buscamos el campo exacto que mencionaste
-        if (p && p.categoria) {
-            categoriasSet.add(p.categoria.trim());
+    for (const refP in productosJson) {
+        if (refP === "images") continue;
+        const claveBusqueda = refP.trim().toLowerCase();
+        const real = productosRealtime[claveBusqueda];
+        
+        // Verificamos que 'categoria' exista en Realtime Database
+        if (real && real.categoria) {
+            categoriasSet.add(real.categoria.trim());
         }
     }
     
-    window.categoriasDisponibles = Array.from(categoriasSet);
-    return window.categoriasDisponibles;
-};
+    categoriasDisponibles = Array.from(categoriasSet);
+    return categoriasDisponibles;
+}
 
-// 3. Definimos la función visual
-window.renderizarMenuCategorias = function() {
+function renderizarMenuCategorias() {
+    // Buscamos por el ID que definiste en el HTML
     const contenedor = document.getElementById("menu-categorias-flotante");
     if (!contenedor) return;
 
-    const categorias = window.obtenerCategoriasUnicas();
+    const categorias = obtenerCategoriasUnicas();
 
+    // Si solo está "Todas", no mostramos nada
     if (categorias.length <= 1) {
         contenedor.style.display = "none";
         return;
@@ -1770,22 +1764,20 @@ window.renderizarMenuCategorias = function() {
     categorias.forEach(cat => {
         const boton = document.createElement("button");
         boton.innerText = cat;
-        boton.className = `cat-btn ${window.categoriaSeleccionada === cat ? 'activo' : ''}`;
+        
+        // IMPORTANTE: Usamos la clase 'cat-btn' y 'activo' de tu CSS
+        boton.className = "cat-btn";
+        if (categoriaSeleccionada === cat) {
+            boton.classList.add("activo");
+        }
         
         boton.onclick = () => {
-            window.categoriaSeleccionada = cat;
-            // Llamamos a render() de forma segura
-            if (typeof render === 'function') {
-                render(); 
-            } else if (window.render) {
-                window.render();
-            }
-            window.renderizarMenuCategorias();
+            categoriaSeleccionada = cat;
+            render(); // Llama a tu función principal para filtrar
         };
         contenedor.appendChild(boton);
     });
-};
-
+}
    // --- 5. SISTEMA DE PEDIDOS ---
 function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
