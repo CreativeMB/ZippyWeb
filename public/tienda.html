@@ -1307,8 +1307,8 @@ body {
     let imagenProducto = "";
     let slug = "";
     let bloqueoActivo = false;
-let categoriaSeleccionada = "Todas";
-let categoriasDisponibles = [];
+window.categoriaSeleccionada = "Todas";
+window.categoriasDisponibles = [];
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
@@ -1426,6 +1426,7 @@ function iniciarCargaBase(slugDesdeURL) {
                 aplicarSEO(perfil);
                 validarYContinuar(perfil, data);
                 llenarPestañaEmpresa(perfil);
+                renderizarMenuCategorias();
                 // -------------------------------------------
 
                 if(loader) loader.style.display = 'none';
@@ -1707,33 +1708,39 @@ function configurarRedesNav(perfil) {
     }, 100); 
 }
 
-function obtenerCategoriasUnicas() {
+window.obtenerCategoriasUnicas = function() {
     const categoriasSet = new Set();
     categoriasSet.add("Todas");
     
+    if (typeof productosJson === 'undefined' || typeof productosRealtime === 'undefined') {
+        console.error("Error: productosJson o productosRealtime no están definidos.");
+        return ["Todas"];
+    }
+
     for (const refP in productosJson) {
         if (refP === "images") continue;
         const claveBusqueda = refP.trim().toLowerCase();
         const real = productosRealtime[claveBusqueda];
         
-        // Verificamos que 'categoria' exista en Realtime Database
+        // IMPORTANTE: Verifica que en Firebase el campo sea 'categoria' exactamente
         if (real && real.categoria) {
             categoriasSet.add(real.categoria.trim());
         }
     }
     
-    categoriasDisponibles = Array.from(categoriasSet);
-    return categoriasDisponibles;
-}
+    window.categoriasDisponibles = Array.from(categoriasSet);
+    return window.categoriasDisponibles;
+};
 
-function renderizarMenuCategorias() {
-    // Buscamos por el ID que definiste en el HTML
+window.renderizarMenuCategorias = function() {
     const contenedor = document.getElementById("menu-categorias-flotante");
-    if (!contenedor) return;
+    if (!contenedor) {
+        console.warn("No se encontró el div #menu-categorias-flotante");
+        return;
+    }
 
-    const categorias = obtenerCategoriasUnicas();
+    const categorias = window.obtenerCategoriasUnicas();
 
-    // Si solo está "Todas", no mostramos nada
     if (categorias.length <= 1) {
         contenedor.style.display = "none";
         return;
@@ -1746,19 +1753,23 @@ function renderizarMenuCategorias() {
         const boton = document.createElement("button");
         boton.innerText = cat;
         
-        // IMPORTANTE: Usamos la clase 'cat-btn' y 'activo' de tu CSS
+        // Usamos tus clases de CSS
         boton.className = "cat-btn";
-        if (categoriaSeleccionada === cat) {
+        if (window.categoriaSeleccionada === cat) {
             boton.classList.add("activo");
         }
         
         boton.onclick = () => {
-            categoriaSeleccionada = cat;
-            render(); // Llama a tu función principal para filtrar
+            window.categoriaSeleccionada = cat;
+            if (typeof render === 'function') {
+                render(); // Llama a tu función de dibujo de productos
+            } else {
+                console.error("La función render() no existe");
+            }
         };
         contenedor.appendChild(boton);
     });
-}
+};
 
    // --- 5. SISTEMA DE PEDIDOS ---
 function enviarPedido() {
