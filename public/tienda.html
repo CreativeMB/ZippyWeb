@@ -1752,14 +1752,17 @@ function obtenerCategoriasUnicas() {
         const producto = productosRealtime[key];
 
         if (producto && producto.categoria) {
+            console.log("Categoria encontrada:", producto.categoria); // 👈 DEBUG
             categoriasSet.add(producto.categoria.trim());
         }
     }
 
     categoriasDisponibles = Array.from(categoriasSet);
+
+    console.log("Categorias finales:", categoriasDisponibles); // 👈 DEBUG FINAL
+
     return categoriasDisponibles;
 }
-
 function renderizarMenuCategorias() {
     const contenedor = document.getElementById("menu-categorias-flotante");
     if (!contenedor) return;
