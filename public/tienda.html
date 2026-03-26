@@ -2548,10 +2548,14 @@ function actualizarMetaProp(property, content) {
     meta.setAttribute("content", content);
 }
 
-// Dentro de renderizarMenuCategorias, cambia el onclick del btnMain y añade eventos al contenedor
+
+
+let timerCierre; // Variable global para controlar el tiempo
+
 const contenedorMenu = document.getElementById("menu-categorias-flotante");
 
 contenedorMenu.onmouseenter = () => {
+    clearTimeout(timerCierre); // Cancelamos el cierre si el mouse volvió a entrar
     if (!menuCategoriasAbierto) {
         menuCategoriasAbierto = true;
         renderizarMenuCategorias();
@@ -2559,10 +2563,13 @@ contenedorMenu.onmouseenter = () => {
 };
 
 contenedorMenu.onmouseleave = () => {
-    if (menuCategoriasAbierto) {
-        menuCategoriasAbierto = false;
-        renderizarMenuCategorias();
-    }
+    // Le damos 500 milisegundos (medio segundo) de gracia antes de cerrar
+    timerCierre = setTimeout(() => {
+        if (menuCategoriasAbierto) {
+            menuCategoriasAbierto = false;
+            renderizarMenuCategorias();
+        }
+    }, 500); 
 };
 window.addEventListener("scroll", (e) => {
     // Solo cerramos si el menú está abierto Y el scroll NO es dentro del wrapper de categorías
