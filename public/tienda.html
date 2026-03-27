@@ -1165,7 +1165,9 @@ button[onclick*="whatsappDirecto"] i {
         gap: 6px;
         z-index: 99997;
     }
-
+.swal2-bottom-end .swal2-toast { 
+        margin-bottom: 140px !important; 
+    }
     /* Contador de productos */
     .cart-count {
         position: absolute;
@@ -1317,7 +1319,7 @@ button[onclick*="whatsappDirecto"] i {
         
         <!-- TOTAL SUMADO -->
         <div class="total-pago-box">
-            Total a Pagar: <span id="total-pedido-suma">$0</span>
+            Total a Pagar Sin Domicilio: <span id="total-pedido-suma">$0</span>
         </div>
 
 
@@ -1915,21 +1917,21 @@ window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
     if (existe) {
         existe.cantidad++;
     } else {
-        carrito.push({ nombre, imagen, precio: precioNum, cantidad: 1 });
+        // AGREGAMOS "descripcion" al objeto que se guarda en el array
+        carrito.push({ 
+            nombre, 
+            imagen, 
+            precio: precioNum, 
+            cantidad: 1, 
+            descripcion: descripcion // <-- MUY IMPORTANTE
+        });
     }
     
     window.actualizarBadgeCarrito();
     
-    // Notificación visual optimizada
     Swal.fire({
-        toast: true, 
-        position: 'bottom-end', // <-- Lo cambiamos a la parte de abajo para que sea más visible
-        icon: 'success',
-        title: 'Añadido al carrito', 
-        showConfirmButton: false, 
-        timer: 1500,
-        background: '#ffffff',
-        color: '#333'
+        toast: true, position: 'bottom-end', icon: 'success',
+        title: 'Añadido al carrito', showConfirmButton: false, timer: 1500
     });
 };
 
@@ -1968,7 +1970,9 @@ window.renderizarCarritoEnForm = () => {
             <img src="${normalizarImagen(item.imagen)}" style="width:50px; height:60px; object-fit:cover; border-radius:5px;">
             <div style="flex:1;">
                 <div style="font-weight:bold; font-size:13px; color:#333;">${item.nombre}</div>
-                <div style="color:#25D366; font-weight:bold;">${formatearPrecio(item.precio)}</div>
+                <!-- AQUÍ SE AGREGA LA DESCRIPCIÓN -->
+                <div style="font-size:11px; color:#777; line-height:1.2; margin-bottom:3px;">${item.descripcion || 'Sin descripción'}</div>
+                <div style="color:#25D366; font-weight:bold; font-size:14px;">${formatearPrecio(item.precio)}</div>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
                 <button onclick="window.cambiarCantidadCarrito(${index}, -1)" style="width:28px; height:28px; border-radius:50%; border:1px solid #ddd; background:#f9f9f9; cursor:pointer;">-</button>
@@ -2312,10 +2316,19 @@ if (campos.fechaOriginal) {
                 document.body.style.overflow = 'auto';
             }
 // 2. CONSTRUIMOS EL MENSAJE PARA WHATSAPP (Lo que faltaba)
-    // Dentro de enviarPedido()
-let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre} (${formatearPrecio(item.precio * item.cantidad)})`).join('\n');
+let listaProductosTexto = carrito.map(item => {
+    let linea = `- ${item.cantidad}x ${item.nombre} (${formatearPrecio(item.precio * item.cantidad)})`;
+    
+    // Si el producto tiene descripción, la añadimos en la línea de abajo en cursivas (_)
+    if (item.descripcion) {
+        linea += `\n  _(${item.descripcion.trim()})_`;
+    }
+    return linea;
+}).join('\n');
+
 let totalSuma = document.getElementById("total-pedido-suma").innerText;
 
+// 2. Construimos el mensaje final
 const mensajeWa = encodeURIComponent(
     `*NUEVO PEDIDO REGISTRADO*\n\n` +
     `*PRODUCTOS:*\n${listaProductosTexto}\n\n` +
