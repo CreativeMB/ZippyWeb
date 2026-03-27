@@ -516,46 +516,52 @@ body {
         /* ========================================= */
         /* 6. BOTONES Y CONTACTO                     */
         /* ========================================= */
-       /* 1. Quitamos bordes y líneas molestas a todos los botones .btn */
+      /* 1. Ajuste General: Botones más grandes y limpios */
 .btn {
+    height: 45px !important;   /* Aumentamos la altura para que sean más grandes */
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border-radius: 8px; /* Opcional: para redondear puntas */
+    border-radius: 10px;       /* Bordes un poco más redondeados y modernos */
+    transition: transform 0.1s ease;
 }
 
-/* 2. Ajuste específico para el botón Dorado (Carrito) */
-/* Buscamos el que tiene ese color de fondo exacto */
+.btn:active {
+    transform: scale(0.96);    /* Efecto de pulsado */
+}
+
+/* 2. Botón Carrito: SIN FONDO y solo el icono */
 button[onclick*="agregarAlCarrito"] {
-    flex: 0 0 45px !important; /* Lo hace pequeño y cuadrado */
+    background: transparent !important; /* Quitamos el fondo dorado */
+    flex: 0 0 50px !important;          /* Ancho fijo para que sea cuadrado */
+    font-size: 0 !important;             /* Escondemos el texto "+ Carrito" */
     padding: 0 !important;
-    font-size: 0 !important;   /* Oculta el texto "+ Carrito" mágicamente */
 }
 
-/* Hacemos que el icono del carrito sí se vea (porque el font-size 0 lo oculta) */
+/* Color y tamaño del icono del carrito */
 button[onclick*="agregarAlCarrito"] i {
-    font-size: 18px !important; 
-    margin: 0 !important;
+    color: #E5C453 !important;          /* El dorado ahora va solo en el icono */
+    font-size: 24px !important;          /* Icono más grande y visible */
 }
 
-/* 3. Ajuste para el botón Verde (WhatsApp) */
+/* 3. Botón WhatsApp: Más grande y llamativo */
 button[onclick*="whatsappDirecto"] {
-    flex: 1 !important; /* Este ocupa el resto del espacio */
+    flex: 1 !important;                  /* Ocupa el resto del ancho */
+    background: #25D366 !important;      /* Fondo verde sólido */
     color: white !important;
+    font-size: 14px !important;          /* Texto un poco más grande */
     font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
-        .btn:hover {
-            background: #1da851;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-        }
-   
+button[onclick*="whatsappDirecto"] i {
+    font-size: 18px !important;
+    margin-right: 8px;
+}
 
         /* ========================================= */
         /* 7. FOOTER Y AVISOS                        */
