@@ -234,111 +234,123 @@ body {
         /* ========================================= */
         /* 4. GRID DE PRODUCTOS (VISTA PC)           */
         /* ========================================= */
-        .productos {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
-            padding: 20px;
+        /* ========================================= */
+/* ESTILO GLOBAL DE PRODUCTOS (PC Y MÓVIL)   */
+/* ========================================= */
 
-        }
+.productos {
+    display: grid;
+    /* En PC se adapta solo, en móvil usaremos el @media más abajo */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
 
-        .producto {
-            background: #ffffff;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            padding: 0;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            /* === ESTO CREA EL EFECTO DE ELEVACIÓN === */
-            /* Desplazamiento x=0, y=5px, desenfoque=15px, color=negro muy transparente */
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+.producto {
+    background: #ffffff;
+    border-radius: 12px;
+    border: none !important; /* Sin bordes */
+    padding: 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-            /* (Opcional) Prepara la tarjeta para una animación suave en PC */
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+.producto:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
 
-        /* Efecto de elevación interactiva (Hover) en PC */
-        .producto:hover {
-            /* La tarjeta sube sutilmente */
-            transform: translateY(-5px);
+.producto img {
+    width: 100%;
+    aspect-ratio: 3 / 4 !important; /* Proporción Retrato 3:4 */
+    object-fit: cover;
+    display: block;
+    border-radius: 12px 12px 0 0;
+}
 
-            /* La sombra se vuelve un poco más oscura y grande para simular más altura */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+.nombre {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px !important; /* Tamaño pedido */
+    color: #333;
+    margin: 10px 0 4px 0;
+    text-transform: capitalize;
+    line-height: 1.2;
+    padding: 0 10px;
+    height: 38px; /* Altura para alinear botones */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
 
-            /* Ocultamos el borde sutil para que la sombra destaque más */
-            border-color: transparent;
-        }
+.precio {
+    color: #111;
+    font-size: 18px !important; /* Tamaño pedido */
+    font-weight: 800;
+    margin: 2px 0 10px 0;
+    line-height: 1;
+}
 
-        .producto img {
-            width: 100%;
-            aspect-ratio: 3 / 4;
-            object-fit: fill;
-            display: block;
-            margin: 0;
-        }
+/* --- BOTONES EN LA MISMA LÍNEA (SIN BORDES) --- */
+.producto div[style*="display: flex"] {
+    display: flex !important;
+    flex-direction: row !important; /* Siempre en línea */
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 0 10px 15px 10px !important;
+}
 
-        .nombre {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            font-size: 15px;
-            color: #333;
-            margin: 8px 0 2px 0;
-            text-transform: capitalize;
-            line-height: 1.2;
-            padding: 0 5px;
-        }
+/* Botón Carrito (Círculo Dorado) */
+.producto .btn:first-child {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    padding: 0 !important;
+    background: #E5C453 !important;
+    color: #000 !important;
+    border-radius: 50% !important; /* Circular */
+    border: none !important; /* Sin bordes */
+    font-size: 20px !important;
+    margin: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-shadow: 0 3px 6px rgba(229, 196, 83, 0.2);
+    cursor: pointer;
+}
 
-        .precio-contenedor {
-            margin: 0;
-            padding: 0 5px 12px 5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+/* Ocultar texto "+ Carrito" para dejar solo el icono */
+.producto .btn:first-child span {
+    display: none !important;
+}
 
-        .precioViejo {
-            text-decoration: line-through;
-            color: #a0a0a0;
-            font-size: 13px;
-            font-weight: 400;
-            line-height: 1;
-        }
-
-        .precio {
-            color: #111;
-            font-size: 20px;
-            font-weight: 800;
-            margin: 2px 0 0 0;
-            line-height: 1;
-        }
-
-        /* ETIQUETAS */
-        .etiquetaPromo,
-        .etiquetaAgotado {
-            position: absolute;
-            top: 0;
-            font-size: 11px;
-            padding: 8px 15px;
-            z-index: 5;
-        }
-
-        .etiquetaPromo {
-            left: 0;
-            background: #e53935;
-            color: white;
-            font-weight: bold;
-            border-radius: 0 0 12px 0;
-        }
-
-        .etiquetaAgotado {
-            right: 0;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border-radius: 0 0 0 12px;
-        }
+/* Botón WhatsApp (Rectangular Verde) */
+.producto .btn:last-child {
+    flex: 1 !important; /* Ocupa el resto del espacio */
+    height: 42px !important;
+    background: #25D366 !important;
+    color: white !important;
+    border-radius: 10px !important;
+    border: none !important; /* Sin bordes */
+    font-size: 12px !important;
+    font-weight: bold;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-transform: uppercase;
+    box-shadow: 0 3px 6px rgba(37, 211, 102, 0.2);
+    cursor: pointer;
+    text-decoration: none;
+}
 
         /* ========================================= */
         /* 5. LOADER          */
