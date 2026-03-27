@@ -1071,60 +1071,61 @@ body {
 /* ========================================= */
 @media screen and (max-width: 767px) {
 
-    /* 1. GRID DE PRODUCTOS (Una sola columna) */
+    /* 1. GRID DE PRODUCTOS (2 Columnas - Estilo Retrato) */
     .productos {
-        grid-template-columns: 1fr !important; /* Productos uno debajo del otro */
-        gap: 20px !important;
-        padding: 15px !important;
+        grid-template-columns: repeat(2, 1fr) !important; /* Dos productos por fila */
+        gap: 12px !important;
+        padding: 10px !important;
         background-color: #f8f9fa;
     }
 
     /* 2. TARJETA DE PRODUCTO */
     .producto {
         border: none !important;
-        border-radius: 15px !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
         background: #ffffff;
         margin-bottom: 5px;
-        max-width: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     .producto img {
-        aspect-ratio: 16 / 9 !important; /* Más panorámico para no ser tan alto */
-        border-radius: 15px 15px 0 0;
+        aspect-ratio: 2 / 3 !important; /* Estilo Retrato (Más alto que ancho) */
+        border-radius: 12px 12px 0 0;
         object-fit: cover !important;
     }
 
     .nombre {
-        font-size: 15px !important;
+        font-size: 13px !important;
         color: #2c3e50;
-        margin: 12px 0 5px 0 !important;
+        margin: 8px 0 4px 0 !important;
         font-weight: 600 !important;
-        padding: 0 10px !important;
+        padding: 0 6px !important;
+        line-height: 1.2;
     }
 
     .precio {
-        font-size: 18px !important;
+        font-size: 15px !important;
         color: #111;
-        margin-bottom: 10px !important;
+        margin-bottom: 8px !important;
     }
 
     /* 3. BOTONES INTERNOS DE LA TARJETA (Uno sobre otro) */
-    /* Este es el contenedor que creamos en el render para los dos botones */
+    /* Apila los botones de Carrito y WhatsApp dentro de la tarjeta */
     .producto div[style*="display: flex"] {
-        flex-direction: column !important; /* Apila botones: Carrito arriba, WhatsApp abajo */
-        gap: 8px !important;
-        padding: 0 12px 15px 12px !important;
+        flex-direction: column !important; 
+        gap: 5px !important;
+        padding: 0 8px 12px 8px !important;
     }
 
     .producto .btn {
         width: 100% !important;
         margin: 0 !important;
-        padding: 12px !important;
-        font-size: 13px !important;
+        padding: 8px !important;
+        font-size: 10px !important; /* Letra pequeña para que quepa en 2 columnas */
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-radius: 10px !important;
+        border-radius: 8px !important;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1135,63 +1136,57 @@ body {
     /* Posición 1 (Abajo): WhatsApp */
     .whatsappbtnflotante {
         bottom: 20px !important;
-        right: 20px !important;
-        width: 60px;
-        height: 60px;
+        right: 15px !important;
+        width: 55px;
+        height: 55px;
         z-index: 99999 !important;
     }
 
     /* Posición 2 (Medio): Carrito */
     #btnCarritoFlotante {
         position: fixed !important;
-        bottom: 90px !important; /* 20 + 60 + 10 de separación */
-        right: 20px !important;
-        width: 60px;
-        height: 60px;
+        bottom: 85px !important; /* Encima de WhatsApp */
+        right: 15px !important;
+        width: 55px;
+        height: 55px;
         background: #E5C453;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 99998 !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
     /* Posición 3 (Arriba): Categorías */
     .menu-categorias {
         top: auto !important;
-        bottom: 160px !important; /* 90 + 60 + 10 de separación */
+        bottom: 150px !important; /* Encima del Carrito */
         right: 0 !important;
-        transform: none;
         position: fixed;
         display: flex;
         flex-direction: column-reverse; /* Abre hacia arriba */
         align-items: flex-end;
         gap: 6px;
-        width: auto;
         z-index: 99997;
     }
 
-    /* Estilo botones de categorías */
     .cat-btn {
         pointer-events: auto;
         border-radius: 8px 0 0 8px !important;
-        width: fit-content;
-        min-width: 140px;
+        min-width: 130px;
         font-size: 14px;
-        padding: 10px 18px;
+        padding: 10px 15px;
         text-align: right;
-        box-shadow: -3px 4px 12px rgba(0,0,0,0.4);
+        box-shadow: -3px 4px 10px rgba(0,0,0,0.3);
     }
 
     .cat-main {
-        margin-top: 6px;
-        z-index: 2001;
         background: linear-gradient(135deg, #E5C453, #caa93a) !important;
         color: #000 !important;
     }
 
-    /* 5. FORMULARIO DE PEDIDO (MODAL/PESTAÑA) */
+    /* 5. FORMULARIO DE PEDIDO EN MÓVIL */
     .modal-contenido {
         padding: 15px !important;
         width: 100% !important;
@@ -1200,39 +1195,33 @@ body {
 
     .fila2 {
         display: grid;
-        grid-template-columns: repeat(2, 1fr) !important; /* Mantiene 2 columnas */
+        grid-template-columns: repeat(2, 1fr) !important; /* Mantiene 2 columnas en el form */
         gap: 8px !important;
     }
 
-    .formulario input, 
-    .formulario select, 
-    .formulario textarea {
+    .formulario input, .formulario select {
         padding: 10px !important;
-        font-size: 14px !important; /* Tamaño legible sin zoom excesivo */
+        font-size: 14px !important;
         margin: 4px 0 !important;
+        box-sizing: border-box;
     }
 
     #productoImagen {
-        width: 70px !important;
-        height: 90px !important;
+        width: 65px !important;
+        height: 85px !important;
     }
 
-    /* Ajuste para el aviso Toast (Añadido al carrito) */
+    /* Aviso Toast (Añadido al carrito) para que no lo tape la torre */
     .swal2-bottom-end .swal2-toast {
-        margin-bottom: 230px !important; /* Para que aparezca arriba de la torre */
+        margin-bottom: 215px !important;
     }
 }
 
-/* Ajustes extra para pantallas muy pequeñas (menos de 600px) */
-@media screen and (max-width: 600px) {
-    .modal-contenido {
-        padding: 12px !important;
-    }
-    
-    .formulario input, .formulario select {
-        padding: 8px !important;
-        font-size: 13px !important;
-    }
+/* Ajustes para pantallas muy angostas */
+@media screen and (max-width: 400px) {
+    .nombre { font-size: 12px !important; }
+    .precio { font-size: 14px !important; }
+    .cat-btn { min-width: 110px; font-size: 13px; }
 }
 
     </style>
