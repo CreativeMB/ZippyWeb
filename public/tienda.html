@@ -1836,12 +1836,12 @@ function render() {
             botonesHtml = `<button class="btn" style="background:#888; color:white; cursor:not-allowed; margin: 10px;" disabled>Agotado</button>`;
         } else {
             botonesHtml = `
-                 <div style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px;">
-        <button class="btn" onclick="window.agregarAlCarrito(...)">
-            <i class="fas fa-shopping-cart"></i> <!-- Icono que verá el móvil -->
-            <span>+ Carrito</span> <!-- Texto que el móvil ocultará con el CSS -->
-        </button>
-        
+         <div style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px;">
+                    <!-- BOTÓN DORADO: Al carrito -->
+                    <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
+                            style="flex: 1; margin: 0; background: #E5C453; color: #000; font-size: 11px; padding: 8px;">
+                        <i class="fas fa-cart-plus"></i>
+                    </button>
                     <!-- BOTÓN VERDE: WhatsApp Directo (Sin formulario) -->
                     <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}')" 
                             style="flex: 1; margin: 0; background: #25D366; font-size: 11px; padding: 8px;">
