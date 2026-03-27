@@ -1428,9 +1428,10 @@ body {
     <div id="productos-tab" class="tab-content">
         <div id="menu-categorias-flotante" class="menu-categorias"></div>
 
-<div id="btnCarritoFlotante" class="cart-btn-flotante" onclick="abrirCarrito()">
-    <i class="fas fa-shopping-cart" style="color: #000; font-size: 24px;"></i>
-    <div id="cart-count-val" class="cart-count">0</div>
+<!-- Botón Flotante Carrito -->
+<div id="btnCarritoFlotante" onclick="window.abrirCarrito()" style="position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px; background: #E5C453; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 999999; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+    <i class="fas fa-shopping-cart" style="font-size: 24px; color: #000;"></i>
+    <span id="cart-count-val" style="position: absolute; top: 0; right: 0; background: #000; color: #fff; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold;">0</span>
 </div>
 
         <a id="btnWhats" class="whatsappbtnflotante" href="#" target="_blank">
