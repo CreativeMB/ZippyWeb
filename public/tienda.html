@@ -373,28 +373,41 @@ body {
             }
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
+      /* ========================================= */
+/* AJUSTE DE MODAL A SECCIÓN INTEGRADA       */
+/* ========================================= */
+.modal {
+    display: none; /* Se controla por JS */
+    width: 100%;
+    background: #f5f6fa; /* Fondo igual al resto de la página */
+    min-height: 100vh;
+    padding-top: 20px;
+}
 
-        .modal-contenido {
-            background: white;
-            width: 95%;
-            max-width: 500px;
-            border-radius: 12px;
-            padding: 20px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+.modal-contenido {
+    background: white;
+    width: 100%;
+    max-width: 800px; /* Un poco más ancho para vista de página */
+    margin: 0 auto;
+    border-radius: 0; /* Sin bordes redondeados para que parezca una pestaña */
+    padding: 20px;
+    box-shadow: none; /* Quitamos la sombra de flotante */
+}
+
+/* Ajuste para que la imagen y descripción se vean bien en modo pestaña */
+.infoProducto {
+    flex: 1;
+}
+
+@media screen and (max-width: 767px) {
+    .modal-contenido {
+        padding: 15px;
+    }
+    #productoImagen {
+        width: 100px !important;
+        height: 130px !important;
+    }
+}
 
         #productoDescripcion {
             white-space: pre-wrap;
@@ -1300,7 +1313,11 @@ body {
 
     <div id="modalPedido" class="modal">
         <div class="modal-contenido">
-            <span style="float:right; cursor:pointer; font-size:24px;" onclick="cerrarModal()">×</span>
+         <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+    <span style="cursor:pointer; color:#e5c453; font-weight:bold;" onclick="cerrarModal()">
+        <i class="fas fa-arrow-left"></i> Volver a la tienda
+    </span>
+</div>
             <div style="display:flex; gap:10px; margin-bottom:15px;">
                 <img id="productoImagen" style="width:120px; height:150px; object-fit:contain; background:#f9f9f9; border-radius:8px;">
                 <div class="infoProducto">
@@ -2259,70 +2276,62 @@ if (campos.fechaOriginal) {
 
     const formatearPrecio = (v) => "$" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-    window.abrirProducto = (nombre, imagen, precio, descripcion) => {
-       // --- 🚀 LIMPIEZA ULTRA-PROFUNDA (BORRA TODO) ---
+  window.abrirProducto = (nombre, imagen, precio, descripcion) => {
+    // 1. LIMPIEZA DE CAMPOS (Tu lógica original)
     const idsParaLimpiar = [
-        "celularComprador", 
-        "direccionEntrega", 
-        "nombreComprador", 
-        "fechaEntrega",
-        "nombreDestinatario",
-        "celularDestinatario",
-        "productoAdicional",
-        "medioPago",
-        "horaEntrega",
-        "notasPedido",
-        "mensajeTarjeta",
-        "deTarjeta",
-        "paraTarjeta"
+        "celularComprador", "direccionEntrega", "nombreComprador", "fechaEntrega",
+        "nombreDestinatario", "celularDestinatario", "productoAdicional", "medioPago",
+        "horaEntrega", "notasPedido", "mensajeTarjeta", "deTarjeta", "paraTarjeta"
     ];
-
     idsParaLimpiar.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            // Si es un select (como medioPago), lo vuelve a la primera opción
-            if (el.tagName === "SELECT") {
-                el.selectedIndex = 0;
-            } else {
-                el.value = ""; // Deja el campo en blanco
-            }
+            if (el.tagName === "SELECT") el.selectedIndex = 0;
+            else el.value = "";
         }
     });
-        productoSeleccionado = nombre; imagenProducto = normalizarImagen(imagen);
-        document.getElementById("productoTitulo").innerText = nombre;
-        document.getElementById("productoDescripcion").innerText = descripcion;
-        document.getElementById("productoImagen").src = imagenProducto;
-        document.getElementById("productoPrecio").innerText = formatearPrecio(precio);
-        document.getElementById("modalPedido").style.display = "flex";
-    };
 
+    // 2. CARGA DE DATOS DEL PRODUCTO
+    productoSeleccionado = nombre; 
+    imagenProducto = normalizarImagen(imagen);
+    document.getElementById("productoTitulo").innerText = nombre;
+    document.getElementById("productoDescripcion").innerText = descripcion;
+    document.getElementById("productoImagen").src = imagenProducto;
+    document.getElementById("productoPrecio").innerText = formatearPrecio(precio);
+
+    // 3. CAMBIO DE VISTA (De Tienda a Formulario)
+    document.getElementById("productos-tab").style.display = "none";
+    document.getElementById("empresa-tab").style.display = "none";
+    document.getElementById("modalPedido").style.display = "block"; // Se muestra como bloque, no modal
+
+    // Ocultar buscador en el formulario
+    const buscador = document.querySelector('.search-nav-container');
+    if (buscador) buscador.style.opacity = '0';
+
+    window.scrollTo(0, 0); // Subir al inicio para ver el formulario
+};
     window.enviarPedido = enviarPedido;
-    window.cerrarModal = () => {
-    // 1. Ocultar el modal visualmente
-    const modal = document.getElementById("modalPedido");
-    if (modal) {
-        modal.style.display = "none";
+
+window.cerrarModal = () => {
+    // 1. Alternar visibilidad de contenedores
+    document.getElementById("modalPedido").style.display = "none";
+    document.getElementById("productos-tab").style.display = "block";
+    
+    // 2. Reactivar el buscador
+    const buscador = document.querySelector('.search-nav-container');
+    if (buscador) {
+        buscador.style.opacity = '1';
+        buscador.style.pointerEvents = 'auto';
     }
 
-    // 2. 🚀 LIBERAR EL MOUSE Y EL SCROLL
-    // Esto quita cualquier bloqueo que SweetAlert o Bootstrap hayan dejado
-    document.body.style.overflow = 'auto'; // Devuelve el scroll
-    document.body.style.pointerEvents = 'auto'; // Devuelve los clics
-    document.body.classList.remove('modal-open'); // Quita clase de bloqueo si existe
+    // 3. Asegurar que el botón de la pestaña tienda esté activo visualmente
+    const tabs = document.querySelectorAll('.tab-item');
+    tabs.forEach(t => t.classList.remove('active'));
+    if(tabs[0]) tabs[0].classList.add('active');
 
-    // 3. ELIMINAR FONDOS OSCUROS (Backdrops)
-    // A veces se queda una mancha oscura que no deja tocar nada
-    const backdrops = document.querySelectorAll('.modal-backdrop, .swal2-container');
-    backdrops.forEach(el => el.remove());
-
-    // 4. LIMPIEZA PREVENTIVA
-    // Si el usuario lo cerró para elegir otro producto, vaciamos los campos
-    const formulario = document.getElementById("tuFormularioId"); 
-    if (formulario) formulario.reset();
-
-    console.log("✅ Modal cerrado y mouse liberado para nuevas compras.");
+    window.scrollTo(0, 0);
+    console.log("✅ Regresando a la tienda");
 };
-
     // Social & Buscador
     document.addEventListener("DOMContentLoaded", () => {
         const url = window.location.href;
@@ -2365,39 +2374,33 @@ if (inputBusquedaNav) {
     });
 }
 
-  window.cambiarPestaña = function(tabId, elemento) {
-    // 1. Ocultar todas las secciones de contenido
-    const todasLasPestañas = document.querySelectorAll('.tab-content');
-    todasLasPestañas.forEach(div => {
+ window.cambiarPestaña = function(tabId, elemento) {
+    // 1. Ocultar absolutamente todo (Tienda, Empresa y Formulario)
+    const contenidos = document.querySelectorAll('.tab-content, .modal');
+    contenidos.forEach(div => {
         div.style.display = 'none';
     });
 
-    // 2. Mostrar la sección activa
+    // 2. Mostrar la sección solicitada
     const seccionActiva = document.getElementById(tabId);
     if (seccionActiva) {
         seccionActiva.style.display = 'block';
     }
 
-    // 3. Quitar el color dorado de todos los botones
+    // 3. Gestión de estados de botones
     const todosLosBotones = document.querySelectorAll('.tab-item');
-    todosLosBotones.forEach(boton => {
-        boton.classList.remove('active');
-    });
+    todosLosBotones.forEach(boton => boton.classList.remove('active'));
+    if (elemento) elemento.classList.add('active');
 
-    // 4. Ponerle el color dorado al botón tocado
-    if (elemento) {
-        elemento.classList.add('active');
-    }
-
-    // 5. Lógica del Buscador
+    // 4. Lógica del Buscador (Solo visible en tienda)
     const buscador = document.querySelector('.search-nav-container');
     if (buscador) {
-        if (tabId === 'empresa-tab') {
-            buscador.style.opacity = '0';
-            buscador.style.pointerEvents = 'none';
-        } else {
+        if (tabId === 'productos-tab') {
             buscador.style.opacity = '1';
             buscador.style.pointerEvents = 'auto';
+        } else {
+            buscador.style.opacity = '0';
+            buscador.style.pointerEvents = 'none';
         }
     }
 };
