@@ -516,20 +516,40 @@ body {
         /* ========================================= */
         /* 6. BOTONES Y CONTACTO                     */
         /* ========================================= */
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 15px;
-            background: #25D366;
-            color: white;
-            padding: 12px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
+       /* 1. Quitamos bordes y líneas molestas a todos los botones .btn */
+.btn {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 8px; /* Opcional: para redondear puntas */
+}
+
+/* 2. Ajuste específico para el botón Dorado (Carrito) */
+/* Buscamos el que tiene ese color de fondo exacto */
+button[onclick*="agregarAlCarrito"] {
+    flex: 0 0 45px !important; /* Lo hace pequeño y cuadrado */
+    padding: 0 !important;
+    font-size: 0 !important;   /* Oculta el texto "+ Carrito" mágicamente */
+}
+
+/* Hacemos que el icono del carrito sí se vea (porque el font-size 0 lo oculta) */
+button[onclick*="agregarAlCarrito"] i {
+    font-size: 18px !important; 
+    margin: 0 !important;
+}
+
+/* 3. Ajuste para el botón Verde (WhatsApp) */
+button[onclick*="whatsappDirecto"] {
+    flex: 1 !important; /* Este ocupa el resto del espacio */
+    color: white !important;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
         .btn:hover {
             background: #1da851;
