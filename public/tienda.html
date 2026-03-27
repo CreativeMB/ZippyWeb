@@ -340,73 +340,99 @@ body {
             border-radius: 0 0 0 12px;
         }
 
-      /* ========================================= */
-/* 5. SECCIÓN DE PEDIDO (Antes era Modal)    */
-/* ========================================= */
+        /* ========================================= */
+        /* 5. MODALES, FORMULARIOS Y LOADER          */
+        /* ========================================= */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease;
+        }
 
-/* Cambiamos .modal para que sea un contenedor normal */
-.modal {
-    display: none; /* Se activa con JS */
-    width: 100%;
-    background: #ffffff; /* Fondo blanco sólido, ya no transparente */
-    min-height: 100vh;   /* Ocupa toda la altura disponible */
-    padding: 10px;
-    box-sizing: border-box;
-    /* Eliminamos position: fixed, justify-content y align-items */
-}
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #eee;
+            border-top: 5px solid #242424;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-/* Transformamos .modal-contenido para que no parezca una caja flotante */
-.modal-contenido {
-    background: white;
-    width: 100%;       /* Ocupa todo el ancho en móviles */
-    max-width: 800px;  /* Un poco más ancho para que en PC se vea bien */
-    margin: 0 auto;    /* Centrado horizontal */
-    padding: 15px;
-    /* Eliminamos max-height y overflow-y: auto porque el scroll será el de la página */
-    border-radius: 0;  /* Opcional: quitar bordes redondeados para que se vea más integrado */
-}
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
-/* --- Tus estilos de formulario se mantienen igual (están perfectos) --- */
-#productoDescripcion {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    line-height: 1.5;
-    display: block;
-    margin-bottom: 15px;
-}
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
 
-.formulario input,
-.formulario textarea,
-.formulario select {
-    width: 100%;
-    padding: 12px; /* Un poco más de aire para móviles */
-    margin: 8px 0;
-    border-radius: 8px;
-    border: 1px solid #ddd; /* Un gris más suave */
-    box-sizing: border-box;
-    font-size: 16px; /* Evita que el iPhone haga zoom automático al tocar el input */
-}
+        .modal-contenido {
+            background: white;
+            width: 95%;
+            max-width: 500px;
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
 
-.fila2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
+        #productoDescripcion {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.5;
+            display: block;
+            margin-bottom: 15px;
+        }
 
-#enviarPedidoBtn {
-    width: 100%;
-    background: #25D366;
-    color: white;
-    border: none;
-    padding: 15px;
-    border-radius: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 15px;
-    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); /* Un toque de sombra para el botón */
-}
+        .formulario input,
+        .formulario textarea,
+        .formulario select {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .fila2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        #enviarPedidoBtn {
+            width: 100%;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
 
         /* ========================================= */
         /* 6. BOTONES Y CONTACTO                     */
@@ -1241,47 +1267,51 @@ body {
     </div>
 </div>
  
-       <div id="productos-tab" class="tab-content">
-    <div id="vista-catalogo">
+    <div id="productos-tab" class="tab-content">
         <div id="menu-categorias-flotante" class="menu-categorias"></div>
         <a id="btnWhats" class="whatsappbtnflotante" href="#" target="_blank">
-            <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
-        </a>
-        
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
+    </a>
         <div class="header">
             <div class="marca-principal">
                 <img id="logoEmpresa" src="" alt="" class="logo-estilo">
                 <h1 id="nombreEmpresa"></h1>
             </div>
+
             <div id="eslogan" class="eslogan"></div>
+
             <div class="banner-informativo">
                 <div id="info-destacada" class="texto-destacado"></div>
             </div>
         </div>
 
         <div id="productos" class="productos"></div>
-        
         <div class="footer">
             <p id="direccion" class="info-footer-elegante"></p>
-            <p id="ciudad" class="info-footer-elegante"></p>
-            <p id="telefono" class="info-footer-elegante"></p>
-            <p id="correo" class="info-footer-elegante"></p>
-        </div>
+        <p id="ciudad" class="info-footer-elegante"></p>
+        <p id="telefono" class="info-footer-elegante"></p>
+        <p id="correo" class="info-footer-elegante"></p>
+        <p style="margin-top:25px; font-size:13px; opacity:.8; border-top: 1px solid #333; padding-top: 20px;">
+            © 2026 - <a href="https://zippy-727d5.web.app/empresa.html" target="_blank"
+                style="color:#fbbf24; text-decoration:none; font-weight:bold;">Creado con Zippy</a>
+        </p>
+    </div>
     </div>
 
-    <div id="modalPedido" style="display: none; background: #fff; padding: 20px;">
-        <button type="button" onclick="cerrarModal()" style="border: none; background: #f0f0f0; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; font-weight: bold;">
-            ← Volver a productos
-        </button>
-
-        <div style="display:flex; gap:15px; margin-bottom:20px; flex-wrap: wrap; align-items: start;">
-            <img id="productoImagen" style="width:120px; height:150px; object-fit:contain; background:#f9f9f9; border-radius:8px; border: 1px solid #eee;">
-            <div class="infoProducto" style="flex: 1; min-width: 250px;">
-                <div id="productoTitulo" style="font-weight:bold; font-size: 1.3em; color: #202020;"></div>
-                <div id="productoPrecio" style="font-weight:bold; color:#FF6600; font-size:22px; margin: 5px 0;"></div>
-                <div id="productoDescripcion" style="font-size:13px; color:#666;"></div>
+    <div id="modalPedido" class="modal">
+        <div class="modal-contenido">
+            <span style="float:right; cursor:pointer; font-size:24px;" onclick="cerrarModal()">×</span>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <img id="productoImagen" style="width:120px; height:150px; object-fit:contain; background:#f9f9f9; border-radius:8px;">
+                <div class="infoProducto">
+                    <div class="aviso-privacidad" style="font-size: 10px; line-height: 1.2; color: #666;">
+                        🔒 Tus datos están protegidos y se usan exclusivamente para procesar y entregar tu pedido, conforme a la Normativa colombiana de protección de datos.
+                    </div>
+                    <div id="productoTitulo" style="font-weight:bold;"></div>
+                    <div id="productoDescripcion" style="font-size:12px; color:#666;"></div>
+                    <div id="productoPrecio" style="font-weight:bold; color:#000000; font-size:20px;"></div>
+                </div>
             </div>
-        </div>
 
             <div class="formulario">
                 <div class="aviso-privacidad">
@@ -2005,22 +2035,32 @@ function enviarPedido() {
 
     // 1. VALIDACIÓN DE DOMICILIARIOS
     if (!idDomiciliarioAsignado) {
-        // En lugar de limpiar modal, solo ocultamos la sección
-        document.getElementById("modalPedido").style.display = "none";
-        document.getElementById("seccionCatalogo").style.display = "block"; // Asegúrate que este sea el ID de tu catálogo
+        const modal = document.getElementById("modalPedido");
+        if (modal) {
+            modal.style.display = "none";
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = 'auto';
+        }
 
         Swal.close(); 
         Swal.fire({
             icon: 'info',
             title: '📍 Sin Domiciliarios',
-            text: 'Lo sentimos, no hay domiciliarios activos en este momento.',
+            text: 'Lo sentimos, no hay domiciliarios activos en este momento. Por favor, contacta a la tienda directamente para coordinar tu entrega.',
             confirmButtonText: 'Entendido',
-            confirmButtonColor: '#FF6600'
+            confirmButtonColor: '#FF6600',
+            target: 'body',
+            didOpen: () => {
+                const container = document.querySelector('.swal2-container');
+                if (container) container.style.zIndex = '10001';
+            }
         });
         return;
     }
 
-    // 2. CAPTURA DE CAMPOS (Se mantiene igual a tu código original)
+    // 2. CAPTURA Y VALIDACIÓN DE CAMPOS OBLIGATORIOS
     const campos = {
         cliente: document.getElementById("celularComprador").value.trim(),
         direccion: document.getElementById("direccionEntrega").value.trim(),
@@ -2036,24 +2076,36 @@ function enviarPedido() {
         paraTarjeta: document.getElementById("paraTarjeta").value.trim()
     };
 
+    // Buscamos si hay algún campo vacío en el objeto anterior
     const camposVacios = Object.keys(campos).filter(key => !campos[key]);
 
     if (camposVacios.length > 0) {
         Swal.fire({
             icon: 'warning',
             title: 'Campos Incompletos',
-            text: 'Por favor, rellena todos los datos obligatorios.',
-            confirmButtonColor: '#FF6600'
+            text: 'Por favor, rellena todos los datos de envío, fecha, hora y tarjeta para continuar. Solo el campo "Adicionales" es opcional.',
+            confirmButtonText: 'Revisar Formulario',
+            confirmButtonColor: '#FF6600',
+            target: 'body', 
+            didOpen: () => {
+                const container = document.querySelector('.swal2-container');
+                if (container) container.style.zIndex = '10000'; 
+            },
+            showClass: { popup: 'animate__animated animate__shakeX' }
         });
-        return;
+        return; // Detiene la función si falta información
     }
 
-    let fechaFormateada = "";
-    if (campos.fechaOriginal) {
-        const partes = campos.fechaOriginal.split(/[-./]/); 
-        fechaFormateada = partes.reverse().join("/");
-    }
+  let fechaFormateada = "";
+if (campos.fechaOriginal) {
+    // Esto divide la cadena ya sea que tenga / , - o .
+    const partes = campos.fechaOriginal.split(/[-./]/); 
+    
+    // Unimos las partes con la barra
+    fechaFormateada = partes.reverse().join("/");
+}
 
+    // Bloqueo del botón para evitar múltiples clics
     btn.disabled = true;
     btn.innerText = "Enviando...";
 
@@ -2074,6 +2126,7 @@ function enviarPedido() {
         const fechaReg = hoy.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/-/g, '/');
         const horaReg = hoy.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
+        // Estructura del pedido (usando los datos capturados en 'campos')
         const pedidoData = {
             idPedido: nuevoRef.key,
             idEmpresa: empresaId,
@@ -2086,7 +2139,7 @@ function enviarPedido() {
             nombreDestinatario: campos.nombreDestinatario,
             destinatario: campos.celularDestinatario,
             referencia: productoSeleccionado || "Pedido Web",
-            adicional: document.getElementById("productoAdicional").value.trim(),
+            adicional: document.getElementById("productoAdicional").value.trim(), // Este sí puede ser vacío
             banco: campos.medioPago,
             diaEntrega: fechaFormateada,
             horaEntrega: campos.horaEntrega,
@@ -2101,12 +2154,19 @@ function enviarPedido() {
             horaRegistro: horaReg
         };
 
+        // Guardar en la base de datos
         set(nuevoRef, pedidoData).then(() => {
             
-            // CAMBIO AQUÍ: Ocultamos la sección en lugar de cerrar modal
-            document.getElementById("modalPedido").style.display = "none";
-            document.getElementById("seccionCatalogo").style.display = "block"; // Regresamos al catálogo
-
+            // Cierre manual del modal
+            const modal = document.getElementById("modalPedido");
+            if (modal) {
+                modal.style.display = "none";
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.remove(); 
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = 'auto';
+            }
+// 2. CONSTRUIMOS EL MENSAJE PARA WHATSAPP (Lo que faltaba)
             const mensajeWa = encodeURIComponent(
                 `*NUEVO PEDIDO REGISTRADO*\n\n` +
                 `*Cliente:* ${campos.nombreComprador}\n` +
@@ -2117,38 +2177,64 @@ function enviarPedido() {
             );
 
             const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
-
+    // 3. Disparamos la Alerta Persistente
             Swal.fire({
                 icon: 'success',
-                title: `Señor(a) ${campos.nombreComprador}`,
-                html: `<p>¡Datos registrados exitosamente! Haz clic abajo para confirmar por WhatsApp.</p>`,
+                title: `Señor(a) ${campos.nombreComprador || 'Cliente'}`,
+                html: `
+                    <div style="text-align: center;">
+                        <p style="font-size: 1.1em; color: #2d2d2d;"><b>¡Datos registrados exitosamente!</b></p>
+                        <p style="margin-top: 10px; color: #555;">
+                           Todo quedó correctamente registrado.<br><br>
+                            Ahora, por favor, <b>haz clic en el botón verde</b> para validar los datos por WhatsApp.
+                        </p>
+                    </div>
+                `,
                 confirmButtonText: 'Confirmar en WhatsApp 📱',
                 confirmButtonColor: '#25D366',
-                allowOutsideClick: false
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: true,
+                target: 'body',
+                didOpen: () => {
+                    const container = document.querySelector('.swal2-container');
+                    if (container) container.style.zIndex = '10005';
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // Abrimos WhatsApp
                     window.open(linkWa, '_blank');
 
-                    // LIMPIEZA (Tu misma lógica)
-                    const idsParaLimpiar = ["celularComprador", "direccionEntrega", "nombreComprador", "fechaEntrega", "nombreDestinatario", "celularDestinatario", "productoAdicional", "medioPago", "horaEntrega", "notasPedido", "mensajeTarjeta", "deTarjeta", "paraTarjeta"];
+                    // 4. LIMPIEZA TOTAL
+                    const idsParaLimpiar = [
+                        "celularComprador", "direccionEntrega", "nombreComprador", "fechaEntrega",
+                        "nombreDestinatario", "celularDestinatario", "productoAdicional", "medioPago",
+                        "horaEntrega", "notasPedido", "mensajeTarjeta", "deTarjeta", "paraTarjeta"
+                    ];
+
                     idsParaLimpiar.forEach(id => {
                         const el = document.getElementById(id);
-                        if (el) { el.tagName === "SELECT" ? el.selectedIndex = 0 : el.value = ""; }
+                        if (el) {
+                            if (el.tagName === "SELECT") el.selectedIndex = 0;
+                            else el.value = "";
+                        }
                     });
 
-                    // Reset de estados
+                    // Desbloqueo de interfaz
+                    document.body.style.overflow = 'auto';
+                    document.body.style.pointerEvents = 'auto';
+                    
                     productoSeleccionado = "";
                     imagenProducto = "";
                     btn.disabled = false;
                     btn.innerText = "Enviar Pedido";
-                    window.scrollTo(0,0); // Volver al inicio de la página
                 }
             });
 
         }).catch(err => {
             btn.disabled = false;
             btn.innerText = "Enviar Pedido";
-            alert("Error: " + err.message);
+            alert("Error al guardar: " + err.message);
         });
     });
 }
@@ -2173,79 +2259,70 @@ function enviarPedido() {
 
     const formatearPrecio = (v) => "$" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-window.abrirProducto = (nombre, imagen, precio, descripcion) => {
-    // 1. --- 🚀 LIMPIEZA ULTRA-PROFUNDA ---
+    window.abrirProducto = (nombre, imagen, precio, descripcion) => {
+       // --- 🚀 LIMPIEZA ULTRA-PROFUNDA (BORRA TODO) ---
     const idsParaLimpiar = [
-        "celularComprador", "direccionEntrega", "nombreComprador", "fechaEntrega",
-        "nombreDestinatario", "celularDestinatario", "productoAdicional", "medioPago",
-        "horaEntrega", "notasPedido", "mensajeTarjeta", "deTarjeta", "paraTarjeta"
+        "celularComprador", 
+        "direccionEntrega", 
+        "nombreComprador", 
+        "fechaEntrega",
+        "nombreDestinatario",
+        "celularDestinatario",
+        "productoAdicional",
+        "medioPago",
+        "horaEntrega",
+        "notasPedido",
+        "mensajeTarjeta",
+        "deTarjeta",
+        "paraTarjeta"
     ];
 
     idsParaLimpiar.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            if (el.tagName === "SELECT") el.selectedIndex = 0;
-            else el.value = "";
+            // Si es un select (como medioPago), lo vuelve a la primera opción
+            if (el.tagName === "SELECT") {
+                el.selectedIndex = 0;
+            } else {
+                el.value = ""; // Deja el campo en blanco
+            }
         }
     });
+        productoSeleccionado = nombre; imagenProducto = normalizarImagen(imagen);
+        document.getElementById("productoTitulo").innerText = nombre;
+        document.getElementById("productoDescripcion").innerText = descripcion;
+        document.getElementById("productoImagen").src = imagenProducto;
+        document.getElementById("productoPrecio").innerText = formatearPrecio(precio);
+        document.getElementById("modalPedido").style.display = "flex";
+    };
 
-    // 2. --- 📦 CARGA DE DATOS DEL PRODUCTO ---
-    productoSeleccionado = nombre; 
-    imagenProducto = (typeof normalizarImagen === 'function') ? normalizarImagen(imagen) : imagen;
-    
-    document.getElementById("productoTitulo").innerText = nombre;
-    document.getElementById("productoDescripcion").innerText = descripcion;
-    document.getElementById("productoImagen").src = imagenProducto;
-    document.getElementById("productoPrecio").innerText = (typeof formatearPrecio === 'function') ? formatearPrecio(precio) : precio;
-
-    // 3. --- 🔄 CAMBIO DE VISTA (Intercambio de Divs) ---
-    
-    // Ocultamos la pestaña activa de productos
-    const vistaTienda = document.getElementById("productos-tab");
-    if (vistaTienda) vistaTienda.style.display = "none";
-
-    // Mostramos el contenedor del formulario (id modalPedido)
-    const vistaPedido = document.getElementById("modalPedido");
-    if (vistaPedido) {
-        vistaPedido.style.display = "block";
-        vistaPedido.style.position = "relative";
-        vistaPedido.style.width = "100%";
+    window.enviarPedido = enviarPedido;
+    window.cerrarModal = () => {
+    // 1. Ocultar el modal visualmente
+    const modal = document.getElementById("modalPedido");
+    if (modal) {
+        modal.style.display = "none";
     }
 
-    // 4. --- 🚀 LIBERAR EL MOUSE Y EL SCROLL ---
-    document.body.style.overflow = 'auto'; 
-    document.body.style.pointerEvents = 'auto'; 
-    document.body.classList.remove('modal-open'); 
+    // 2. 🚀 LIBERAR EL MOUSE Y EL SCROLL
+    // Esto quita cualquier bloqueo que SweetAlert o Bootstrap hayan dejado
+    document.body.style.overflow = 'auto'; // Devuelve el scroll
+    document.body.style.pointerEvents = 'auto'; // Devuelve los clics
+    document.body.classList.remove('modal-open'); // Quita clase de bloqueo si existe
 
-    // Eliminar restos de SweetAlert o capas oscuras
+    // 3. ELIMINAR FONDOS OSCUROS (Backdrops)
+    // A veces se queda una mancha oscura que no deja tocar nada
     const backdrops = document.querySelectorAll('.modal-backdrop, .swal2-container');
     backdrops.forEach(el => el.remove());
 
-    console.log("✅ Vista de pedido abierta (clics liberados).");
-    window.scrollTo(0, 0);
+    // 4. LIMPIEZA PREVENTIVA
+    // Si el usuario lo cerró para elegir otro producto, vaciamos los campos
+    const formulario = document.getElementById("tuFormularioId"); 
+    if (formulario) formulario.reset();
+
+    console.log("✅ Modal cerrado y mouse liberado para nuevas compras.");
 };
 
-// Mantenemos el nombre original para no desconectar tus botones
-window.cerrarModal = () => {
-    // 1. Ocultar el formulario
-    const vistaPedido = document.getElementById("modalPedido");
-    if (vistaPedido) vistaPedido.style.display = "none";
-
-    // 2. Volver a mostrar la pestaña de la tienda
-    const vistaTienda = document.getElementById("productos-tab");
-    if (vistaTienda) vistaTienda.style.display = "block";
-
-    // 3. 🚀 LIMPIEZA DE SEGURIDAD
-    document.body.style.overflow = 'auto'; 
-    document.body.style.pointerEvents = 'auto'; 
-    document.body.classList.remove('modal-open'); 
-
-    const backdrops = document.querySelectorAll('.modal-backdrop, .swal2-container');
-    backdrops.forEach(el => el.remove());
-
-    console.log("✅ Regresamos a la tienda.");
-    window.scrollTo(0, 0);
-};
     // Social & Buscador
     document.addEventListener("DOMContentLoaded", () => {
         const url = window.location.href;
