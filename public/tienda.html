@@ -1590,7 +1590,7 @@ function procesarProductoDirecto() {
     const productoUrl = urlParams.get('producto'); 
     if (!productoUrl) return;
 
-    // Tu lógica original de limpieza por nombre (ADN)
+    // 1. Mantenemos tu limpieza original
     const buscadoOriginal = decodeURIComponent(productoUrl).trim().toLowerCase();
     const buscadoADN = buscadoOriginal.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
 
@@ -1599,37 +1599,43 @@ function procesarProductoDirecto() {
     let mejorMatch = null;
     const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
 
-    // Buscamos por nombre exacto o por ADN en las llaves del JSON
     let matchExacto = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
 
     if (matchExacto) {
         mejorMatch = matchExacto;
     } else {
+        // --- AQUÍ APLICAMOS LA MEJORA DEL PRIMER SCRIPT ---
         mejorMatch = listaRefs.find(ref => {
             const refADN = ref.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+            
+            // Si la palabra es corta (3 letras o menos), debe ser exacta para no fallar
+            if (buscadoADN.length <= 3) return refADN === buscadoADN;
+            
+            // Si es larga, busca coincidencias por ambos lados
             return refADN.includes(buscadoADN) || buscadoADN.includes(refADN);
         });
     }
 
     if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
+        // Usamos la referencia del match encontrado
         const real = productosRealtime[mejorMatch.trim().toLowerCase()];
         const imgOriginal = productosJson[mejorMatch];
 
+        // 2. Subimos a 1800ms para asegurar que Firebase cargó todo
         setTimeout(() => {
             if (typeof abrirProducto === 'function') {
                 let precio = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
                 const desc = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
                 
-                // Abrimos el producto usando el nombre (mejorMatch)
-                abrirProducto(mejorMatch, normalizarImagen(imgOriginal), precio, desc);
+                // 3. Abrimos con la "referenciaReal" si existe, para que el título sea perfecto
+                abrirProducto(real.referenciaReal || mejorMatch, normalizarImagen(imgOriginal), precio, desc);
 
                 const modal = document.getElementById('modalPedido');
                 if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                // Limpiar URL
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
-        }, 1500); // Un tiempo seguro para que el DOM esté listo
+        }, 1800); 
     }
 }
 
