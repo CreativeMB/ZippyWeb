@@ -1590,6 +1590,7 @@ function procesarProductoDirecto() {
     const productoUrl = urlParams.get('producto'); 
     if (!productoUrl) return;
 
+    // Tu lógica original de limpieza por nombre (ADN)
     const buscadoOriginal = decodeURIComponent(productoUrl).trim().toLowerCase();
     const buscadoADN = buscadoOriginal.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
 
@@ -1598,6 +1599,7 @@ function procesarProductoDirecto() {
     let mejorMatch = null;
     const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
 
+    // Buscamos por nombre exacto o por ADN en las llaves del JSON
     let matchExacto = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
 
     if (matchExacto) {
@@ -1605,34 +1607,29 @@ function procesarProductoDirecto() {
     } else {
         mejorMatch = listaRefs.find(ref => {
             const refADN = ref.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
-            if (buscadoADN.length <= 3) return refADN === buscadoADN;
             return refADN.includes(buscadoADN) || buscadoADN.includes(refADN);
         });
     }
 
     if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
-        const refFinal = mejorMatch;
-        const real = productosRealtime[refFinal.trim().toLowerCase()];
-        const imgOriginal = productosJson[refFinal];
+        const real = productosRealtime[mejorMatch.trim().toLowerCase()];
+        const imgOriginal = productosJson[mejorMatch];
 
         setTimeout(() => {
             if (typeof abrirProducto === 'function') {
                 let precio = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
                 const desc = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
-                const imgNorm = normalizarImagen(imgOriginal);
-
-                abrirProducto(real.referenciaReal || refFinal, imgNorm, precio, desc);
+                
+                // Abrimos el producto usando el nombre (mejorMatch)
+                abrirProducto(mejorMatch, normalizarImagen(imgOriginal), precio, desc);
 
                 const modal = document.getElementById('modalPedido');
                 if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                // --- SOLUCIÓN: LIMPIAR LA URL DESPUÉS DE ABRIR ---
-                // Esto quita el "?producto=..." de la barra de direcciones sin recargar la página
-                const nuevaUrl = window.location.pathname;
-                window.history.replaceState({}, document.title, nuevaUrl);
-                console.log("🧹 URL Limpiada para evitar re-apertura.");
+                // Limpiar URL
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
-        }, 1800);
+        }, 1500); // Un tiempo seguro para que el DOM esté listo
     }
 }
 
