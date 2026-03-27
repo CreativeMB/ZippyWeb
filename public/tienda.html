@@ -2182,6 +2182,17 @@ function renderizarMenuCategorias() {
 function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
 
+    // 0. VALIDACIÓN ADICIONAL: CARRITO VACÍO
+    if (carrito.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Carrito Vacío',
+            text: 'Por favor, añade al menos un producto antes de enviar el pedido.',
+            confirmButtonColor: '#E5C453'
+        });
+        return;
+    }
+
     // 1. VALIDACIÓN DE DOMICILIARIOS
     if (!idDomiciliarioAsignado) {
         const modal = document.getElementById("modalPedido");
@@ -2225,7 +2236,6 @@ function enviarPedido() {
         paraTarjeta: document.getElementById("paraTarjeta").value.trim()
     };
 
-    // Buscamos si hay algún campo vacío en el objeto anterior
     const camposVacios = Object.keys(campos).filter(key => !campos[key]);
 
     if (camposVacios.length > 0) {
@@ -2242,19 +2252,23 @@ function enviarPedido() {
             },
             showClass: { popup: 'animate__animated animate__shakeX' }
         });
-        return; // Detiene la función si falta información
+        return;
     }
 
-  let fechaFormateada = "";
-if (campos.fechaOriginal) {
-    // Esto divide la cadena ya sea que tenga / , - o .
-    const partes = campos.fechaOriginal.split(/[-./]/); 
+    // --- PROCESAMIENTO DE DATOS DEL CARRITO (FORMATO SOLICITADO) ---
+    // Crea: "Rosas 3, Chocolates 2, Girasoles 1"
+    const referenciaUnificada = carrito.map(item => `${item.nombre} ${item.cantidad}`).join(', ');
     
-    // Unimos las partes con la barra
-    fechaFormateada = partes.reverse().join("/");
-}
+    // Crea: "url_imagen1, url_imagen2, url_imagen3"
+    const imagenesUnificadas = carrito.map(item => item.imagen).join(', ');
 
-    // Bloqueo del botón para evitar múltiples clics
+    let fechaFormateada = "";
+    if (campos.fechaOriginal) {
+        const partes = campos.fechaOriginal.split(/[-./]/); 
+        fechaFormateada = partes.reverse().join("/");
+    }
+
+    // Bloqueo del botón
     btn.disabled = true;
     btn.innerText = "Enviando...";
 
@@ -2275,20 +2289,20 @@ if (campos.fechaOriginal) {
         const fechaReg = hoy.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/-/g, '/');
         const horaReg = hoy.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
-        // Estructura del pedido (usando los datos capturados en 'campos')
+        // --- ESTRUCTURA DEL PEDIDO PARA FIREBASE ---
         const pedidoData = {
             idPedido: nuevoRef.key,
             idEmpresa: empresaId,
             idDomiciliario: idDomiciliarioAsignado,
             nombreDomiciliario: nombreDomiciliarioAsignado,
             direccion: campos.direccion,
-            imagenUrl: imagenProducto || "",
+            imagenUrl: imagenesUnificadas, // TODAS LAS IMÁGENES CON COMA
             nombreCliente: campos.nombreComprador,
             cliente: campos.cliente,
             nombreDestinatario: campos.nombreDestinatario,
             destinatario: campos.celularDestinatario,
-            referencia: productoSeleccionado || "Pedido Web",
-            adicional: document.getElementById("productoAdicional").value.trim(), // Este sí puede ser vacío
+            referencia: referenciaUnificada, // "PRODUCTO CANTIDAD, PRODUCTO CANTIDAD"
+            adicional: document.getElementById("productoAdicional").value.trim(),
             banco: campos.medioPago,
             diaEntrega: fechaFormateada,
             horaEntrega: campos.horaEntrega,
@@ -2303,52 +2317,36 @@ if (campos.fechaOriginal) {
             horaRegistro: horaReg
         };
 
-        // Guardar en la base de datos
         set(nuevoRef, pedidoData).then(() => {
             
-            // Cierre manual del modal
-            const modal = document.getElementById("modalPedido");
-            if (modal) {
-                modal.style.display = "none";
-                const backdrop = document.querySelector('.modal-backdrop');
-                if (backdrop) backdrop.remove(); 
-                document.body.classList.remove('modal-open');
-                document.body.style.overflow = 'auto';
-            }
-// 2. CONSTRUIMOS EL MENSAJE PARA WHATSAPP (Lo que faltaba)
-let listaProductosTexto = carrito.map(item => {
-    let linea = `- ${item.cantidad}x ${item.nombre} (${formatearPrecio(item.precio * item.cantidad)})`;
-    
-    // Si el producto tiene descripción, la añadimos en la línea de abajo en cursivas (_)
-    if (item.descripcion) {
-        linea += `\n  _(${item.descripcion.trim()})_`;
-    }
-    return linea;
-}).join('\n');
+            // --- CONSTRUCCIÓN DEL MENSAJE PARA WHATSAPP ---
+            let listaProductosTexto = carrito.map(item => {
+                return `- ${item.cantidad}x ${item.nombre} (${formatearPrecio(item.precio * item.cantidad)})`;
+            }).join('\n');
 
-let totalSuma = document.getElementById("total-pedido-suma").innerText;
+            let totalSuma = document.getElementById("total-pedido-suma").innerText;
 
-// 2. Construimos el mensaje final
-const mensajeWa = encodeURIComponent(
-    `*NUEVO PEDIDO REGISTRADO*\n\n` +
-    `*PRODUCTOS:*\n${listaProductosTexto}\n\n` +
-    `*TOTAL A PAGAR: ${totalSuma}*\n\n` +
-    `*Cliente:* ${campos.nombreComprador}\n` +
-    `*Medio de Pago:* ${campos.medioPago}\n\n` +
-    `_Por favor confirma mi pedido._`
-);
+            const mensajeWa = encodeURIComponent(
+                `*NUEVO PEDIDO REGISTRADO*\n\n` +
+                `*PRODUCTOS:*\n${listaProductosTexto}\n\n` +
+                `*TOTAL A PAGAR: ${totalSuma}*\n\n` +
+                `*Cliente:* ${campos.nombreComprador}\n` +
+                `*Fecha Entrega:* ${fechaFormateada}\n` +
+                `*Medio de Pago:* ${campos.medioPago}\n\n` +
+                `_Por favor confirma mi pedido._`
+            );
 
             const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
-    // 3. Disparamos la Alerta Persistente
+
+            // Alerta de éxito persistente
             Swal.fire({
                 icon: 'success',
-                title: `Señor(a) ${campos.nombreComprador || 'Cliente'}`,
+                title: `Señor(a) ${campos.nombreComprador}`,
                 html: `
                     <div style="text-align: center;">
-                        <p style="font-size: 1.1em; color: #2d2d2d;"><b>¡Datos registrados exitosamente!</b></p>
+                        <p><b>¡Datos registrados exitosamente!</b></p>
                         <p style="margin-top: 10px; color: #555;">
-                           Todo quedó correctamente registrado.<br><br>
-                            Ahora, por favor, <b>haz clic en el botón verde</b> para validar los datos por WhatsApp.
+                            Haz clic en el botón verde para finalizar y confirmar por WhatsApp.
                         </p>
                     </div>
                 `,
@@ -2364,10 +2362,12 @@ const mensajeWa = encodeURIComponent(
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Abrimos WhatsApp
                     window.open(linkWa, '_blank');
 
-                    // 4. LIMPIEZA TOTAL
+                    // LIMPIEZA TOTAL
+                    carrito = [];
+                    window.actualizarBadgeCarrito();
+                    
                     const idsParaLimpiar = [
                         "celularComprador", "direccionEntrega", "nombreComprador", "fechaEntrega",
                         "nombreDestinatario", "celularDestinatario", "productoAdicional", "medioPago",
@@ -2382,20 +2382,19 @@ const mensajeWa = encodeURIComponent(
                         }
                     });
 
-                    // Desbloqueo de interfaz
                     document.body.style.overflow = 'auto';
                     document.body.style.pointerEvents = 'auto';
                     
-                    productoSeleccionado = "";
-                    imagenProducto = "";
                     btn.disabled = false;
-                    btn.innerText = "Enviar Pedido";
+                    btn.innerText = "Enviar pedido";
+
+                    window.cerrarModal(); // Vuelve a la tienda
                 }
             });
 
         }).catch(err => {
             btn.disabled = false;
-            btn.innerText = "Enviar Pedido";
+            btn.innerText = "Enviar pedido";
             alert("Error al guardar: " + err.message);
         });
     });
