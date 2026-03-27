@@ -1270,7 +1270,7 @@ body {
     </div>
 
     <div id="modalPedido" style="display: none; background: #fff; padding: 20px;">
-        <button type="button" onclick="cerrarSeccionPedido()" style="border: none; background: #f0f0f0; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; font-weight: bold;">
+        <button type="button" onclick="cerrarModal()" style="border: none; background: #f0f0f0; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; font-weight: bold;">
             ← Volver a productos
         </button>
 
@@ -2191,20 +2191,20 @@ window.abrirProducto = (nombre, imagen, precio, descripcion) => {
 
     // 2. --- 📦 CARGA DE DATOS DEL PRODUCTO ---
     productoSeleccionado = nombre; 
-    imagenProducto = typeof normalizarImagen === 'function' ? normalizarImagen(imagen) : imagen;
+    imagenProducto = (typeof normalizarImagen === 'function') ? normalizarImagen(imagen) : imagen;
     
     document.getElementById("productoTitulo").innerText = nombre;
     document.getElementById("productoDescripcion").innerText = descripcion;
     document.getElementById("productoImagen").src = imagenProducto;
-    document.getElementById("productoPrecio").innerText = typeof formatearPrecio === 'function' ? formatearPrecio(precio) : precio;
+    document.getElementById("productoPrecio").innerText = (typeof formatearPrecio === 'function') ? formatearPrecio(precio) : precio;
 
     // 3. --- 🔄 CAMBIO DE VISTA (Intercambio de Divs) ---
     
-    // Ocultamos la pestaña de productos (la tienda)
+    // Ocultamos la pestaña activa de productos
     const vistaTienda = document.getElementById("productos-tab");
     if (vistaTienda) vistaTienda.style.display = "none";
 
-    // Mostramos el formulario de pedido
+    // Mostramos el contenedor del formulario (id modalPedido)
     const vistaPedido = document.getElementById("modalPedido");
     if (vistaPedido) {
         vistaPedido.style.display = "block";
@@ -2212,31 +2212,33 @@ window.abrirProducto = (nombre, imagen, precio, descripcion) => {
         vistaPedido.style.width = "100%";
     }
 
-    // 4. --- 🚀 LIBERAR INTERFAZ ---
+    // 4. --- 🚀 LIBERAR EL MOUSE Y EL SCROLL ---
     document.body.style.overflow = 'auto'; 
     document.body.style.pointerEvents = 'auto'; 
     document.body.classList.remove('modal-open'); 
 
-    // Limpiar restos de SweetAlert o modales previos
+    // Eliminar restos de SweetAlert o capas oscuras
     const backdrops = document.querySelectorAll('.modal-backdrop, .swal2-container');
     backdrops.forEach(el => el.remove());
 
-    console.log("✅ Vista de pedido activa.");
+    console.log("✅ Vista de pedido abierta (clics liberados).");
     window.scrollTo(0, 0);
 };
 
-window.cerrarSeccionPedido = () => {
-    // 1. Ocultar la vista de pedido
+// Mantenemos el nombre original para no desconectar tus botones
+window.cerrarModal = () => {
+    // 1. Ocultar el formulario
     const vistaPedido = document.getElementById("modalPedido");
     if (vistaPedido) vistaPedido.style.display = "none";
 
-    // 2. Mostrar nuevamente la pestaña de productos
+    // 2. Volver a mostrar la pestaña de la tienda
     const vistaTienda = document.getElementById("productos-tab");
     if (vistaTienda) vistaTienda.style.display = "block";
 
     // 3. 🚀 LIMPIEZA DE SEGURIDAD
     document.body.style.overflow = 'auto'; 
     document.body.style.pointerEvents = 'auto'; 
+    document.body.classList.remove('modal-open'); 
 
     const backdrops = document.querySelectorAll('.modal-backdrop, .swal2-container');
     backdrops.forEach(el => el.remove());
@@ -2244,10 +2246,6 @@ window.cerrarSeccionPedido = () => {
     console.log("✅ Regresamos a la tienda.");
     window.scrollTo(0, 0);
 };
-
-// Mantenemos cerrarModal como alias por si lo usas en otros botones
-window.cerrarModal = window.cerrarSeccionPedido;
-
     // Social & Buscador
     document.addEventListener("DOMContentLoaded", () => {
         const url = window.location.href;
