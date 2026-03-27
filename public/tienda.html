@@ -2173,8 +2173,8 @@ function enviarPedido() {
 
     const formatearPrecio = (v) => "$" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-  window.abrirProducto = (nombre, imagen, precio, descripcion) => {
-    // --- 🚀 LIMPIEZA ULTRA-PROFUNDA (Mantenemos tu lógica) ---
+window.abrirProducto = (nombre, imagen, precio, descripcion) => {
+    // 1. --- 🚀 LIMPIEZA ULTRA-PROFUNDA ---
     const idsParaLimpiar = [
         "celularComprador", "direccionEntrega", "nombreComprador", "fechaEntrega",
         "nombreDestinatario", "celularDestinatario", "productoAdicional", "medioPago",
@@ -2189,72 +2189,64 @@ function enviarPedido() {
         }
     });
 
-    // --- 📦 CARGA DE DATOS ---
+    // 2. --- 📦 CARGA DE DATOS DEL PRODUCTO ---
     productoSeleccionado = nombre; 
-    imagenProducto = normalizarImagen(imagen);
+    imagenProducto = typeof normalizarImagen === 'function' ? normalizarImagen(imagen) : imagen;
     
     document.getElementById("productoTitulo").innerText = nombre;
     document.getElementById("productoDescripcion").innerText = descripcion;
     document.getElementById("productoImagen").src = imagenProducto;
-    document.getElementById("productoPrecio").innerText = formatearPrecio(precio);
+    document.getElementById("productoPrecio").innerText = typeof formatearPrecio === 'function' ? formatearPrecio(precio) : precio;
 
-    // --- 🔄 CAMBIO DE VISTA (Aquí está el truco) ---
+    // 3. --- 🔄 CAMBIO DE VISTA (Intercambio de Divs) ---
     
-    // 1. Ocultamos el catálogo (Asegúrate que este ID exista en tu HTML)
-    const catalogo = document.getElementById("seccionCatalogo");
-    if (catalogo) catalogo.style.display = "none";
+    // Ocultamos la pestaña de productos (la tienda)
+    const vistaTienda = document.getElementById("productos-tab");
+    if (vistaTienda) vistaTienda.style.display = "none";
 
-    // 2. Mostramos el formulario (el que antes era el modal)
+    // Mostramos el formulario de pedido
     const vistaPedido = document.getElementById("modalPedido");
     if (vistaPedido) {
-        vistaPedido.style.display = "block"; // Ya no usamos 'flex' para que fluya con el scroll
-        vistaPedido.style.position = "relative"; // Se comporta como parte de la página
+        vistaPedido.style.display = "block";
+        vistaPedido.style.position = "relative";
         vistaPedido.style.width = "100%";
     }
 
-    // 2. 🚀 LIBERAR EL MOUSE Y EL SCROLL
-    // Esto quita cualquier bloqueo que SweetAlert o Bootstrap hayan dejado
-    document.body.style.overflow = 'auto'; // Devuelve el scroll
-    document.body.style.pointerEvents = 'auto'; // Devuelve los clics
-    document.body.classList.remove('modal-open'); // Quita clase de bloqueo si existe
-
-    // 3. ELIMINAR FONDOS OSCUROS (Backdrops)
-    // A veces se queda una mancha oscura que no deja tocar nada
-    const backdrops = document.querySelectorAll('.modal-backdrop, .swal2-container');
-    backdrops.forEach(el => el.remove());
-
-    // 4. LIMPIEZA PREVENTIVA
-    // Si el usuario lo cerró para elegir otro producto, vaciamos los campos
-    const formulario = document.getElementById("tuFormularioId"); 
-    if (formulario) formulario.reset();
-
-    console.log("✅ Modal cerrado y mouse liberado para nuevas compras.");
-window.scrollTo(0, 0);
-};
-
-window.cerrarModal = () => {
-    // 1. Ocultar la vista de pedido
-    const vistaPedido = document.getElementById("modalPedido");
-    if (vistaPedido) {
-        vistaPedido.style.display = "none";
-    }
-
-    // 2. Mostrar nuevamente el catálogo
-    const catalogo = document.getElementById("seccionCatalogo");
-    if (catalogo) {
-        catalogo.style.display = "block";
-    }
-
-    // 3. 🚀 LIMPIEZA DE ESTADOS (Mantenemos tu lógica de liberación)
+    // 4. --- 🚀 LIBERAR INTERFAZ ---
     document.body.style.overflow = 'auto'; 
     document.body.style.pointerEvents = 'auto'; 
     document.body.classList.remove('modal-open'); 
 
+    // Limpiar restos de SweetAlert o modales previos
     const backdrops = document.querySelectorAll('.modal-backdrop, .swal2-container');
     backdrops.forEach(el => el.remove());
 
-    console.log("✅ Regresamos al catálogo con éxito.");
+    console.log("✅ Vista de pedido activa.");
+    window.scrollTo(0, 0);
 };
+
+window.cerrarSeccionPedido = () => {
+    // 1. Ocultar la vista de pedido
+    const vistaPedido = document.getElementById("modalPedido");
+    if (vistaPedido) vistaPedido.style.display = "none";
+
+    // 2. Mostrar nuevamente la pestaña de productos
+    const vistaTienda = document.getElementById("productos-tab");
+    if (vistaTienda) vistaTienda.style.display = "block";
+
+    // 3. 🚀 LIMPIEZA DE SEGURIDAD
+    document.body.style.overflow = 'auto'; 
+    document.body.style.pointerEvents = 'auto'; 
+
+    const backdrops = document.querySelectorAll('.modal-backdrop, .swal2-container');
+    backdrops.forEach(el => el.remove());
+
+    console.log("✅ Regresamos a la tienda.");
+    window.scrollTo(0, 0);
+};
+
+// Mantenemos cerrarModal como alias por si lo usas en otros botones
+window.cerrarModal = window.cerrarSeccionPedido;
 
     // Social & Buscador
     document.addEventListener("DOMContentLoaded", () => {
