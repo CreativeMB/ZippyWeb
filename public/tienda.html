@@ -2008,20 +2008,22 @@ function render() {
         const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
         const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
 
-        // --- BOTONES CORREGIDOS ---
+        // --- LÓGICA DE BOTONES ---
         let botonesHtml = "";
         if (real.agotado) {
             botonesHtml = `<button class="btn" style="background:#888; color:white; cursor:not-allowed; margin: 10px;" disabled>Agotado</button>`;
         } else {
             botonesHtml = `
                 <div style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px;">
+                    <!-- BOTÓN DORADO: Al carrito -->
                     <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
                             style="flex: 1; margin: 0; background: #E5C453; color: #000; font-size: 11px; padding: 8px;">
                         <i class="fas fa-cart-plus"></i> + Carrito
                     </button>
-                    <button class="btn" onclick="window.abrirProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
+                    <!-- BOTÓN VERDE: WhatsApp Directo (Sin formulario) -->
+                    <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}')" 
                             style="flex: 1; margin: 0; background: #25D366; font-size: 11px; padding: 8px;">
-                        Comprar
+                        <i class="fab fa-whatsapp"></i> WhatsApp
                     </button>
                 </div>
             `;
@@ -2037,7 +2039,7 @@ function render() {
                      style="${estiloImagen}; cursor:pointer;" 
                      ${prioridadAttr} 
                      alt="${refProd}"
-                     onclick="window.abrirProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')">
+                     onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')">
             </div>
             <div class="nombre">${real.referenciaReal || refP}</div>
             <div class="precio-contenedor">${precioHTML}</div>
@@ -2058,41 +2060,60 @@ function render() {
         if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
     }, 100); 
 }
-// Pegamos el render al window para que se actualice bien
 window.render = render;
-// 1. FUNCIÓN PARA EL BOTÓN "AGREGAR AL CARRITO"
-window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
-    // Limpiamos el precio por si viene con símbolos
-    const precioNum = typeof precio === 'string' ? parseFloat(precio.replace(/[^0-9.-]+/g,"")) : precio;
+
+// 1. WHATSAPP DIRECTO (Botón Verde de la tarjeta)
+window.whatsappDirecto = (nombre, precio) => {
+    const textoPrecio = precio > 0 ? formatearPrecio(precio) : "Consultar";
+    const msg = `*¡Hola!* 👋 Me interesa este producto de tu tienda:\n\n` +
+                `*Producto:* ${nombre}\n` +
+                `*Precio:* ${textoPrecio}\n\n` +
+                `¿Está disponible?`;
     
+    const url = `https://wa.me/${telefonoEmpresa}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+};
+
+// =========================================
+// LÓGICA ÚNICA DEL CARRITO (SIN REPETICIONES)
+// =========================================
+// 1. AGREGAR AL CARRITO (Botón Dorado)
+window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
+    // Limpiar el precio: convertir "$10.000" a número 10000
+    const precioNum = typeof precio === 'string' 
+        ? parseFloat(precio.replace(/[^0-9.-]+/g,"")) 
+        : precio;
+
     const existe = carrito.find(item => item.nombre === nombre);
+    
     if (existe) {
         existe.cantidad++;
     } else {
         carrito.push({ nombre, imagen, precio: precioNum, cantidad: 1 });
     }
     
-    actualizarBadgeCarrito();
+    window.actualizarBadgeCarrito();
+    
+    // Notificación visual
     Swal.fire({
         toast: true, position: 'top-end', icon: 'success',
-        title: '¡Al carrito!', showConfirmButton: false, timer: 1000
+        title: 'Añadido al carrito', showConfirmButton: false, timer: 1000
     });
 };
 
-// 2. FUNCIÓN "ABRIR PRODUCTO / COMPRAR AHORA" (La que pedías que no se bloquee)
-window.abrirProducto = (nombre, imagen, precio, descripcion) => {
-    // Si el carrito está vacío, agregamos este producto automáticamente
-    const existe = carrito.find(item => item.nombre === nombre);
-    if (!existe) {
+// 2. ABRIR FORMULARIO (Al tocar imagen o botón carrito)
+window.abrirPestañaProducto = (nombre, imagen, precio, descripcion) => {
+    // Si viene de tocar una imagen y el carrito está vacío, lo agregamos automáticamente
+    if (nombre && carrito.length === 0) {
         window.agregarAlCarrito(nombre, imagen, precio, descripcion);
     }
-    
-    // Cambiamos a la pestaña del formulario
+
+    // Ocultar tienda y mostrar sección de pedido
     document.getElementById("productos-tab").style.display = "none";
     document.getElementById("empresa-tab").style.display = "none";
     document.getElementById("modalPedido").style.display = "block";
     
-    renderizarCarritoEnForm();
+    window.renderizarCarritoEnForm();
     window.scrollTo(0, 0);
 };
 
@@ -2100,6 +2121,7 @@ window.abrirProducto = (nombre, imagen, precio, descripcion) => {
 window.renderizarCarritoEnForm = () => {
     const contenedor = document.getElementById("lista-carrito-form");
     if (!contenedor) return;
+    
     contenedor.innerHTML = "";
     let total = 0;
 
@@ -2113,81 +2135,65 @@ window.renderizarCarritoEnForm = () => {
         div.innerHTML = `
             <img src="${normalizarImagen(item.imagen)}" style="width:50px; height:60px; object-fit:cover; border-radius:5px;">
             <div style="flex:1;">
-                <div style="font-weight:bold; font-size:14px; color:#333;">${item.nombre}</div>
+                <div style="font-weight:bold; font-size:13px; color:#333;">${item.nombre}</div>
                 <div style="color:#25D366; font-weight:bold;">${formatearPrecio(item.precio)}</div>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-                <button onclick="window.cambiarCantidadCarrito(${index}, -1)" style="width:28px; height:28px; border-radius:50%; border:1px solid #ddd; background:#f9f9f9;">-</button>
+                <button onclick="window.cambiarCantidadCarrito(${index}, -1)" style="width:28px; height:28px; border-radius:50%; border:1px solid #ddd; background:#f9f9f9; cursor:pointer;">-</button>
                 <span style="font-weight:bold; min-width:20px; text-align:center;">${item.cantidad}</span>
-                <button onclick="window.cambiarCantidadCarrito(${index}, 1)" style="width:28px; height:28px; border-radius:50%; border:1px solid #ddd; background:#f9f9f9;">+</button>
+                <button onclick="window.cambiarCantidadCarrito(${index}, 1)" style="width:28px; height:28px; border-radius:50%; border:1px solid #ddd; background:#f9f9f9; cursor:pointer;">+</button>
             </div>
         `;
         contenedor.appendChild(div);
     });
     
-    document.getElementById("total-pedido-suma").innerText = formatearPrecio(total);
+    const totalElem = document.getElementById("total-pedido-suma");
+    if (totalElem) totalElem.innerText = formatearPrecio(total);
 };
 
+// 4. CAMBIAR CANTIDADES (+ / -)
 window.cambiarCantidadCarrito = (index, valor) => {
     carrito[index].cantidad += valor;
-    if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
     
+    // Si la cantidad es 0, lo quitamos del array
+    if (carrito[index].cantidad <= 0) {
+        carrito.splice(index, 1);
+    }
+    
+    // Si ya no hay productos, cerramos y volvemos a la tienda
     if (carrito.length === 0) {
         window.cerrarModal();
     } else {
         window.renderizarCarritoEnForm();
     }
-    actualizarBadgeCarrito();
+    
+    window.actualizarBadgeCarrito();
 };
 
-function actualizarBadgeCarrito() {
-    const total = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+// 5. ACTUALIZAR EL NÚMERO DEL BOTÓN FLOTANTE
+window.actualizarBadgeCarrito = () => {
+    const totalItems = carrito.reduce((acc, item) => acc + item.cantidad, 0);
     const badge = document.getElementById("cart-count-val");
-    if (badge) badge.innerText = total;
-}
+    if (badge) badge.innerText = totalItems;
+};
 
-// Para que el botón flotante del carrito también funcione
+// 6. BOTÓN FLOTANTE DEL CARRITO
 window.abrirCarrito = () => {
     if (carrito.length === 0) {
-        Swal.fire('Carrito vacío', 'Añade productos para continuar', 'info');
+        Swal.fire({
+            icon: 'info',
+            title: 'Carrito vacío',
+            text: 'Añade algunos productos para continuar con tu pedido.',
+            confirmButtonColor: '#E5C453'
+        });
         return;
     }
-    window.abrirProducto(carrito[0].nombre, carrito[0].imagen, carrito[0].precio, "");
+    // Abrimos la pestaña sin añadir producto extra
+    window.abrirPestañaProducto("", "", 0, "");
 };
 
-// 4. CAMBIAR CANTIDADES (+ / -)
-window.cambiarCantidad = (index, delta) => {
-    carrito[index].cantidad += delta;
-    
-    // Si la cantidad llega a 0, eliminar producto
-    if (carrito[index].cantidad <= 0) {
-        carrito.splice(index, 1);
-    }
-    
-    actualizarUI();
-    renderizarCarritoEnForm();
-    
-    // Si el carrito queda vacío, volver a la tienda
-    if (carrito.length === 0) {
-        cerrarModal();
-    }
-};
-
-// 5. ABRIR EL FORMULARIO DESDE EL BOTÓN FLOTANTE
-window.abrirCarrito = () => {
-    if (carrito.length === 0) {
-        Swal.fire('Carrito vacío', 'Añade algunos productos primero', 'info');
-        return;
-    }
-    
-    // Ocultar tienda, mostrar formulario
-    document.getElementById("productos-tab").style.display = "none";
-    document.getElementById("empresa-tab").style.display = "none";
-    document.getElementById("modalPedido").style.display = "block";
-    
-    renderizarCarritoEnForm();
-    window.scrollTo(0, 0);
-};
+// Alias para compatibilidad con tus botones antiguos si hiciera falta
+window.abrirProducto = window.abrirPestañaProducto;
 
 
 function obtenerCategoriasUnicas() {
