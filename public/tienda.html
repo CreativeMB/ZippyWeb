@@ -1073,7 +1073,7 @@ body {
 
     /* 1. GRID DE PRODUCTOS (2 Columnas - Estilo Retrato) */
     .productos {
-        grid-template-columns: repeat(2, 1fr) !important; 
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 12px !important;
         padding: 10px !important;
         background-color: #f8f9fa;
@@ -1083,7 +1083,7 @@ body {
     .producto {
         border: none !important;
         border-radius: 12px !important;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
         background: #ffffff;
         margin-bottom: 5px;
     }
@@ -1100,101 +1100,115 @@ body {
         margin: 8px 0 4px 0 !important;
         font-weight: 600 !important;
         padding: 0 6px !important;
+        line-height: 1.2;
+        height: 32px; /* Altura fija para alinear botones */
+        overflow: hidden;
     }
 
     .precio {
         font-size: 15px !important;
         color: #111;
         margin-bottom: 8px !important;
+        font-weight: 800;
     }
 
-    /* 3. BOTONES INTERNOS DE LA TARJETA (Uno sobre otro) */
+    /* 3. BOTONES INTERNOS (EN LA MISMA LÍNEA - SIN BORDES) */
     .producto div[style*="display: flex"] {
-        flex-direction: column !important; 
+        flex-direction: row !important; /* Misma línea */
+        align-items: center !important;
+        justify-content: space-between !important;
         gap: 6px !important;
         padding: 0 8px 12px 8px !important;
     }
 
-    .producto .btn {
-        width: 100% !important;
+    /* Botón Carrito (Solo Icono - Circular) */
+    .producto .btn:first-child {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        padding: 0 !important;
+        background: #E5C453 !important;
+        color: #000 !important;
+        border-radius: 50% !important; /* Circular */
+        border: none !important; /* Sin bordes */
+        font-size: 18px !important;
         margin: 0 !important;
-        padding: 10px !important;
-        font-size: 10px !important;
-        text-transform: uppercase;
-        border-radius: 8px !important;
-    }
-
-    /* 4. BOTONES FLOTANTES: MISMA LÍNEA Y MODERNOS (SIN BORDES) */
-    
-    /* Estilo Base para WA y Carrito */
-    .whatsappbtnflotante, #btnCarritoFlotante {
-        position: fixed !important;
-        width: 65px !important; /* Más grande */
-        height: 65px !important;
-        background-color: #25d366 !important; /* Verde WhatsApp */
-        border-radius: 50% !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
-        z-index: 999999 !important;
-        border: none !important; /* Sin bordes negros */
-        box-shadow: 0 10px 20px rgba(37, 211, 102, 0.4) !important; /* Sombra llamativa */
     }
+    
+    /* Ocultar texto del carrito si el JS lo envía (fuerza solo icono) */
+    .producto .btn:first-child span { display: none !important; }
 
-    /* WhatsApp (A la derecha) */
-    .whatsappbtnflotante {
-        bottom: 25px !important;
-        right: 20px !important;
-    }
-
-    /* Carrito (A la izquierda de WhatsApp - Misma línea) */
-    #btnCarritoFlotante {
-        bottom: 25px !important;
-        right: 95px !important; /* Alineado horizontalmente */
-    }
-
-    /* Iconos y Contador */
-    .whatsappbtnflotante img, #btnCarritoFlotante i {
-        width: 32px !important;
-        height: 32px !important;
-        font-size: 28px !important;
+    /* Botón WhatsApp (Alargado) */
+    .producto .btn:last-child {
+        flex: 1 !important; /* Ocupa el resto del espacio */
+        height: 42px !important;
+        background: #25D366 !important;
         color: white !important;
-    }
-
-    .cart-count {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background: #ff3b30;
-        color: white;
-        width: 22px;
-        height: 22px;
-        font-size: 11px;
+        border-radius: 10px !important;
         border: none !important; /* Sin bordes */
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        font-size: 11px !important;
+        margin: 0 !important;
+        padding: 0 5px !important;
     }
 
-    /* 5. CATEGORÍAS (Sube para no tapar los botones) */
+    /* 4. TORRE DE BOTONES FLOTANTES (Se mantienen igual) */
+
+    .whatsappbtnflotante {
+        bottom: 20px !important;
+        right: 15px !important;
+        width: 55px;
+        height: 55px;
+        z-index: 99999 !important;
+        border: none !important;
+    }
+
+    #btnCarritoFlotante {
+        position: fixed !important;
+        bottom: 85px !important; 
+        right: 15px !important;
+        width: 55px;
+        height: 55px;
+        background: #E5C453;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99998 !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        border: none !important;
+    }
+
     .menu-categorias {
         top: auto !important;
-        bottom: 110px !important; /* Encima de los botones horizontales */
+        bottom: 150px !important; 
         right: 0 !important;
         position: fixed;
         display: flex;
         flex-direction: column-reverse;
         align-items: flex-end;
+        gap: 6px;
         z-index: 99997;
     }
 
     .cat-btn {
+        pointer-events: auto;
+        border-radius: 8px 0 0 8px !important;
         min-width: 130px;
         font-size: 14px;
         padding: 10px 15px;
-        border-radius: 8px 0 0 8px !important;
-        box-shadow: -3px 4px 10px rgba(0,0,0,0.3);
+        text-align: right;
+        border: none !important;
     }
 
-    /* 6. FORMULARIO DE PEDIDO EN MÓVIL */
+    .cat-main {
+        background: linear-gradient(135deg, #E5C453, #caa93a) !important;
+        color: #000 !important;
+    }
+
+    /* 5. FORMULARIO DE PEDIDO */
     .modal-contenido {
         padding: 15px !important;
     }
@@ -1208,6 +1222,7 @@ body {
     .formulario input, .formulario select {
         padding: 10px !important;
         font-size: 14px !important;
+        border: 1px solid #ddd !important;
     }
 
     #productoImagen {
@@ -1215,19 +1230,10 @@ body {
         height: 85px !important;
     }
 
-    /* Aviso Toast arriba de los botones */
+    /* Ajuste de Aviso Toast */
     .swal2-bottom-end .swal2-toast {
-        margin-bottom: 100px !important;
+        margin-bottom: 215px !important;
     }
-}
-
-/* Ajustes para pantallas muy angostas */
-@media screen and (max-width: 400px) {
-    .whatsappbtnflotante, #btnCarritoFlotante {
-        width: 58px !important;
-        height: 58px !important;
-    }
-    #btnCarritoFlotante { right: 88px !important; }
 }
 
     </style>
@@ -1851,12 +1857,12 @@ function render() {
             botonesHtml = `<button class="btn" style="background:#888; color:white; cursor:not-allowed; margin: 10px;" disabled>Agotado</button>`;
         } else {
             botonesHtml = `
-                <div style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px;">
-                    <!-- BOTÓN DORADO: Al carrito -->
-                    <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
-                            style="flex: 1; margin: 0; background: #E5C453; color: #000; font-size: 11px; padding: 8px;">
-                        <i class="fas fa-cart-plus"></i> + Carrito
-                    </button>
+                 <div style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px;">
+        <button class="btn" onclick="window.agregarAlCarrito(...)">
+            <i class="fas fa-shopping-cart"></i> <!-- Icono que verá el móvil -->
+            <span>+ Carrito</span> <!-- Texto que el móvil ocultará con el CSS -->
+        </button>
+        
                     <!-- BOTÓN VERDE: WhatsApp Directo (Sin formulario) -->
                     <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}')" 
                             style="flex: 1; margin: 0; background: #25D366; font-size: 11px; padding: 8px;">
