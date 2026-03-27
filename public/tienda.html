@@ -1153,6 +1153,18 @@ button[onclick*="whatsappDirecto"] i {
         gap: 12px !important;
         padding: 10px !important;
     }
+    .menu-categorias {
+        top: auto !important;
+        /* Subimos a 140px para que haya un espacio libre sobre el carrito */
+        bottom: 140px !important; 
+        right: 0 !important;
+        position: fixed;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: flex-end;
+        gap: 6px;
+        z-index: 99997;
+    }
 
     /* Contador de productos */
     .cart-count {
