@@ -1073,7 +1073,7 @@ body {
 
     /* 1. GRID DE PRODUCTOS (2 Columnas - Estilo Retrato) */
     .productos {
-        grid-template-columns: repeat(2, 1fr) !important; /* Dos productos por fila */
+        grid-template-columns: repeat(2, 1fr) !important; 
         gap: 12px !important;
         padding: 10px !important;
         background-color: #f8f9fa;
@@ -1086,12 +1086,10 @@ body {
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
         background: #ffffff;
         margin-bottom: 5px;
-        display: flex;
-        flex-direction: column;
     }
 
     .producto img {
-        aspect-ratio: 2 / 3 !important; /* Estilo Retrato (Más alto que ancho) */
+        aspect-ratio: 2 / 3 !important; /* Estilo Retrato */
         border-radius: 12px 12px 0 0;
         object-fit: cover !important;
     }
@@ -1102,7 +1100,6 @@ body {
         margin: 8px 0 4px 0 !important;
         font-weight: 600 !important;
         padding: 0 6px !important;
-        line-height: 1.2;
     }
 
     .precio {
@@ -1112,98 +1109,105 @@ body {
     }
 
     /* 3. BOTONES INTERNOS DE LA TARJETA (Uno sobre otro) */
-    /* Apila los botones de Carrito y WhatsApp dentro de la tarjeta */
     .producto div[style*="display: flex"] {
         flex-direction: column !important; 
-        gap: 5px !important;
+        gap: 6px !important;
         padding: 0 8px 12px 8px !important;
     }
 
     .producto .btn {
         width: 100% !important;
         margin: 0 !important;
-        padding: 8px !important;
-        font-size: 10px !important; /* Letra pequeña para que quepa en 2 columnas */
+        padding: 10px !important;
+        font-size: 10px !important;
         text-transform: uppercase;
         border-radius: 8px !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
 
-    /* 4. TORRE DE BOTONES FLOTANTES (Esquina inferior derecha) */
-
-    /* Posición 1 (Abajo): WhatsApp */
-    .whatsappbtnflotante {
-        bottom: 20px !important;
-        right: 15px !important;
-        width: 55px;
-        height: 55px;
-        z-index: 99999 !important;
-    }
-
-    /* Posición 2 (Medio): Carrito */
-    #btnCarritoFlotante {
+    /* 4. BOTONES FLOTANTES: MISMA LÍNEA Y MODERNOS (SIN BORDES) */
+    
+    /* Estilo Base para WA y Carrito */
+    .whatsappbtnflotante, #btnCarritoFlotante {
         position: fixed !important;
-        bottom: 85px !important; /* Encima de WhatsApp */
-        right: 15px !important;
-        width: 55px;
-        height: 55px;
-        background: #E5C453;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 99998 !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        width: 65px !important; /* Más grande */
+        height: 65px !important;
+        background-color: #25d366 !important; /* Verde WhatsApp */
+        border-radius: 50% !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        z-index: 999999 !important;
+        border: none !important; /* Sin bordes negros */
+        box-shadow: 0 10px 20px rgba(37, 211, 102, 0.4) !important; /* Sombra llamativa */
     }
 
-    /* Posición 3 (Arriba): Categorías */
+    /* WhatsApp (A la derecha) */
+    .whatsappbtnflotante {
+        bottom: 25px !important;
+        right: 20px !important;
+    }
+
+    /* Carrito (A la izquierda de WhatsApp - Misma línea) */
+    #btnCarritoFlotante {
+        bottom: 25px !important;
+        right: 95px !important; /* Alineado horizontalmente */
+    }
+
+    /* Iconos y Contador */
+    .whatsappbtnflotante img, #btnCarritoFlotante i {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 28px !important;
+        color: white !important;
+    }
+
+    .cart-count {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: #ff3b30;
+        color: white;
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+        border: none !important; /* Sin bordes */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* 5. CATEGORÍAS (Sube para no tapar los botones) */
     .menu-categorias {
         top: auto !important;
-        bottom: 150px !important; /* Encima del Carrito */
+        bottom: 110px !important; /* Encima de los botones horizontales */
         right: 0 !important;
         position: fixed;
         display: flex;
-        flex-direction: column-reverse; /* Abre hacia arriba */
+        flex-direction: column-reverse;
         align-items: flex-end;
-        gap: 6px;
         z-index: 99997;
     }
 
     .cat-btn {
-        pointer-events: auto;
-        border-radius: 8px 0 0 8px !important;
         min-width: 130px;
         font-size: 14px;
         padding: 10px 15px;
-        text-align: right;
+        border-radius: 8px 0 0 8px !important;
         box-shadow: -3px 4px 10px rgba(0,0,0,0.3);
     }
 
-    .cat-main {
-        background: linear-gradient(135deg, #E5C453, #caa93a) !important;
-        color: #000 !important;
-    }
-
-    /* 5. FORMULARIO DE PEDIDO EN MÓVIL */
+    /* 6. FORMULARIO DE PEDIDO EN MÓVIL */
     .modal-contenido {
         padding: 15px !important;
-        width: 100% !important;
-        box-sizing: border-box;
     }
 
     .fila2 {
         display: grid;
-        grid-template-columns: repeat(2, 1fr) !important; /* Mantiene 2 columnas en el form */
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 8px !important;
     }
 
     .formulario input, .formulario select {
         padding: 10px !important;
         font-size: 14px !important;
-        margin: 4px 0 !important;
-        box-sizing: border-box;
     }
 
     #productoImagen {
@@ -1211,17 +1215,19 @@ body {
         height: 85px !important;
     }
 
-    /* Aviso Toast (Añadido al carrito) para que no lo tape la torre */
+    /* Aviso Toast arriba de los botones */
     .swal2-bottom-end .swal2-toast {
-        margin-bottom: 215px !important;
+        margin-bottom: 100px !important;
     }
 }
 
 /* Ajustes para pantallas muy angostas */
 @media screen and (max-width: 400px) {
-    .nombre { font-size: 12px !important; }
-    .precio { font-size: 14px !important; }
-    .cat-btn { min-width: 110px; font-size: 13px; }
+    .whatsappbtnflotante, #btnCarritoFlotante {
+        width: 58px !important;
+        height: 58px !important;
+    }
+    #btnCarritoFlotante { right: 88px !important; }
 }
 
     </style>
