@@ -1590,55 +1590,67 @@ function procesarProductoDirecto() {
     const productoUrl = urlParams.get('producto'); 
     if (!productoUrl) return;
 
-    // 1. Mantenemos tu limpieza original
+    // 1. NORMALIZACIÓN TOTAL (Quita tildes, espacios y caracteres raros)
+    const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    
     const buscadoOriginal = decodeURIComponent(productoUrl).trim().toLowerCase();
-    const buscadoADN = buscadoOriginal.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+    const buscadoADN = buscarLimpio(buscadoOriginal).replace(/[^a-z0-9]/g, "");
 
     if (buscadoADN.length < 2) return;
 
-    let mejorMatch = null;
-    const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
+    const ejecutarBusqueda = () => {
+        let mejorMatch = null;
+        const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
 
-    let matchExacto = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
+        // Intentar match exacto primero
+        mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
 
-    if (matchExacto) {
-        mejorMatch = matchExacto;
-    } else {
-        // --- AQUÍ APLICAMOS LA MEJORA DEL PRIMER SCRIPT ---
-        mejorMatch = listaRefs.find(ref => {
-            const refADN = ref.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
-            
-            // Si la palabra es corta (3 letras o menos), debe ser exacta para no fallar
-            if (buscadoADN.length <= 3) return refADN === buscadoADN;
-            
-            // Si es larga, busca coincidencias por ambos lados
-            return refADN.includes(buscadoADN) || buscadoADN.includes(refADN);
-        });
-    }
+        // Si no hay exacto, usar el ADN (infalible para el Ferrero)
+        if (!mejorMatch) {
+            mejorMatch = listaRefs.find(ref => {
+                const refADN = buscarLimpio(ref).replace(/[^a-z0-9]/g, "");
+                if (buscadoADN.length <= 3) return refADN === buscadoADN;
+                return refADN.includes(buscadoADN) || buscadoADN.includes(refADN);
+            });
+        }
 
-    if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
-        // Usamos la referencia del match encontrado
-        const real = productosRealtime[mejorMatch.trim().toLowerCase()];
-        const imgOriginal = productosJson[mejorMatch];
+        // 2. VERIFICACIÓN Y APERTURA
+        if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
+            const real = productosRealtime[mejorMatch.trim().toLowerCase()];
+            const imgOriginal = productosJson[mejorMatch];
 
-        // 2. Subimos a 1800ms para asegurar que Firebase cargó todo
-        setTimeout(() => {
-            if (typeof abrirProducto === 'function') {
-                let precio = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
-                const desc = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
-                
-                // 3. Abrimos con la "referenciaReal" si existe, para que el título sea perfecto
-                abrirProducto(real.referenciaReal || mejorMatch, normalizarImagen(imgOriginal), precio, desc);
+            // TIEMPO DE SEGURIDAD: 2200ms para asegurar que el DOM y Firebase estén listos
+            setTimeout(() => {
+                if (typeof abrirProducto === 'function') {
+                    let precio = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
+                    const desc = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
+                    
+                    abrirProducto(real.referenciaReal || mejorMatch, normalizarImagen(imgOriginal), precio, desc);
 
-                const modal = document.getElementById('modalPedido');
-                if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Asegurar que el modal se vea
+                    const modal = document.getElementById('modalPedido');
+                    if (modal) {
+                        modal.style.display = 'flex';
+                        modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
 
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        }, 2500); 
+                    // Limpiar URL para evitar bucles
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }, 2200);
+            return true; // Encontrado
+        }
+        return false; // No encontrado aún
+    };
+
+    // --- ESTRATEGIA DE DOBLE INTENTO ---
+    // Primer intento inmediato
+    if (!ejecutarBusqueda()) {
+        // Si falló (porque Firebase no cargó), re-intenta a los 3 segundos automáticamente
+        console.log("⏳ Producto no listo, re-intentando en 3s...");
+        setTimeout(ejecutarBusqueda, 3000);
     }
 }
-
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
 function configurarRedesNav(perfil) {
     const fbLink = document.getElementById('shareFB');
