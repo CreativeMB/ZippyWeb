@@ -376,137 +376,118 @@ body {
 /* FORMULARIO COMO PESTAÑA (OPTIMIZADO)      */
 /* ========================================= */
 
-/* Contenedor Principal (ID Original: modalPedido) */
+/* Contenedor Principal (ID: modalPedido) */
 #modalPedido {
-    display: none; /* Se activa por JS */
+    display: none; 
     width: 100%;
     min-height: 100vh;
     background-color: #f8f9fa;
     margin: 0;
     padding: 0;
-    box-sizing: border-box; /* Evita que el ancho se salga de la pantalla */
-    overflow-x: hidden;
+    box-sizing: border-box; 
+    overflow-x: hidden; /* Evita cualquier desborde lateral */
 }
 
 /* El cuadro blanco del formulario */
 .modal-contenido {
     background: #ffffff;
     width: 100%;
-    max-width: 700px; /* Ancho máximo en PC */
+    max-width: 700px; 
     margin: 0 auto;
     padding: 20px;
-    box-sizing: border-box; /* IMPORTANTE: Mantiene todo dentro del borde */
+    box-sizing: border-box; 
 }
 
-/* Encabezado del Producto dentro del Formulario */
+/* Resumen del producto */
 .producto-info-pestaña {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     background: #fffcf5;
-    padding: 15px;
+    padding: 12px;
     border-radius: 12px;
     border: 1px solid #fdf2d2;
     margin-bottom: 20px;
     align-items: center;
 }
 
-/* IDs Originales de la Info del Producto */
 #productoImagen {
-    width: 80px;
-    height: 100px;
+    width: 70px;
+    height: 90px;
     object-fit: cover;
     border-radius: 8px;
     flex-shrink: 0;
 }
 
-#productoTitulo {
-    font-size: 18px;
-    font-weight: 700;
-    color: #333;
-    margin: 0;
-}
+#productoTitulo { font-size: 16px; font-weight: 700; color: #333; margin: 0; }
+#productoPrecio { font-size: 18px; font-weight: 800; color: #000; }
 
-#productoPrecio {
-    font-size: 20px;
-    font-weight: 800;
-    color: #000;
-}
-
-/* Estilo de los Campos del Formulario */
+/* ESTILO DE LOS CAMPOS (IDs respetados) */
 .formulario input,
 .formulario textarea,
 .formulario select {
     width: 100%;
-    padding: 12px;
-    margin: 8px 0;
+    padding: 10px;
+    margin: 6px 0;
     border-radius: 8px;
     border: 1px solid #ccc;
-    font-size: 16px; /* Evita zoom molesto en iPhone */
+    font-size: 15px; /* Tamaño ideal para móvil y web */
     font-family: 'Poppins', sans-serif;
-    box-sizing: border-box; /* Asegura que el input no sea más ancho que su padre */
+    box-sizing: border-box; /* Esto evita que el 100% se salga */
 }
 
-/* Las filas de dos columnas */
+/* FILA DE DOS COLUMNAS (SE MANTIENE EN MÓVIL) */
 .fila2 {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr); /* Fuerza 2 columnas siempre */
+    gap: 10px; /* Espacio entre columnas */
 }
 
-/* BOTÓN DE ENVÍO (ID Original: enviarPedidoBtn) */
+/* Títulos separadores dentro del form */
+.separador-tarjeta, .separador-entrega {
+    font-size: 14px;
+    color: #e5c453;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 3px;
+    grid-column: span 2; /* Ocupa las dos columnas si está dentro de una fila2 */
+}
+
+/* BOTÓN DE ENVÍO (ID: enviarPedidoBtn) */
 #enviarPedidoBtn {
     width: 100%;
-    background: #25D366; /* Verde WhatsApp */
+    background: #25D366;
     color: white !important;
     border: none;
     padding: 15px;
     border-radius: 10px;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     cursor: pointer;
     margin-top: 20px;
-    display: block; /* Asegura que se vea como bloque */
+    display: block;
     box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-    transition: transform 0.2s;
 }
 
-#enviarPedidoBtn:active {
-    transform: scale(0.98);
-}
-
-/* === AJUSTES PARA CELULARES (MÓVIL) === */
+/* AJUSTES ESPECÍFICOS PARA MÓVIL (Para que no se vea apretado) */
 @media screen and (max-width: 600px) {
     .modal-contenido {
-        padding: 15px; /* Menos margen en los lados en móvil */
+        padding: 12px; /* Margen lateral más pequeño en celulares */
     }
 
-    /* En móvil, las filas de 2 pasan a ser de 1 para que no se aplasten */
     .fila2 {
-        grid-template-columns: 1fr;
-        gap: 0;
+        gap: 6px; /* Menos espacio entre columnas para que quepa todo */
     }
 
-    .producto-info-pestaña {
-        padding: 10px;
+    .formulario input, .formulario select {
+        padding: 8px; /* Inputs un poco más delgados en móvil */
+        font-size: 13px; /* Letra un poco más pequeña para que los textos largos no se corten */
     }
 
     #productoImagen {
-        width: 65px;
-        height: 85px;
+        width: 60px;
+        height: 80px;
     }
-}
-
-/* EL LOADER (Pantalla de carga inicial) */
-#loader {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: #ffffff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 999999; /* Por encima de todo */
 }
 
         /* ========================================= */
