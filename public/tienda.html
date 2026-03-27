@@ -341,7 +341,7 @@ body {
         }
 
         /* ========================================= */
-        /* 5. MODALES, FORMULARIOS Y LOADER          */
+        /* 5. LOADER          */
         /* ========================================= */
         #loader {
             position: fixed;
@@ -372,80 +372,106 @@ body {
                 transform: rotate(360deg);
             }
         }
-
-      /* ========================================= */
-/* AJUSTE DE MODAL A SECCIÓN INTEGRADA       */
 /* ========================================= */
+/* FORMULARIO INTEGRADO (OPTIMIZADO MÓVIL)   */
+/* ========================================= */
+
 .modal {
-    display: none; /* Se controla por JS */
+    display: none; 
     width: 100%;
-    background: #f5f6fa; /* Fondo igual al resto de la página */
+    background: #f8f9fa;
     min-height: 100vh;
-    padding-top: 20px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box; /* Fundamental para que el padding no sume ancho */
 }
 
 .modal-contenido {
     background: white;
     width: 100%;
-    max-width: 800px; /* Un poco más ancho para vista de página */
+    max-width: 700px; /* Un poco más angosto para que sea legible */
     margin: 0 auto;
-    border-radius: 0; /* Sin bordes redondeados para que parezca una pestaña */
     padding: 20px;
-    box-shadow: none; /* Quitamos la sombra de flotante */
+    box-sizing: border-box; /* Evita que el formulario sea más grande que el móvil */
 }
 
-/* Ajuste para que la imagen y descripción se vean bien en modo pestaña */
-.infoProducto {
-    flex: 1;
+/* Encabezado del formulario (Botón volver) */
+.form-header {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+    color: #E5C453;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-@media screen and (max-width: 767px) {
+/* Contenedor de Info de Producto arriba del form */
+.producto-info-pestaña {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    background: #fffcf5;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #fdf2d2;
+}
+
+#productoImagen {
+    width: 90px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0; /* Evita que la imagen se achique */
+}
+
+/* Ajuste de Inputs y Formulario */
+.formulario input,
+.formulario textarea,
+.formulario select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-sizing: border-box; /* Clave para que el 100% sea real */
+    font-size: 16px; /* Evita zoom automático en iPhone */
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Cuadrícula de 2 columnas */
+.fila2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* === OPTIMIZACIÓN PARA MÓVIL (PANTALLAS PEQUEÑAS) === */
+@media screen and (max-width: 600px) {
     .modal-contenido {
-        padding: 15px;
+        padding: 15px; /* Menos espacio en los bordes */
     }
+
+    .fila2 {
+        grid-template-columns: 1fr; /* 🔥 Aquí es donde se arregla el ancho: de 2 columnas a 1 */
+        gap: 0;
+    }
+
+    .producto-info-pestaña {
+        flex-direction: row; /* Mantiene imagen al lado del texto */
+        align-items: center;
+    }
+
     #productoImagen {
-        width: 100px !important;
-        height: 130px !important;
+        width: 70px;
+        height: 90px;
+    }
+
+    #productoTitulo {
+        font-size: 16px;
     }
 }
-
-        #productoDescripcion {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            line-height: 1.5;
-            display: block;
-            margin-bottom: 15px;
-        }
-
-        .formulario input,
-        .formulario textarea,
-        .formulario select {
-            width: 100%;
-            padding: 10px;
-            margin: 6px 0;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-
-        .fila2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        #enviarPedidoBtn {
-            width: 100%;
-            background: #25D366;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
 
         /* ========================================= */
         /* 6. BOTONES Y CONTACTO                     */
