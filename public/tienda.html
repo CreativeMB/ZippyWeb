@@ -373,60 +373,66 @@ body {
             }
         }
 /* ========================================= */
-/* FORMULARIO INTEGRADO (OPTIMIZADO MÓVIL)   */
+/* FORMULARIO COMO PESTAÑA (OPTIMIZADO)      */
 /* ========================================= */
 
-.modal {
-    display: none; 
+/* Contenedor Principal (ID Original: modalPedido) */
+#modalPedido {
+    display: none; /* Se activa por JS */
     width: 100%;
-    background: #f8f9fa;
     min-height: 100vh;
-    padding: 0;
+    background-color: #f8f9fa;
     margin: 0;
-    box-sizing: border-box; /* Fundamental para que el padding no sume ancho */
+    padding: 0;
+    box-sizing: border-box; /* Evita que el ancho se salga de la pantalla */
+    overflow-x: hidden;
 }
 
+/* El cuadro blanco del formulario */
 .modal-contenido {
-    background: white;
+    background: #ffffff;
     width: 100%;
-    max-width: 700px; /* Un poco más angosto para que sea legible */
+    max-width: 700px; /* Ancho máximo en PC */
     margin: 0 auto;
     padding: 20px;
-    box-sizing: border-box; /* Evita que el formulario sea más grande que el móvil */
+    box-sizing: border-box; /* IMPORTANTE: Mantiene todo dentro del borde */
 }
 
-/* Encabezado del formulario (Botón volver) */
-.form-header {
-    display: flex;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 20px;
-    color: #E5C453;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-/* Contenedor de Info de Producto arriba del form */
+/* Encabezado del Producto dentro del Formulario */
 .producto-info-pestaña {
     display: flex;
     gap: 15px;
-    margin-bottom: 25px;
     background: #fffcf5;
     padding: 15px;
     border-radius: 12px;
     border: 1px solid #fdf2d2;
+    margin-bottom: 20px;
+    align-items: center;
 }
 
+/* IDs Originales de la Info del Producto */
 #productoImagen {
-    width: 90px;
-    height: 110px;
+    width: 80px;
+    height: 100px;
     object-fit: cover;
     border-radius: 8px;
-    flex-shrink: 0; /* Evita que la imagen se achique */
+    flex-shrink: 0;
 }
 
-/* Ajuste de Inputs y Formulario */
+#productoTitulo {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+#productoPrecio {
+    font-size: 20px;
+    font-weight: 800;
+    color: #000;
+}
+
+/* Estilo de los Campos del Formulario */
 .formulario input,
 .formulario textarea,
 .formulario select {
@@ -434,43 +440,73 @@ body {
     padding: 12px;
     margin: 8px 0;
     border-radius: 8px;
-    border: 1px solid #ddd;
-    box-sizing: border-box; /* Clave para que el 100% sea real */
-    font-size: 16px; /* Evita zoom automático en iPhone */
+    border: 1px solid #ccc;
+    font-size: 16px; /* Evita zoom molesto en iPhone */
     font-family: 'Poppins', sans-serif;
+    box-sizing: border-box; /* Asegura que el input no sea más ancho que su padre */
 }
 
-/* Cuadrícula de 2 columnas */
+/* Las filas de dos columnas */
 .fila2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
 }
 
-/* === OPTIMIZACIÓN PARA MÓVIL (PANTALLAS PEQUEÑAS) === */
+/* BOTÓN DE ENVÍO (ID Original: enviarPedidoBtn) */
+#enviarPedidoBtn {
+    width: 100%;
+    background: #25D366; /* Verde WhatsApp */
+    color: white !important;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    display: block; /* Asegura que se vea como bloque */
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+    transition: transform 0.2s;
+}
+
+#enviarPedidoBtn:active {
+    transform: scale(0.98);
+}
+
+/* === AJUSTES PARA CELULARES (MÓVIL) === */
 @media screen and (max-width: 600px) {
     .modal-contenido {
-        padding: 15px; /* Menos espacio en los bordes */
+        padding: 15px; /* Menos margen en los lados en móvil */
     }
 
+    /* En móvil, las filas de 2 pasan a ser de 1 para que no se aplasten */
     .fila2 {
-        grid-template-columns: 1fr; /* 🔥 Aquí es donde se arregla el ancho: de 2 columnas a 1 */
+        grid-template-columns: 1fr;
         gap: 0;
     }
 
     .producto-info-pestaña {
-        flex-direction: row; /* Mantiene imagen al lado del texto */
-        align-items: center;
+        padding: 10px;
     }
 
     #productoImagen {
-        width: 70px;
-        height: 90px;
+        width: 65px;
+        height: 85px;
     }
+}
 
-    #productoTitulo {
-        font-size: 16px;
-    }
+/* EL LOADER (Pantalla de carga inicial) */
+#loader {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999; /* Por encima de todo */
 }
 
         /* ========================================= */
