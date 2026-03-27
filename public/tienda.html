@@ -1961,7 +1961,6 @@ function configurarRedesNav(perfil) {
     });
 }
 
-
 function render() {
     if (bloqueoActivo) return;
     const contenedor = document.getElementById("productos");
@@ -2009,18 +2008,18 @@ function render() {
         const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
         const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
 
-        // --- LÓGICA DE BOTONES (CARRITO + COMPRAR) ---
-        let botonAccion = "";
+        // --- BOTONES CORREGIDOS ---
+        let botonesHtml = "";
         if (real.agotado) {
-            botonAccion = `<button class="btn" style="background:#888; color:white; cursor:not-allowed; margin: 10px;" disabled>Agotado</button>`;
+            botonesHtml = `<button class="btn" style="background:#888; color:white; cursor:not-allowed; margin: 10px;" disabled>Agotado</button>`;
         } else {
-            botonAccion = `
+            botonesHtml = `
                 <div style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px;">
-                    <button class="btn" onclick="agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
+                    <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
                             style="flex: 1; margin: 0; background: #E5C453; color: #000; font-size: 11px; padding: 8px;">
                         <i class="fas fa-cart-plus"></i> + Carrito
                     </button>
-                    <button class="btn" onclick="comprarAhora('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
+                    <button class="btn" onclick="window.abrirProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
                             style="flex: 1; margin: 0; background: #25D366; font-size: 11px; padding: 8px;">
                         Comprar
                     </button>
@@ -2035,21 +2034,21 @@ function render() {
             <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
                 <img src="${normalizarImagen(imgUrl)}" 
-                     style="${estiloImagen}" 
+                     style="${estiloImagen}; cursor:pointer;" 
                      ${prioridadAttr} 
                      alt="${refProd}"
-                     onclick="${real.agotado ? '' : `comprarAhora('${refProd}','${imgUrl}','${precioFinal}','${descProd}')`}">
+                     onclick="window.abrirProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')">
             </div>
             <div class="nombre">${real.referenciaReal || refP}</div>
             <div class="precio-contenedor">${precioHTML}</div>
-            ${botonAccion}
+            ${botonesHtml}
         `;
 
         contenedor.appendChild(card);
         indice++;
     }
 
-    // Animación y loader (Tu lógica original)
+    // Animación y loader
     setTimeout(() => {
         if (bloqueoActivo) return;
         document.querySelectorAll(".producto:not(.visible)").forEach((el, i) => {
@@ -2059,82 +2058,102 @@ function render() {
         if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
     }, 100); 
 }
-
-// 1. FUNCIÓN PARA AÑADIR (Se llama desde la tarjeta del producto)
+// Pegamos el render al window para que se actualice bien
+window.render = render;
+// 1. FUNCIÓN PARA EL BOTÓN "AGREGAR AL CARRITO"
 window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
-    const precioNum = parseFloat(precio);
+    // Limpiamos el precio por si viene con símbolos
+    const precioNum = typeof precio === 'string' ? parseFloat(precio.replace(/[^0-9.-]+/g,"")) : precio;
     
-    // Verificar si ya está en el carrito
     const existe = carrito.find(item => item.nombre === nombre);
-    
     if (existe) {
         existe.cantidad++;
     } else {
-        carrito.push({
-            nombre,
-            imagen,
-            precio: precioNum,
-            descripcion,
-            cantidad: 1
-        });
+        carrito.push({ nombre, imagen, precio: precioNum, cantidad: 1 });
     }
     
-    actualizarUI();
-    
-    // Notificación rápida
+    actualizarBadgeCarrito();
     Swal.fire({
-        title: '¡Añadido!',
-        text: `${nombre} se agregó al carrito`,
-        icon: 'success',
-        timer: 1000,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end'
+        toast: true, position: 'top-end', icon: 'success',
+        title: '¡Al carrito!', showConfirmButton: false, timer: 1000
     });
 };
 
-// 2. ACTUALIZAR CONTADOR Y TOTALES
-function actualizarUI() {
-    const totalItems = carrito.reduce((acc, item) => acc + item.cantidad, 0);
-    document.getElementById('cart-count-val').innerText = totalItems;
-    
-    // Si el carrito está abierto, refrescar la lista
-    if (document.getElementById('modalPedido').style.display === 'block') {
-        renderizarCarritoEnForm();
+// 2. FUNCIÓN "ABRIR PRODUCTO / COMPRAR AHORA" (La que pedías que no se bloquee)
+window.abrirProducto = (nombre, imagen, precio, descripcion) => {
+    // Si el carrito está vacío, agregamos este producto automáticamente
+    const existe = carrito.find(item => item.nombre === nombre);
+    if (!existe) {
+        window.agregarAlCarrito(nombre, imagen, precio, descripcion);
     }
-}
+    
+    // Cambiamos a la pestaña del formulario
+    document.getElementById("productos-tab").style.display = "none";
+    document.getElementById("empresa-tab").style.display = "none";
+    document.getElementById("modalPedido").style.display = "block";
+    
+    renderizarCarritoEnForm();
+    window.scrollTo(0, 0);
+};
 
 // 3. RENDERIZAR LA LISTA EN EL FORMULARIO
-function renderizarCarritoEnForm() {
-    const contenedor = document.getElementById('lista-carrito-form');
-    const totalTexto = document.getElementById('total-pedido-suma');
+window.renderizarCarritoEnForm = () => {
+    const contenedor = document.getElementById("lista-carrito-form");
+    if (!contenedor) return;
     contenedor.innerHTML = "";
-    
-    let totalAcumulado = 0;
+    let total = 0;
 
     carrito.forEach((item, index) => {
         const subtotal = item.precio * item.cantidad;
-        totalAcumulado += subtotal;
-
-        const div = document.createElement('div');
+        total += subtotal;
+        
+        const div = document.createElement("div");
         div.className = "item-carrito-form";
+        div.style = "display:flex; align-items:center; gap:10px; padding:10px; border-bottom:1px solid #eee; background:white;";
         div.innerHTML = `
-            <img src="${normalizarImagen(item.imagen)}">
-            <div class="item-info">
-                <div class="item-nombre">${item.nombre}</div>
-                <div class="item-precio">${formatearPrecio(item.precio)}</div>
+            <img src="${normalizarImagen(item.imagen)}" style="width:50px; height:60px; object-fit:cover; border-radius:5px;">
+            <div style="flex:1;">
+                <div style="font-weight:bold; font-size:14px; color:#333;">${item.nombre}</div>
+                <div style="color:#25D366; font-weight:bold;">${formatearPrecio(item.precio)}</div>
             </div>
-            <div class="controles-cantidad">
-                <button class="btn-cant" onclick="cambiarCantidad(${index}, -1)">-</button>
-                <span style="font-weight:bold;">${item.cantidad}</span>
-                <button class="btn-cant" onclick="cambiarCantidad(${index}, 1)">+</button>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <button onclick="window.cambiarCantidadCarrito(${index}, -1)" style="width:28px; height:28px; border-radius:50%; border:1px solid #ddd; background:#f9f9f9;">-</button>
+                <span style="font-weight:bold; min-width:20px; text-align:center;">${item.cantidad}</span>
+                <button onclick="window.cambiarCantidadCarrito(${index}, 1)" style="width:28px; height:28px; border-radius:50%; border:1px solid #ddd; background:#f9f9f9;">+</button>
             </div>
         `;
         contenedor.appendChild(div);
     });
+    
+    document.getElementById("total-pedido-suma").innerText = formatearPrecio(total);
+};
 
-    totalTexto.innerText = formatearPrecio(totalAcumulado);
+window.cambiarCantidadCarrito = (index, valor) => {
+    carrito[index].cantidad += valor;
+    if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
+    
+    if (carrito.length === 0) {
+        window.cerrarModal();
+    } else {
+        window.renderizarCarritoEnForm();
+    }
+    actualizarBadgeCarrito();
+};
+
+function actualizarBadgeCarrito() {
+    const total = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+    const badge = document.getElementById("cart-count-val");
+    if (badge) badge.innerText = total;
 }
+
+// Para que el botón flotante del carrito también funcione
+window.abrirCarrito = () => {
+    if (carrito.length === 0) {
+        Swal.fire('Carrito vacío', 'Añade productos para continuar', 'info');
+        return;
+    }
+    window.abrirProducto(carrito[0].nombre, carrito[0].imagen, carrito[0].precio, "");
+};
 
 // 4. CAMBIAR CANTIDADES (+ / -)
 window.cambiarCantidad = (index, delta) => {
@@ -2455,17 +2474,18 @@ if (campos.fechaOriginal) {
                 document.body.style.overflow = 'auto';
             }
 // 2. CONSTRUIMOS EL MENSAJE PARA WHATSAPP (Lo que faltaba)
-          let detalleProductos = carrito.map(item => `- ${item.cantidad}x ${item.nombre} (${formatearPrecio(item.precio * item.cantidad)})`).join('\n');
-    let totalFinal = document.getElementById('total-pedido-suma').innerText;
+    // Dentro de enviarPedido()
+let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre} (${formatearPrecio(item.precio * item.cantidad)})`).join('\n');
+let totalSuma = document.getElementById("total-pedido-suma").innerText;
 
-    const mensajeWa = encodeURIComponent(
-        `*NUEVO PEDIDO MULTIPLE*\n\n` +
-        `*PRODUCTOS:*\n${detalleProductos}\n\n` +
-        `*TOTAL A PAGAR: ${totalFinal}*\n\n` +
-        `*Cliente:* ${campos.nombreComprador}\n` +
-        `*Fecha Entrega:* ${fechaFormateada}\n` +
-        `*Medio de Pago:* ${campos.medioPago}`
-    );
+const mensajeWa = encodeURIComponent(
+    `*NUEVO PEDIDO REGISTRADO*\n\n` +
+    `*PRODUCTOS:*\n${listaProductosTexto}\n\n` +
+    `*TOTAL A PAGAR: ${totalSuma}*\n\n` +
+    `*Cliente:* ${campos.nombreComprador}\n` +
+    `*Medio de Pago:* ${campos.medioPago}\n\n` +
+    `_Por favor confirma mi pedido._`
+);
 
             const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
     // 3. Disparamos la Alerta Persistente
