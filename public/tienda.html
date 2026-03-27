@@ -1761,6 +1761,7 @@ function configurarRedesNav(perfil) {
         console.log("YA CARGÓ TODO REALTIME:", productosRealtime);
 
         render(); // ← AQUÍ se generan categorías correctamente
+        procesarProductoDirecto();
     });
 }
 
@@ -1772,6 +1773,10 @@ function configurarRedesNav(perfil) {
     
     renderizarMenuCategorias();
 
+    // 🟢 DETECTAR SI HAY UN PRODUCTO EN LA URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productoEnUrl = urlParams.get('producto')?.trim().toLowerCase();
+
     let indice = 0;
 
     for (const refP in productosJson) {
@@ -1780,17 +1785,21 @@ function configurarRedesNav(perfil) {
         const claveBusqueda = refP.trim().toLowerCase();
         const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
         
-// --- LÓGICA DE FILTRADO categorias ---
-if (categoriaSeleccionada !== null && categoriaSeleccionada !== "") {
-    
-    const categoriasProducto = (real.categoria || "")
-        .split(",")
-        .map(c => c.trim().toLowerCase());
+        // --- LÓGICA DE FILTRADO categorias ---
+        if (categoriaSeleccionada !== null && categoriaSeleccionada !== "" && categoriaSeleccionada !== "Todas") {
+            
+            const categoriasProducto = (real.categoria || "")
+                .split(",")
+                .map(c => c.trim().toLowerCase());
 
-    if (!categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
-        continue;
-    }
-}
+            // 🔥 CAMBIO AQUÍ: Si es el producto de la URL, NO ejecutamos el "continue"
+            const esProductoDirecto = (claveBusqueda === productoEnUrl);
+
+            if (!esProductoDirecto && !categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
+                continue;
+            }
+        }
+
         const imgUrl = productosJson[refP];
         let precioHTML = "";
         let precioFinal = 0;
@@ -1806,7 +1815,6 @@ if (categoriaSeleccionada !== null && categoriaSeleccionada !== "") {
         }
 
         const card = document.createElement("div");
-        // PRIORIDAD: Las primeras 4 son visibles desde el nacimiento del elemento
         card.className = `producto ${real.agotado ? 'agotado' : ''} ${indice < 4 ? 'visible' : ''}`;
 
         const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
@@ -1826,8 +1834,6 @@ if (categoriaSeleccionada !== null && categoriaSeleccionada !== "") {
             : `<a href="${linkWa}" target="_blank" class="btn" style="background:#25D366; text-decoration:none; display:inline-block; text-align:center;">Pedir por WhatsApp</a>`;
 
         const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '';
-        
-        // Atributos de carga inteligente
         const prioridadAttr = indice < 4 ? 'fetchpriority="high"' : 'loading="lazy"';
 
         card.innerHTML = `
@@ -1848,11 +1854,9 @@ if (categoriaSeleccionada !== null && categoriaSeleccionada !== "") {
         indice++;
     }
 
-    // Animación para el resto y gestión del loader
+    // Animación y loader
     setTimeout(() => {
         if (bloqueoActivo) return;
-        
-        // Solo animamos los que NO se marcaron como visibles al inicio
         document.querySelectorAll(".producto:not(.visible)").forEach((el, i) => {
             setTimeout(() => el.classList.add("visible"), i * 30);
         });
