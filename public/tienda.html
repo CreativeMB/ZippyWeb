@@ -469,26 +469,6 @@ body {
     box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
 }
 
-/* AJUSTES ESPECÍFICOS PARA MÓVIL (Para que no se vea apretado) */
-@media screen and (max-width: 600px) {
-    .modal-contenido {
-        padding: 12px; /* Margen lateral más pequeño en celulares */
-    }
-
-    .fila2 {
-        gap: 6px; /* Menos espacio entre columnas para que quepa todo */
-    }
-
-    .formulario input, .formulario select {
-        padding: 8px; /* Inputs un poco más delgados en móvil */
-        font-size: 13px; /* Letra un poco más pequeña para que los textos largos no se corten */
-    }
-
-    #productoImagen {
-        width: 60px;
-        height: 80px;
-    }
-}
 
         /* ========================================= */
         /* 6. BOTONES Y CONTACTO                     */
@@ -681,63 +661,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ========================================= */
-/* --- 6. RESPONSIVE (MÓVILES) --- */
-/* ========================================= */
-@media screen and (max-width: 600px) {
-    .tabs-container {
-        padding: 0 8px;
-        height: 70px; /* Mantener altura cómoda en móvil */
-    }
-    
-    .tabs-left {
-        flex: 0 0 auto; /* Las pestañas ocupan solo lo que necesitan sus títulos */
-    }
 
-    .tab-item {
-        padding: 0 10px;
-        gap: 4px;
-    }
-
-    /* Mantenemos el texto de las pestañas visible */
-    .tab-item span { 
-        display: inline-block !important; 
-        font-size: 12px;
-        white-space: nowrap; 
-    }
-
-    .tab-item i {
-        font-size: 16px;
-    }
-
-    /* BUSCADOR ELÁSTICO EN MÓVIL */
-    .search-nav-container {
-        flex: 1; /* Toma el espacio que dejen las pestañas y redes */
-        margin: 0 8px;
-        height: 45px; 
-        min-width: 80px; 
-        max-width: 160px; /* No deja que tape los títulos */
-    }
-
-    .search-input-nav {
-        font-size: 15px; /* Texto grande para evitar zoom en iPhone */
-        padding: 0 10px 0 35px;
-    }
-
-    .search-icon-nav {
-        left: 10px;
-        font-size: 14px;
-    }
-
-    .redes-nav {
-        gap: 5px;
-    }
-
-    .icono-nav {
-        width: 32px;
-        height: 32px;
-    }
-}
         
         /* --- BOTÓN FLOTANTE DE WHATSAPP --- */
 .whatsappbtnflotante {
@@ -791,82 +715,7 @@ body {
     }
 }
 
-/* Ajuste para móviles (opcional, por si quieres que sea más pequeño) */
-@media screen and (max-width: 767px) {
-    .whatsappbtnflotante {
-        width: 55px;
-        height: 55px;
-        bottom: 15px;
-        right: 15px;
-    }
-    .whatsappbtnflotante img {
-        width: 30px;
-    }
-}
-        /* ========================================= */
-        /* 8 DISEÑO PARA MÓVIL (PANTALLAS PEQUEÑAS)    */
-        /* ========================================= */
 
-        @media screen and (max-width: 767px) {
-            .productos {
-                grid-template-columns: repeat(2, 1fr) !important;
-                /* Dos columnas */
-                gap: 15px !important;
-                /* Más espacio entre tarjetas para que no choquen */
-                padding: 15px !important;
-                background-color: #f8f9fa;
-                /* Un fondo ligeramente distinto para resaltar la tarjeta blanca */
-            }
-
-            .producto {
-                border: none !important;
-                /* Quitamos el borde gris para que la sombra sea la protagonista */
-                border-radius: 15px !important;
-                /* Bordes más redondeados se ven más modernos */
-
-                /* SOMBRA MÁS ATRACTIVA PARA MÓVIL */
-                /* Un poco más profunda (8px) para que se note la elevación en pantallas pequeñas */
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-
-                background: #ffffff;
-                margin-bottom: 5px;
-            }
-
-            .producto img {
-                aspect-ratio: 3 / 4 !important;
-                /* Menos alta como pediste */
-                border-radius: 15px 15px 0 0;
-                /* Redondeamos solo las esquinas de arriba de la foto */
-                object-fit: cover !important;
-            }
-
-            .nombre {
-                font-size: 13px !important;
-                color: #2c3e50;
-                /* Un gris muy oscuro, más elegante que el negro puro */
-                margin: 10px 0 5px 0 !important;
-                font-weight: 600 !important;
-                /* Letra un poco más gruesa */
-                padding: 0 8px !important;
-            }
-
-            .precio {
-                font-size: 16px !important;
-                color: #111;
-                margin-bottom: 10px !important;
-            }
-
-            /* BOTÓN MÁS ESTILIZADO */
-            .btn {
-                margin: 0 10px 15px 10px !important;
-                /* Espaciado interno para que no toque los bordes */
-                padding: 10px !important;
-                font-size: 11px !important;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                border-radius: 10px !important;
-            }
-        }
       /* 1. CONTENEDOR pagina empresas */
 /* 1. CONFIGURACIÓN DE FONDO Y CUERPO */
 #empresa-tab {
@@ -1217,181 +1066,173 @@ body {
     background: rgba(229, 196, 83, 0.3); /* Color dorado suave */
     border-radius: 10px;
 }
-/* ESTILOS ESPECÍFICOS PARA CELULARES */
-@media (max-width: 767px) {
+/* ========================================= */
+/* --- SECCIÓN UNIFICADA: DISEÑO MÓVIL ---  */
+/* ========================================= */
+@media screen and (max-width: 767px) {
+
+    /* 1. GRID DE PRODUCTOS (Una sola columna) */
+    .productos {
+        grid-template-columns: 1fr !important; /* Productos uno debajo del otro */
+        gap: 20px !important;
+        padding: 15px !important;
+        background-color: #f8f9fa;
+    }
+
+    /* 2. TARJETA DE PRODUCTO */
+    .producto {
+        border: none !important;
+        border-radius: 15px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        background: #ffffff;
+        margin-bottom: 5px;
+        max-width: 100%;
+    }
+
+    .producto img {
+        aspect-ratio: 16 / 9 !important; /* Más panorámico para no ser tan alto */
+        border-radius: 15px 15px 0 0;
+        object-fit: cover !important;
+    }
+
+    .nombre {
+        font-size: 15px !important;
+        color: #2c3e50;
+        margin: 12px 0 5px 0 !important;
+        font-weight: 600 !important;
+        padding: 0 10px !important;
+    }
+
+    .precio {
+        font-size: 18px !important;
+        color: #111;
+        margin-bottom: 10px !important;
+    }
+
+    /* 3. BOTONES INTERNOS DE LA TARJETA (Uno sobre otro) */
+    /* Este es el contenedor que creamos en el render para los dos botones */
+    .producto div[style*="display: flex"] {
+        flex-direction: column !important; /* Apila botones: Carrito arriba, WhatsApp abajo */
+        gap: 8px !important;
+        padding: 0 12px 15px 12px !important;
+    }
+
+    .producto .btn {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 12px !important;
+        font-size: 13px !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 10px !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* 4. TORRE DE BOTONES FLOTANTES (Esquina inferior derecha) */
+
+    /* Posición 1 (Abajo): WhatsApp */
+    .whatsappbtnflotante {
+        bottom: 20px !important;
+        right: 20px !important;
+        width: 60px;
+        height: 60px;
+        z-index: 99999 !important;
+    }
+
+    /* Posición 2 (Medio): Carrito */
+    #btnCarritoFlotante {
+        position: fixed !important;
+        bottom: 90px !important; /* 20 + 60 + 10 de separación */
+        right: 20px !important;
+        width: 60px;
+        height: 60px;
+        background: #E5C453;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99998 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    /* Posición 3 (Arriba): Categorías */
     .menu-categorias {
-        top: auto;
-        right: 0 !important; /* Pegado total a la orilla */
-        bottom: 85px; /* Altura ideal sobre el botón de WhatsApp */
+        top: auto !important;
+        bottom: 160px !important; /* 90 + 60 + 10 de separación */
+        right: 0 !important;
         transform: none;
         position: fixed;
         display: flex;
-        flex-direction: column-reverse; /* 🔥 El menú crece hacia ARRIBA */
+        flex-direction: column-reverse; /* Abre hacia arriba */
         align-items: flex-end;
         gap: 6px;
         width: auto;
-        pointer-events: none; /* Evita bloquear la pantalla */
-        z-index: 2000;
+        z-index: 99997;
     }
 
-    /* Estilo de Etiqueta (botones individuales) */
+    /* Estilo botones de categorías */
     .cat-btn {
         pointer-events: auto;
-        border-radius: 8px 0 0 8px !important; /* Solo redondeado izquierdo */
+        border-radius: 8px 0 0 8px !important;
         width: fit-content;
-        min-width: 150px;
-        max-width: 85vw;
-        font-size: 16px;
-        padding: 12px 18px;
+        min-width: 140px;
+        font-size: 14px;
+        padding: 10px 18px;
         text-align: right;
-        border-right: none !important; /* Elimina borde en la orilla */
         box-shadow: -3px 4px 12px rgba(0,0,0,0.4);
-        margin-right: 0 !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Botón Dorado Principal */
     .cat-main {
-        margin-top: 6px; /* Espacio cuando se despliegan las categorías arriba */
+        margin-top: 6px;
         z-index: 2001;
-        box-shadow: -4px 6px 15px rgba(229, 196, 83, 0.3) !important;
+        background: linear-gradient(135deg, #E5C453, #caa93a) !important;
+        color: #000 !important;
     }
 
-    /* Contenedor de Categorías (Acordeón hacia arriba) */
-    .cat-wrapper {
-        display: flex;
-        flex-direction: column-reverse; /* Mantiene el orden hacia arriba */
-        gap: 4px;
-        width: auto;
-        max-height: 0; /* Cerrado por defecto */
-        opacity: 0;
-        visibility: hidden;
-        overflow-y: auto;
-        overflow-x: hidden;
-        pointer-events: none; /* Bloquea clics accidentales al estar cerrado */
-        transition: max-height 0.4s ease, opacity 0.3s ease, visibility 0.3s;
-        overscroll-behavior: contain;
-        padding-right: 0;
+    /* 5. FORMULARIO DE PEDIDO (MODAL/PESTAÑA) */
+    .modal-contenido {
+        padding: 15px !important;
+        width: 100% !important;
+        box-sizing: border-box;
     }
 
-    /* ESTADO ABIERTO (Se activa con la clase 'abierto' o 'menu-abierto') */
-    .menu-categorias.abierto .cat-wrapper,
-    .menu-categorias.menu-abierto .cat-wrapper {
-        max-height: 50vh; /* Altura máxima en móvil */
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto; /* Habilita selección solo cuando es visible */
-        padding-bottom: 5px; /* Espacio sobre el botón principal */
+    .fila2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr) !important; /* Mantiene 2 columnas */
+        gap: 8px !important;
     }
 
-    /* Scrollbar invisible en móvil */
-    .cat-wrapper::-webkit-scrollbar {
-        width: 3px;
+    .formulario input, 
+    .formulario select, 
+    .formulario textarea {
+        padding: 10px !important;
+        font-size: 14px !important; /* Tamaño legible sin zoom excesivo */
+        margin: 4px 0 !important;
     }
-    .cat-wrapper::-webkit-scrollbar-thumb {
-        background: rgba(229, 196, 83, 0.5);
+
+    #productoImagen {
+        width: 70px !important;
+        height: 90px !important;
+    }
+
+    /* Ajuste para el aviso Toast (Añadido al carrito) */
+    .swal2-bottom-end .swal2-toast {
+        margin-bottom: 230px !important; /* Para que aparezca arriba de la torre */
     }
 }
-/* --- BOTÓN FLOTANTE CARRITO --- */
-.cart-btn-flotante {
-    position: fixed;
-    bottom: 90px; /* Arriba del de WhatsApp */
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    background-color: #E5C453;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999999;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    cursor: pointer;
-    transition: 0.3s;
-}
 
-.cart-count {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: #000;
-    color: #fff;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* --- LISTA DE PRODUCTOS EN EL FORMULARIO --- */
-#lista-carrito-form {
-    width: 100%;
-    margin-bottom: 20px;
-}
-
-.item-carrito-form {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    background: #fff;
-}
-
-.item-carrito-form img {
-    width: 50px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 5px;
-}
-
-.item-info { flex: 1; }
-.item-nombre { font-size: 14px; font-weight: bold; }
-.item-precio { font-size: 13px; color: #666; }
-
-/* Controles de cantidad (+ / -) */
-.controles-cantidad {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #f8f9fa;
-    padding: 5px 10px;
-    border-radius: 20px;
-}
-
-.btn-cant {
-    background: #E5C453;
-    border: none;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* Botón Añadir al carrito en la tarjeta del producto */
-.btn-add-cart {
-    background: #000;
-    color: #E5C453;
-    border: 1px solid #E5C453;
-    padding: 10px;
-    border-radius: 12px;
-    margin-top: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    width: 100%;
-}
-
-.total-pago-box {
-    text-align: right;
-    padding: 15px;
-    font-size: 18px;
-    font-weight: 800;
-    color: #000;
-    border-top: 2px solid #E5C453;
+/* Ajustes extra para pantallas muy pequeñas (menos de 600px) */
+@media screen and (max-width: 600px) {
+    .modal-contenido {
+        padding: 12px !important;
+    }
+    
+    .formulario input, .formulario select {
+        padding: 8px !important;
+        font-size: 13px !important;
+    }
 }
 
     </style>
@@ -2080,7 +1921,6 @@ window.whatsappDirecto = (nombre, precio) => {
 // =========================================
 // 1. AGREGAR AL CARRITO (Botón Dorado)
 window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
-    // Limpiar el precio: convertir "$10.000" a número 10000
     const precioNum = typeof precio === 'string' 
         ? parseFloat(precio.replace(/[^0-9.-]+/g,"")) 
         : precio;
@@ -2095,10 +1935,16 @@ window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
     
     window.actualizarBadgeCarrito();
     
-    // Notificación visual
+    // Notificación visual optimizada
     Swal.fire({
-        toast: true, position: 'top-end', icon: 'success',
-        title: 'Añadido al carrito', showConfirmButton: false, timer: 1000
+        toast: true, 
+        position: 'bottom-end', // <-- Lo cambiamos a la parte de abajo para que sea más visible
+        icon: 'success',
+        title: 'Añadido al carrito', 
+        showConfirmButton: false, 
+        timer: 1500,
+        background: '#ffffff',
+        color: '#333'
     });
 };
 
