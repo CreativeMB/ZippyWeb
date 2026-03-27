@@ -1241,56 +1241,47 @@ body {
     </div>
 </div>
  
-    <div id="productos-tab" class="tab-content">
+       <div id="productos-tab" class="tab-content">
+    <div id="vista-catalogo">
         <div id="menu-categorias-flotante" class="menu-categorias"></div>
         <a id="btnWhats" class="whatsappbtnflotante" href="#" target="_blank">
-        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
-    </a>
+            <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
+        </a>
+        
         <div class="header">
             <div class="marca-principal">
                 <img id="logoEmpresa" src="" alt="" class="logo-estilo">
                 <h1 id="nombreEmpresa"></h1>
             </div>
-
             <div id="eslogan" class="eslogan"></div>
-
             <div class="banner-informativo">
                 <div id="info-destacada" class="texto-destacado"></div>
             </div>
         </div>
 
         <div id="productos" class="productos"></div>
+        
         <div class="footer">
             <p id="direccion" class="info-footer-elegante"></p>
-        <p id="ciudad" class="info-footer-elegante"></p>
-        <p id="telefono" class="info-footer-elegante"></p>
-        <p id="correo" class="info-footer-elegante"></p>
-        <p style="margin-top:25px; font-size:13px; opacity:.8; border-top: 1px solid #333; padding-top: 20px;">
-            © 2026 - <a href="https://zippy-727d5.web.app/empresa.html" target="_blank"
-                style="color:#fbbf24; text-decoration:none; font-weight:bold;">Creado con Zippy</a>
-        </p>
-    </div>
-    </div>
-
-<div id="modalPedido" style="display: none; width: 100%; min-height: 100vh; background: #fff; padding: 20px; box-sizing: border-box;">
-    
-    <button type="button" onclick="cerrarSeccionPedido()" style="border: none; background: #f0f0f0; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px;">
-        ← Volver a productos
-    </button>
-
-    <div style="display:flex; gap:15px; margin-bottom:20px; flex-wrap: wrap;">
-        <img id="productoImagen" style="width:120px; height:150px; object-fit:contain; background:#f9f9f9; border-radius:8px;">
-        <div class="infoProducto" style="flex: 1; min-width: 250px;">
-            <div class="aviso-privacidad" style="font-size: 10px; line-height: 1.2; color: #666; margin-bottom: 5px;">
-                🔒 Tus datos están protegidos y se usan exclusivamente para procesar y entregar tu pedido.
-            </div>
-            <div id="productoTitulo" style="font-weight:bold; font-size: 1.1em;"></div>
-            <div id="productoDescripcion" style="font-size:12px; color:#666; margin-top: 5px;"></div>
-            <div id="productoPrecio" style="font-weight:bold; color:#FF6600; font-size:20px; margin-top: 5px;"></div>
+            <p id="ciudad" class="info-footer-elegante"></p>
+            <p id="telefono" class="info-footer-elegante"></p>
+            <p id="correo" class="info-footer-elegante"></p>
         </div>
     </div>
 
-    </div>
+    <div id="modalPedido" style="display: none; background: #fff; padding: 20px;">
+        <button type="button" onclick="cerrarSeccionPedido()" style="border: none; background: #f0f0f0; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; font-weight: bold;">
+            ← Volver a productos
+        </button>
+
+        <div style="display:flex; gap:15px; margin-bottom:20px; flex-wrap: wrap; align-items: start;">
+            <img id="productoImagen" style="width:120px; height:150px; object-fit:contain; background:#f9f9f9; border-radius:8px; border: 1px solid #eee;">
+            <div class="infoProducto" style="flex: 1; min-width: 250px;">
+                <div id="productoTitulo" style="font-weight:bold; font-size: 1.3em; color: #202020;"></div>
+                <div id="productoPrecio" style="font-weight:bold; color:#FF6600; font-size:22px; margin: 5px 0;"></div>
+                <div id="productoDescripcion" style="font-size:13px; color:#666;"></div>
+            </div>
+        </div>
 
             <div class="formulario">
                 <div class="aviso-privacidad">
