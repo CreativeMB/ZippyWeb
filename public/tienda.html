@@ -1613,7 +1613,6 @@ function procesarProductoDirecto() {
                 return refADN.includes(buscadoADN) || buscadoADN.includes(refADN);
             });
         }
-
         // 2. VERIFICACIÓN Y APERTURA
         if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
             const real = productosRealtime[mejorMatch.trim().toLowerCase()];
