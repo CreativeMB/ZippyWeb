@@ -1718,22 +1718,19 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     card.innerHTML = `
         <div class="pedido-top">
-        <div class="pedido-img-wrapper">
-            <!-- Llamamos a la función directamente aquí sin etiquetas <img> extras -->
-            ${generarMosaicoHTML(p)}
+            <div class="pedido-img-wrapper">
+                ${generarMosaicoHTML(p)}
 
-            ${
-                p.adicional && p.adicional.trim() !== ''
-                ? `<div class="cinta-adicional">
-                        <span>${p.adicional}</span>
-                   </div>`
-                : ''
-            }
-        </div>
+                ${
+                    p.adicional && p.adicional.trim() !== ''
+                    ? `<div class="cinta-adicional">
+                            <span>${p.adicional}</span>
+                       </div>`
+                    : ''
+                }
+            </div>
             <div class="pedido-info">
-
-                <div class="linea ref">🏷️ ${p.referencia || 'Pedido'}</div>
-
+                <!-- Se eliminó la referencia de aquí -->
                 <div class="linea">
                     👤 ${p.nombreCliente || ''}
                     <div class="sub-linea">
@@ -1764,27 +1761,31 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                     📅 ${p.diaEntrega || ''}
                     <div class="sub-linea">⏰ ${p.horaEntrega || ''}</div>
                 </div>
-
             </div>
         </div>
 
         <div class="pedido-bottom">
-             <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
-
-          <div class="linea mensaje-linea">
-            <strong>📝:</strong>
-            <span class="mensaje-texto">${p.mensaje || ''}</span>
-            <button class="btn-editar-mensaje">✏️</button>
-            <button class="btn-imprimir">🖨 Imprimir</button>
-            <label class="switch-ruta">
-                <input type="checkbox" class="chkRuta">
-                🚘En Ruta
-            </label>
-            <div class="etiqueta-ruta">
-                <span>EN</span>
-                <span>RUTA</span>
+            <!-- 🏷️ REFERENCIA MOVIDA AQUÍ (Encima de notas) -->
+            <div class="linea ref" style="font-size: 15px; font-weight: 800; color: #000; margin-bottom: 5px;">
+                🏷️ ${p.referencia || 'Pedido'}
             </div>
-          </div>
+
+            <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
+
+            <div class="linea mensaje-linea">
+                <strong>📝:</strong>
+                <span class="mensaje-texto">${p.mensaje || ''}</span>
+                <button class="btn-editar-mensaje">✏️</button>
+                <button class="btn-imprimir">🖨 Imprimir</button>
+                <label class="switch-ruta">
+                    <input type="checkbox" class="chkRuta">
+                    🚘En Ruta
+                </label>
+                <div class="etiqueta-ruta">
+                    <span>EN</span>
+                    <span>RUTA</span>
+                </div>
+            </div>
 
             <div class="linea">
                 👉 De: ${p.de || ''} 👉 Para: ${p.para || ''}
