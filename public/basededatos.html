@@ -269,19 +269,18 @@ th {
     flex-shrink: 0;
     border-radius: 2px; /* Radio pequeño solicitado */
     overflow: hidden; /* Corta el marquee para que no se salga */
+    position: relative !important;
     background-color: #2c2c2c;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 /* EL MOSAICO O IMAGEN PRINCIPAL */
-.pedido-img-wrapper > div:first-child,
-.pedido-img {
+/* EL MOSAICO (Forzamos que no se estire) */
+.pedido-img-wrapper > div:first-child {
+    height: 140px !important; 
     width: 100% !important;
-    height: 140px !important; /* Altura controlada */
-    object-fit: cover;
-    display: block;
+    flex-shrink: 0; /* Evita que la cinta lo aplaste */
 }
-
 /* ============================================================
    CINTA ADICIONAL CON MARQUEE
    ============================================================ */
@@ -292,6 +291,7 @@ th {
     min-height: 22px !important;
     background: #242424 !important;
     color: #fff !important;
+    margin: 0 !important;
     padding: 2px 0;
     overflow: hidden; /* Importante para el Marquee */
     z-index: 10;
