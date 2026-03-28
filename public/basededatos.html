@@ -276,6 +276,44 @@ th {
     gap: 2px;
     margin-top: 2px; /* margen entre top y bottom */
 }
+/* EL CONTENEDOR DE LA IMAGEN */
+.pedido-img-wrapper {
+    display: flex;
+    flex-direction: column; /* Alinea imagen y cinta uno sobre otro */
+    position: relative; /* Lo mantenemos por si usas otros iconos flotantes */
+    width: 110px; /* Mantiene el ancho de tu imagen actual */
+    flex-shrink: 0;
+}
+/* ===== CINTA ADICIONAL (AHORA DEBAJO) ===== */
+.cinta-adicional {
+    /* Quitamos absolute, bottom, left, right */
+    position: relative; 
+    background: rgba(0,0,0,0.85); /* Un poco más oscuro para que contraste con el fondo de la card */
+    color: #fff;
+    font-size: 11px; /* Un pelín más pequeña para que no robe espacio */
+    padding: 4px 6px;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom-left-radius: 4px; /* Opcional: para redondear las esquinas de abajo */
+    border-bottom-right-radius: 4px;
+    
+    white-space: nowrap;
+    overflow: hidden;
+    /* Ya no tapa la imagen, aparece justo después */
+}
+
+/* 🔹 TEXTO NORMAL (quieto) */
+.cinta-adicional span {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* 🔹 SOLO SI NO CABE → MARQUEE */
+.cinta-adicional.marquee span {
+    padding-left: 100%;
+    animation: moverTexto 8s linear infinite;
+    will-change: transform;
+}
 
 /* TEXTO COMPACTO */
 .linea {
@@ -715,34 +753,6 @@ th {
     object-fit: fill; /* Estira la imagen para llenar el 3/4 */
 }
 
-/* ===== CINTA ADICIONAL ===== */
-.cinta-adicional {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    background: rgba(0,0,0,0.75);
-    color: #fff;
-    font-size: 12px;
-    padding: 6px 8px;
-
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-/* 🔹 TEXTO NORMAL (quieto) */
-.cinta-adicional span {
-    display: inline-block;
-    white-space: nowrap;
-}
-
-/* 🔹 SOLO SI NO CABE → MARQUEE */
-.cinta-adicional.marquee span {
-    padding-left: 100%;
-    animation: moverTexto 8s linear infinite;
-    will-change: transform;
-}
 
 /* 🔹 ANIMACIÓN */
 @keyframes moverTexto {
