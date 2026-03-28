@@ -260,26 +260,25 @@ th {
     align-items: flex-start; /* Alinea el texto al inicio de la imagen */
 }
 
-/* CONTENEDOR DE IMAGEN Y CINTA */
 .pedido-img-wrapper {
     display: flex !important;
-    flex-direction: column !important; 
-    width: 150px !important; /* Ancho fijo solicitado */
+    flex-direction: column !important; /* Fuerza a la cinta a ir debajo de la foto */
+    width: 150px !important;  
     height: auto !important;
-    flex-shrink: 0;
-    border-radius: 2px; /* Radio pequeño solicitado */
-    overflow: hidden; /* Corta el marquee para que no se salga */
     position: relative !important;
+    /* Cambiamos a hidden para que el marquee no se salga por los lados */
+    overflow: hidden !important; 
     background-color: #2c2c2c;
+    flex-shrink: 0;
+    border-radius: 2px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-
-/* EL MOSAICO (Forzamos que no se estire) */
+/* Aseguramos que el mosaico mida lo que debe */
 .pedido-img-wrapper > div:first-child {
-    height: 140px !important; 
     width: 100% !important;
-    flex-shrink: 0; /* Evita que la cinta lo aplaste */
+    height: 140px !important; /* Altura del mosaico */
+    position: relative !important;
 }
 /* ============================================================
    CINTA ADICIONAL CON MARQUEE
