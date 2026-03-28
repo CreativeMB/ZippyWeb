@@ -2014,9 +2014,13 @@ function render() {
             `;
         }
 
+        const eventoClickImagen = real.agotado 
+            ? "" 
+            : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')"`;
+        
+        const estiloCursor = real.agotado ? 'cursor: default' : 'cursor: pointer';
         const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '';
         const prioridadAttr = indice < 4 ? 'fetchpriority="high"' : 'loading="lazy"';
-
         card.innerHTML = `
             <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
@@ -2035,7 +2039,7 @@ function render() {
         indice++;
     }
 
-    // Animación y loader
+   // Animación y loader
     setTimeout(() => {
         if (bloqueoActivo) return;
         document.querySelectorAll(".producto:not(.visible)").forEach((el, i) => {
@@ -2049,10 +2053,13 @@ window.render = render;
 
 // 1. WHATSAPP DIRECTO (Botón Verde de la tarjeta)
 window.whatsappDirecto = (nombre, precio, descripcion) => {
+    // Formatear precio para que no salgan números puros
     const textoPrecio = precio > 0 ? formatearPrecio(precio) : "Consultar";
     
-    // Validamos si hay descripción, si no, ponemos un texto breve
-    const textoDescripcion = descripcion ? descripcion : "Sin detalles adicionales";
+    // Limpiar el texto de la descripción (quitar saltos de línea extraños si los hay)
+    const textoDescripcion = (descripcion && descripcion !== "Sin descripción disponible") 
+                             ? descripcion 
+                             : "Ver detalles en catálogo";
 
     const msg = `*¡Hola!* 👋 Me interesa este producto de tu tienda:\n\n` +
                 `*Producto:* ${nombre}\n` +
