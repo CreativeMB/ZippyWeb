@@ -1722,37 +1722,29 @@ window.procesarProductoDirecto = function() {
     
     if (!productosParam) return;
 
-    console.log("%c🚀 Procesador de URL Activo", "color: #E5C453; font-weight: bold;");
+    console.log("%c🚀 Procesador Zippy Activo", "color: #E5C453; font-weight: bold;");
 
     const ejecutarCargaMasiva = () => {
-        // 1. ASEGURAR QUE EL CARRITO EXISTA GLOBALMENTE
-        // Si 'carrito' no está definido, lo buscamos en window o lo creamos
-        if (typeof window.carrito === 'undefined') {
-            window.carrito = []; 
-        }
-        
-        // 2. VALIDACIÓN CRÍTICA DE DATOS
-        // Verificamos que los objetos de Firebase no estén vacíos
-        const datosListos = window.productosJson && 
-                           window.productosRealtime && 
-                           Object.keys(window.productosRealtime).length > 0;
+        // --- VERIFICACIÓN DE TUS VARIABLES GLOBALES ---
+        // Comprobamos que el JSON y el Realtime ya tengan datos (no sean {})
+        const jsonListo = Object.keys(productosJson).length > 0;
+        const realtimeListo = Object.keys(productosRealtime).length > 0;
 
-        if (!datosListos) {
-            console.warn("⏳ Esperando que Firebase cargue los productos...");
+        if (!jsonListo || !realtimeListo) {
+            console.warn("⏳ Esperando que los productos carguen de Firebase...");
             return false; 
         }
 
         const itemsRaw = productosParam.split(',');
         let totalEncontrados = 0;
         
-        // Función de limpieza de texto (ADN)
         const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
         itemsRaw.forEach((itemRaw) => {
             const bloque = itemRaw.trim();
             if (!bloque) return;
 
-            // Separar Referencia:Cantidad (Ej: A015:2)
+            // Manejo de Referencia:Cantidad
             const partes = bloque.split(':');
             const busquedaQuery = partes[0].trim();
             const cantidadURL = partes[1] ? parseInt(partes[1]) : 1;
@@ -1761,9 +1753,9 @@ window.procesarProductoDirecto = function() {
             const buscadoOriginal = decodeURIComponent(busquedaQuery).toLowerCase();
             const buscadoADN = buscarLimpio(buscadoOriginal).replace(/[^a-z0-9]/g, "");
 
-            const listaRefs = Object.keys(window.productosJson).filter(ref => ref !== "images");
+            const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
 
-            // BUSQUEDA DE COINCIDENCIA
+            // Búsqueda
             let mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
             
             if (!mejorMatch) {
@@ -1773,22 +1765,22 @@ window.procesarProductoDirecto = function() {
                 });
             }
 
-            // SI SE ENCUENTRA EL PRODUCTO
-            if (mejorMatch && window.productosRealtime[mejorMatch.trim().toLowerCase()]) {
-                const real = window.productosRealtime[mejorMatch.trim().toLowerCase()];
+            // Si hay match, usamos tus variables globales para insertar
+            if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
+                const real = productosRealtime[mejorMatch.trim().toLowerCase()];
                 
                 const nombreFinal = real.referenciaReal || mejorMatch;
                 const precioFinal = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
-                const imagenFinal = window.productosJson[mejorMatch];
+                const imagenFinal = productosJson[mejorMatch];
                 const descFinal = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
-                // Insertar al carrito global
-                const existeEnCarrito = window.carrito.find(item => item.nombre === nombreFinal);
+                // Insertar en tu array 'carrito' (Global)
+                const existeEnCarrito = carrito.find(item => item.nombre === nombreFinal);
                 
                 if (existeEnCarrito) {
                     existeEnCarrito.cantidad += cantidadFinal;
                 } else {
-                    window.carrito.push({ 
+                    carrito.push({ 
                         nombre: nombreFinal, 
                         imagen: imagenFinal, 
                         precio: precioFinal, 
@@ -1797,57 +1789,48 @@ window.procesarProductoDirecto = function() {
                     });
                 }
                 totalEncontrados++;
-                console.log(`%c✅ Cargado: ${nombreFinal} (x${cantidadFinal})`, "color: #25D366;");
-            } else {
-                console.error(`%c❌ No se encontró: ${busquedaQuery}`, "color: #ff4444;");
+                console.log(`%c✅ Agregado: ${nombreFinal}`, "color: #25D366;");
             }
         });
 
-        // 3. FINALIZAR Y ABRIR INTERFAZ
         if (totalEncontrados > 0) {
-            // Actualizar contador visual si la función existe
-            if (typeof window.actualizarBadgeCarrito === 'function') {
-                window.actualizarBadgeCarrito();
-            }
+            // Sincronizar UI
+            if (typeof actualizarBadgeCarrito === 'function') actualizarBadgeCarrito();
             
-            // Abrir el formulario de pedido
             setTimeout(() => {
-                if (typeof window.abrirPestañaProducto === 'function') {
-                    // Abrimos la pestaña (esto dispara el renderizado del formulario)
-                    window.abrirPestañaProducto("", "", 0, ""); 
+                // Abrir la pestaña de pedido
+                if (typeof abrirPestañaProducto === 'function') {
+                    abrirPestañaProducto("", "", 0, ""); 
                 } else {
-                    // Plan B: Forzar visualización si la función falla
-                    const modal = document.getElementById("modalPedido");
-                    const tienda = document.getElementById("productos-tab");
-                    if (modal) {
-                        if(tienda) tienda.style.display = "none";
-                        modal.style.display = "block";
-                        if (typeof window.renderizarCarritoEnForm === 'function') window.renderizarCarritoEnForm();
+                    // Fallback manual si la función no ha cargado
+                    const mod = document.getElementById("modalPedido");
+                    const prodTab = document.getElementById("productos-tab");
+                    if (mod) {
+                        if(prodTab) prodTab.style.display = "none";
+                        mod.style.display = "block";
+                        if (typeof renderizarCarritoEnForm === 'function') renderizarCarritoEnForm();
                     }
                 }
-                // Limpiar la URL para evitar bucles al recargar
+                // Limpiar URL
                 window.history.replaceState({}, document.title, window.location.pathname);
-            }, 1000);
+            }, 800);
 
-            return true; // Detiene el intervalo de búsqueda
+            return true;
         }
         return false;
     };
 
-    // INTENTOS: Revisa cada 1.5 segundos si los datos ya llegaron de Firebase
-    let checking = setInterval(() => {
-        if (ejecutarCargaMasiva()) {
-            clearInterval(checking);
-            console.log("%c🏁 Proceso de URL finalizado con éxito.", "color: #25D366; font-weight: bold;");
-        }
+    // Reintentar cada 1.5s hasta que Firebase llene productosJson y productosRealtime
+    let intervaloBusqueda = setInterval(() => {
+        if (ejecutarCargaMasiva()) clearInterval(intervaloBusqueda);
     }, 1500);
 
-    // Parar búsqueda después de 15 segundos para no consumir recursos
-    setTimeout(() => clearInterval(checking), 15000);
+    // Límite de seguridad
+    setTimeout(() => clearInterval(intervaloBusqueda), 15000);
 };
 
-// Iniciar cuando el navegador termine de cargar el HTML base
-window.addEventListener('DOMContentLoaded', window.procesarProductoDirecto);
+// Iniciar proceso apenas el DOM esté listo
+document.addEventListener('DOMContentLoaded', window.procesarProductoDirecto);
 
 
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
