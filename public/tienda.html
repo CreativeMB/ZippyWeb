@@ -1156,13 +1156,27 @@ body {
         animation: slideDown 0.3s ease-out forwards;
     }
 
-    .tab-item {
-        width: 100%;
-        height: 80px;
-        justify-content: flex-start;
-        padding-left: 25px;
-        border-bottom: 1px solid #2a2a2a;
-    }
+  /* --- Ajuste de los ítems en el menú desplegable --- */
+.tab-item {
+    width: 100%;
+    height: 80px; /* Tu nuevo alto: más espacio para el dedo */
+    justify-content: flex-start;
+    padding-left: 30px; /* Un poco más de aire a la izquierda */
+    border-bottom: 1px solid #2a2a2a;
+    font-size: 18px; /* Texto un poco más grande para acompañar el alto */
+    gap: 15px; /* Más espacio entre el icono y el texto */
+    transition: background 0.2s;
+}
+
+.tab-item i {
+    font-size: 22px; /* Iconos más visibles */
+    color: #E5C453; /* Dorado para que resalten sobre el fondo oscuro */
+}
+
+/* Efecto visual al tocar (Feedback táctil) */
+.tab-item:active {
+    background: #252525;
+}
 
     /* BUSCADOR MÓVIL (Solo Lupa) */
     .search-nav-container {
