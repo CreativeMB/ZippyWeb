@@ -1555,8 +1555,8 @@ button[onclick*="whatsappDirecto"] i {
 // --- 1. ARRANQUE Y DETECCIÓN ---
 
 document.getElementById('btnMenu').addEventListener('click', function() {
-    // Esto pone o quita la clase que hace visible el menú
-    document.getElementById('menuTabs').classList.toggle('mostrar-menu');
+    // Buscamos el contenedor por su clase y le añadimos la clase que lo muestra
+    document.querySelector('.tabs-left').classList.toggle('mostrar-menu');
 });
     detectarEmpresaPorDominio();
 
