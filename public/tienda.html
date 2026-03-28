@@ -2351,31 +2351,39 @@ function enviarPedido() {
     }
 
     // 1. VALIDACIÓN DE DOMICILIARIOS
-    if (!idDomiciliarioAsignado) {
-        const modal = document.getElementById("modalPedido");
-        if (modal) {
-            modal.style.display = "none";
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) backdrop.remove();
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = 'auto';
-        }
-
-        Swal.close(); 
-        Swal.fire({
-            icon: 'info',
-            title: '📍 Sin Domiciliarios',
-            text: 'Lo sentimos, no hay domiciliarios activos en este momento. Por favor, contacta a la tienda directamente para coordinar tu entrega.',
-            confirmButtonText: 'Entendido',
-            confirmButtonColor: '#FF6600',
-            target: 'body',
-            didOpen: () => {
-                const container = document.querySelector('.swal2-container');
-                if (container) container.style.zIndex = '10001';
-            }
-        });
-        return;
+   // 1. VALIDACIÓN DE DOMICILIARIOS
+if (!idDomiciliarioAsignado) {
+    const modal = document.getElementById("modalPedido");
+    if (modal) {
+        modal.style.display = "none";
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) backdrop.remove();
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = 'auto';
     }
+
+    Swal.close(); 
+    Swal.fire({
+        icon: 'info',
+        title: '📍 Sin Domiciliarios',
+        text: 'Lo sentimos, no hay domiciliarios activos en este momento. Por favor, contacta a la tienda directamente para coordinar tu entrega.',
+        confirmButtonText: 'Volver a la tienda', // Cambiado para mayor claridad
+        confirmButtonColor: '#FF6600',
+        target: 'body',
+        allowOutsideClick: false, // Evita que cierren el aviso sin leer
+        didOpen: () => {
+            const container = document.querySelector('.swal2-container');
+            if (container) container.style.zIndex = '10001';
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+           
+            window.location.reload(); 
+
+        }
+    });
+    return;
+}
 
     // 2. CAPTURA Y VALIDACIÓN DE CAMPOS OBLIGATORIOS
     const campos = {
