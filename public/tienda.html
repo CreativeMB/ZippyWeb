@@ -1722,8 +1722,8 @@ window.procesarProductoDirecto = function() {
     const productosParam = urlParams.get('producto'); 
     if (!productosParam) return;
 
-    // 1. Convertir la cadena "A015,a0145,a214" en un Array ['A015', 'a0145', 'a214']
-    const referenciasABuscar = productosParam.split(',');
+    // 1. Convertir "A015:2,A016:1" en un Array ['A015:2', 'A016:1']
+    const itemsABuscar = productosParam.split(',');
 
     const ejecutarCargaMasiva = () => {
         if (!window.productosJson || Object.keys(window.productosJson).length === 0) return false;
@@ -1731,7 +1731,12 @@ window.procesarProductoDirecto = function() {
         let totalEncontrados = 0;
         const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
-        referenciasABuscar.forEach(refBusqueda => {
+        itemsABuscar.forEach(itemRaw => {
+            // 2. SEPARAR CÓDIGO DE CANTIDAD (Ejemplo A015:2 -> ref: A015, cant: 2)
+            const partes = itemRaw.split(':');
+            const refBusqueda = partes[0];
+            const cantidadURL = partes[1] ? parseInt(partes[1]) : 1; // Si no hay ":", por defecto es 1
+
             const buscadoOriginal = decodeURIComponent(refBusqueda).trim().toLowerCase();
             const buscadoADN = buscarLimpio(buscadoOriginal).replace(/[^a-z0-9]/g, "");
 
@@ -1739,7 +1744,7 @@ window.procesarProductoDirecto = function() {
 
             const listaRefs = Object.keys(window.productosJson).filter(ref => ref !== "images");
 
-            // Buscar coincidencia
+            // Buscar coincidencia en el JSON
             let mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
             if (!mejorMatch) {
                 mejorMatch = listaRefs.find(ref => {
@@ -1748,7 +1753,7 @@ window.procesarProductoDirecto = function() {
                 });
             }
 
-            // Si existe en Realtime, agregarlo al carrito
+            // 3. Si existe, agregarlo con la cantidad indicada
             if (mejorMatch && window.productosRealtime[mejorMatch.trim().toLowerCase()]) {
                 const real = window.productosRealtime[mejorMatch.trim().toLowerCase()];
                 const imgOriginal = window.productosJson[mejorMatch];
@@ -1758,36 +1763,33 @@ window.procesarProductoDirecto = function() {
                 let imagen = normalizarImagen(imgOriginal);
                 let desc = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
-                // Agregar al carrito (Usamos una lógica sin SweetAlert para no saturar la pantalla)
                 const existe = carrito.find(item => item.nombre === nombre);
                 if (existe) {
-                    existe.cantidad++;
+                    existe.cantidad += cantidadURL; // Suma la cantidad de la URL
                 } else {
-                    carrito.push({ nombre, imagen, precio, cantidad: 1, descripcion: desc });
+                    carrito.push({ 
+                        nombre, 
+                        imagen, 
+                        precio, 
+                        cantidad: cantidadURL, // Usa la cantidad de la URL
+                        descripcion: desc 
+                    });
                 }
                 totalEncontrados++;
             }
         });
 
-        // 2. Si se encontró al menos uno, actualizar UI y abrir Formulario
         if (totalEncontrados > 0) {
             window.actualizarBadgeCarrito();
-            
             setTimeout(() => {
-                // Abrir pestaña de pedido (parámetros vacíos para que no agregue nada más)
                 window.abrirPestañaProducto("", "", 0, ""); 
-                
-                // Limpiar la URL para que no se dupliquen al recargar
                 window.history.replaceState({}, document.title, window.location.pathname);
-                
-                console.log(`✅ Se cargaron ${totalEncontrados} productos desde la URL.`);
             }, 1000);
             return true;
         }
         return false;
     };
 
-    // Intentar cargar. Si Firebase no está listo, re-intentar en 3 segundos.
     if (!ejecutarCargaMasiva()) {
         setTimeout(ejecutarCargaMasiva, 3000);
     }
