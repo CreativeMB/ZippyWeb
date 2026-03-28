@@ -1560,8 +1560,18 @@ body {
 </div>
    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, onValue, push, set, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    // --- IMPORT DE DATABASE (Añadimos el alias as queryDB) ---
+import { 
+    getDatabase, ref, onValue, push, set, get, 
+    query as queryDB, // <--- Aquí le ponemos el apodo
+    orderByChild, equalTo 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// --- IMPORT DE FIRESTORE (Ya tiene su propio query) ---
+import { 
+    getFirestore, collection, query, where, getDocs 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 
     const firebaseConfig = {
         apiKey: "TU_API_KEY",
@@ -1684,21 +1694,23 @@ async function iniciarCargaBase(slugDesdeURL) {
     const loader = document.getElementById('loader');
     const dominioLimpioDB = window.location.hostname.replace(/\./g, '_');
     
-    console.log("🚀 Buscando empresa específicamente por slug o dominio...");
+    console.log("🔍 Buscando tienda...");
 
     try {
-        // 1. Intentamos buscar DIRECTAMENTE por el SLUG (Sin descargar todo)
-        const consultaSlug = query(ref(db), orderByChild("perfilempresa/slug"), equalTo(slugDesdeURL));
+        const baseRef = ref(db); 
+
+        // 1. Usamos queryDB (el alias que creamos en el import)
+        const consultaSlug = queryDB(baseRef, orderByChild("perfilempresa/slug"), equalTo(slugDesdeURL));
         let snapshot = await get(consultaSlug);
 
-        // 2. Si no lo encuentra por slug, intentamos por DOMINIO
         if (!snapshot.exists()) {
-            const consultaDominio = query(ref(db), orderByChild("perfilempresa/dominio"), equalTo(dominioLimpioDB));
+            console.log("⚠️ No encontrado por slug, buscando por dominio...");
+            // Usamos queryDB aquí también
+            const consultaDominio = queryDB(baseRef, orderByChild("perfilempresa/dominio"), equalTo(dominioLimpioDB));
             snapshot = await get(consultaDominio);
         }
 
         if (snapshot.exists()) {
-            // Firebase devuelve un objeto donde la llave es el ID de la empresa
             const empresasEncontradas = snapshot.val();
             const id = Object.keys(empresasEncontradas)[0];
             const data = empresasEncontradas[id];
@@ -1706,21 +1718,20 @@ async function iniciarCargaBase(slugDesdeURL) {
 
             empresaId = id;
 
-            // --- TUS FUNCIONES ORIGINALES (SE MANTIENEN IGUAL) ---
             aplicarSEO(perfil);
             validarYContinuar(perfil, data);
             llenarPestañaEmpresa(perfil);
             renderizarMenuCategorias();
             
-            console.log("✅ Empresa cargada con éxito:", perfil.nombreEmpresa);
+            console.log("✅ Empresa cargada exitosamente.");
         } else {
-            console.error("🚫 No se encontró ninguna empresa");
+            console.error("🚫 No se encontró la empresa.");
         }
         
         if (loader) loader.style.display = 'none';
 
     } catch (err) {
-        console.error("❌ Error Firebase:", err);
+        console.error("🔥 Error crítico:", err);
         if (loader) loader.style.display = 'none';
     }
 }
