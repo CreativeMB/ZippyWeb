@@ -632,43 +632,30 @@ button[onclick*="whatsappDirecto"] i {
 /* ========================================= */
 /* --- BARRA PRINCIPAL (CORREGIDA) --- */
 /* ========================================= */
+/* ========================================= */
+/* --- BARRA NAVEGACIÓN EXPANDIBLE (MÓVIL) --- */
+/* ========================================= */
+
 .tabs-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
     background: #1a1a1a;
-    border-bottom: 2px solid #E5C453;
+    height: 70px;
+    padding: 0 10px;
     position: sticky;
     top: 0;
     z-index: 1100;
-    padding: 0 10px; /* Reducido para ganar espacio */
-    height: 70px;
-    box-sizing: border-box;
-    gap: 5px; /* Espacio mínimo entre grupos */
+    gap: 10px;
+    overflow: hidden; /* Evita que nada se salga al expandir */
 }
 
-/* --- PESTAÑAS --- */
-.tabs-left {
-    display: flex;
-    flex-shrink: 0; /* Evita que las pestañas se aplasten */
-}
-
-.tab-item {
-    padding: 0 12px;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    height: 70px;
-    transition: 0.3s;
-}
-
-/* --- BUSCADOR --- */
+/* 1. EL BUSCADOR (Estado inicial: Encogido) */
 .search-nav-container {
     position: relative;
-    flex: 1; /* Toma el espacio sobrante */
-    min-width: 50px; /* Permite que se encoja si es necesario */
+    flex: 0 0 45px; /* Ancho inicial pequeño (solo para la lupa) */
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    order: 2; /* Lo mantiene al centro */
 }
 
 .search-input-nav {
@@ -676,56 +663,58 @@ button[onclick*="whatsappDirecto"] i {
     height: 40px;
     background: #2a2a2a;
     border: 1px solid #444;
-    border-radius: 10px;
-    padding: 0 10px 0 35px;
+    border-radius: 20px;
+    padding: 0 0 0 35px; /* Padding derecho 0 mientras está cerrado */
     color: white;
     font-size: 16px;
-    box-sizing: border-box;
     outline: none;
+    cursor: pointer;
+    transition: all 0.4s;
 }
 
-/* --- RESPONSIVE MÓVIL (EL CAMBIO CLAVE) --- */
+/* 2. EFECTO DE EXPANSIÓN (Al tocar/enfocar) */
+.search-nav-container:focus-within {
+    flex: 1; /* Se estira para ocupar todo el espacio disponible */
+}
+
+.search-input-nav:focus {
+    padding: 0 15px 0 40px;
+    border-color: #E5C453;
+    background: #333;
+}
+
+/* 3. OCULTAR ELEMENTOS AL BUSCAR */
+/* Cuando el buscador se expande, ocultamos los títulos de las pestañas y las redes */
+.search-nav-container:focus-within ~ .redes-nav {
+    display: none !important;
+}
+
+/* 4. AJUSTE DE PESTAÑAS (MÓVIL) */
 @media screen and (max-width: 767px) {
-    
-    /* 1. Ocultar texto de pestañas, dejar solo iconos */
-    .tab-item span {
-        display: none !important;
-    }
-    
     .tab-item {
-        padding: 0 15px;
+        padding: 0 8px;
+        font-size: 12px; /* Un poco más pequeño para que quepa todo */
     }
 
-    /* 2. Cuando el buscador tiene el foco (clic) */
-    .search-nav-container:focus-within {
-        flex: 10; /* Se expande al máximo */
-        z-index: 10;
-    }
-
-    /* 3. Ocultar redes sociales cuando se escribe en el buscador */
-    .search-nav-container:focus-within ~ .redes-nav {
+    /* Ocultamos el texto de las pestañas SOLO cuando el buscador está abierto */
+    .search-nav-container:focus-within ~ .tabs-left .tab-item span,
+    .tabs-container:has(.search-nav-container:focus-within) .tab-item span {
         display: none !important;
     }
 
-    /* 4. Ajuste de la lupa */
-    .search-icon-nav {
-        left: 10px;
-        font-size: 14px;
+    /* Redes sociales por defecto visibles */
+    .redes-nav {
+        display: flex;
+        gap: 5px;
+        flex-shrink: 0;
+        order: 3;
     }
-    
-    .search-input-nav {
-        font-size: 14px;
-        padding-left: 30px;
+
+    .icono-nav {
+        width: 32px;
+        height: 32px;
     }
 }
-
-/* Redes sociales */
-.redes-nav {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
         
         /* --- BOTÓN FLOTANTE DE WHATSAPP --- */
 .whatsappbtnflotante {
