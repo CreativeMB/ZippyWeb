@@ -1501,10 +1501,8 @@ async function validarYAsignarImagenDesdeCampo(idDomi, idPedido, pedido) {
     }
 }
 
-
 // --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
-
     const grid = document.getElementById("pedidosGrid");
     if (!grid) return;
 
@@ -1512,7 +1510,6 @@ function cargarPedidosRealtime() {
     const domiRef = db.ref(`${idEmpresa}/Domiciliarios`);
 
     domiRef.once('value').then(domiSnap => {
-
         const domiciliarios = {};
         domiSnap.forEach(d => {
             domiciliarios[d.key] = {
@@ -1523,23 +1520,21 @@ function cargarPedidosRealtime() {
 
         // 🔥 ESCUCHA REALTIME
         pedidosRef.on('value', snapshot => {
-
             grid.innerHTML = '';
             const pedidosPorFecha = {};
 
             snapshot.forEach(domicSnap => {
-
                 const idDomi = domicSnap.key;
 
                 domicSnap.forEach(pedidoSnap => {
-
                     const p = pedidoSnap.val();
                     if (!p || !p.diaEntrega) return;
 
                     const idPedido = pedidoSnap.key;
 
-                    // ✅ AUTO ASIGNAR IMAGEN (SOLO SI ESTÁ VACÍA)
-                    validarYAsignarImagenDesdeReferencia(
+                    // ✅ CAMBIO AQUÍ: Llamamos a la nueva función
+                    // Antes decía: validarYAsignarImagenDesdeReferencia
+                    validarYAsignarImagenDesdeCampo(
                         idDomi,
                         idPedido,
                         p
