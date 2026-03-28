@@ -1704,7 +1704,7 @@ function procesarProductoDirecto() {
     const productoUrl = urlParams.get('producto'); 
     if (!productoUrl) return;
 
-    // 1. NORMALIZACIÓN TOTAL (Quita tildes, espacios y caracteres raros)
+    // 1. NORMALIZACIÓN TOTAL
     const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
     
     const buscadoOriginal = decodeURIComponent(productoUrl).trim().toLowerCase();
@@ -1714,12 +1714,14 @@ function procesarProductoDirecto() {
 
     const ejecutarBusqueda = () => {
         let mejorMatch = null;
+        if (!productosJson) return false; // Seguridad si el JSON no carga
+        
         const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
 
         // Intentar match exacto primero
         mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
 
-        // Si no hay exacto, usar el ADN (infalible para el Ferrero)
+        // Si no hay exacto, usar el ADN
         if (!mejorMatch) {
             mejorMatch = listaRefs.find(ref => {
                 const refADN = buscarLimpio(ref).replace(/[^a-z0-9]/g, "");
@@ -1727,43 +1729,46 @@ function procesarProductoDirecto() {
                 return refADN.includes(buscadoADN) || buscadoADN.includes(refADN);
             });
         }
-        // 2. VERIFICACIÓN Y APERTURA
+
+        // 2. VERIFICACIÓN, AGREGAR AL CARRITO Y ABRIR
         if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
             const real = productosRealtime[mejorMatch.trim().toLowerCase()];
             const imgOriginal = productosJson[mejorMatch];
 
-            // TIEMPO DE SEGURIDAD: 2200ms para asegurar que el DOM y Firebase estén listos
+            // TIEMPO DE SEGURIDAD: Para asegurar que Firebase y el DOM estén listos
             setTimeout(() => {
-                if (typeof abrirProducto === 'function') {
-                    let precio = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
-                    const desc = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
-                    
-                    abrirProducto(real.referenciaReal || mejorMatch, normalizarImagen(imgOriginal), precio, desc);
+                // Extraer datos limpios
+                let nombre = real.referenciaReal || mejorMatch;
+                let precio = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
+                let imagen = normalizarImagen(imgOriginal);
+                let desc = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
-                    // Asegurar que el modal se vea
-                    const modal = document.getElementById('modalPedido');
-                    if (modal) {
-                        modal.style.display = 'flex';
-                        modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-
-                    // Limpiar URL para evitar bucles
-                    window.history.replaceState({}, document.title, window.location.pathname);
+                // ACCIÓN 1: Agregar al carrito directamente
+                if (typeof window.agregarAlCarrito === 'function') {
+                    window.agregarAlCarrito(nombre, imagen, precio, desc);
                 }
+
+                // ACCIÓN 2: Abrir la pestaña de pedido (Formulario)
+                if (typeof window.abrirPestañaProducto === 'function') {
+                    window.abrirPestañaProducto(nombre, imagen, precio, desc);
+                }
+
+                // Limpiar URL para evitar que se agregue el mismo producto al recargar
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
             }, 2200);
-            return true; // Encontrado
+            return true; 
         }
-        return false; // No encontrado aún
+        return false; 
     };
 
-    // --- ESTRATEGIA DE DOBLE INTENTO ---
-    // Primer intento inmediato
+    // ESTRATEGIA DE RE-INTENTO
     if (!ejecutarBusqueda()) {
-        // Si falló (porque Firebase no cargó), re-intenta a los 3 segundos automáticamente
-        console.log("⏳ Producto no listo, re-intentando en 3s...");
+        console.log("⏳ Esperando datos de Firebase para procesar URL...");
         setTimeout(ejecutarBusqueda, 3000);
     }
 }
+
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
 function configurarRedesNav(perfil) {
     const fbLink = document.getElementById('shareFB');
