@@ -279,40 +279,43 @@ th {
 /* EL CONTENEDOR PADRE */
 .pedido-img-wrapper {
     display: flex !important;
-    flex-direction: column !important; /* Mosaico arriba, cinta abajo */
+    flex-direction: column !important; 
     width: 115px !important;
-    height: auto !important;          /* CLAVE: Que crezca para que quepa la cinta */
+    /* Quitamos el height: auto y dejamos que el contenido mande */
+    height: fit-content !important; 
     position: relative !important;
     overflow: hidden;
     flex-shrink: 0;
     border-radius: 4px;
     background: #000;
 }
+/* LA CINTA (Debajo del mosaico) */
+/* EL MOSAICO (Primer hijo) */
+.pedido-img-wrapper > div:first-child {
+    display: block !important;
+    width: 100% !important;
+    height: 140px !important; 
+    position: relative !important; /* IMPORTANTE */
+    order: 1 !important;
+}
 
 /* LA CINTA (Debajo del mosaico) */
 .cinta-adicional {
-    position: relative !important;    /* Cambiado de absolute a relative */
     display: flex !important;
+    position: relative !important; /* NO USAR ABSOLUTE */
     width: 100% !important;
-    height: auto !important;          /* Que se ajuste al texto */
-    min-height: 20px;
-    background: rgba(0, 0, 0, 0.9) !important;
+    height: 22px !important; /* Altura fija para la cinta */
+    background: #000 !important; /* Color sólido para probar */
     color: #fff !important;
     font-size: 11px !important;
-    padding: 4px 0 !important;
-    margin: 0 !important;             /* Sin márgenes que la muevan */
+    padding: 0 !important;
+    margin: 0 !important;
     justify-content: center;
     align-items: center;
-    z-index: 2;                       /* Por encima del fondo pero debajo de alertas */
-    order: 2;                         /* Fuerza que sea el segundo elemento */
+    order: 2 !important; /* Va después del mosaico */
+    z-index: 5;
 }
 
-/* EL MOSAICO (Forzamos que sea el primer elemento) */
-.pedido-img-wrapper > div:first-child {
-    order: 1;                         /* Fuerza que sea el primero */
-    width: 100% !important;
-    height: 140px !important;         /* Mantiene el tamaño del mosaico */
-}
 
 /* 3. El texto dentro de la cinta */
 .cinta-adicional span {
@@ -1712,7 +1715,6 @@ function generarMosaicoHTML(p) {
         height: 140px; 
         background: #000;
         position: relative;
-        z-index: 1;
     `;
 
     let html = `<div style="${gridStyle}">`;
