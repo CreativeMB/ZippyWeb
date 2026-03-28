@@ -1016,19 +1016,29 @@ button[onclick*="whatsappDirecto"] i {
 /* ========================================= */
 /* --- 1. BARRA PRINCIPAL (PC Y BASE) ---    */
 /* ========================================= */
+/* --- BARRA SIEMPRE FIJA --- */
 .tabs-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
     background: #1a1a1a;
     border-bottom: 2px solid #E5C453;
-    position: sticky;
+    
+    /* Esto garantiza que no se mueva al bajar */
+    position: fixed; /* Cambiado de sticky a fixed para mayor compatibilidad */
     top: 0;
-    z-index: 1100;
+    left: 0;
+    width: 100%;
+    
+    z-index: 2000; /* Aumentado para que nada pase por encima */
     padding: 0 15px;
     height: 75px; 
     box-sizing: border-box;
-    font-family: 'Montserrat', sans-serif;
+}
+
+/* Espaciador para que el contenido no se meta debajo de la barra fija */
+body {
+    padding-top: 75px; 
 }
 
 /* Botón Menú Móvil (Oculto en PC) */
@@ -1174,54 +1184,14 @@ button[onclick*="whatsappDirecto"] i {
         border-bottom: 1px solid #2a2a2a;
     }
 
-    /* Buscador Compacto (Lupa a la derecha) */
-    .search-nav-container {
-        flex: 0 0 40px;
-        max-width: 40px;
-        margin-left: auto;
-        margin-right: 8px;
-        height: 40px;
-        background: transparent;
     }
 
-    .search-input-nav {
-        padding: 0 !important;
-        background: transparent !important;
-        border: none !important;
-        font-size: 14px !important;
-    }
-
-    .search-icon-nav {
-        left: 50%;
-        transform: translate(-50%, -50%); /* Centrada cuando está cerrado */
-        font-size: 16px;
-    }
-
-    /* Expansión del buscador al tocar */
-    .search-nav-container:focus-within {
-        flex: 1;
-        max-width: 160px; 
-        background: #2a2a2a !important;
-        border: 1px solid #E5C453 !important;
-        border-radius: 20px;
-    }
-
-    .search-nav-container:focus-within .search-input-nav {
-        padding: 0 10px 0 35px !important;
-        background: #2a2a2a !important;
-    }
-
-    .search-nav-container:focus-within .search-icon-nav {
-        left: 12px;
-        transform: translateY(-50%);
-    }
 
     /* Redes sociales más pequeñas en móvil */
     .icono-nav {
         width: 34px !important;
         height: 34px !important;
     }
-}
 
 /* Animaciones */
 @keyframes slideDown {
