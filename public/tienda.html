@@ -1045,25 +1045,29 @@ button[onclick*="whatsappDirecto"] i {
 
 /* Pestañas (Izquierda) */
 .tabs-left {
-    display: flex;
-    flex: 0 0 auto;
-    height: 100%;
-}
+        position: absolute;
+        top: 75px; 
+        left: 0;
+        width: 100%;
+        background: #1a1a1a;
+        flex-direction: column;
+        display: none; /* Tu JS controla esto con 'mostrar-menu' */
+        z-index: 1000;
+        border-bottom: 2px solid #E5C453;
+    }
 
-.tab-item {
-    padding: 0 20px;
-    color: #ffffff;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-    font-size: 14px;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    height: 100%;
-}
+.tabs-left.mostrar-menu {
+        display: flex;
+        animation: slideDown 0.3s ease-out forwards;
+    }
+
+    .tab-item {
+        width: 100%;
+        height: 60px;
+        justify-content: flex-start;
+        padding-left: 25px;
+        border-bottom: 1px solid #2a2a2a;
+    }
 
 .tab-item i { font-size: 18px; }
 .tab-item.active { background: #E5C453; color: #000; }
@@ -1109,13 +1113,12 @@ button[onclick*="whatsappDirecto"] i {
     font-size: 18px;
 }
 
-/* Redes Sociales (Derecha) */
-.redes-nav {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 0 0 auto;
-}
+/* 5. REDES (Fijas a la derecha) */
+    .redes-nav {
+        order: 3;
+        gap: 5px;
+    }
+
 
 .icono-nav {
     width: 38px;
@@ -1138,86 +1141,81 @@ button[onclick*="whatsappDirecto"] i {
 /* --- 2. DISEÑO MÓVIL (MENÚ DESPLEGABLE) --- */
 /* ========================================= */
 @media screen and (max-width: 767px) {
-    .tabs-container {
-        padding: 0 10px;
-        gap: 5px;
-    }
-
-    /* 1. Mostrar Icono Hamburguesa */
-    .menu-toggle {
-        display: block;
-        flex: 0 0 auto;
-    }
-
-    /* 2. Pestañas Ocultas (Menú Desplegable) */
-    .tabs-left {
-        position: absolute;
-        top: 75px; /* Aparece justo debajo del nav */
-        left: 0;
-        width: 100%;
-        background: #1a1a1a;
-        flex-direction: column;
-        border-bottom: 2px solid #E5C453;
-        box-shadow: 0 10px 15px rgba(0,0,0,0.5);
-        height: auto;
-        display: none; /* Oculto por defecto en móvil */
-    }
-
-    /* Clase activa controlada por JS */
-    .tabs-left.mostrar-menu {
+   .tabs-container {
         display: flex;
-        animation: slideDown 0.3s ease forwards;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        position: relative;
     }
 
-    .tab-item {
-        width: 100%;
-        height: 55px;
-        justify-content: flex-start;
-        padding: 0 25px;
-        border-bottom: 1px solid #333;
-    }
+    /* 1. ORDEN DE LOS ELEMENTOS */
+    .menu-toggle { order: 1; }      /* Hamburguesa a la izquierda */
+    .search-nav-container { order: 2; } /* Buscador en medio/derecha */
+    .redes-nav { order: 3; }         /* Redes a la derecha */
 
-    /* 3. Buscador Expandible (Móvil) */
+    /* 2. BUSCADOR COMPACTO (Solo la Lupa) */
     .search-nav-container {
-        flex: 0 0 45px; /* Estado cerrado */
-        max-width: 45px;
+        order: 2; 
+        flex: 0 0 40px;
+        max-width: 40px;
+        margin-left: auto; /* Empuja a la derecha junto a redes */
+        margin-right: 8px;
+        transition: all 0.4s ease, opacity 0.3s ease; /* Opacity para tu JS */
         height: 40px;
-        margin: 0 5px;
+        display: flex;
+        align-items: center;
+        border-radius: 20px;
     }
 
+    /* El input se vuelve invisible/circular cuando está cerrado */
     .search-input-nav {
-        padding: 0 0 0 35px !important;
-        font-size: 14px !important;
-        border-radius: 20px !important;
+        width: 100%;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        color: white;
+        outline: none;
     }
 
     .search-icon-nav {
-        font-size: 15px;
+        position: absolute;
         left: 12px;
+        font-size: 16px;
+        color: #E5C453;
+        pointer-events: none;
     }
 
-    /* Estado abierto (Al tocar) */
+    /* 3. EXPANSIÓN (Al tocar la lupa) */
     .search-nav-container:focus-within {
-        flex: 1 1 auto;
-        max-width: 180px; /* Expansión controlada */
-    }
-
-    .search-input-nav:focus {
+        flex: 1;
+        max-width: 160px; /* Tamaño ideal para no chocar */
+        background: #2a2a2a !important;
+        border: 1px solid #E5C453 !important;
         padding: 0 10px 0 35px !important;
     }
 
-    /* 4. Redes Sociales (Móvil) */
-    .redes-nav {
-        flex: 0 0 auto;
-        gap: 6px;
+    .search-nav-container:focus-within .search-input-nav {
+        padding: 0 15px 0 40px !important;
+        background: #2a2a2a !important;
+        border: 1px solid #444 !important;
+        width: 100%;
     }
 
+    /* Reposiciona la lupa cuando se abre */
+    .search-nav-container:focus-within .search-icon-nav {
+        left: 15px;
+        transform: translateY(-50%);
+    }
+
+.redes-nav {
+        order: 3;
+        gap: 5px;
+    }
     .icono-nav {
-        width: 32px;
-        height: 32px;
+        width: 34px !important;
+        height: 34px !important;
     }
-
-    .icono-nav i { font-size: 14px; }
 }
 
 @keyframes slideDown {
@@ -1554,10 +1552,6 @@ button[onclick*="whatsappDirecto"] i {
     let carrito = [];
 // --- 1. ARRANQUE Y DETECCIÓN ---
 
-document.getElementById('btnMenu').addEventListener('click', function() {
-    // Buscamos el contenedor por su clase y le añadimos la clase que lo muestra
-    document.querySelector('.tabs-left').classList.toggle('mostrar-menu');
-});
     detectarEmpresaPorDominio();
 
 async function detectarEmpresaPorDominio() {
@@ -2642,7 +2636,15 @@ if (inputBusquedaNav) {
             buscador.style.pointerEvents = 'none';
         }
     }
+    const menuPestañas = document.querySelector('.tabs-left');
+    if (menuPestañas.classList.contains('mostrar-menu')) {
+        menuPestañas.classList.remove('mostrar-menu');
+    }
 };
+// Además, mantén el evento del botón para abrirlo:
+document.getElementById('btnMenu').addEventListener('click', function() {
+    document.querySelector('.tabs-left').classList.toggle('mostrar-menu');
+});
 
 function llenarPestañaEmpresa(data) {
     if (!data) return;
