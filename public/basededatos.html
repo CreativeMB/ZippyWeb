@@ -228,27 +228,28 @@ th {
     #suggestions div:hover { background: #eee; cursor: pointer; }
     /* ================= CONTENEDOR GRID ================= */
 /* CONTENEDOR GRID pedidos */
+
 #pedidosGrid {
     display: grid;
-    /* minmax(300px, 1fr) hace que las tarjetas midan MÍNIMO 300px, 
-       pero si sobra espacio, se estiran (1fr) para llenar todo el ancho */
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-    gap: 10px; 
-    padding: 5px; /* Margen mínimo en los bordes de la pantalla */
+    /* auto-fill con un ancho fijo (ej. 350px) hace que todas midan lo mismo */
+    /* Si sobra espacio, el grid centrará o dejará el hueco al final */
+    grid-template-columns: repeat(auto-fill, 350px); 
+    gap: 15px; 
+    padding: 5px;
     width: 100%;
+    justify-content: center; /* Centra las tarjetas en pantallas grandes */
     box-sizing: border-box;
-    align-items: start; /* Crecimiento individual hacia abajo */
+    align-items: start; /* CRUCIAL: Evita que las tarjetas se estiren para igualar a la más alta */
 }
+
+/* OPCIONAL: Dale un poco más de aire interno a la tarjeta */
 .pedido-card {
-    width: 100%; /* Ocupa todo el espacio que le asigne el grid */
     border-radius: 5px;
-    padding: 10px;
+    padding: 10px; /* Subimos de 10px a 15px */
     display: flex;
     flex-direction: column;
-    gap: 8px; /* Un poco más compacto */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    background-color: #fff;
-    height: auto; /* Crece hacia abajo según el contenido */
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 /* PARTE SUPERIOR */
@@ -274,67 +275,6 @@ th {
     flex-direction: column;
     gap: 2px;
     margin-top: 2px; /* margen entre top y bottom */
-}
-/* 1. El contenedor que guarda la foto y la cinta */
-/* EL CONTENEDOR PADRE */
-.pedido-img-wrapper {
-    display: flex !important;
-    flex-direction: column !important; 
-    width: 115px !important;
-    /* Quitamos el height: auto y dejamos que el contenido mande */
-    height: fit-content !important; 
-    position: relative !important;
-    overflow: hidden;
-    flex-shrink: 0;
-    border-radius: 4px;
-    background: #000;
-}
-/* LA CINTA (Debajo del mosaico) */
-/* EL MOSAICO (Primer hijo) */
-.pedido-img-wrapper > div:first-child {
-    display: block !important;
-    width: 100% !important;
-    height: 140px !important; 
-    position: relative !important; /* IMPORTANTE */
-    order: 1 !important;
-}
-
-/* LA CINTA (Debajo del mosaico) */
-.cinta-adicional {
-    display: flex !important;
-    position: relative !important; /* NO USAR ABSOLUTE */
-    width: 100% !important;
-    height: 22px !important; /* Altura fija para la cinta */
-    background: #000 !important; /* Color sólido para probar */
-    color: #fff !important;
-    font-size: 11px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    justify-content: center;
-    align-items: center;
-    order: 2 !important; /* Va después del mosaico */
-    z-index: 5;
-}
-
-
-/* 3. El texto dentro de la cinta */
-.cinta-adicional span {
-    display: inline-block;
-    white-space: nowrap;
-    color: #fff;
-}
-
-/* 🔹 TEXTO NORMAL (quieto) */
-.cinta-adicional span {
-    display: inline-block;
-    white-space: nowrap;
-}
-
-/* 🔹 SOLO SI NO CABE → MARQUEE */
-.cinta-adicional.marquee span {
-    padding-left: 100%;
-    animation: moverTexto 8s linear infinite;
-    will-change: transform;
 }
 
 /* TEXTO COMPACTO */
@@ -775,6 +715,34 @@ th {
     object-fit: fill; /* Estira la imagen para llenar el 3/4 */
 }
 
+/* ===== CINTA ADICIONAL ===== */
+.cinta-adicional {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 8px;
+
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* 🔹 TEXTO NORMAL (quieto) */
+.cinta-adicional span {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* 🔹 SOLO SI NO CABE → MARQUEE */
+.cinta-adicional.marquee span {
+    padding-left: 100%;
+    animation: moverTexto 8s linear infinite;
+    will-change: transform;
+}
 
 /* 🔹 ANIMACIÓN */
 @keyframes moverTexto {
@@ -1712,9 +1680,8 @@ function generarMosaicoHTML(p) {
         grid-template-rows: repeat(${filas}, 1fr); 
         gap: 1px; 
         width: 100%; 
-        height: 140px; 
+        height: 100%; 
         background: #000;
-        position: relative;
     `;
 
     let html = `<div style="${gridStyle}">`;
