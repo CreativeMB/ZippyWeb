@@ -1014,9 +1014,9 @@ button[onclick*="whatsappDirecto"] i {
     border-radius: 10px;
 }
 /* ========================================= */
+/* ========================================= */
 /* --- 1. BARRA PRINCIPAL (PC Y BASE) ---    */
 /* ========================================= */
-/* --- BARRA SIEMPRE FIJA --- */
 .tabs-container {
     display: flex;
     align-items: center;
@@ -1024,24 +1024,24 @@ button[onclick*="whatsappDirecto"] i {
     background: #1a1a1a;
     border-bottom: 2px solid #E5C453;
     
-    /* Esto garantiza que no se mueva al bajar */
-    position: fixed; /* Cambiado de sticky a fixed para mayor compatibilidad */
+    /* FIJO PARA TODO DISPOSITIVO */
+    position: fixed; 
     top: 0;
     left: 0;
     width: 100%;
+    z-index: 2000; 
     
-    z-index: 2000; /* Aumentado para que nada pase por encima */
     padding: 0 15px;
     height: 75px; 
     box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
 }
 
-/* Espaciador para que el contenido no se meta debajo de la barra fija */
+/* Espaciador para que el contenido no quede debajo de la barra */
 body {
     padding-top: 75px; 
 }
 
-/* Botón Menú Móvil (Oculto en PC) */
 .menu-toggle {
     display: none; 
     background: transparent;
@@ -1050,10 +1050,8 @@ body {
     font-size: 24px;
     cursor: pointer;
     padding: 0 5px;
-    transition: 0.3s;
 }
 
-/* Pestañas (Izquierda en PC) */
 .tabs-left {
     display: flex;
     flex: 0 0 auto;
@@ -1075,10 +1073,8 @@ body {
     height: 100%;
 }
 
-.tab-item i { font-size: 18px; }
 .tab-item.active { background: #E5C453; color: #000; }
 
-/* Buscador Integrado (Centro en PC) */
 .search-nav-container {
     position: relative;
     flex: 1 1 auto; 
@@ -1087,7 +1083,7 @@ body {
     height: 50px; 
     display: flex;
     align-items: center;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s ease;
 }
 
 .search-input-nav {
@@ -1099,15 +1095,7 @@ body {
     padding: 0 15px 0 45px;
     color: white;
     font-size: 18px; 
-    box-sizing: border-box;
     outline: none;
-    transition: 0.3s;
-}
-
-.search-input-nav:focus {
-    border-color: #E5C453;
-    background: #333;
-    box-shadow: 0 0 10px rgba(229, 196, 83, 0.2);
 }
 
 .search-icon-nav {
@@ -1116,10 +1104,8 @@ body {
     top: 50%;
     transform: translateY(-50%);
     color: #E5C453; 
-    font-size: 18px;
 }
 
-/* Redes Sociales (Derecha) */
 .redes-nav {
     display: flex;
     align-items: center;
@@ -1133,31 +1119,27 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    text-decoration: none;
-    transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: 0.3s;
 }
 
 .icono-nav i { font-size: 18px; color: white; }
-.icono-nav.facebook:hover { background: #1877F2; border-color: #1877F2; transform: translateY(-2px); }
-.icono-nav.whatsapp:hover { background: #25D366; border-color: #25D366; transform: translateY(-2px); }
 
 /* ========================================= */
-/* --- 2. DISEÑO MÓVIL (MENÚ DESPLEGABLE) --- */
+/* --- 2. DISEÑO MÓVIL (CORRECCIONES) ---    */
 /* ========================================= */
 @media screen and (max-width: 767px) {
     .tabs-container {
         padding: 0 10px;
-        position: relative;
+        /* Reafirmamos que es fija */
+        position: fixed !important; 
     }
 
-    /* Orden de elementos móviles */
     .menu-toggle { order: 1; display: block; } 
     .search-nav-container { order: 2; }
     .redes-nav { order: 3; gap: 5px; }
 
-    /* Pestañas ahora son un menú vertical oculto */
     .tabs-left {
         position: absolute;
         top: 75px; 
@@ -1168,7 +1150,6 @@ body {
         display: none; 
         z-index: 1000;
         border-bottom: 2px solid #E5C453;
-        height: auto;
     }
 
     .tabs-left.mostrar-menu {
@@ -1184,16 +1165,53 @@ body {
         border-bottom: 1px solid #2a2a2a;
     }
 
+    /* BUSCADOR MÓVIL (Solo Lupa) */
+    .search-nav-container {
+        flex: 0 0 40px;
+        max-width: 40px;
+        margin-left: auto;
+        margin-right: 8px;
+        height: 40px;
     }
 
+    .search-input-nav {
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        cursor: pointer;
+    }
 
-    /* Redes sociales más pequeñas en móvil */
+    .search-icon-nav {
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
+
+    /* Expansión al tocar */
+    .search-nav-container:focus-within {
+        flex: 1;
+        max-width: 160px; 
+        background: #2a2a2a !important;
+        border: 1px solid #E5C453 !important;
+        border-radius: 20px;
+    }
+
+    .search-nav-container:focus-within .search-input-nav {
+        padding: 0 10px 0 35px !important;
+        background: #2a2a2a !important;
+    }
+
+    .search-nav-container:focus-within .search-icon-nav {
+        left: 12px;
+        transform: translateY(-50%);
+    }
+
     .icono-nav {
         width: 34px !important;
         height: 34px !important;
     }
+}
 
-/* Animaciones */
 @keyframes slideDown {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
