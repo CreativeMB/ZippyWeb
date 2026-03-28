@@ -1560,7 +1560,7 @@ body {
 </div>
    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-     import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, onValue, push, set, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -1680,7 +1680,52 @@ function irAMantenimiento(motivo) {
     `;
 }
 
-function iniciarCargaBase(slugDesdeURL) {
+async function iniciarCargaBase(slugDesdeURL) {
+    const loader = document.getElementById('loader');
+    const dominioLimpioDB = window.location.hostname.replace(/\./g, '_');
+    
+    console.log("🚀 Buscando empresa específicamente por slug o dominio...");
+
+    try {
+        // 1. Intentamos buscar DIRECTAMENTE por el SLUG (Sin descargar todo)
+        const consultaSlug = query(ref(db), orderByChild("perfilempresa/slug"), equalTo(slugDesdeURL));
+        let snapshot = await get(consultaSlug);
+
+        // 2. Si no lo encuentra por slug, intentamos por DOMINIO
+        if (!snapshot.exists()) {
+            const consultaDominio = query(ref(db), orderByChild("perfilempresa/dominio"), equalTo(dominioLimpioDB));
+            snapshot = await get(consultaDominio);
+        }
+
+        if (snapshot.exists()) {
+            // Firebase devuelve un objeto donde la llave es el ID de la empresa
+            const empresasEncontradas = snapshot.val();
+            const id = Object.keys(empresasEncontradas)[0];
+            const data = empresasEncontradas[id];
+            const perfil = data.perfilempresa;
+
+            empresaId = id;
+
+            // --- TUS FUNCIONES ORIGINALES (SE MANTIENEN IGUAL) ---
+            aplicarSEO(perfil);
+            validarYContinuar(perfil, data);
+            llenarPestañaEmpresa(perfil);
+            renderizarMenuCategorias();
+            
+            console.log("✅ Empresa cargada con éxito:", perfil.nombreEmpresa);
+        } else {
+            console.error("🚫 No se encontró ninguna empresa");
+        }
+        
+        if (loader) loader.style.display = 'none';
+
+    } catch (err) {
+        console.error("❌ Error Firebase:", err);
+        if (loader) loader.style.display = 'none';
+    }
+}
+
+/*function iniciarCargaBase(slugDesdeURL) {
     const loader = document.getElementById('loader');
     const empresasRef = ref(db);
     
@@ -1723,7 +1768,7 @@ function iniciarCargaBase(slugDesdeURL) {
         if(loader) loader.style.display = 'none';
     });
 }
-
+*/
 
 window.procesarProductoDirecto = function() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -1923,7 +1968,46 @@ function configurarRedesNav(perfil) {
             render();
         } catch (e) { productosJson = {}; render(); }
     }
+    function escucharCambios(id) {
+    if (bloqueoActivo) return;
 
+    const productosRef = ref(db, id + "/productos");
+
+    // CAMBIO CLAVE: 'get' en lugar de 'onValue' para ahorrar 90% de datos
+    get(productosRef).then((snapshot) => {
+        if (bloqueoActivo) return;
+
+        // Limpiamos el objeto antes de llenarlo
+        productosRealtime = {};
+
+        if (snapshot.exists()) {
+            snapshot.forEach((child) => {
+                const p = child.val();
+                const refOriginal = p.referencia || p.Referencia || p.nombre || "";
+
+                if (refOriginal) {
+                    const claveLimpia = String(refOriginal).trim().toLowerCase();
+                    productosRealtime[claveLimpia] = p;
+                    productosRealtime[claveLimpia].referenciaReal = refOriginal;
+                }
+            });
+        }
+
+        console.log("📦 Catálogo cargado (Descarga única):", Object.keys(productosRealtime).length, "productos");
+
+        // Ejecutamos el renderizado
+        render(); 
+        
+        // Procesamos si venía un producto por URL
+        if (typeof procesarProductoDirecto === "function") {
+            procesarProductoDirecto();
+        }
+
+    }).catch((error) => {
+        console.error("❌ Error al cargar productos:", error);
+    });
+}
+/*
  function escucharCambios(id) {
     if (bloqueoActivo) return;
 
@@ -1953,7 +2037,7 @@ function configurarRedesNav(perfil) {
         procesarProductoDirecto();
     });
 }
-
+*/
 function render() {
     if (bloqueoActivo) return;
     const contenedor = document.getElementById("productos");
