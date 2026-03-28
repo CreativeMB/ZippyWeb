@@ -1507,41 +1507,7 @@ async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
     }
 }
 
-// --- OBTENER IMAGEN PARA MOSTRAR ---
-function obtenerImagenPedido(p){
-    let url = '';
 
-    // 1. Prioridad: imagenUrl (Ahora puede tener varias URLs separadas por coma)
-    if(p.imagenUrl && p.imagenUrl.trim() !== ''){
-        // Convertimos el string en lista y tomamos solo la primera URL
-        // Usamos trim() por si hay espacios después de la coma
-        url = p.imagenUrl.split(',')[0].trim();
-    } 
-    // 2. Si no hay imagenUrl, buscamos por referencia en el JSON (Respaldo)
-    else if(p.referencia){
-        const refLimpia = p.referencia.trim().toLowerCase();
-        
-        // Buscamos en las llaves del JSON que cargamos
-        const llaveEncontrada = Object.keys(referenciasDrive).find(k => k.toLowerCase() === refLimpia);
-        
-        if(llaveEncontrada){
-            url = referenciasDrive[llaveEncontrada];
-        }
-    }
-    
-    // Si al final no se encontró ninguna URL, devolvemos vacío
-    if (!url) return '';
-
-    // 3. Lógica de normalización de Drive (Para que la imagen sea visible en el panel)
-    if(url.includes('drive.google.com')){
-        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-        if(match && match[1]) {
-            return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
-        }
-    }
-
-    return url;
-}
 
 // --- CARGAR PEDIDOS ---
 function cargarPedidosRealtime() {
@@ -1630,8 +1596,6 @@ function cargarPedidosRealtime() {
 function normalizarImagen(url) {
     if (!url) return '';
     let link = url.trim();
-
-    // Si el link es de Drive, lo convertimos a formato miniatura (thumbnail) para que se vea en la web
     if (link.includes('drive.google.com')) {
         const match = link.match(/\/d\/([a-zA-Z0-9_-]+)/) || link.match(/[?&]id=([a-zA-Z0-9_-]+)/);
         if (match && match[1]) {
@@ -1640,6 +1604,64 @@ function normalizarImagen(url) {
     }
     return link;
 }
+function obtenerImagenPedido(p) {
+    let url = '';
+
+    // 1. Si hay imagenUrl (una o varias), tomamos la primera
+    if (p.imagenUrl && p.imagenUrl.trim() !== '') {
+        url = p.imagenUrl.split(',')[0].trim();
+    } 
+    // 2. Si no, buscamos en el JSON por referencia
+    else if (p.referencia) {
+        const refLimpia = p.referencia.trim().toLowerCase();
+        const llaveEncontrada = Object.keys(referenciasDrive).find(k => k.toLowerCase() === refLimpia);
+        if (llaveEncontrada) url = referenciasDrive[llaveEncontrada];
+    }
+    
+    return normalizarImagen(url);
+}
+function renderizarMosaicoWeb(p, contenedorId) {
+    const contenedor = document.getElementById(contenedorId);
+    if (!contenedor) return;
+
+    // Obtener todas las URLs del campo
+    const imgData = p.imagenUrl || "";
+    if (imgData.trim() === "") {
+        contenedor.innerHTML = '<img src="img/placeholder.png" style="width:100%; height:100px; object-fit:cover;">';
+        return;
+    }
+
+    const urls = imgData.split(',').map(u => u.trim()).filter(u => u !== "");
+    contenedor.innerHTML = ''; // Limpiar previo
+
+    // Estilo del Contenedor (Grid dinámico)
+    contenedor.style.display = 'grid';
+    contenedor.style.gap = '4px';
+    contenedor.style.width = '100%';
+    
+    // Si hay 5 fotos, hace 3 columnas. Si hay 2, hace 2 columnas.
+    let columnas = urls.length === 1 ? 1 : (urls.length <= 4 ? 2 : 3);
+    contenedor.style.gridTemplateColumns = `repeat(${columnas}, 1fr)`;
+
+    urls.forEach(url => {
+        const img = document.createElement('img');
+        img.src = normalizarImagen(url);
+        
+        // Estilo de imagen estirada completa (FIT_XY)
+        img.style.width = '100%';
+        img.style.height = urls.length > 2 ? '90px' : '140px'; 
+        img.style.objectFit = 'fill'; // Esto estira la imagen para llenar el cuadro
+        img.style.borderRadius = '4px';
+        img.style.border = '1px solid #eee';
+        img.style.cursor = 'pointer';
+
+        // Zoom al hacer clic
+        img.onclick = () => window.open(url, '_blank');
+
+        contenedor.appendChild(img);
+    });
+}
+
 
 function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
