@@ -1744,7 +1744,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                         ${p.direccion || ''}
                     </a>
                 </div>
-
+ <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
                 <div class="linea">
                     📅 ${p.diaEntrega || ''}
                     <div class="sub-linea">⏰ ${p.horaEntrega || ''}</div>
@@ -1757,9 +1757,6 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             <div class="linea ref" style="font-size: 15px; font-weight: 800; color: #000; margin-bottom: 5px;">
                 🏷️ ${p.referencia || 'Pedido'}
             </div>
-
-            <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
-
             <div class="linea mensaje-linea">
                 <strong>📝:</strong>
                 <span class="mensaje-texto">${p.mensaje || ''}</span>
