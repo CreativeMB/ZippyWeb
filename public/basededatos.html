@@ -1928,114 +1928,34 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     }
     activarEdicionMensaje();
 
+// Busca la cinta dentro de la tarjeta
 const cinta = card.querySelector('.cinta-adicional');
-if (cinta) activarMarqueeSiNecesario(cinta);
 
-function activarMarqueeSiNecesario(cinta) {
-    const span = cinta.querySelector('span');
+// Usamos un pequeño retraso para asegurar que el navegador ya dibujó el texto
+if (cinta) {
+    setTimeout(() => {
+        activarMarqueeSiNecesario(cinta);
+    }, 100); 
+}
+
+function activarMarqueeSiNecesario(cintaElement) {
+    const span = cintaElement.querySelector('span');
     if (!span) return;
 
-    if (span.scrollWidth > cinta.clientWidth) {
-        cinta.classList.add('marquee');
+    // Medimos el ancho real del texto vs el ancho visible del contenedor
+    const anchoTexto = span.scrollWidth;
+    const anchoContenedor = cintaElement.clientWidth;
+
+    console.log("Midiendo cinta:", anchoTexto, "vs", anchoContenedor); // Para que revises en la consola
+
+    if (anchoTexto > anchoContenedor) {
+        cintaElement.classList.add('marquee');
     } else {
-        cinta.classList.remove('marquee');
+        cintaElement.classList.remove('marquee');
+        // Opcional: Centrar si el texto es corto
+        cintaElement.style.justifyContent = 'center'; 
     }
 }
-
-/* 🔹 RECALCULAR CUANDO CARGA LA IMAGEN */
-const img = card.querySelector('.pedido-img');
-if (img && cinta) {
-    img.onload = () => activarMarqueeSiNecesario(cinta);
-}
-
-
-    /* ====== EDITAR REFERENCIA ====== */
-    function activarEdicionReferencia() {
-        const lineaRef = card.querySelector('.linea.ref');
-        if (!lineaRef) return;
-
-        let btnEditarRef = lineaRef.querySelector('.btn-editar-ref');
-        if (!btnEditarRef) {
-            btnEditarRef = document.createElement('button');
-            btnEditarRef.className = 'btn-editar-ref';
-            btnEditarRef.textContent = '✏️';
-            btnEditarRef.style.marginLeft = '6px';
-            lineaRef.appendChild(btnEditarRef);
-        }
-
-        const spanRef = document.createElement('span');
-        spanRef.className = 'referencia-texto';
-        spanRef.textContent = p.referencia || 'Pedido';
-
-        lineaRef.innerHTML = `🏷️ `;
-        lineaRef.appendChild(spanRef);
-        lineaRef.appendChild(btnEditarRef);
-
-        btnEditarRef.onclick = () => {
-            const textoOriginal = spanRef.textContent;
-
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = textoOriginal;
-            input.style.width = '70%';
-
-            const btnGuardar = document.createElement('button');
-            btnGuardar.textContent = '💾 Guardar';
-            btnGuardar.style.marginRight = '6px';
-
-            const btnCancelar = document.createElement('button');
-            btnCancelar.textContent = '❌ Cancelar';
-
-            const contenedorBtns = document.createElement('div');
-            contenedorBtns.style.display = 'inline-block';
-            contenedorBtns.style.marginLeft = '6px';
-            contenedorBtns.append(btnGuardar, btnCancelar);
-
-            spanRef.replaceWith(input);
-            btnEditarRef.replaceWith(contenedorBtns);
-
-            /* ====== GUARDAR ====== */
-          /* ====== GUARDAR SOLO EL TEXTO DE LA REFERENCIA ====== */
-btnGuardar.onclick = async () => {
-    const nuevaRef = input.value.trim(); // Captura lo que escribiste (ej: "Chocolates, Peluche")
-
-    try {
-        // ACTUALIZACIÓN: Solo enviamos el campo 'referencia' a Firebase
-        await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
-            .update({ 
-                referencia: nuevaRef 
-                // Eliminamos imagenUrl de aquí para que NO cambie la foto
-            });
-
-        // Actualizamos la interfaz visualmente sin recargar nada más
-        spanRef.textContent = nuevaRef;
-        lineaRef.innerHTML = `🏷️ `;
-        lineaRef.appendChild(spanRef);
-        lineaRef.appendChild(btnEditarRef);
-
-        // Volver a activar el evento del botón por si se quiere editar de nuevo
-        activarEdicionReferencia(); 
-        
-    } catch (e) {
-        console.error("Error al actualizar:", e);
-        alert('Error guardando referencia');
-    }
-};
-
-
-            /* ====== CANCELAR ====== */
-            btnCancelar.onclick = () => {
-                spanRef.textContent = textoOriginal;
-                lineaRef.innerHTML = `🏷️ `;
-                lineaRef.appendChild(spanRef);
-                lineaRef.appendChild(btnEditarRef);
-
-                activarEdicionReferencia(); // reactivar
-            };
-        };
-    }
-    activarEdicionReferencia();
-
     return card;
 }
 
