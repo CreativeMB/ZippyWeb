@@ -2014,6 +2014,7 @@ function render() {
             `;
         }
 
+        // --- VARIABLES DE CONTROL (CORREGIDAS) ---
         const eventoClickImagen = real.agotado 
             ? "" 
             : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')"`;
@@ -2021,19 +2022,21 @@ function render() {
         const estiloCursor = real.agotado ? 'cursor: default' : 'cursor: pointer';
         const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '';
         const prioridadAttr = indice < 4 ? 'fetchpriority="high"' : 'loading="lazy"';
+
         card.innerHTML = `
             <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
                 <img src="${normalizarImagen(imgUrl)}" 
-                     style="${estiloImagen}; cursor:pointer;" 
+                     style="${estiloImagen} ${estiloCursor};" 
                      ${prioridadAttr} 
                      alt="${refProd}"
-                     onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')">
+                     ${eventoClickImagen}> 
             </div>
             <div class="nombre">${real.referenciaReal || refP}</div>
             <div class="precio-contenedor">${precioHTML}</div>
             ${botonesHtml}
         `;
+        // Nota: Cambié onclick fijo por ${eventoClickImagen} y cursor:pointer por ${estiloCursor}
 
         contenedor.appendChild(card);
         indice++;
