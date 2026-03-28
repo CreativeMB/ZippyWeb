@@ -608,7 +608,7 @@ button[onclick*="whatsappDirecto"] i {
             font-size: 12px;
             color: #64748b;
             line-height: 1.3;
-            padding: 1px 3px;
+            padding: 8px 12px;
             background-color: #f1f5f9;
             border-left: 3px solid #25D366;
            margin-top: 0 !important;
@@ -1415,33 +1415,36 @@ body {
     </div>
 
     <div id="modalPedido" class="modal">
-        <div class="modal-contenido">
-         <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-    <span style="cursor:pointer; color:#e5c453; font-weight:bold;" onclick="cerrarModal()">
-        <i class="fas fa-arrow-left"></i> Volver a la tienda
-    </span>
-</div>
-
-
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                            <div class="infoProducto">
-                    <div class="aviso-privacidad" style="font-size: 10px; line-height: 1.2; color: #666;">
-                        🔒 Tus datos están protegidos y se usan exclusivamente para procesar y entregar tu pedido, conforme a la Normativa colombiana de protección de datos.
-                    </div>
-                    <div id="productoTitulo" style="font-weight:bold;"></div>
-                    <div id="productoDescripcion" style="font-size:12px; color:#666;"></div>
-                    <div id="productoPrecio" style="font-weight:bold; color:#000000; font-size:20px;"></div>
-                </div>
-            </div>
- <h3 style="margin-bottom:10px;">Resumen de tu Pedido</h3>
-        <!-- AQUÍ SE CARGARÁN TODOS LOS PRODUCTOS SELECCIONADOS -->
-        <div id="lista-carrito-form"></div>
-        
-        <!-- TOTAL SUMADO -->
-        <div class="total-pago-box">
-            Total a Pagar Sin Domicilio: <span id="total-pedido-suma">$0</span>
+       <div class="modal-contenido" style="padding: 15px;"> <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px;">
+            <h3 style="margin: 0; font-size: 16px; color: #333;">Resumen de Pedido</h3>
+            <span style="cursor:pointer; color:#e5c453; font-weight:bold; font-size: 13px;" onclick="cerrarModal()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </span>
         </div>
 
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <div class="infoProducto" style="width: 100%;">
+                <div id="productoTitulo" style="font-weight:bold; font-size: 14px;"></div>
+                <div id="productoDescripcion" style="font-size:11px; color:#888; line-height: 1.2;"></div>
+                <div id="productoPrecio" style="font-weight:bold; color:#000; font-size:18px; margin-top: 2px;"></div>
+            </div>
+        </div>
+
+        <div id="lista-carrito-form" style="margin-bottom: 10px;"></div>
+        
+        <div class="total-pago-box" style="padding: 8px; background: #f9f9f9; border-radius: 4px; font-weight: bold; font-size: 14px; text-align: right;">
+            Total: <span id="total-pedido-suma" style="color: #000; font-size: 16px;">$0</span>
+        </div>
+
+        <div style="margin-top: 15px; border-top: 1px dotted #eee; padding-top: 10px;">
+            <div class="aviso-privacidad" style="font-size: 9px; color: #999; display: flex; align-items: flex-start; gap: 5px; margin-bottom: 5px;">
+                <span>🔒</span> 
+                <span>Tus datos se usan exclusivamente para procesar tu pedido bajo la normativa colombiana.</span>
+            </div>
+            <div class="aviso-privacidad" style="font-size: 9px; color: #777; font-weight: 500;">
+                <span style="color: #27ae60;">✓</span> Disponibilidad y pago sujetos a validación previa.
+            </div>
+        </div>
 
             <div class="formulario">
                 <div class="aviso-privacidad">
