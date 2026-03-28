@@ -1984,24 +1984,29 @@ if (img && cinta) {
             btnEditarRef.replaceWith(contenedorBtns);
 
             /* ====== GUARDAR ====== */
-           btnGuardar.onclick = async () => {
-    const nuevaRef = input.value.trim();
-    const nuevaUrl = referenciasDrive[nuevaRef] || ''; // validar URL existente
+          /* ====== GUARDAR SOLO EL TEXTO DE LA REFERENCIA ====== */
+btnGuardar.onclick = async () => {
+    const nuevaRef = input.value.trim(); // Captura lo que escribiste (ej: "Chocolates, Peluche")
 
     try {
+        // ACTUALIZACIÓN: Solo enviamos el campo 'referencia' a Firebase
         await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
             .update({ 
-                referencia: nuevaRef,
-                imagenUrl: nuevaUrl // o el campo donde guardes el URL
+                referencia: nuevaRef 
+                // Eliminamos imagenUrl de aquí para que NO cambie la foto
             });
 
+        // Actualizamos la interfaz visualmente sin recargar nada más
         spanRef.textContent = nuevaRef;
         lineaRef.innerHTML = `🏷️ `;
         lineaRef.appendChild(spanRef);
         lineaRef.appendChild(btnEditarRef);
 
-        activarEdicionReferencia(); // reactivar
+        // Volver a activar el evento del botón por si se quiere editar de nuevo
+        activarEdicionReferencia(); 
+        
     } catch (e) {
+        console.error("Error al actualizar:", e);
         alert('Error guardando referencia');
     }
 };
