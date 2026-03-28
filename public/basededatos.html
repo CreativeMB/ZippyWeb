@@ -253,7 +253,7 @@ th {
 /* PARTE SUPERIOR */
 .pedido-top {
     display: flex;
-    gap: 2px;
+    gap: 10px;
     align-items: flex-start;
 }
 
@@ -295,10 +295,14 @@ th {
     font-size: 14px;
     font-weight: 600;
 }
-
 .pedido-info {
-    font-size: 14px; /* ajusta al tamaño que quieras */
-     font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Alinea el texto arriba */
+    padding-top: 2px;
+    flex: 1; /* Hace que use todo el ancho restante */
+    font-size: 14px;
+    font-weight: bold;
 }
 .pedido-info .linea,
 .pedido-info .sub-linea,
@@ -334,7 +338,7 @@ th {
     position: relative !important; 
     width: 100% !important;
     min-height: 22px !important;      /* Altura mínima garantizada */
-    background: #ff0000 !important;   /* PUESTA EN ROJO para que la encuentres */
+    background: #242424 !important;   /* PUESTA EN ROJO para que la encuentres */
     color: #fff !important;
     font-size: 11px !important;
     margin: 0 !important;
