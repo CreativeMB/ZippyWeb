@@ -236,7 +236,7 @@ th {
     padding: 5px; 
     width: 100%;
     box-sizing: border-box;
-    align-items: start; /* Permite que cada tarjeta crezca a su propio ritmo */
+    align-items: start;
 }
 
 /* ============================================================
@@ -253,61 +253,75 @@ th {
     height: auto;
 }
 
-/* PARTE SUPERIOR (FOTO + INFO) */
 .pedido-top {
     display: flex;
     gap: 10px;
-    align-items: flex-start; /* Alinea el texto al inicio de la imagen */
+    align-items: flex-start;
 }
-/* EL CONTENEDOR PADRE */
+
+/* EL CONTENEDOR PADRE (IMAGEN + CINTA) */
 .pedido-img-wrapper {
     display: flex !important;
     flex-direction: column !important; /* Mosaico arriba, Cinta abajo */
     width: 150px !important;
-    height: auto !important;          /* Suma las alturas de los hijos */
+    height: auto !important;
     position: relative !important;
-    overflow: hidden !important;       /* Recorta el radio y el marquee */
+    overflow: hidden !important; 
     background-color: #2c2c2c;
     flex-shrink: 0;
-    border-radius: 2px;
+    border-radius: 4px; /* Un poco más de radio para estética */
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* EL CONTENEDOR DEL MOSAICO (El div que viene del JS) */
+/* EL CONTENEDOR DEL MOSAICO */
 .pedido-img-wrapper > div:first-child {
-    flex: 0 0 140px !important;       /* Fuerza a que mida EXACTO 140px */
+    flex: 0 0 140px !important; 
     width: 100% !important;
-    position: relative !important;     /* Lo mantiene en su sitio */
-    display: grid !important;          /* Mantiene el grid del mosaico vivo */
+    height: 140px !important;
+    position: relative !important;
+    display: grid !important;
+    overflow: hidden;
 }
 
-/* LA CINTA (Totalmente fuera de la imagen) */
+/* LA CINTA (Debajo del mosaico) */
 .cinta-adicional {
-    flex: 0 0 22px !important;        /* Fuerza a que mida EXACTO 22px */
-    display: flex !important;
-    position: relative !important;     /* Se apila debajo del mosaico */
+    flex: 0 0 22px !important;
+    height: 22px !important;
     width: 100% !important;
     background: #242424 !important;
     color: #fff !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    justify-content: center;
+    display: flex !important;
     align-items: center;
-    z-index: 10;
+    justify-content: flex-start; /* Alineado a la izquierda para el inicio del scroll */
+    overflow: hidden; /* CRUCIAL: Recorta el texto que sobra */
+    position: relative;
+    border-top: 1px solid #3d3d3d; /* Separación visual opcional */
 }
 
-/* TEXTO DE LA CINTA */
+/* TEXTO DE LA CINTA CON ANIMACIÓN */
 .cinta-adicional span {
     font-size: 11px;
     font-weight: bold;
     white-space: nowrap;
+    display: inline-block;
+    padding-left: 100%; /* Empieza desde el borde derecho */
+    animation: moverTexto 8s linear infinite;
 }
 
+/* Pausar animación al pasar el mouse (opcional) */
+.cinta-adicional:hover span {
+    animation-play-state: paused;
+}
+
+/* ANIMACIÓN MARQUESINA */
 @keyframes moverTexto {
-    0%   { transform: translate(0, 0); }
-    100% { transform: translate(-100%, 0); }
+    0% {
+        transform: translate(0, 0);
+    }
+    100% {
+        transform: translate(-100%, 0);
+    }
 }
-
 /* ============================================================
    SECCIÓN DE TEXTO E INFORMACIÓN
    ============================================================ */
