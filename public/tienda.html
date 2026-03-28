@@ -1868,11 +1868,11 @@ window.procesarProductoDirecto = function() {
         return false;
     };
 
-   /* let intervaloBusqueda = setInterval(() => {
+   let intervaloBusqueda = setInterval(() => {
         if (ejecutarCargaMasiva()) clearInterval(intervaloBusqueda);
     }, 1500);
 
-    setTimeout(() => clearInterval(intervaloBusqueda), 12000);*/
+    setTimeout(() => clearInterval(intervaloBusqueda), 12000);
 };
 
 document.addEventListener('DOMContentLoaded', window.procesarProductoDirecto);
