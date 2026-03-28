@@ -2049,12 +2049,17 @@ function render() {
 window.render = render;
 
 // 1. WHATSAPP DIRECTO (Botón Verde de la tarjeta)
-window.whatsappDirecto = (nombre, precio) => {
+window.whatsappDirecto = (nombre, precio, descripcion) => {
     const textoPrecio = precio > 0 ? formatearPrecio(precio) : "Consultar";
+    
+    // Validamos si hay descripción, si no, ponemos un texto breve
+    const textoDescripcion = descripcion ? descripcion : "Sin detalles adicionales";
+
     const msg = `*¡Hola!* 👋 Me interesa este producto de tu tienda:\n\n` +
                 `*Producto:* ${nombre}\n` +
-                `*Precio:* ${textoPrecio}\n\n` +
-                `¿Está disponible?`;
+                `*Precio:* ${textoPrecio}\n` +
+                `*Descripción:* ${textoDescripcion}\n\n` +
+                `¿Me puedes colaborar?`;
     
     const url = `https://wa.me/${telefonoEmpresa}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
