@@ -228,22 +228,25 @@ th {
     #suggestions div:hover { background: #eee; cursor: pointer; }
     /* ================= CONTENEDOR GRID ================= */
 /* CONTENEDOR GRID */
+/* BUSCA ESTO EN TU CSS */
 #pedidosGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* más flexible para pantallas medianas */
-    gap: 10px;          /* separación visible entre tarjetas */
-    padding: 1px 0;
+    /* Cambia 280px por 350px o 380px para que sean más anchas */
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+    gap: 15px; /* Aumentamos un poco el espacio entre tarjetas */
+    padding: 10px;
     width: 100%;
-    max-width: 100%;
     box-sizing: border-box;
 }
-/* TARJETAS */
+
+/* OPCIONAL: Dale un poco más de aire interno a la tarjeta */
 .pedido-card {
     border-radius: 14px;
-    padding: 10px;  /* espacio interno reducido a 2px */
+    padding: 15px; /* Subimos de 10px a 15px */
     display: flex;
     flex-direction: column;
-    gap: 2px;      /* espacio entre elementos internos */
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 /* PARTE SUPERIOR */
