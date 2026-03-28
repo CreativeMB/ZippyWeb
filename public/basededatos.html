@@ -1714,18 +1714,17 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     card.innerHTML = `
         <div class="pedido-top">
         <div class="pedido-img-wrapper">
-    <img class="pedido-img"
-         src="${generarMosaicoHTML(p)}"
-         loading="lazy">
+            <!-- Llamamos a la función directamente aquí sin etiquetas <img> extras -->
+            ${generarMosaicoHTML(p)}
 
-    ${
-        p.adicional && p.adicional.trim() !== ''
-        ? `<div class="cinta-adicional">
-                <span>${p.adicional}</span>
-           </div>`
-        : ''
-    }
-</div>
+            ${
+                p.adicional && p.adicional.trim() !== ''
+                ? `<div class="cinta-adicional">
+                        <span>${p.adicional}</span>
+                   </div>`
+                : ''
+            }
+        </div>
             <div class="pedido-info">
 
                 <div class="linea ref">🏷️ ${p.referencia || 'Pedido'}</div>
