@@ -275,43 +275,43 @@ th {
     gap: 2px;
     margin-top: 2px; /* margen entre top y bottom */
 }
-/* EL CONTENEDOR (Wrapper) */
+/* 1. El contenedor que guarda la foto y la cinta */
+/* EL CONTENEDOR PADRE */
 .pedido-img-wrapper {
     display: flex !important;
-    flex-direction: column !important; /* Fuerza orden vertical */
+    flex-direction: column !important; /* Mosaico arriba, cinta abajo */
     width: 115px !important;
-    height: auto !important;          /* Deja que crezca hacia abajo */
+    height: auto !important;          /* CLAVE: Que crezca para que quepa la cinta */
     position: relative !important;
-    overflow: hidden !important;
+    overflow: hidden;
     flex-shrink: 0;
-    background: #000;
     border-radius: 4px;
+    background: #000;
 }
 
-/* EL MOSAICO (Imagen) */
-.pedido-img-wrapper > div:first-child, 
-.pedido-img-wrapper > img:first-child {
-    display: block !important;
-    width: 100% !important;
-    height: 140px !important; /* Altura fija para que la cinta quepa abajo */
-    position: relative !important; /* IMPORTANTE: No puede ser absolute */
-    top: 0 !important;
-}
-
-/* LA CINTA (Debajo) */
+/* LA CINTA (Debajo del mosaico) */
 .cinta-adicional {
+    position: relative !important;    /* Cambiado de absolute a relative */
     display: flex !important;
-    position: static !important;  /* STATIC elimina cualquier "vuelo" sobre la foto */
     width: 100% !important;
-    height: 22px !important;      /* Altura fija para la cinta */
-    background: #000 !important;
+    height: auto !important;          /* Que se ajuste al texto */
+    min-height: 20px;
+    background: rgba(0, 0, 0, 0.9) !important;
     color: #fff !important;
     font-size: 11px !important;
-    margin: 0 !important;
-    padding: 2px 0 !important;
+    padding: 4px 0 !important;
+    margin: 0 !important;             /* Sin márgenes que la muevan */
     justify-content: center;
     align-items: center;
-    z-index: 10;
+    z-index: 2;                       /* Por encima del fondo pero debajo de alertas */
+    order: 2;                         /* Fuerza que sea el segundo elemento */
+}
+
+/* EL MOSAICO (Forzamos que sea el primer elemento) */
+.pedido-img-wrapper > div:first-child {
+    order: 1;                         /* Fuerza que sea el primero */
+    width: 100% !important;
+    height: 140px !important;         /* Mantiene el tamaño del mosaico */
 }
 
 /* 3. El texto dentro de la cinta */
@@ -1712,6 +1712,7 @@ function generarMosaicoHTML(p) {
         height: 140px; 
         background: #000;
         position: relative;
+        z-index: 1;
     `;
 
     let html = `<div style="${gridStyle}">`;
