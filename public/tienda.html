@@ -1722,20 +1722,23 @@ window.procesarProductoDirecto = function() {
     const productosParam = urlParams.get('producto'); 
     if (!productosParam) return;
 
-    // 1. Convertir "A015:2,A016:1" en un Array ['A015:2', 'A016:1']
+    // 1. Dividir por comas: "A015:2,A016" -> ['A015:2', 'A016']
     const itemsABuscar = productosParam.split(',');
 
     const ejecutarCargaMasiva = () => {
-        if (!window.productosJson || Object.keys(window.productosJson).length === 0) return false;
+        // VERIFICACIÓN CRÍTICA: ¿Están listos los datos y el array del carrito?
+        if (!window.productosJson || !window.productosRealtime || typeof carrito === 'undefined') {
+            console.log("⏳ Esperando que el sistema y el carrito estén listos...");
+            return false; 
+        }
 
         let totalEncontrados = 0;
         const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
         itemsABuscar.forEach(itemRaw => {
-            // 2. SEPARAR CÓDIGO DE CANTIDAD (Ejemplo A015:2 -> ref: A015, cant: 2)
             const partes = itemRaw.split(':');
             const refBusqueda = partes[0];
-            const cantidadURL = partes[1] ? parseInt(partes[1]) : 1; // Si no hay ":", por defecto es 1
+            const cantidadURL = partes[1] ? parseInt(partes[1]) : 1;
 
             const buscadoOriginal = decodeURIComponent(refBusqueda).trim().toLowerCase();
             const buscadoADN = buscarLimpio(buscadoOriginal).replace(/[^a-z0-9]/g, "");
@@ -1744,7 +1747,6 @@ window.procesarProductoDirecto = function() {
 
             const listaRefs = Object.keys(window.productosJson).filter(ref => ref !== "images");
 
-            // Buscar coincidencia en el JSON
             let mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
             if (!mejorMatch) {
                 mejorMatch = listaRefs.find(ref => {
@@ -1753,25 +1755,25 @@ window.procesarProductoDirecto = function() {
                 });
             }
 
-            // 3. Si existe, agregarlo con la cantidad indicada
             if (mejorMatch && window.productosRealtime[mejorMatch.trim().toLowerCase()]) {
                 const real = window.productosRealtime[mejorMatch.trim().toLowerCase()];
                 const imgOriginal = window.productosJson[mejorMatch];
 
                 let nombre = real.referenciaReal || mejorMatch;
                 let precio = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
-                let imagen = normalizarImagen(imgOriginal);
+                let imagen = imgOriginal;
                 let desc = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
+                // INSERTAR DIRECTO AL ARRAY DEL CARRITO
                 const existe = carrito.find(item => item.nombre === nombre);
                 if (existe) {
-                    existe.cantidad += cantidadURL; // Suma la cantidad de la URL
+                    existe.cantidad += cantidadURL;
                 } else {
                     carrito.push({ 
                         nombre, 
                         imagen, 
                         precio, 
-                        cantidad: cantidadURL, // Usa la cantidad de la URL
+                        cantidad: cantidadURL, 
                         descripcion: desc 
                     });
                 }
@@ -1780,20 +1782,35 @@ window.procesarProductoDirecto = function() {
         });
 
         if (totalEncontrados > 0) {
-            window.actualizarBadgeCarrito();
+            // Actualizar el número del icono del carrito
+            if (typeof window.actualizarBadgeCarrito === 'function') window.actualizarBadgeCarrito();
+            
+            // Forzar apertura del formulario de pedido
             setTimeout(() => {
-                window.abrirPestañaProducto("", "", 0, ""); 
+                if (typeof window.abrirPestañaProducto === 'function') {
+                    // Abrimos vacío para que solo muestre lo que ya metimos arriba
+                    window.abrirPestañaProducto("", "", 0, ""); 
+                }
+                // Limpiar URL
                 window.history.replaceState({}, document.title, window.location.pathname);
-            }, 1000);
+            }, 1500);
             return true;
         }
         return false;
     };
 
-    if (!ejecutarCargaMasiva()) {
-        setTimeout(ejecutarCargaMasiva, 3000);
-    }
+    // Intentar cada 2 segundos hasta que funcione (máximo 5 intentos)
+    let intentos = 0;
+    const intervalo = setInterval(() => {
+        intentos++;
+        if (ejecutarCargaMasiva() || intentos > 5) {
+            clearInterval(intervalo);
+        }
+    }, 2000);
 };
+
+// LLAMADA AUTOMÁTICA AL CARGAR LA PÁGINA
+window.addEventListener('load', window.procesarProductoDirecto);
 
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
 function configurarRedesNav(perfil) {
