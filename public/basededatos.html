@@ -352,15 +352,37 @@ th {
     display: inline-block;
 }
 
-/* 🔹 LA ANIMACIÓN (MARQUEE) */
+.pedido-img-wrapper {
+    position: relative;
+    /* Tamaño fijo para que todos sean iguales */
+    width: 150px !important;  
+    height: 200px !important; 
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative !important;
+    overflow: visible !important;
+    background-color: #2c2c2c; /* Fondo oscuro por si la imagen tarda en cargar */
+    flex-shrink: 0; /* Evita que el texto de la derecha lo aplaste */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.pedido-img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill; /* Estira la imagen para llenar el 3/4 */
+}
+
+
+/* 🔹 ANIMACIÓN */
 @keyframes moverTexto {
-    0% {
-        transform: translate(0, 0);
+    from {
+        transform: translateX(0);
     }
-    100% {
-        transform: translate(-100%, 0);
+    to {
+        transform: translateX(-100%);
     }
 }
+
 
 /* RESPONSIVE */
 @media (max-width: 600px) {
@@ -728,36 +750,7 @@ th {
     cursor: pointer;
     font-size: 14px;
 }
-.pedido-img-wrapper {
-    position: relative;
-    /* Tamaño fijo para que todos sean iguales */
-    width: 150px !important;  
-    height: 200px !important; 
-    border-radius: 2px;
-    overflow: hidden;
-    position: relative !important;
-    overflow: visible !important;
-    background-color: #2c2c2c; /* Fondo oscuro por si la imagen tarda en cargar */
-    flex-shrink: 0; /* Evita que el texto de la derecha lo aplaste */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
 
-.pedido-img {
-    width: 100%;
-    height: 100%;
-    object-fit: fill; /* Estira la imagen para llenar el 3/4 */
-}
-
-
-/* 🔹 ANIMACIÓN */
-@keyframes moverTexto {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(-100%);
-    }
-}
 
 </style>
 </head>
