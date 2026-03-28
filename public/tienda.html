@@ -2006,12 +2006,11 @@ function render() {
                             style="flex: 1; margin: 0; background: #E5C453; color: #000; font-size: 11px; padding: 8px;">
                         <i class="fas fa-cart-plus"></i>
                     </button>
-                    <!-- BOTÓN VERDE: WhatsApp Directo (Sin formulario) -->
-                    <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}')" 
-                            style="flex: 1; margin: 0; background: #25D366; font-size: 11px; padding: 8px;">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
-                    </button>
-                </div>
+                    <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" 
+                    style="flex: 1; margin: 0; background: #25D366; font-size: 11px; padding: 8px;">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </button>
+        </div>
             `;
         }
 
