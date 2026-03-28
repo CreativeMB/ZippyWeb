@@ -1445,59 +1445,80 @@ async function cargarReferenciasDesdeFirebase() {
     }
 }
 // --- AUTO ASIGNAR IMAGEN DESDE REFERENCIA ---
-
 async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
 
-    // 1️⃣ Si ya tiene imagen en cualquier propiedad → no tocar
-    if ((pedido.imagenUrl && pedido.imagenUrl.trim() !== '') || (pedido.imagen && pedido.imagen.trim() !== '')) {
-        return false; // nada cambió
+    // 1️⃣ Si ya tiene imagen (aunque sea una o varias) → no tocar
+    if (pedido.imagenUrl && pedido.imagenUrl.trim() !== '') {
+        return false; 
     }
 
     // 2️⃣ Si no hay referencia → no hacer nada
     if (!pedido.referencia) return false;
 
-    const urlImagen = referenciasDrive[pedido.referencia];
-    if (!urlImagen) return false;
+    // --- NUEVA LÓGICA PARA PROCESAR MULTI-REFERENCIAS ---
+    
+    // Separamos los productos (ej: "Rosas 2, Girasoles 1" -> ["Rosas 2", "Girasoles 1"])
+    const partesReferencia = pedido.referencia.split(',').map(item => item.trim()).filter(item => item !== "");
+    let urlsEncontradas = [];
 
-    // 3️⃣ Solo actualizar si realmente no tiene imagen en Firebase
+    partesReferencia.forEach(item => {
+        // Limpiamos la cantidad para buscar en el JSON (ej: "Rosas 2" -> "Rosas")
+        // Esta regex quita el espacio y el número al final
+        const nombreProducto = item.replace(/\s+\d+$/, '').trim();
+        
+        const url = referenciasDrive[nombreProducto];
+        if (url) {
+            urlsEncontradas.push(url);
+        }
+    });
+
+    // Si no encontramos ninguna imagen para ninguno de los productos, salimos
+    if (urlsEncontradas.length === 0) return false;
+
+    // Unimos las URLs encontradas con comas para crear el mosaico
+    const mosaicoUrls = urlsEncontradas.join(', ');
+
+    // 3️⃣ Solo actualizar si realmente no tiene imagen en Firebase (Seguridad)
     try {
         const snapshot = await db.ref(`${idEmpresa}/Pedidos/${idDomi}/${idPedido}/imagenUrl`).get();
         if (snapshot.exists() && snapshot.val().trim() !== '') {
-            // Ya tiene imagen en Firebase, solo asignamos en memoria
+            // Si ya apareció una en Firebase, la cargamos a memoria y no hacemos nada más
             pedido.imagenUrl = snapshot.val();
             return false;
         }
 
-        // 4️⃣ Asignar directamente en memoria
-        pedido.imagenUrl = urlImagen;
+        // 4️⃣ Asignar el mosaico de URLs directamente en memoria
+        pedido.imagenUrl = mosaicoUrls;
 
-        // 5️⃣ Actualizar Firebase
+        // 5️⃣ Actualizar Firebase con el string de URLs separadas por comas
         await db
             .ref(`${idEmpresa}/Pedidos/${idDomi}/${idPedido}`)
             .update({
-                imagenUrl: urlImagen,
+                imagenUrl: mosaicoUrls,
                 imagenAuto: true
             });
 
-        console.log(`🖼️ Imagen asignada automáticamente → ${pedido.referencia}`);
-        return true; // hubo cambio
+        console.log(`🧩 Mosaico asignado automáticamente (${urlsEncontradas.length} fotos) → ${pedido.referencia}`);
+        return true; 
 
     } catch (e) {
-        console.error('❌ Error asignando imagen', e);
+        console.error('❌ Error asignando mosaico de imágenes', e);
         return false;
     }
 }
-
 
 // --- OBTENER IMAGEN PARA MOSTRAR ---
 function obtenerImagenPedido(p){
     let url = '';
 
+    // 1. Prioridad: imagenUrl (Ahora puede tener varias URLs separadas por coma)
     if(p.imagenUrl && p.imagenUrl.trim() !== ''){
-        url = p.imagenUrl;
+        // Convertimos el string en lista y tomamos solo la primera URL
+        // Usamos trim() por si hay espacios después de la coma
+        url = p.imagenUrl.split(',')[0].trim();
     } 
+    // 2. Si no hay imagenUrl, buscamos por referencia en el JSON (Respaldo)
     else if(p.referencia){
-        // Buscamos la referencia ignorando mayúsculas/minúsculas
         const refLimpia = p.referencia.trim().toLowerCase();
         
         // Buscamos en las llaves del JSON que cargamos
@@ -1508,10 +1529,15 @@ function obtenerImagenPedido(p){
         }
     }
     
-    // ... (el resto de tu lógica de normalización de Drive se queda igual)
+    // Si al final no se encontró ninguna URL, devolvemos vacío
+    if (!url) return '';
+
+    // 3. Lógica de normalización de Drive (Para que la imagen sea visible en el panel)
     if(url.includes('drive.google.com')){
         const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-        if(match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+        if(match && match[1]) {
+            return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+        }
     }
 
     return url;
@@ -1601,9 +1627,18 @@ function cargarPedidosRealtime() {
         });
     });
 }
-function normalizarImagen(url){
-    if(!url) return '';
-    return url; // nada más
+function normalizarImagen(url) {
+    if (!url) return '';
+    let link = url.trim();
+
+    // Si el link es de Drive, lo convertimos a formato miniatura (thumbnail) para que se vea en la web
+    if (link.includes('drive.google.com')) {
+        const match = link.match(/\/d\/([a-zA-Z0-9_-]+)/) || link.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+            return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+        }
+    }
+    return link;
 }
 
 function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
