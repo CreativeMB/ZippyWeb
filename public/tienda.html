@@ -1717,75 +1717,86 @@ function iniciarCargaBase(slugDesdeURL) {
     });
 }
 
-function procesarProductoDirecto() {
+function procesarProductosMultiples() {
     const urlParams = new URLSearchParams(window.location.search);
-    const productoUrl = urlParams.get('producto'); 
-    if (!productoUrl) return;
+    const productosUrl = urlParams.get('productos') || urlParams.get('producto'); // Acepta ambos
+    if (!productosUrl) return;
 
-    // 1. NORMALIZACIÓN TOTAL
+    // 1. Convertir la cadena en un Array (Separa por comas)
+    const listaNombres = productosUrl.split(',');
+
+    // Función de limpieza para el "ADN"
     const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-    
-    const buscadoOriginal = decodeURIComponent(productoUrl).trim().toLowerCase();
-    const buscadoADN = buscarLimpio(buscadoOriginal).replace(/[^a-z0-9]/g, "");
 
-    if (buscadoADN.length < 2) return;
+    const ejecutarCargaMasiva = () => {
+        if (!productosJson || Object.keys(productosJson).length === 0) return false;
 
-    const ejecutarBusqueda = () => {
-        let mejorMatch = null;
-        if (!productosJson) return false; // Seguridad si el JSON no carga
-        
-        const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
+        let productosEncontrados = 0;
 
-        // Intentar match exacto primero
-        mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
+        listaNombres.forEach(nombreBusqueda => {
+            const buscadoOriginal = decodeURIComponent(nombreBusqueda).trim().toLowerCase();
+            const buscadoADN = buscarLimpio(buscadoOriginal).replace(/[^a-z0-9]/g, "");
 
-        // Si no hay exacto, usar el ADN
-        if (!mejorMatch) {
-            mejorMatch = listaRefs.find(ref => {
-                const refADN = buscarLimpio(ref).replace(/[^a-z0-9]/g, "");
-                if (buscadoADN.length <= 3) return refADN === buscadoADN;
-                return refADN.includes(buscadoADN) || buscadoADN.includes(refADN);
-            });
-        }
+            if (buscadoADN.length < 2) return;
 
-        // 2. VERIFICACIÓN, AGREGAR AL CARRITO Y ABRIR
-        if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
-            const real = productosRealtime[mejorMatch.trim().toLowerCase()];
-            const imgOriginal = productosJson[mejorMatch];
+            const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
 
-            // TIEMPO DE SEGURIDAD: Para asegurar que Firebase y el DOM estén listos
-            setTimeout(() => {
-                // Extraer datos limpios
+            // Buscar el mejor match para este producto específico
+            let mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
+            
+            if (!mejorMatch) {
+                mejorMatch = listaRefs.find(ref => {
+                    const refADN = buscarLimpio(ref).replace(/[^a-z0-9]/g, "");
+                    return refADN.includes(buscadoADN) || buscadoADN.includes(refADN);
+                });
+            }
+
+            // Si lo encuentra, lo añade al carrito
+            if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
+                const real = productosRealtime[mejorMatch.trim().toLowerCase()];
+                const imgOriginal = productosJson[mejorMatch];
+
                 let nombre = real.referenciaReal || mejorMatch;
                 let precio = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
                 let imagen = normalizarImagen(imgOriginal);
                 let desc = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
-                // ACCIÓN 1: Agregar al carrito directamente
                 if (typeof window.agregarAlCarrito === 'function') {
-                    window.agregarAlCarrito(nombre, imagen, precio, desc);
+                    // Añadimos al carrito (sin el mensaje de SweetAlert para no saturar si son muchos)
+                    // Nota: Si tu función agregarAlCarrito tiene el Swal dentro, podrías crear una versión "silenciosa"
+                    window.agregarAlCarritoSilencioso(nombre, imagen, precio, desc);
+                    productosEncontrados++;
                 }
+            }
+        });
 
-                // ACCIÓN 2: Abrir la pestaña de pedido (Formulario)
-                if (typeof window.abrirPestañaProducto === 'function') {
-                    window.abrirPestañaProducto(nombre, imagen, precio, desc);
-                }
-
-                // Limpiar URL para evitar que se agregue el mismo producto al recargar
+        // 2. Después de procesar todos, abrimos el formulario si encontramos algo
+        if (productosEncontrados > 0) {
+            setTimeout(() => {
+                window.abrirPestañaProducto("", "", 0, ""); // Abre el resumen con lo que haya
                 window.history.replaceState({}, document.title, window.location.pathname);
-                
-            }, 2200);
-            return true; 
+            }, 500);
+            return true;
         }
-        return false; 
+        return false;
     };
 
-    // ESTRATEGIA DE RE-INTENTO
-    if (!ejecutarBusqueda()) {
-        console.log("⏳ Esperando datos de Firebase para procesar URL...");
-        setTimeout(ejecutarBusqueda, 3000);
+    // Re-intento si Firebase no está listo
+    if (!ejecutarCargaMasiva()) {
+        setTimeout(ejecutarCargaMasiva, 3000);
     }
 }
+
+// Función auxiliar para agregar sin mostrar alertas por cada producto
+window.agregarAlCarritoSilencioso = (nombre, imagen, precio, descripcion) => {
+    const existe = carrito.find(item => item.nombre === nombre);
+    if (existe) {
+        existe.cantidad++;
+    } else {
+        carrito.push({ nombre, imagen, precio, cantidad: 1, descripcion });
+    }
+    window.actualizarBadgeCarrito();
+};
 
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
 function configurarRedesNav(perfil) {
