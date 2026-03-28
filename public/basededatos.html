@@ -227,16 +227,19 @@ th {
     }
     #suggestions div:hover { background: #eee; cursor: pointer; }
     /* ================= CONTENEDOR GRID ================= */
-/* CONTENEDOR GRID */
-/* BUSCA ESTO EN TU CSS */
+/* CONTENEDOR GRID pedidos */
+
 #pedidosGrid {
     display: grid;
-    /* Cambia 280px por 350px o 380px para que sean más anchas */
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-    gap: 10px; /* Aumentamos un poco el espacio entre tarjetas */
-    padding: 10px;
+    /* auto-fill con un ancho fijo (ej. 350px) hace que todas midan lo mismo */
+    /* Si sobra espacio, el grid centrará o dejará el hueco al final */
+    grid-template-columns: repeat(auto-fill, 350px); 
+    gap: 15px; 
+    padding: 15px;
     width: 100%;
+    justify-content: center; /* Centra las tarjetas en pantallas grandes */
     box-sizing: border-box;
+    align-items: start; /* CRUCIAL: Evita que las tarjetas se estiren para igualar a la más alta */
 }
 
 /* OPCIONAL: Dale un poco más de aire interno a la tarjeta */
