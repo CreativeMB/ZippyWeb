@@ -229,17 +229,17 @@ th {
     /* ================= CONTENEDOR GRID ================= */
 /* CONTENEDOR GRID pedidos */
 
+/* CONTENEDOR GRID pedidos */
 #pedidosGrid {
     display: grid;
-    /* auto-fill con un ancho fijo (ej. 350px) hace que todas midan lo mismo */
-    /* Si sobra espacio, el grid centrará o dejará el hueco al final */
-    grid-template-columns: repeat(auto-fill, 350px); 
-    gap: 15px; 
-    padding: 5px;
+    /* minmax(300px, 1fr) hace que las tarjetas midan MÍNIMO 300px, 
+       pero si sobra espacio, se estiran (1fr) para llenar todo el ancho */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 10px; 
+    padding: 5px; /* Margen mínimo en los bordes de la pantalla */
     width: 100%;
-    justify-content: center; /* Centra las tarjetas en pantallas grandes */
     box-sizing: border-box;
-    align-items: start; /* CRUCIAL: Evita que las tarjetas se estiren para igualar a la más alta */
+    align-items: start; /* Crecimiento individual hacia abajo */
 }
 
 /* OPCIONAL: Dale un poco más de aire interno a la tarjeta */
@@ -329,6 +329,34 @@ th {
     width: 12px;
     height: 12px;
     border-radius: 50%;
+}
+/* ===== CINTA ADICIONAL ===== */
+.cinta-adicional {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 8px;
+
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* 🔹 TEXTO NORMAL (quieto) */
+.cinta-adicional span {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* 🔹 SOLO SI NO CABE → MARQUEE */
+.cinta-adicional.marquee span {
+    padding-left: 100%;
+    animation: moverTexto 8s linear infinite;
+    will-change: transform;
 }
 
 /* RESPONSIVE */
@@ -715,34 +743,6 @@ th {
     object-fit: fill; /* Estira la imagen para llenar el 3/4 */
 }
 
-/* ===== CINTA ADICIONAL ===== */
-.cinta-adicional {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    background: rgba(0,0,0,0.75);
-    color: #fff;
-    font-size: 12px;
-    padding: 6px 8px;
-
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-/* 🔹 TEXTO NORMAL (quieto) */
-.cinta-adicional span {
-    display: inline-block;
-    white-space: nowrap;
-}
-
-/* 🔹 SOLO SI NO CABE → MARQUEE */
-.cinta-adicional.marquee span {
-    padding-left: 100%;
-    animation: moverTexto 8s linear infinite;
-    will-change: transform;
-}
 
 /* 🔹 ANIMACIÓN */
 @keyframes moverTexto {
