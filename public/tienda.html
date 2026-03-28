@@ -1415,36 +1415,41 @@ body {
     </div>
 
     <div id="modalPedido" class="modal">
-      <div class="modal-contenido" style="padding: 15px; max-width: 500px; margin: auto;">
+    <div class="modal-contenido" style="padding: 25px; max-width: 600px; width: 95%; margin: 20px auto; border-radius: 12px; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.15); background: #ffffff;">
         
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-            <h3 style="margin: 0; font-size: 17px; color: #333;">Resumen de tu Pedido</h3>
-            <span style="cursor:pointer; color:#e5c453; font-weight:bold; font-size: 13px;" onclick="cerrarModal()">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; border-bottom: 2px solid #f8f8f8; padding-bottom: 12px;">
+            <h3 style="margin: 0; font-size: 20px; color: #1a1a1a; letter-spacing: -0.5px;">Resumen de tu Pedido</h3>
+            <span style="cursor:pointer; color:#e5c453; font-weight:600; font-size: 13px; transition: 0.3s;" onclick="cerrarModal()" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                 <i class="fas fa-arrow-left"></i> Volver a la tienda
             </span>
         </div>
 
-        <div style="display:flex; gap:12px; margin-bottom:12px; align-items: center;">
-            <div class="infoProducto">
-                <div id="productoTitulo" style="font-weight:bold; font-size: 15px;"></div>
-                <div id="productoDescripcion" style="font-size:12px; color:#666; margin-top: 2px;"></div>
-                <div id="productoPrecio" style="font-weight:bold; color:#000; font-size:18px;"></div>
-            </div>
-        </div>
-
-        <div id="lista-carrito-form" style="margin-bottom: 8px;"></div>
+        <div id="lista-carrito-form" style="margin-bottom: 15px;"></div>
         
-        <div class="total-pago-box" style="background: #fdfdfd; border: 1px solid #eee; padding: 10px; border-radius: 6px; text-align: right; font-weight: bold; margin-bottom: 15px;">
-            Total a Pagar Sin Domicilio: <span id="total-pedido-suma" style="font-size: 18px; color: #27ae60;">$0</span>
+        <div style="background: #fcfcfc; border: 1px solid #f0f0f0; padding: 15px; border-radius: 8px; text-align: right; margin-bottom: 20px;">
+            <span style="font-size: 13px; color: #666; font-weight: 500;">Total a Pagar Sin Domicilio</span>
+            <div id="total-pedido-suma" style="font-size: 24px; color: #27ae60; font-weight: 800; margin-top: 5px;">$0</div>
         </div>
 
-        <div style="background-color: #f8f9fa; border-left: 4px solid #e5c453; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
-            <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
-                <span style="font-size: 16px;">🔒</span>
-                <p style="margin: 0; font-size: 11px; line-height: 1.4; color: #444;">
-                    <strong>Privacidad:</strong> Tus datos están protegidos y se usan exclusivamente para procesar y entregar tu pedido, conforme a la Normativa colombiana de protección de datos.
+        <div style="background: linear-gradient(145deg, #f8f9fa, #ffffff); border: 1px solid #e9ecef; border-left: 5px solid #e5c453; padding: 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 25px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px;">
+                <div style="background: #fff; padding: 6px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0;">
+                    <span style="font-size: 16px;">🔒</span>
+                </div>
+                <p style="margin: 0; font-size: 11.5px; line-height: 1.5; color: #444;">
+                    <strong style="color: #1a1a1a;">Garantía de Privacidad:</strong> Sus datos personales están protegidos bajo cifrado de seguridad y se procesan exclusivamente para la logística de su pedido, cumpliendo estrictamente con la <strong>Ley 1581 de Protección de Datos (Habeas Data)</strong>.
                 </p>
             </div>
+            
+            <div style="display: flex; align-items: center; gap: 12px; border-top: 1px solid #eee; padding-top: 10px; margin-top: 5px;">
+                <div style="background: #fff; padding: 6px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0;">
+                    <span style="color: #27ae60; font-size: 14px;">✓</span>
+                </div>
+                <p style="margin: 0; font-size: 11.5px; color: #444; font-weight: 600;">
+                    Pedido sujeto a validación previa de disponibilidad y medios de pago.
+                </p>
+            </div>
+        </div>
            
             <div class="formulario">
                 <div class="aviso-privacidad">
