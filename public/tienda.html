@@ -613,68 +613,116 @@ button[onclick*="whatsappDirecto"] i {
 /* ========================================= */
 /* --- 1. BARRA PRINCIPAL (NAV) --- */
 /* ========================================= */
-/* ========================================= */
-/* --- BARRA NAVEGACIÓN EXPANDIBLE DINÁMICA --- */
-/* ========================================= */
+.tabs-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1a1a1a;
+    border-bottom: 2px solid #E5C453;
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    padding: 0 15px;
+    height: 75px; /* Barra más alta para dar aire al buscador */
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
 
-@media screen and (max-width: 767px) {
-    .tabs-container {
-        padding: 0 10px;
-        gap: 5px; /* Espacio reducido entre elementos */
-        justify-content: space-between;
-    }
+/* --- 2. GRUPO DE PESTAÑAS (IZQUIERDA) --- */
+.tabs-left {
+    display: flex;
+    flex: 0 0 auto;
+    height: 100%;
+}
 
-    /* 1. ESTADO INICIAL DEL BUSCADOR (Compacto) */
-    .search-nav-container {
-        flex: 0 0 45px; /* Empieza midiendo solo 45px */
-        max-width: 45px; 
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        margin: 0 5px;
-    }
+.tab-item {
+    padding: 0 20px;
+    color: #ffffff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 14px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 100%;
+}
 
-    .search-input-nav {
-        padding: 0 0 0 35px !important; /* Sin espacio para texto al inicio */
-        font-size: 14px !important;
-        border-radius: 20px !important;
-    }
+.tab-item i {
+    font-size: 18px;
+}
 
-    /* 2. EXPANSIÓN AL TOCAR (Moderada) */
-    /* Se expande pero permite que redes y pestañas respiren */
-    .search-nav-container:focus-within {
-        flex: 1 1 auto; 
-        max-width: 180px; /* Expansión controlada para no tapar todo */
-    }
+.tab-item.active {
+    background: #E5C453;
+    color: #000;
+}
 
-    .search-input-nav:focus {
-        padding: 0 10px 0 35px !important;
-        background: #333;
-    }
+/* --- 3. BUSCADOR INTEGRADO (CENTRO) --- */
+.search-nav-container {
+    position: relative;
+    flex: 1 1 auto; /* Elástico: se acomoda al espacio disponible */
+    max-width: 500px;
+    margin: 0 15px;
+    height: 50px; /* Altura grande para el buscador */
+    display: flex;
+    align-items: center;
+}
 
-    /* 3. COMPACTAR PESTAÑAS (Solo iconos + IDs respetados) */
-    /* Cuando el buscador está activo, ocultamos el texto de las pestañas */
-    .tabs-container:focus-within .tab-item span {
-        display: none !important;
-    }
+.search-input-nav {
+    width: 100%;
+    height: 100%; /* Ocupa todo el alto del contenedor */
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 0 15px 0 45px;
+    color: white;
+    font-size: 18px; /* Texto grande y legible */
+    box-sizing: border-box;
+    outline: none;
+    transition: 0.3s;
+}
 
-    .tab-item {
-        padding: 0 10px !important;
-        min-width: 40px;
-    }
+.search-input-nav:focus {
+    border-color: #E5C453;
+    background: #333;
+    box-shadow: 0 0 10px rgba(229, 196, 83, 0.2);
+}
 
-    /* 4. REDES SOCIALES (Siempre visibles) */
-    .redes-nav {
-        gap: 6px !important;
-        flex: 0 0 auto;
-    }
+.search-icon-nav {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #E5C453; /* Lupa dorada */
+    font-size: 18px;
+}
 
-    .icono-nav {
-        width: 32px !important;
-        height: 32px !important;
-    }
+/* --- 4. REDES SOCIALES (DERECHA) --- */
+.redes-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+}
 
-    .icono-nav i {
-        font-size: 14px !important;
-    }
+.icono-nav {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.icono-nav i {
+    font-size: 18px;
+    color: white;
 }
 
 .icono-nav.facebook:hover { background: #1877F2; border-color: #1877F2; transform: translateY(-2px); }
