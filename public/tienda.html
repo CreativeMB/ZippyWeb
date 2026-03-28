@@ -1719,44 +1719,48 @@ function iniciarCargaBase(slugDesdeURL) {
 window.procesarProductoDirecto = function() {
     const urlParams = new URLSearchParams(window.location.search);
     const productosParam = urlParams.get('producto'); 
-    if (!productosParam) return;
+    
+    if (!productosParam) {
+        console.log("%cℹ️ URL limpia: No hay parámetros de producto.", "color: #E5C453; font-weight: bold;");
+        return;
+    }
 
-    // 1. Separar por comas para manejar múltiples productos
+    console.log("%c🚀 Iniciando procesador de URL...", "color: #25D366; font-weight: bold;");
+    console.log("📥 Recibido en URL:", productosParam);
+
     const itemsRaw = productosParam.split(',');
 
     const ejecutarCargaMasiva = () => {
-        // Verificación de disponibilidad de datos y variable global carrito
+        // Verificación de datos
         if (!window.productosJson || !window.productosRealtime || typeof carrito === 'undefined') {
+            console.warn("⏳ Datos no listos aún (Firebase o Carrito)... reintentando.");
             return false; 
         }
 
         let totalEncontrados = 0;
-        const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300._-]/g, "").toLowerCase().trim();
+        const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
-        itemsRaw.forEach(itemRaw => {
-            // LIMPIEZA INICIAL: Quitar espacios accidentales de la URL
+        itemsRaw.forEach((itemRaw, index) => {
+            console.group(`📦 Procesando Item ${index + 1}`);
+            
             const bloque = itemRaw.trim();
-            if (!bloque) return;
-
-            // MANEJO DE CANTIDADES (A015:2)
             const partes = bloque.split(':');
-            const busquedaQuery = partes[0].trim(); // El código o nombre
+            const busquedaQuery = partes[0].trim();
             const cantidadURL = partes[1] ? parseInt(partes[1]) : 1;
             const cantidadFinal = isNaN(cantidadURL) ? 1 : cantidadURL;
 
-            // NORMALIZACIÓN PARA BÚSQUEDA (ADN)
+            console.log("🔍 Buscando:", busquedaQuery);
+            console.log("🔢 Cantidad detectada:", cantidadFinal);
+
             const buscadoOriginal = decodeURIComponent(busquedaQuery).toLowerCase();
             const buscadoADN = buscarLimpio(buscadoOriginal).replace(/[^a-z0-9]/g, "");
 
-            if (buscadoADN.length < 2) return;
-
             const listaRefs = Object.keys(window.productosJson).filter(ref => ref !== "images");
 
-            // ESTRATEGIA DE MATCH
-            // Caso A: Match Exacto (Ideal para códigos como A015)
+            // 1. INTENTO EXACTO
             let mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
             
-            // Caso B: Match por ADN (Ideal para nombres largos como "estuche detalle...")
+            // 2. INTENTO ADN
             if (!mejorMatch) {
                 mejorMatch = listaRefs.find(ref => {
                     const refADN = buscarLimpio(ref).replace(/[^a-z0-9]/g, "");
@@ -1764,42 +1768,44 @@ window.procesarProductoDirecto = function() {
                 });
             }
 
-            // PROCESAR E INSERTAR AL CARRITO
             if (mejorMatch && window.productosRealtime[mejorMatch.trim().toLowerCase()]) {
                 const real = window.productosRealtime[mejorMatch.trim().toLowerCase()];
-                const imgOriginal = window.productosJson[mejorMatch];
+                console.log("%c✅ ENCONTRADO:", "color: #25D366;", mejorMatch);
 
                 const nombreFinal = real.referenciaReal || mejorMatch;
                 const precioFinal = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
-                const descFinal = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
+                // AGREGAR
                 const existeEnCarrito = carrito.find(item => item.nombre === nombreFinal);
-                
                 if (existeEnCarrito) {
                     existeEnCarrito.cantidad += cantidadFinal;
+                    console.log("➕ Sumada cantidad al existente.");
                 } else {
                     carrito.push({ 
                         nombre: nombreFinal, 
-                        imagen: imgOriginal, 
+                        imagen: window.productosJson[mejorMatch], 
                         precio: precioFinal, 
                         cantidad: cantidadFinal, 
-                        descripcion: descFinal 
+                        descripcion: (real.descripcion || "Sin descripción")
                     });
+                    console.log("🛒 Añadido como nuevo item.");
                 }
                 totalEncontrados++;
+            } else {
+                console.error("❌ NO ENCONTRADO en la base de datos:", busquedaQuery);
             }
+            console.groupEnd();
         });
 
-        // CIERRE Y APERTURA DE INTERFAZ
         if (totalEncontrados > 0) {
+            console.log(`%c✨ Éxito: ${totalEncontrados} productos cargados al carrito.`, "background: #222; color: #bada55; padding: 5px;");
+            
             if (typeof window.actualizarBadgeCarrito === 'function') window.actualizarBadgeCarrito();
             
             setTimeout(() => {
-                // Abrir directamente la pestaña de pedido
                 if (typeof window.abrirPestañaProducto === 'function') {
                     window.abrirPestañaProducto("", "", 0, ""); 
                 }
-                // Limpiar URL para evitar duplicados al recargar
                 window.history.replaceState({}, document.title, window.location.pathname);
             }, 800);
             return true;
@@ -1807,17 +1813,19 @@ window.procesarProductoDirecto = function() {
         return false;
     };
 
-    // Re-intentos automáticos (útil si Firebase tarda en responder)
     let checking = setInterval(() => {
         if (ejecutarCargaMasiva()) clearInterval(checking);
-    }, 1500);
+    }, 2000);
 
-    // Cancelar tras 12 segundos si no cargó nada
-    setTimeout(() => clearInterval(checking), 12000);
+    setTimeout(() => {
+        clearInterval(checking);
+        console.log("⏹️ Fin del ciclo de búsqueda.");
+    }, 15000);
 };
 
-// Disparar cuando el DOM esté listo
 window.addEventListener('DOMContentLoaded', window.procesarProductoDirecto);
+
+
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
 function configurarRedesNav(perfil) {
     const fbLink = document.getElementById('shareFB');
