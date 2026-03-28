@@ -1661,7 +1661,49 @@ function renderizarMosaicoWeb(p, contenedorId) {
         contenedor.appendChild(img);
     });
 }
+// --- GENERAR HTML DEL MOSAICO DINÁMICO ---
+function generarMosaicoHTML(p) {
+    const imgData = p.imagenUrl || "";
+    let urls = [];
 
+    if (imgData.trim() !== "") {
+        urls = imgData.split(',').map(u => u.trim()).filter(u => u !== "");
+    } else {
+        // Si imagenUrl está vacío, intentamos obtener la de referencia (fallback)
+        const singleImg = obtenerImagenPedido(p);
+        if (singleImg) urls = [singleImg];
+    }
+
+    if (urls.length === 0) {
+        return `<img class="pedido-img" src="img/placeholder.png" style="object-fit: cover;">`;
+    }
+
+    // Decidir columnas: 1 foto = 1 col, 2-4 fotos = 2 cols, 5+ fotos = 3 cols
+    let columnas = urls.length === 1 ? 1 : (urls.length <= 4 ? 2 : 3);
+    
+    // Estilo del grid para que llene el contenedor portrait (120x150)
+    let gridStyle = `
+        display: grid; 
+        grid-template-columns: repeat(${columnas}, 1fr); 
+        gap: 2px; 
+        width: 100%; 
+        height: 100%; 
+        background: #eee;
+    `;
+
+    let html = `<div style="${gridStyle}">`;
+    urls.forEach(url => {
+        const normalized = normalizarImagen(url);
+        // "object-fit: fill" para que la imagen se estire y complete el cuadro como pediste
+        html += `<img src="${normalized}" 
+                     style="width: 100%; height: 100%; object-fit: fill; cursor: pointer;" 
+                     onclick="window.open('${url}', '_blank')"
+                     title="Click para ver original">`;
+    });
+    html += `</div>`;
+    
+    return html;
+}
 
 function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
@@ -1671,9 +1713,9 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     card.innerHTML = `
         <div class="pedido-top">
-           <div class="pedido-img-wrapper">
+        <div class="pedido-img-wrapper">
     <img class="pedido-img"
-         src="${obtenerImagenPedido(p)}"
+         src=" ${generarMosaicoHTML(p)}}"
          loading="lazy">
 
     ${
