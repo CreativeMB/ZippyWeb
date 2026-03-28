@@ -274,7 +274,7 @@ th {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* EL MOSAICO O IMAGEN PRINCIPAL */
+
 /* EL MOSAICO (Forzamos que no se estire) */
 .pedido-img-wrapper > div:first-child {
     height: 140px !important; 
@@ -293,8 +293,10 @@ th {
     color: #fff !important;
     margin: 0 !important;
     padding: 2px 0;
-    overflow: hidden; /* Importante para el Marquee */
-    z-index: 10;
+   overflow: hidden; /* Esto oculta lo que sobra cuando se mueve */
+    justify-content: center; /* Centra el texto si es corto */
+    align-items: center;
+    z-index: 99;
 }
 
 .cinta-adicional span {
