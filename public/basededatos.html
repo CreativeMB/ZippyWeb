@@ -344,11 +344,18 @@ th {
 }
 
 /* TEXTO DENTRO */
+/* 🔹 EL TEXTO DENTRO (Animación) */
 .cinta-adicional span {
-    color: white !important;
-    font-weight: bold;
-    white-space: nowrap;
     display: inline-block;
+    padding-left: 100%; /* Empieza desde la derecha */
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    
+    /* Aplicamos la animación */
+    animation: moverTexto 8s linear infinite;
+    will-change: transform;
 }
 
 .pedido-img-wrapper {
