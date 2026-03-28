@@ -1717,33 +1717,30 @@ function iniciarCargaBase(slugDesdeURL) {
     });
 }
 
-function procesarProductosMultiples() {
+window.procesarProductoDirecto = function() {
     const urlParams = new URLSearchParams(window.location.search);
-    const productosUrl = urlParams.get('productos') || urlParams.get('producto'); // Acepta ambos
-    if (!productosUrl) return;
+    const productosParam = urlParams.get('producto'); 
+    if (!productosParam) return;
 
-    // 1. Convertir la cadena en un Array (Separa por comas)
-    const listaNombres = productosUrl.split(',');
-
-    // Función de limpieza para el "ADN"
-    const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    // 1. Convertir la cadena "A015,a0145,a214" en un Array ['A015', 'a0145', 'a214']
+    const referenciasABuscar = productosParam.split(',');
 
     const ejecutarCargaMasiva = () => {
-        if (!productosJson || Object.keys(productosJson).length === 0) return false;
+        if (!window.productosJson || Object.keys(window.productosJson).length === 0) return false;
 
-        let productosEncontrados = 0;
+        let totalEncontrados = 0;
+        const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
-        listaNombres.forEach(nombreBusqueda => {
-            const buscadoOriginal = decodeURIComponent(nombreBusqueda).trim().toLowerCase();
+        referenciasABuscar.forEach(refBusqueda => {
+            const buscadoOriginal = decodeURIComponent(refBusqueda).trim().toLowerCase();
             const buscadoADN = buscarLimpio(buscadoOriginal).replace(/[^a-z0-9]/g, "");
 
             if (buscadoADN.length < 2) return;
 
-            const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
+            const listaRefs = Object.keys(window.productosJson).filter(ref => ref !== "images");
 
-            // Buscar el mejor match para este producto específico
+            // Buscar coincidencia
             let mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
-            
             if (!mejorMatch) {
                 mejorMatch = listaRefs.find(ref => {
                     const refADN = buscarLimpio(ref).replace(/[^a-z0-9]/g, "");
@@ -1751,51 +1748,49 @@ function procesarProductosMultiples() {
                 });
             }
 
-            // Si lo encuentra, lo añade al carrito
-            if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
-                const real = productosRealtime[mejorMatch.trim().toLowerCase()];
-                const imgOriginal = productosJson[mejorMatch];
+            // Si existe en Realtime, agregarlo al carrito
+            if (mejorMatch && window.productosRealtime[mejorMatch.trim().toLowerCase()]) {
+                const real = window.productosRealtime[mejorMatch.trim().toLowerCase()];
+                const imgOriginal = window.productosJson[mejorMatch];
 
                 let nombre = real.referenciaReal || mejorMatch;
                 let precio = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
                 let imagen = normalizarImagen(imgOriginal);
                 let desc = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
-                if (typeof window.agregarAlCarrito === 'function') {
-                    // Añadimos al carrito (sin el mensaje de SweetAlert para no saturar si son muchos)
-                    // Nota: Si tu función agregarAlCarrito tiene el Swal dentro, podrías crear una versión "silenciosa"
-                    window.agregarAlCarritoSilencioso(nombre, imagen, precio, desc);
-                    productosEncontrados++;
+                // Agregar al carrito (Usamos una lógica sin SweetAlert para no saturar la pantalla)
+                const existe = carrito.find(item => item.nombre === nombre);
+                if (existe) {
+                    existe.cantidad++;
+                } else {
+                    carrito.push({ nombre, imagen, precio, cantidad: 1, descripcion: desc });
                 }
+                totalEncontrados++;
             }
         });
 
-        // 2. Después de procesar todos, abrimos el formulario si encontramos algo
-        if (productosEncontrados > 0) {
+        // 2. Si se encontró al menos uno, actualizar UI y abrir Formulario
+        if (totalEncontrados > 0) {
+            window.actualizarBadgeCarrito();
+            
             setTimeout(() => {
-                window.abrirPestañaProducto("", "", 0, ""); // Abre el resumen con lo que haya
+                // Abrir pestaña de pedido (parámetros vacíos para que no agregue nada más)
+                window.abrirPestañaProducto("", "", 0, ""); 
+                
+                // Limpiar la URL para que no se dupliquen al recargar
                 window.history.replaceState({}, document.title, window.location.pathname);
-            }, 500);
+                
+                console.log(`✅ Se cargaron ${totalEncontrados} productos desde la URL.`);
+            }, 1000);
             return true;
         }
         return false;
     };
 
-    // Re-intento si Firebase no está listo
+    // Intentar cargar. Si Firebase no está listo, re-intentar en 3 segundos.
     if (!ejecutarCargaMasiva()) {
         setTimeout(ejecutarCargaMasiva, 3000);
     }
-}
-
-// Función auxiliar para agregar sin mostrar alertas por cada producto
-window.agregarAlCarritoSilencioso = (nombre, imagen, precio, descripcion) => {
-    const existe = carrito.find(item => item.nombre === nombre);
-    if (existe) {
-        existe.cantidad++;
-    } else {
-        carrito.push({ nombre, imagen, precio, cantidad: 1, descripcion });
-    }
-    window.actualizarBadgeCarrito();
 };
 
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
