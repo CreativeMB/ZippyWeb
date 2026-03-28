@@ -611,118 +611,104 @@ button[onclick*="whatsappDirecto"] i {
 
        
 /* ========================================= */
-/* --- 1. BARRA PRINCIPAL (NAV) --- */
+/* --- BOTÓN MENÚ MÓVIL (Oculto en PC) --- */
 /* ========================================= */
-.tabs-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #1a1a1a;
-    border-bottom: 2px solid #E5C453;
-    position: sticky;
-    top: 0;
-    z-index: 1100;
-    padding: 0 15px;
-    height: 75px; /* Barra más alta para dar aire al buscador */
-    box-sizing: border-box;
-    font-family: 'Montserrat', sans-serif;
-}
-
-/* --- 2. GRUPO DE PESTAÑAS (IZQUIERDA) --- */
-.tabs-left {
-    display: flex;
-    flex: 0 0 auto;
-    height: 100%;
-}
-
-.tab-item {
-    padding: 0 20px;
-    color: #ffffff;
-    font-weight: bold;
+.menu-toggle {
+    display: none; /* Oculto por defecto en PC */
+    background: transparent;
+    border: none;
+    color: #E5C453; /* Dorado de tu paleta */
+    font-size: 24px;
     cursor: pointer;
-    transition: 0.3s;
-    font-size: 14px;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    height: 100%;
-}
-
-.tab-item i {
-    font-size: 18px;
-}
-
-.tab-item.active {
-    background: #E5C453;
-    color: #000;
-}
-
-/* --- 3. BUSCADOR INTEGRADO (CENTRO) --- */
-.search-nav-container {
-    position: relative;
-    flex: 1 1 auto; /* Elástico: se acomoda al espacio disponible */
-    max-width: 500px;
-    margin: 0 15px;
-    height: 50px; /* Altura grande para el buscador */
-    display: flex;
-    align-items: center;
-}
-
-.search-input-nav {
-    width: 100%;
-    height: 100%; /* Ocupa todo el alto del contenedor */
-    background: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 12px;
-    padding: 0 15px 0 45px;
-    color: white;
-    font-size: 18px; /* Texto grande y legible */
-    box-sizing: border-box;
-    outline: none;
+    padding: 0 5px;
     transition: 0.3s;
 }
 
-.search-input-nav:focus {
-    border-color: #E5C453;
-    background: #333;
-    box-shadow: 0 0 10px rgba(229, 196, 83, 0.2);
+.menu-toggle:hover {
+    color: #ffffff;
 }
 
-.search-icon-nav {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #E5C453; /* Lupa dorada */
-    font-size: 18px;
+/* ========================================= */
+/* --- DISEÑO MÓVIL (Menú Desplegable) --- */
+/* ========================================= */
+@media screen and (max-width: 767px) {
+    .tabs-container {
+        padding: 0 10px;
+        gap: 8px; /* Espaciado ajustado para que quepa todo */
+    }
+
+    /* 1. Mostrar las 3 líneas */
+    .menu-toggle {
+        display: block;
+        flex: 0 0 auto;
+    }
+
+    /* 2. Convertir Pestañas en Menú Desplegable (Hacia abajo) */
+    .tabs-left {
+        position: absolute;
+        top: 75px; /* Aparece justo debajo de la barra negra */
+        left: 0;
+        width: 100%;
+        background: #1a1a1a;
+        flex-direction: column; /* Lista vertical */
+        border-bottom: 2px solid #E5C453;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.5);
+        height: auto;
+        
+        /* Oculto por defecto */
+        display: none; 
+    }
+
+    /* Clase activa que agregaremos con JavaScript al tocar */
+    .tabs-left.mostrar-menu {
+        display: flex;
+        animation: slideDown 0.3s ease forwards;
+    }
+
+    /* Ajuste de los botones del menú desplegado */
+    .tab-item {
+        width: 100%;
+        height: 55px; /* Alto cómodo para el dedo */
+        justify-content: flex-start; /* Texto alineado a la izquierda */
+        padding: 0 25px;
+        border-bottom: 1px solid #333;
+    }
+
+    /* 3. Ajuste del Buscador en móvil */
+    .search-nav-container {
+        flex: 1; /* Ocupa el centro dinámicamente */
+        margin: 0;
+    }
+
+    .search-input-nav {
+        font-size: 15px;
+        padding: 0 10px 0 35px;
+        height: 40px; /* Un poco más estilizado en móvil */
+    }
+
+    .search-icon-nav {
+        font-size: 15px;
+        left: 12px;
+    }
+
+    /* 4. Ajuste Redes Sociales */
+    .redes-nav {
+        flex: 0 0 auto;
+        gap: 5px;
+    }
+
+    .icono-nav {
+        width: 32px;
+        height: 32px;
+    }
+
+    .icono-nav i { font-size: 15px; }
 }
 
-/* --- 4. REDES SOCIALES (DERECHA) --- */
-.redes-nav {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 0 0 auto;
-}
-
-.icono-nav {
-    width: 38px;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.icono-nav i {
-    font-size: 18px;
-    color: white;
+/* Animación de caída suave para el menú */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .icono-nav.facebook:hover { background: #1877F2; border-color: #1877F2; transform: translateY(-2px); }
@@ -1239,6 +1225,9 @@ button[onclick*="whatsappDirecto"] i {
     </div>
 
    <div class="tabs-container">
+    <button class="menu-toggle" id="btnMenu" aria-label="Abrir menú">
+        <i class="fas fa-bars"></i>
+    </button>
     <div class="tabs-left">
         <div class="tab-item active" onclick="cambiarPestaña('productos-tab', this)">
             <i class="fas fa-store"></i> <span>Tienda</span>
@@ -1468,6 +1457,11 @@ button[onclick*="whatsappDirecto"] i {
     let menuCategoriasAbierto = false;
     let carrito = [];
 // --- 1. ARRANQUE Y DETECCIÓN ---
+
+document.getElementById('btnMenu').addEventListener('click', function() {
+    // Esto pone o quita la clase que hace visible el menú
+    document.getElementById('menuTabs').classList.toggle('mostrar-menu');
+});
     detectarEmpresaPorDominio();
 
 async function detectarEmpresaPorDominio() {
