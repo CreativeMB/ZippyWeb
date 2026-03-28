@@ -613,86 +613,83 @@ button[onclick*="whatsappDirecto"] i {
 /* ========================================= */
 /* --- 1. BARRA PRINCIPAL (NAV) --- */
 /* ========================================= */
+/* ========================================= */
+/* --- BARRA NAVEGACIÓN EXPANDIBLE DINÁMICA --- */
+/* ========================================= */
 
-.tabs-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #1a1a1a;
-    height: 70px;
-    padding: 0 10px;
-    position: sticky;
-    top: 0;
-    z-index: 1100;
-    gap: 10px;
-    overflow: hidden; /* Evita que nada se salga al expandir */
-}
-
-/* 1. EL BUSCADOR (Estado inicial: Encogido) */
-.search-nav-container {
-    position: relative;
-    flex: 0 0 45px; /* Ancho inicial pequeño (solo para la lupa) */
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    order: 2; /* Lo mantiene al centro */
-}
-
-.search-input-nav {
-    width: 100%;
-    height: 40px;
-    background: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 20px;
-    padding: 0 0 0 35px; /* Padding derecho 0 mientras está cerrado */
-    color: white;
-    font-size: 16px;
-    outline: none;
-    cursor: pointer;
-    transition: all 0.4s;
-}
-
-/* 2. EFECTO DE EXPANSIÓN (Al tocar/enfocar) */
-.search-nav-container:focus-within {
-    flex: 1; /* Se estira para ocupar todo el espacio disponible */
-}
-
-.search-input-nav:focus {
-    padding: 0 15px 0 40px;
-    border-color: #E5C453;
-    background: #333;
-}
-
-/* 3. OCULTAR ELEMENTOS AL BUSCAR */
-/* Cuando el buscador se expande, ocultamos los títulos de las pestañas y las redes */
-.search-nav-container:focus-within ~ .redes-nav {
-    display: none !important;
-}
-
-/* 4. AJUSTE DE PESTAÑAS (MÓVIL) */
 @media screen and (max-width: 767px) {
-    .tab-item {
-        padding: 0 8px;
-        font-size: 12px; /* Un poco más pequeño para que quepa todo */
+    .tabs-container {
+        padding: 0 10px;
+        gap: 5px; /* Espacio reducido entre elementos */
+        justify-content: space-between;
     }
 
-    /* Ocultamos el texto de las pestañas SOLO cuando el buscador está abierto */
-    .search-nav-container:focus-within ~ .tabs-left .tab-item span,
-    .tabs-container:has(.search-nav-container:focus-within) .tab-item span {
+    /* 1. ESTADO INICIAL DEL BUSCADOR (Compacto) */
+    .search-nav-container {
+        flex: 0 0 45px; /* Empieza midiendo solo 45px */
+        max-width: 45px; 
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin: 0 5px;
+    }
+
+    .search-input-nav {
+        padding: 0 0 0 35px !important; /* Sin espacio para texto al inicio */
+        font-size: 14px !important;
+        border-radius: 20px !important;
+    }
+
+    /* 2. EXPANSIÓN AL TOCAR (Moderada) */
+    /* Se expande pero permite que redes y pestañas respiren */
+    .search-nav-container:focus-within {
+        flex: 1 1 auto; 
+        max-width: 180px; /* Expansión controlada para no tapar todo */
+    }
+
+    .search-input-nav:focus {
+        padding: 0 10px 0 35px !important;
+        background: #333;
+    }
+
+    /* 3. COMPACTAR PESTAÑAS (Solo iconos + IDs respetados) */
+    /* Cuando el buscador está activo, ocultamos el texto de las pestañas */
+    .tabs-container:focus-within .tab-item span {
         display: none !important;
     }
 
-    /* Redes sociales por defecto visibles */
+    .tab-item {
+        padding: 0 10px !important;
+        min-width: 40px;
+    }
+
+    /* 4. REDES SOCIALES (Siempre visibles) */
     .redes-nav {
-        display: flex;
-        gap: 5px;
-        flex-shrink: 0;
-        order: 3;
+        gap: 6px !important;
+        flex: 0 0 auto;
     }
 
     .icono-nav {
-        width: 32px;
-        height: 32px;
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .icono-nav i {
+        font-size: 14px !important;
     }
 }
+
+.icono-nav.facebook:hover { background: #1877F2; border-color: #1877F2; transform: translateY(-2px); }
+.icono-nav.whatsapp:hover { background: #25D366; border-color: #25D366; transform: translateY(-2px); }
+
+.tab-content {
+    animation: none !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
         
         /* --- BOTÓN FLOTANTE DE WHATSAPP --- */
 .whatsappbtnflotante {
