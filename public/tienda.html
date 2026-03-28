@@ -1582,6 +1582,7 @@ body {
     let categoriaSeleccionada = null;
     let menuCategoriasAbierto = false;
     let carrito = [];
+    let procesadoExitoso = false;
 // --- 1. ARRANQUE Y DETECCIÓN ---
 
     detectarEmpresaPorDominio();
@@ -1716,48 +1717,51 @@ function iniciarCargaBase(slugDesdeURL) {
         if(loader) loader.style.display = 'none';
     });
 }
+
+
 window.procesarProductoDirecto = function() {
     const urlParams = new URLSearchParams(window.location.search);
     const productosParam = urlParams.get('producto'); 
     
-    if (!productosParam) return;
+    // Si no hay parámetro o ya se procesó con éxito, salimos
+    if (!productosParam || procesadoExitoso) return;
 
     console.log("%c🚀 Procesador Zippy Activo", "color: #E5C453; font-weight: bold;");
 
     const ejecutarCargaMasiva = () => {
-        // --- VERIFICACIÓN DE TUS VARIABLES GLOBALES ---
-        // Comprobamos que el JSON y el Realtime ya tengan datos (no sean {})
+        // Doble verificación: Si ya se procesó mientras esperábamos el intervalo, frenamos
+        if (procesadoExitoso) return true;
+
         const jsonListo = Object.keys(productosJson).length > 0;
         const realtimeListo = Object.keys(productosRealtime).length > 0;
 
         if (!jsonListo || !realtimeListo) {
-            console.warn("⏳ Esperando que los productos carguen de Firebase...");
+            console.warn("⏳ Esperando carga de Firebase...");
             return false; 
         }
 
+        // --- INICIO DE PROCESAMIENTO ---
+        procesadoExitoso = true; // ACTIVAMOS EL CANDADO INMEDIATAMENTE
+        
         const itemsRaw = productosParam.split(',');
         let totalEncontrados = 0;
-        
         const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
         itemsRaw.forEach((itemRaw) => {
             const bloque = itemRaw.trim();
             if (!bloque) return;
 
-            // Manejo de Referencia:Cantidad
             const partes = bloque.split(':');
             const busquedaQuery = partes[0].trim();
             const cantidadURL = partes[1] ? parseInt(partes[1]) : 1;
-            const cantidadFinal = isNaN(cantidadURL) ? 1 : cantidadURL;
+            const cantidadFinal = isNaN(cantidadURL) || cantidadURL < 1 ? 1 : cantidadURL;
 
             const buscadoOriginal = decodeURIComponent(busquedaQuery).toLowerCase();
             const buscadoADN = buscarLimpio(buscadoOriginal).replace(/[^a-z0-9]/g, "");
 
             const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
 
-            // Búsqueda
             let mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
-            
             if (!mejorMatch) {
                 mejorMatch = listaRefs.find(ref => {
                     const refADN = buscarLimpio(ref).replace(/[^a-z0-9]/g, "");
@@ -1765,71 +1769,53 @@ window.procesarProductoDirecto = function() {
                 });
             }
 
-            // Si hay match, usamos tus variables globales para insertar
             if (mejorMatch && productosRealtime[mejorMatch.trim().toLowerCase()]) {
                 const real = productosRealtime[mejorMatch.trim().toLowerCase()];
-                
                 const nombreFinal = real.referenciaReal || mejorMatch;
                 const precioFinal = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
-                const imagenFinal = productosJson[mejorMatch];
-                const descFinal = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
-                // Insertar en tu array 'carrito' (Global)
+                // Verificamos si ya existe en el carrito para no duplicar por error de lógica
                 const existeEnCarrito = carrito.find(item => item.nombre === nombreFinal);
                 
-                if (existeEnCarrito) {
-                    existeEnCarrito.cantidad += cantidadFinal;
-                } else {
+                if (!existeEnCarrito) {
                     carrito.push({ 
                         nombre: nombreFinal, 
-                        imagen: imagenFinal, 
+                        imagen: productosJson[mejorMatch], 
                         precio: precioFinal, 
                         cantidad: cantidadFinal, 
-                        descripcion: descFinal 
+                        descripcion: (real.descripcion || "Sin descripción")
                     });
+                    totalEncontrados++;
+                    console.log(`%c✅ Agregado: ${nombreFinal} (Cant: ${cantidadFinal})`, "color: #25D366;");
                 }
-                totalEncontrados++;
-                console.log(`%c✅ Agregado: ${nombreFinal}`, "color: #25D366;");
             }
         });
 
         if (totalEncontrados > 0) {
-            // Sincronizar UI
             if (typeof actualizarBadgeCarrito === 'function') actualizarBadgeCarrito();
             
             setTimeout(() => {
-                // Abrir la pestaña de pedido
                 if (typeof abrirPestañaProducto === 'function') {
                     abrirPestañaProducto("", "", 0, ""); 
-                } else {
-                    // Fallback manual si la función no ha cargado
-                    const mod = document.getElementById("modalPedido");
-                    const prodTab = document.getElementById("productos-tab");
-                    if (mod) {
-                        if(prodTab) prodTab.style.display = "none";
-                        mod.style.display = "block";
-                        if (typeof renderizarCarritoEnForm === 'function') renderizarCarritoEnForm();
-                    }
                 }
-                // Limpiar URL
+                // Limpiamos la URL para que el parámetro 'producto' desaparezca
                 window.history.replaceState({}, document.title, window.location.pathname);
             }, 800);
-
             return true;
         }
+        
+        // Si no encontró nada, liberamos el candado para que el siguiente intervalo intente de nuevo
+        procesadoExitoso = false; 
         return false;
     };
 
-    // Reintentar cada 1.5s hasta que Firebase llene productosJson y productosRealtime
     let intervaloBusqueda = setInterval(() => {
         if (ejecutarCargaMasiva()) clearInterval(intervaloBusqueda);
     }, 1500);
 
-    // Límite de seguridad
-    setTimeout(() => clearInterval(intervaloBusqueda), 15000);
+    setTimeout(() => clearInterval(intervaloBusqueda), 12000);
 };
 
-// Iniciar proceso apenas el DOM esté listo
 document.addEventListener('DOMContentLoaded', window.procesarProductoDirecto);
 
 
