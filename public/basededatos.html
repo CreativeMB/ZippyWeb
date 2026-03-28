@@ -226,144 +226,140 @@ th {
         display: none;
     }
     #suggestions div:hover { background: #eee; cursor: pointer; }
-    /* ================= CONTENEDOR GRID ================= */
-/* CONTENEDOR GRID pedidos */
+ /* ============================================================
+   CONTENEDOR GLOBAL DEL GRID
+   ============================================================ */
 #pedidosGrid {
     display: grid;
-    /* minmax(300px, 1fr) hace que las tarjetas midan MÍNIMO 300px, 
-       pero si sobra espacio, se estiran (1fr) para llenar todo el ancho */
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
     gap: 10px; 
-    padding: 5px; /* Margen mínimo en los bordes de la pantalla */
+    padding: 5px; 
     width: 100%;
     box-sizing: border-box;
-    align-items: start; /* Crecimiento individual hacia abajo */
+    align-items: start; /* Permite que cada tarjeta crezca a su propio ritmo */
 }
 
-/* OPCIONAL: Dale un poco más de aire interno a la tarjeta */
+/* ============================================================
+   TARJETA DE PEDIDO
+   ============================================================ */
 .pedido-card {
+    background-color: #fff;
     border-radius: 5px;
-    padding: 10px; /* Subimos de 10px a 15px */
+    padding: 10px;
     display: flex;
     flex-direction: column;
     gap: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    height: auto;
 }
 
-/* PARTE SUPERIOR */
+/* PARTE SUPERIOR (FOTO + INFO) */
 .pedido-top {
     display: flex;
     gap: 10px;
-    align-items: flex-start;
+    align-items: flex-start; /* Alinea el texto al inicio de la imagen */
 }
 
-/* IMAGE */
-.pedido-img {
-    width: 110px;
-    height: 160px;
-    object-fit: contain;
-    background: #fff;
-    border-radius: 0px;
+/* CONTENEDOR DE IMAGEN Y CINTA */
+.pedido-img-wrapper {
+    display: flex !important;
+    flex-direction: column !important; 
+    width: 150px !important; /* Ancho fijo solicitado */
+    height: auto !important;
     flex-shrink: 0;
+    border-radius: 2px; /* Radio pequeño solicitado */
+    overflow: hidden; /* Corta el marquee para que no se salga */
+    background-color: #2c2c2c;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* PARTE INFERIOR */
-.pedido-bottom {
+/* EL MOSAICO O IMAGEN PRINCIPAL */
+.pedido-img-wrapper > div:first-child,
+.pedido-img {
+    width: 100% !important;
+    height: 140px !important; /* Altura controlada */
+    object-fit: cover;
+    display: block;
+}
+
+/* ============================================================
+   CINTA ADICIONAL CON MARQUEE
+   ============================================================ */
+.cinta-adicional {
+    display: flex !important;
+    position: relative !important;
+    width: 100% !important;
+    min-height: 22px !important;
+    background: #242424 !important;
+    color: #fff !important;
+    padding: 2px 0;
+    overflow: hidden; /* Importante para el Marquee */
+    z-index: 10;
+}
+
+.cinta-adicional span {
+    display: inline-block;
+    padding-left: 100%; /* Inicia fuera a la derecha */
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: bold;
+    color: #ffffff;
+    animation: moverTexto 8s linear infinite;
+}
+
+@keyframes moverTexto {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(-100%, 0); }
+}
+
+/* ============================================================
+   SECCIÓN DE TEXTO E INFORMACIÓN
+   ============================================================ */
+.pedido-info {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    margin-top: 2px; /* margen entre top y bottom */
+    font-size: 14px;
+    font-weight: bold;
+    min-width: 0; /* Evita que el texto largo rompa el flex */
 }
 
-/* TEXTO COMPACTO */
-.linea {
-    font-size: 13px;
-    line-height: 1.2;
-    margin: 0;
-    padding: 0;
-}
-
-/* BODY */
-.pedido-body p,
-.pedido-body h4 {
-    margin: 2px 0;
-}
-
-/* TITULO */
 .pedido-body h4 {
     margin: 0;
     font-size: 14px;
     font-weight: 600;
-}
-.pedido-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Alinea el texto arriba */
-    padding-top: 2px;
-    flex: 1; /* Hace que use todo el ancho restante */
-    font-size: 14px;
-    font-weight: bold;
-}
-.pedido-info .linea,
-.pedido-info .sub-linea,
-.pedido-info .linea.ref {
-    font-size: inherit; /* hereda el tamaño del contenedor principal */
+    line-height: 1.2;
 }
 
+.linea {
+    font-size: 13px;
+    line-height: 1.2;
+    margin: 0;
+}
 
-/* MENSAJE LARGO */
 .mensaje {
     font-size: 12.5px;
     white-space: pre-wrap;
+    margin-top: 5px;
 }
 
-/* FOOTER */
+/* ============================================================
+   FOOTER Y DETALLES
+   ============================================================ */
 .pedido-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 1px 0; /* margen superior e inferior */
+    border-top: 1px solid #eee;
+    padding-top: 5px;
     font-size: 11px;
 }
 
-/* COLOR */
 .color-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-}
-/* LA CINTA (Forzada para que aparezca) */
-.cinta-adicional {
-    display: flex !important;
-    position: relative !important; 
-    width: 100% !important;
-    min-height: 22px !important;      /* Altura mínima garantizada */
-    background: #242424 !important;   /* PUESTA EN ROJO para que la encuentres */
-    color: #fff !important;
-    font-size: 11px !important;
-    margin: 0 !important;
-    padding: 2px 0 !important;
-    justify-content: center;
-    align-items: center;
-    z-index: 99;                      /* Por encima de todo */
-}
-
-/* TEXTO DENTRO */
-.cinta-adicional span {
-    color: white !important;
-    font-weight: bold;
-    white-space: nowrap;
-    display: inline-block;
-}
-
-/* 🔹 LA ANIMACIÓN (MARQUEE) */
-@keyframes moverTexto {
-    0% {
-        transform: translate(0, 0);
-    }
-    100% {
-        transform: translate(-100%, 0);
-    }
 }
 
 /* RESPONSIVE */
@@ -731,35 +727,6 @@ th {
     margin-left: 6px;
     cursor: pointer;
     font-size: 14px;
-}
-.pedido-img-wrapper {
-    display: flex !important;
-    flex-direction: column !important; /* Fuerza a la cinta a ir debajo de la foto */
-    width: 150px !important;  
-    height: auto !important;
-    position: relative !important;
-    overflow: hidden !important; 
-    background-color: #2c2c2c;
-    flex-shrink: 0;
-    border-radius: 2px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-/* Aseguramos que el mosaico mida lo que debe */
-.pedido-img-wrapper > div:first-child {
-    width: 100% !important;
-    height: 140px !important; /* Altura del mosaico */
-    position: relative !important;
-}
-
-/* 🔹 ANIMACIÓN */
-@keyframes moverTexto {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(-100%);
-    }
 }
 
 </style>
