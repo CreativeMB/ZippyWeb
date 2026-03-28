@@ -1452,69 +1452,54 @@ async function cargarReferenciasDesdeFirebase() {
         referenciasDrive = {};
     }
 }
-// --- AUTO ASIGNAR IMAGEN DESDE REFERENCIA ---
-async function validarYAsignarImagenDesdeReferencia(idDomi, idPedido, pedido) {
+// --- AUTO ASIGNAR IMAGEN DESDE CAMPO imagenUrl ---
+async function validarYAsignarImagenDesdeCampo(idDomi, idPedido, pedido) {
 
-    // 1️⃣ Si ya tiene imagen (aunque sea una o varias) → no tocar
-    if (pedido.imagenUrl && pedido.imagenUrl.trim() !== '') {
+    // 1️⃣ Validamos si el campo imagenUrl existe y tiene contenido
+    // Si está vacío, no hay nada que asignar
+    if (!pedido.imagenUrl || pedido.imagenUrl.trim() === '') {
+        console.log("ℹ️ El pedido no contiene URLs de imagen para procesar.");
         return false; 
     }
 
-    // 2️⃣ Si no hay referencia → no hacer nada
-    if (!pedido.referencia) return false;
+    // 2️⃣ Limpiamos el string por si tiene espacios extra entre comas
+    // Ej: "url1.jpg,  url2.jpg" -> "url1.jpg, url2.jpg"
+    const urlsLimpias = pedido.imagenUrl
+        .split(',')
+        .map(url => url.trim())
+        .filter(url => url !== "")
+        .join(', ');
 
-    // --- NUEVA LÓGICA PARA PROCESAR MULTI-REFERENCIAS ---
-    
-    // Separamos los productos (ej: "Rosas 2, Girasoles 1" -> ["Rosas 2", "Girasoles 1"])
-    const partesReferencia = pedido.referencia.split(',').map(item => item.trim()).filter(item => item !== "");
-    let urlsEncontradas = [];
-
-    partesReferencia.forEach(item => {
-        // Limpiamos la cantidad para buscar en el JSON (ej: "Rosas 2" -> "Rosas")
-        // Esta regex quita el espacio y el número al final
-        const nombreProducto = item.replace(/\s+\d+$/, '').trim();
-        
-        const url = referenciasDrive[nombreProducto];
-        if (url) {
-            urlsEncontradas.push(url);
-        }
-    });
-
-    // Si no encontramos ninguna imagen para ninguno de los productos, salimos
-    if (urlsEncontradas.length === 0) return false;
-
-    // Unimos las URLs encontradas con comas para crear el mosaico
-    const mosaicoUrls = urlsEncontradas.join(', ');
-
-    // 3️⃣ Solo actualizar si realmente no tiene imagen en Firebase (Seguridad)
+    // 3️⃣ Verificación de seguridad en Firebase
     try {
         const snapshot = await db.ref(`${idEmpresa}/Pedidos/${idDomi}/${idPedido}/imagenUrl`).get();
+        
+        // Si ya existe una imagen en Firebase y es diferente a la que intentamos poner, 
+        // respetamos la de la base de datos para evitar sobrescrituras accidentales.
         if (snapshot.exists() && snapshot.val().trim() !== '') {
-            // Si ya apareció una en Firebase, la cargamos a memoria y no hacemos nada más
             pedido.imagenUrl = snapshot.val();
             return false;
         }
 
-        // 4️⃣ Asignar el mosaico de URLs directamente en memoria
-        pedido.imagenUrl = mosaicoUrls;
-
-        // 5️⃣ Actualizar Firebase con el string de URLs separadas por comas
+        // 4️⃣ Actualizar Firebase con el string de URLs procesado
         await db
             .ref(`${idEmpresa}/Pedidos/${idDomi}/${idPedido}`)
             .update({
-                imagenUrl: mosaicoUrls,
-                imagenAuto: true
+                imagenUrl: urlsLimpias,
+                imagenAuto: true // Marcamos que se procesó automáticamente
             });
 
-        console.log(`🧩 Mosaico asignado automáticamente (${urlsEncontradas.length} fotos) → ${pedido.referencia}`);
+        // Actualizamos el objeto local en memoria
+        pedido.imagenUrl = urlsLimpias;
+
+        console.log(`📸 Imágenes asignadas desde campo local (${urlsLimpias.split(',').length} detectadas)`);
         return true; 
 
     } catch (e) {
-        console.error('❌ Error asignando mosaico de imágenes', e);
+        console.error('❌ Error al sincronizar imagenUrl con Firebase', e);
         return false;
     }
 }
-
 
 
 // --- CARGAR PEDIDOS ---
