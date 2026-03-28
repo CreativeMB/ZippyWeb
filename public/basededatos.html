@@ -328,33 +328,40 @@ th {
     height: 12px;
     border-radius: 50%;
 }
-/* ===== CINTA ADICIONAL ===== */
+/* 🔹 EL CONTENEDOR DE LA CINTA */
 .cinta-adicional {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    background: rgba(0,0,0,0.75);
-    color: #fff;
-    font-size: 12px;
-    padding: 6px 8px;
-
+    position: relative !important;
+    display: flex !important;
+    width: 100% !important;
+    height: 22px !important;
+    background: #000 !important;
+    overflow: hidden; /* CRUCIAL: Para que el texto que sale no se vea fuera */
     white-space: nowrap;
-    overflow: hidden;
+    align-items: center;
 }
 
-/* 🔹 TEXTO NORMAL (quieto) */
+/* 🔹 EL TEXTO DENTRO (Animación) */
 .cinta-adicional span {
     display: inline-block;
-    white-space: nowrap;
-}
-
-/* 🔹 SOLO SI NO CABE → MARQUEE */
-.cinta-adicional.marquee span {
-    padding-left: 100%;
+    padding-left: 100%; /* Empieza desde la derecha */
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    
+    /* Aplicamos la animación */
     animation: moverTexto 8s linear infinite;
     will-change: transform;
+}
+
+/* 🔹 LA ANIMACIÓN (MARQUEE) */
+@keyframes moverTexto {
+    0% {
+        transform: translate(0, 0);
+    }
+    100% {
+        transform: translate(-100%, 0);
+    }
 }
 
 /* RESPONSIVE */
