@@ -327,32 +327,6 @@ th {
     height: 12px;
     border-radius: 50%;
 }
-/* LA CINTA (Forzada para que aparezca) */
-.cinta-adicional {
-     overflow: hidden !important; 
-    display: flex !important;
-    position: relative !important; 
-    width: 100% !important;
-    min-height: 22px !important;      /* Altura mínima garantizada */
-    background: #242424 !important;   /* PUESTA EN ROJO para que la encuentres */
-    color: #fff !important;
-    font-size: 11px !important;
-    margin: 0 !important;
-    padding: 2px 0 !important;
-    justify-content: center;
-    align-items: center;
-    z-index: 99;                      /* Por encima de todo */
-}
-
-/* TEXTO DENTRO */
-.cinta-adicional span {
-    display: inline-block;
-    white-space: nowrap; /* FUERZA una sola línea */
-    color: #fff;
-    font-size: 11px;
-    padding-left: 100%; /* Inicia el recorrido desde afuera */
-    animation: moverTexto 8s linear infinite;
-}
 
 .pedido-img-wrapper {
     position: relative;
@@ -374,15 +348,52 @@ th {
     object-fit: fill; /* Estira la imagen para llenar el 3/4 */
 }
 
+/* ============================================================
+   ESTADO BASE DE LA CINTA (Sin movimiento)
+   ============================================================ */
+.cinta-adicional {
+    display: flex !important;
+    width: 100% !important;
+    height: 22px !important;
+    background: #242424 !important;
+    color: #fff !important;
+    overflow: hidden !important; /* CRUCIAL: Oculta lo que se sale */
+    position: relative !important;
+    align-items: center;
+}
 
-/* 🔹 ANIMACIÓN */
-@keyframes moverTexto {
-    from {
+.cinta-adicional span {
+    display: inline-block;
+    white-space: nowrap; /* Fuerza una sola línea */
+    font-size: 11px;
+    font-weight: bold;
+    padding: 0 5px;
+    /* Por defecto no tiene animación */
+}
+
+/* ============================================================
+   ESTADO CON MARQUEE (Activado por JS)
+   ============================================================ */
+/* Cuando el JS añade la clase .marquee al contenedor .cinta-adicional */
+.cinta-adicional.marquee span {
+    padding-left: 100%; /* Empuja el texto al inicio derecho */
+    animation: moverCinta 10s linear infinite;
+}
+
+/* 🔹 LA ANIMACIÓN */
+@keyframes moverCinta {
+    0% {
         transform: translateX(0);
     }
-    to {
+    100% {
+        /* Se mueve hacia la izquierda hasta desaparecer completamente */
         transform: translateX(-100%);
     }
+}
+
+/* Opcional: Pausar cuando pases el mouse */
+.cinta-adicional.marquee:hover span {
+    animation-play-state: paused;
 }
 
 
