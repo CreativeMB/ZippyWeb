@@ -1722,31 +1722,36 @@ window.procesarProductoDirecto = function() {
     const productosParam = urlParams.get('producto'); 
     if (!productosParam) return;
 
-    // 1. Dividir por comas: "A015:2,A016" -> ['A015:2', 'A016']
-    const itemsABuscar = productosParam.split(',');
+    // 1. Convertir "A015, A012" -> ['A015', ' A012']
+    const itemsRaw = productosParam.split(',');
 
     const ejecutarCargaMasiva = () => {
-        // VERIFICACIÓN CRÍTICA: ¿Están listos los datos y el array del carrito?
+        // Verificación de datos listos
         if (!window.productosJson || !window.productosRealtime || typeof carrito === 'undefined') {
-            console.log("⏳ Esperando que el sistema y el carrito estén listos...");
             return false; 
         }
 
         let totalEncontrados = 0;
         const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
-        itemsABuscar.forEach(itemRaw => {
-            const partes = itemRaw.split(':');
-            const refBusqueda = partes[0];
+        itemsRaw.forEach(itemRaw => {
+            // --- LIMPIEZA CLAVE ---
+            // Quitamos espacios en blanco que sobran (ej: " A012" -> "A012")
+            const itemLimpio = itemRaw.trim(); 
+            
+            // Separar código de cantidad (A015:2)
+            const partes = itemLimpio.split(':');
+            const refBusqueda = partes[0].trim();
             const cantidadURL = partes[1] ? parseInt(partes[1]) : 1;
 
-            const buscadoOriginal = decodeURIComponent(refBusqueda).trim().toLowerCase();
+            const buscadoOriginal = decodeURIComponent(refBusqueda).toLowerCase();
             const buscadoADN = buscarLimpio(buscadoOriginal).replace(/[^a-z0-9]/g, "");
 
             if (buscadoADN.length < 2) return;
 
             const listaRefs = Object.keys(window.productosJson).filter(ref => ref !== "images");
 
+            // Buscar match
             let mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
             if (!mejorMatch) {
                 mejorMatch = listaRefs.find(ref => {
@@ -1755,23 +1760,22 @@ window.procesarProductoDirecto = function() {
                 });
             }
 
+            // Si existe, lo metemos al carrito
             if (mejorMatch && window.productosRealtime[mejorMatch.trim().toLowerCase()]) {
                 const real = window.productosRealtime[mejorMatch.trim().toLowerCase()];
                 const imgOriginal = window.productosJson[mejorMatch];
 
                 let nombre = real.referenciaReal || mejorMatch;
                 let precio = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
-                let imagen = imgOriginal;
                 let desc = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
-                // INSERTAR DIRECTO AL ARRAY DEL CARRITO
                 const existe = carrito.find(item => item.nombre === nombre);
                 if (existe) {
                     existe.cantidad += cantidadURL;
                 } else {
                     carrito.push({ 
                         nombre, 
-                        imagen, 
+                        imagen: imgOriginal, 
                         precio, 
                         cantidad: cantidadURL, 
                         descripcion: desc 
@@ -1782,34 +1786,28 @@ window.procesarProductoDirecto = function() {
         });
 
         if (totalEncontrados > 0) {
-            // Actualizar el número del icono del carrito
-            if (typeof window.actualizarBadgeCarrito === 'function') window.actualizarBadgeCarrito();
-            
-            // Forzar apertura del formulario de pedido
+            window.actualizarBadgeCarrito();
             setTimeout(() => {
-                if (typeof window.abrirPestañaProducto === 'function') {
-                    // Abrimos vacío para que solo muestre lo que ya metimos arriba
-                    window.abrirPestañaProducto("", "", 0, ""); 
-                }
-                // Limpiar URL
+                // Abrir el formulario con los datos ya cargados
+                window.abrirPestañaProducto("", "", 0, ""); 
                 window.history.replaceState({}, document.title, window.location.pathname);
-            }, 1500);
+            }, 1000);
             return true;
         }
         return false;
     };
 
-    // Intentar cada 2 segundos hasta que funcione (máximo 5 intentos)
+    // Re-intentos automáticos
     let intentos = 0;
     const intervalo = setInterval(() => {
         intentos++;
-        if (ejecutarCargaMasiva() || intentos > 5) {
+        if (ejecutarCargaMasiva() || intentos > 8) {
             clearInterval(intervalo);
         }
-    }, 2000);
+    }, 1500);
 };
 
-// LLAMADA AUTOMÁTICA AL CARGAR LA PÁGINA
+// Ejecutar al cargar
 window.addEventListener('load', window.procesarProductoDirecto);
 
 // --- FUNCIÓN AUXILIAR PARA LAS REDES DE LA BARRA ---
