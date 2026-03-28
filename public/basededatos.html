@@ -228,28 +228,27 @@ th {
     #suggestions div:hover { background: #eee; cursor: pointer; }
     /* ================= CONTENEDOR GRID ================= */
 /* CONTENEDOR GRID pedidos */
-
 #pedidosGrid {
     display: grid;
-    /* auto-fill con un ancho fijo (ej. 350px) hace que todas midan lo mismo */
-    /* Si sobra espacio, el grid centrará o dejará el hueco al final */
-    grid-template-columns: repeat(auto-fill, 350px); 
-    gap: 15px; 
-    padding: 5px;
+    /* minmax(300px, 1fr) hace que las tarjetas midan MÍNIMO 300px, 
+       pero si sobra espacio, se estiran (1fr) para llenar todo el ancho */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 10px; 
+    padding: 5px; /* Margen mínimo en los bordes de la pantalla */
     width: 100%;
-    justify-content: center; /* Centra las tarjetas en pantallas grandes */
     box-sizing: border-box;
-    align-items: start; /* CRUCIAL: Evita que las tarjetas se estiren para igualar a la más alta */
+    align-items: start; /* Crecimiento individual hacia abajo */
 }
-
-/* OPCIONAL: Dale un poco más de aire interno a la tarjeta */
 .pedido-card {
+    width: 100%; /* Ocupa todo el espacio que le asigne el grid */
     border-radius: 5px;
-    padding: 10px; /* Subimos de 10px a 15px */
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    gap: 8px; /* Un poco más compacto */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background-color: #fff;
+    height: auto; /* Crece hacia abajo según el contenido */
 }
 
 /* PARTE SUPERIOR */
@@ -279,29 +278,36 @@ th {
 /* EL CONTENEDOR DE LA IMAGEN */
 .pedido-img-wrapper {
     display: flex;
-    flex-direction: column; /* Alinea imagen y cinta uno sobre otro */
-    position: relative; /* Lo mantenemos por si usas otros iconos flotantes */
-    width: 110px; /* Mantiene el ancho de tu imagen actual */
-    flex-shrink: 0;
+    flex-direction: column; /* Apila mosaico arriba y cinta abajo */
+    width: 115px;           /* Ajusta según el ancho que quieras para la foto */
+    flex-shrink: 0;         /* Evita que se encoja */
+    background: #f5f5f5;    /* Fondo por si la imagen tarda en cargar */
+    border-radius: 4px;
+    overflow: hidden;       /* Para que la cinta no se salga de los bordes redondeados */
 }
 /* ===== CINTA ADICIONAL (AHORA DEBAJO) ===== */
 .cinta-adicional {
-    /* Quitamos absolute, bottom, left, right */
-    position: relative; 
-    background: rgba(0,0,0,0.85); /* Un poco más oscuro para que contraste con el fondo de la card */
-    color: #fff;
-    font-size: 11px; /* Un pelín más pequeña para que no robe espacio */
-    padding: 4px 6px;
+    position: relative;     /* Cambiado de absolute a relative */
     width: 100%;
-    box-sizing: border-box;
-    border-bottom-left-radius: 4px; /* Opcional: para redondear las esquinas de abajo */
-    border-bottom-right-radius: 4px;
-    
-    white-space: nowrap;
-    overflow: hidden;
-    /* Ya no tapa la imagen, aparece justo después */
+    background: #000;       /* Negro sólido para que resalte */
+    color: #fff;
+    font-size: 11px;
+    padding: 3px 0;         /* Espacio arriba y abajo del texto */
+    text-align: center;
+    font-weight: bold;
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-
+/* Asegúrate de que el mosaico o imagen no flote */
+.pedido-img-wrapper img, 
+.pedido-img-wrapper div:first-child {
+    width: 100%;
+    height: 150px; /* Ajusta esta altura a tu gusto */
+    object-fit: fill;
+    display: block;
+}
 /* 🔹 TEXTO NORMAL (quieto) */
 .cinta-adicional span {
     display: inline-block;
