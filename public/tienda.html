@@ -1014,7 +1014,7 @@ button[onclick*="whatsappDirecto"] i {
     border-radius: 10px;
 }
 /* ========================================= */
-/* --- 1. BARRA PRINCIPAL (PC Y BASE) --- */
+/* --- 1. BARRA PRINCIPAL (PC Y BASE) ---    */
 /* ========================================= */
 .tabs-container {
     display: flex;
@@ -1043,36 +1043,32 @@ button[onclick*="whatsappDirecto"] i {
     transition: 0.3s;
 }
 
-/* Pestañas (Izquierda) */
+/* Pestañas (Izquierda en PC) */
 .tabs-left {
-        position: absolute;
-        top: 75px; 
-        left: 0;
-        width: 100%;
-        background: #1a1a1a;
-        flex-direction: column;
-        display: none; /* Tu JS controla esto con 'mostrar-menu' */
-        z-index: 1000;
-        border-bottom: 2px solid #E5C453;
-    }
+    display: flex;
+    flex: 0 0 auto;
+    height: 100%;
+}
 
-.tabs-left.mostrar-menu {
-        display: flex;
-        animation: slideDown 0.3s ease-out forwards;
-    }
-
-    .tab-item {
-        width: 100%;
-        height: 60px;
-        justify-content: flex-start;
-        padding-left: 25px;
-        border-bottom: 1px solid #2a2a2a;
-    }
+.tab-item {
+    padding: 0 20px;
+    color: #ffffff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 14px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 100%;
+}
 
 .tab-item i { font-size: 18px; }
 .tab-item.active { background: #E5C453; color: #000; }
 
-/* Buscador Integrado (Centro) */
+/* Buscador Integrado (Centro en PC) */
 .search-nav-container {
     position: relative;
     flex: 1 1 auto; 
@@ -1113,12 +1109,12 @@ button[onclick*="whatsappDirecto"] i {
     font-size: 18px;
 }
 
-/* 5. REDES (Fijas a la derecha) */
-    .redes-nav {
-        order: 3;
-        gap: 5px;
-    }
-
+/* Redes Sociales (Derecha) */
+.redes-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
 .icono-nav {
     width: 38px;
@@ -1141,83 +1137,93 @@ button[onclick*="whatsappDirecto"] i {
 /* --- 2. DISEÑO MÓVIL (MENÚ DESPLEGABLE) --- */
 /* ========================================= */
 @media screen and (max-width: 767px) {
-   .tabs-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .tabs-container {
         padding: 0 10px;
         position: relative;
     }
 
-    /* 1. ORDEN DE LOS ELEMENTOS */
-    .menu-toggle { order: 1; }      /* Hamburguesa a la izquierda */
-    .search-nav-container { order: 2; } /* Buscador en medio/derecha */
-    .redes-nav { order: 3; }         /* Redes a la derecha */
+    /* Orden de elementos móviles */
+    .menu-toggle { order: 1; display: block; } 
+    .search-nav-container { order: 2; }
+    .redes-nav { order: 3; gap: 5px; }
 
-    /* 2. BUSCADOR COMPACTO (Solo la Lupa) */
-    .search-nav-container {
-        order: 2; 
-        flex: 0 0 40px;
-        max-width: 40px;
-        margin-left: auto; /* Empuja a la derecha junto a redes */
-        margin-right: 8px;
-        transition: all 0.4s ease, opacity 0.3s ease; /* Opacity para tu JS */
-        height: 40px;
-        display: flex;
-        align-items: center;
-        border-radius: 20px;
+    /* Pestañas ahora son un menú vertical oculto */
+    .tabs-left {
+        position: absolute;
+        top: 75px; 
+        left: 0;
+        width: 100%;
+        background: #1a1a1a;
+        flex-direction: column;
+        display: none; 
+        z-index: 1000;
+        border-bottom: 2px solid #E5C453;
+        height: auto;
     }
 
-    /* El input se vuelve invisible/circular cuando está cerrado */
-    .search-input-nav {
+    .tabs-left.mostrar-menu {
+        display: flex;
+        animation: slideDown 0.3s ease-out forwards;
+    }
+
+    .tab-item {
         width: 100%;
+        height: 60px;
+        justify-content: flex-start;
+        padding-left: 25px;
+        border-bottom: 1px solid #2a2a2a;
+    }
+
+    /* Buscador Compacto (Lupa a la derecha) */
+    .search-nav-container {
+        flex: 0 0 40px;
+        max-width: 40px;
+        margin-left: auto;
+        margin-right: 8px;
+        height: 40px;
+        background: transparent;
+    }
+
+    .search-input-nav {
+        padding: 0 !important;
         background: transparent !important;
         border: none !important;
-        padding: 0 !important;
-        color: white;
-        outline: none;
+        font-size: 14px !important;
     }
 
     .search-icon-nav {
-        position: absolute;
-        left: 12px;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Centrada cuando está cerrado */
         font-size: 16px;
-        color: #E5C453;
-        pointer-events: none;
     }
 
-    /* 3. EXPANSIÓN (Al tocar la lupa) */
+    /* Expansión del buscador al tocar */
     .search-nav-container:focus-within {
         flex: 1;
-        max-width: 160px; /* Tamaño ideal para no chocar */
+        max-width: 160px; 
         background: #2a2a2a !important;
         border: 1px solid #E5C453 !important;
-        padding: 0 10px 0 35px !important;
+        border-radius: 20px;
     }
 
     .search-nav-container:focus-within .search-input-nav {
-        padding: 0 15px 0 40px !important;
+        padding: 0 10px 0 35px !important;
         background: #2a2a2a !important;
-        border: 1px solid #444 !important;
-        width: 100%;
     }
 
-    /* Reposiciona la lupa cuando se abre */
     .search-nav-container:focus-within .search-icon-nav {
-        left: 15px;
+        left: 12px;
         transform: translateY(-50%);
     }
 
-.redes-nav {
-        order: 3;
-        gap: 5px;
-    }
+    /* Redes sociales más pequeñas en móvil */
     .icono-nav {
         width: 34px !important;
         height: 34px !important;
     }
 }
 
+/* Animaciones */
 @keyframes slideDown {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
