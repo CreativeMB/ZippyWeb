@@ -2128,20 +2128,32 @@ function render() {
         const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '';
         const prioridadAttr = indice < 4 ? 'fetchpriority="high"' : 'loading="lazy"';
 
-        card.innerHTML = `
-            <div class="img-container">
-                ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-                <img src="${normalizarImagen(imgUrl)}" 
-                     style="${estiloImagen} ${estiloCursor};" 
-                     ${prioridadAttr} 
-                     alt="${refProd}"
-                     ${eventoClickImagen}> 
-            </div>
-            <div class="nombre">${real.referenciaReal || refP}</div>
-            <div class="precio-contenedor">${precioHTML}</div>
-            ${botonesHtml}
-        `;
-        // Nota: Cambié onclick fijo por ${eventoClickImagen} y cursor:pointer por ${estiloCursor}
+   card.innerHTML = `
+    <div class="img-container" style="position: relative; overflow: hidden; border-radius: 8px 8px 0 0;">
+        ${real.promocion ? '<div class="etiquetaPromo" style="position: absolute; top: 10px; left: 10px; z-index: 2;">PROMO</div>' : ''}
+        
+        <img src="${normalizarImagen(imgUrl)}" 
+             style="${estiloImagen} ${estiloCursor} display: block; width: 100%; height: auto; object-fit: cover;" 
+             loading="lazy" 
+             ${prioridadAttr} 
+             alt="${refProd}"
+             ${eventoClickImagen}
+             onerror="this.src='https://via.placeholder.com/300?text=Imagen+No+Disponible'"> 
+    </div>
+
+    <div class="nombre" style="padding: 10px 10px 0; font-weight: bold; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        ${real.referenciaReal || refP}
+    </div>
+
+    <div class="precio-contenedor" style="padding: 0 10px; margin-bottom: 5px;">
+        ${precioHTML}
+    </div>
+
+    <div class="botones-container" style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: auto;">
+        ${botonesHtml}
+    </div>
+`;
+       
 
         contenedor.appendChild(card);
         indice++;
