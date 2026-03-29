@@ -2093,17 +2093,18 @@ function render() {
             botonesHtml = `<button class="btn" style="background:#888; color:white; cursor:not-allowed; margin: 10px;" disabled>Agotado</button>`;
         } else {
             botonesHtml = `
-         <div style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px;">
-                    <!-- BOTÓN DORADO: Al carrito -->
-                    <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
-                            style="flex: 1; margin: 0; background: #E5C453; color: #000; font-size: 11px; padding: 8px;">
-                        <i class="fas fa-cart-plus"></i>
-                    </button>
-                    <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" 
-                    style="flex: 1; margin: 0; background: #25D366; font-size: 11px; padding: 8px;">
-                <i class="fab fa-whatsapp"></i> WhatsApp
-            </button>
-        </div>
+         <div style="display: flex; gap: 8px; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+    <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
+            style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; min-width: 0; background: #E5C453; color: #000; font-size: 11px; padding: 8px; border-radius: 5px; border: none; white-space: nowrap;">
+        <i class="fas fa-cart-plus"></i>
+    </button>
+
+    <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" 
+            style="flex: 1.5; display: flex; align-items: center; justify-content: center; gap: 4px; min-width: 0; background: #25D366; color: #fff; font-size: 11px; padding: 8px; border-radius: 5px; border: none; white-space: nowrap;">
+        <i class="fab fa-whatsapp"></i> 
+        <span style="overflow: hidden; text-overflow: ellipsis;">WhatsApp</span>
+    </button>
+</div>
             `;
         }
 
