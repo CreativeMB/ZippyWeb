@@ -1602,7 +1602,7 @@ import {
     let procesadoExitoso = false;
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
-
+/*
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
     const path = window.location.pathname;
@@ -1677,7 +1677,76 @@ async function detectarEmpresaPorDominio() {
         console.error("🔥 Error general:", error);
         irAMantenimiento("Error de conexión");
     }
+}*/
+async function detectarEmpresaPorDominio() {
+    const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
+    const path = window.location.pathname;
+
+    try {
+        let idEmpresa = ""; 
+        let slug = "";
+
+        // ==========================================
+        // CASO 1: DOMINIO PROPIO
+        // ==========================================
+        if (host !== "zippy-727d5.web.app" && host !== "localhost") {
+            const dominioKey = host.replaceAll(".", "_");
+            const dominioRef = ref(db, `dominios/${dominioKey}`);
+            const snap = await get(dominioRef);
+
+            if (!snap.exists()) return irAMantenimiento("Dominio no registrado");
+
+            const data = snap.val();
+            idEmpresa = data.idEmpresa; // <--- OBTENEMOS EL ID DIRECTO
+            slug = data.slug;
+        }
+
+        // ==========================================
+        // CARGA DE DATOS SEGURA
+        // ==========================================
+        
+        // IMPORTANTE: No llames a una función que busque por slug en la raíz.
+        // Llama a una función que pida los nodos específicos usando el idEmpresa.
+        
+        if (idEmpresa) {
+            cargarTiendaSegura(idEmpresa); 
+        } else {
+            // Si vienes por SLUG (/t/slug), primero busca el UID de ese slug
+            // o usa una consulta limitada.
+            buscarUidPorSlug(slug);
+        }
+
+    } catch (error) {
+        console.error("🔥 Error:", error);
+    }
 }
+
+// ESTA ES LA FUNCIÓN QUE REALMENTE PROTEGE TUS DATOS
+async function cargarTiendaSegura(idEmpresa) {
+    console.log("🛡️ Cargando de forma segura para ID:", idEmpresa);
+
+    // 1. Pedimos SOLO el perfil (esto NO trae la base de datos)
+    const perfilRef = ref(db, `${idEmpresa}/perfilempresa`);
+    const productosRef = ref(db, `${idEmpresa}/productos`);
+
+    const [snapPerfil, snapProductos] = await Promise.all([
+        get(perfilRef),
+        get(productosRef)
+    ]);
+
+    if (snapPerfil.exists()) {
+        console.log("✅ Datos públicos cargados. Los privados están bloqueados por las reglas.");
+        const perfil = snapPerfil.val();
+        const productos = snapProductos.val();
+        
+        // Aquí disparas tu lógica de mostrar productos y logo
+        renderizarTienda(perfil, productos);
+    }
+}
+
+
+
+
 // Función de mantenimiento sin redirección externa
 function irAMantenimiento(motivo) {
     console.log("Mantenimiento por:", motivo);
