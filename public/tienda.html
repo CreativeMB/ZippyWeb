@@ -1682,71 +1682,77 @@ async function detectarEmpresaPorDominio() {
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
     const path = window.location.pathname;
+    const loader = document.getElementById("loaderTienda"); // Asegúrate que el ID sea este
 
     try {
+        let idEmpresa = "";
         let slug = "";
-        let idEmpresa = ""; // <--- Agregamos esta variable
 
-        // ==========================================
-        // CASO 1: DOMINIO PROPIO
-        // ==========================================
+        // 1. OBTENER DATOS POR DOMINIO
         if (host !== "zippy-727d5.web.app" && host !== "localhost") {
             const dominioKey = host.replaceAll(".", "_");
-            const dominioRef = ref(db, `dominios/${dominioKey}`);
-            const snap = await get(dominioRef);
+            const snap = await get(ref(db, `dominios/${dominioKey}`));
 
-            if (!snap.exists()) return irAMantenimiento("Dominio no registrado");
+            if (snap.exists()) {
+                const data = snap.val();
+                idEmpresa = data.idEmpresa;
+                slug = data.slug;
+            }
+        } 
 
-            const data = snap.val();
-            idEmpresa = data.idEmpresa; // <--- Ya tenemos el ID, ¡úsalo!
-            slug = data.slug;
-            
-            window.idEmpresa = idEmpresa; // Guardar global
-        }
-
-        // ==========================================
-        // CASO 2: URL /t/slug
-        // ==========================================
-        else if (path.includes("/t/")) {
+        // 2. OBTENER DATOS POR URL (SLUG)
+        if (!idEmpresa && path.includes("/t/")) {
             slug = path.split("/t/")[1]?.split("/")[0] || "";
         }
 
-        if (!slug) return window.location.replace("https://zippy-727d5.web.app/portal.html");
-
-        window.slug = slug;
-        if (document.getElementById("loaderTienda")) document.getElementById("loaderTienda").style.display = "none";
-
-        // ==========================================
-        // INICIAR CARGA (EL CAMBIO IMPORTANTE)
-        // ==========================================
-        
-        // Si ya tenemos el ID (por dominio), cargamos directo para NO EXPONER DATOS
+        // 3. CARGAR LA TIENDA
         if (idEmpresa) {
-            cargarDatosDirectos(idEmpresa);
-        } else {
-            // Si es por slug, que siga su lógica normal
+            // CARGA SEGURA POR ID (EVITA LOADER INFINITO)
+            await cargarTiendaSegura(idEmpresa);
+        } else if (slug) {
+            // CARGA POR SLUG (Llamamos a tu función original)
             iniciarCargaBase(slug);
+        } else {
+            window.location.replace("https://zippy-727d5.web.app/portal.html");
         }
 
     } catch (error) {
-        console.error("🔥 Error:", error);
+        console.error("Error:", error);
+        if (loader) loader.style.display = "none";
     }
 }
 
-// Nueva función para cargar sin buscar en la raíz y evitar filtraciones
-async function cargarDatosDirectos(id) {
-    console.log("🛡️ Cargando modo seguro por ID");
-    // Pedimos solo los nodos públicos explícitamente
-    const snapPerfil = await get(ref(db, `${id}/perfilempresa`));
-    const snapProd = await get(ref(db, `${id}/productos`));
+// ESTA FUNCIÓN ES LA QUE EVITA QUE SE QUEDE EL LOADER
+async function cargarTiendaSegura(id) {
+    const loader = document.getElementById("loaderTienda");
     
-    if (snapPerfil.exists()) {
-        // Aquí disparas tu lógica de mostrar la tienda
-        // Ejemplo: renderizarTienda(snapPerfil.val(), snapProd.val());
-        console.log("✅ Tienda cargada sin exponer pedidos.");
+    try {
+        // Pedimos solo los nodos que las reglas permiten
+        const [snapPerfil, snapProd] = await Promise.all([
+            get(ref(db, `${id}/perfilempresa`)),
+            get(ref(db, `${id}/productos`))
+        ]);
+
+        if (snapPerfil.exists()) {
+            // 🚩 ASIGNA LAS VARIABLES QUE TU TIENDA USA
+            window.datosTienda = snapPerfil.val();
+            window.productosTienda = snapProd.val() || {};
+            window.slug = window.datosTienda.slug;
+
+            // 🚩 OCULTAR LOADER (Esto es lo que te falta)
+            if (loader) loader.style.display = "none";
+
+            // 🚩 LLAMAR A TU FUNCIÓN DE RENDERIZADO
+            // Cambia "mostrarTienda" por el nombre de la función que dibuja tu web
+            if (typeof iniciarInterfaz === "function") {
+                iniciarInterfaz(); 
+            }
+        }
+    } catch (e) {
+        console.error("Fallo al cargar nodos seguros", e);
+        if (loader) loader.style.display = "none";
     }
 }
-
 
 
 // Función para cuando entran por SLUG (ej: zippy.app/t/tienda)
