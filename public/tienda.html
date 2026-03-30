@@ -1602,7 +1602,7 @@ import {
     let procesadoExitoso = false;
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
-/*
+
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
     const path = window.location.pathname;
@@ -1677,77 +1677,8 @@ async function detectarEmpresaPorDominio() {
         console.error("🔥 Error general:", error);
         irAMantenimiento("Error de conexión");
     }
-}*/
-async function detectarEmpresaPorDominio() {
-    const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
-    const path = window.location.pathname;
-    const loader = document.getElementById("loaderTienda");
-
-    try {
-        // CASO 1: Por Dominio
-        if (host !== "zippy-727d5.web.app" && host !== "localhost") {
-            const dominioKey = host.replaceAll(".", "_");
-            const snap = await get(ref(db, `dominios/${dominioKey}`));
-            if (snap.exists()) {
-                console.log("✅ ID por dominio encontrado");
-                return cargarTiendaPorID(snap.val().idEmpresa);
-            }
-        }
-
-        // CASO 2: Por Slug en URL
-        if (path.includes("/t/")) {
-            const slug = path.split("/t/")[1]?.split("/")[0] || "";
-            const consulta = query(ref(db), orderByChild("perfilempresa/slug"), equalTo(slug));
-            const snap = await get(consulta);
-
-            if (snap.exists()) {
-                const idEmpresa = Object.keys(snap.val())[0];
-                console.log("✅ ID por slug encontrado");
-                return cargarTiendaPorID(idEmpresa);
-            }
-        }
-
-        // Si nada coincide
-        window.location.replace("https://zippy-727d5.web.app/portal.html");
-
-    } catch (error) {
-        console.error("🔥 Error detectando empresa:", error);
-        if (loader) loader.style.display = "none";
-    }
 }
 
-// FUNCIÓN DEFINITIVA PARA CARGAR DATOS Y QUITAR LOADER
-async function cargarTiendaPorID(idEmpresa) {
-    const loader = document.getElementById("loaderTienda");
-    try {
-        // Pedimos SOLO los nodos públicos por separado para que Firebase no bloquee la lectura
-        const [snapPerfil, snapProd] = await Promise.all([
-            get(ref(db, `${idEmpresa}/perfilempresa`)),
-            get(ref(db, `${idEmpresa}/productos`))
-        ]);
-
-        if (snapPerfil.exists()) {
-            // Guardamos en las variables que usa tu sistema
-            window.datosTienda = snapPerfil.val();
-            window.productosTienda = snapProd.val() || {};
-            window.slug = window.datosTienda.slug;
-
-            // 🚩 AQUÍ SE QUITA EL LOADER
-            if (loader) loader.style.display = "none";
-
-            // Disparamos la función que dibuja tu tienda
-            // Asegúrate de que este sea el nombre correcto de tu función de inicio
-            if (typeof iniciarTienda === "function") iniciarTienda();
-            else if (typeof iniciarInterfaz === "function") iniciarInterfaz();
-            
-        } else {
-            throw new Error("La empresa no tiene perfil público");
-        }
-    } catch (error) {
-        console.error("🔥 Error cargando ID:", error);
-        if (loader) loader.style.display = "none";
-    }
-}
 
 
 // Función para cuando entran por SLUG (ej: zippy.app/t/tienda)
