@@ -1678,71 +1678,72 @@ async function detectarEmpresaPorDominio() {
         irAMantenimiento("Error de conexión");
     }
 }*/
-
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
-    const loader = document.getElementById("loader");
+    const path = window.location.pathname;
+    const loader = document.getElementById("loaderTienda");
 
     try {
+        let slug = "";
+        let idEmpresa = "";
+
         // ==========================================
-        // 1. BUSCAR ID POR DOMINIO
+        // CASO 1: DOMINIO PROPIO
         // ==========================================
         if (host !== "zippy-727d5.web.app" && host !== "localhost") {
             const dominioKey = host.replaceAll(".", "_");
-            const snapDominio = await get(ref(db, `dominios/${dominioKey}`));
+            const snap = await get(ref(db, `dominios/${dominioKey}`));
 
-            if (!snapDominio.exists()) {
-                if (loader) loader.style.display = "none";
-                return irAMantenimiento("Dominio no registrado");
+            if (snap.exists()) {
+                const data = snap.val();
+                idEmpresa = data.idEmpresa; // tc62AVkjwvZfawegqZ5Bs3RGdGk1
+                slug = data.slug;
             }
+        }
 
-            const data = snapDominio.val();
-            const idEmpresa = data.idEmpresa; // tc62AVkjwvZfawegqZ5Bs3RGdGk1
-            const slug = data.slug;
-
-            console.log("✅ ID detectado:", idEmpresa);
-
-            // ==========================================
-            // 2. CARGAR NODOS PÚBLICOS POR SEPARADO 
-            // (Esto evita el error de permisos y el loader infinito)
-            // ==========================================
-            const perfilRef = ref(db, `${idEmpresa}/perfilempresa`);
-            const productosRef = ref(db, `${idEmpresa}/productos`);
-
+        // ==========================================
+        // CARGA DE DATOS (PROTEGIENDO LO PRIVADO)
+        // ==========================================
+        if (idEmpresa) {
+            // 🚩 PASO CLAVE: Pedimos solo lo público por separado
+            // Si pides el ID completo, Firebase da error y el loader no se quita.
             const [snapPerfil, snapProductos] = await Promise.all([
-                get(perfilRef),
-                get(productosRef)
+                get(ref(db, `${idEmpresa}/perfilempresa`)),
+                get(ref(db, `${idEmpresa}/productos`))
             ]);
 
             if (snapPerfil.exists()) {
-                // Seteamos las variables globales que usa tu app
+                // Seteamos las variables que tu app necesita
                 window.slug = slug;
                 window.datosTienda = snapPerfil.val();
                 window.productosTienda = snapProductos.val() || {};
 
-                // 🚩 ¡AQUÍ SE QUITA EL LOADER!
+                // ✅ QUITAMOS EL LOADER
                 if (loader) loader.style.display = "none";
-
-                console.log("🚀 Tienda lista por dominio");
                 
-                // Si tienes una función que inicializa la interfaz, llámala aquí
+                // Llamamos a la carga de la base pero solo con los datos que ya tenemos
+                // Si tienes una funcion que dibuja la tienda, llámala aquí:
                 // iniciarInterfaz(); 
-                return; 
+                return;
             }
+        } 
+
+        // Si es por SLUG normal o no se detectó ID por dominio
+        else if (path.includes("/t/")) {
+            slug = path.split("/t/")[1]?.split("/")[0] || "";
+            window.slug = slug;
+            iniciarCargaBase(slug); // Tu función original
         }
 
-        // Si no es dominio, sigue con tu lógica de SLUG...
-        // (Tu lógica de slug actual aquí abajo)
-
     } catch (error) {
-        console.error("🔥 Error en dominio:", error);
+        console.error("🔥 Error crítico:", error);
         if (loader) loader.style.display = "none";
     }
 }
 
 // ESTA FUNCIÓN ES LA QUE EVITA QUE SE QUEDE EL LOADER
 async function cargarTiendaSegura(id) {
-    const loader = document.getElementById("loader");
+    const loader = document.getElementById("loaderTienda");
     
     try {
         // Pedimos solo los nodos que las reglas permiten
