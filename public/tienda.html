@@ -1613,38 +1613,48 @@ async function detectarEmpresaPorDominio() {
     try {
         let slug = "";
 
-        // ==========================================
-        // CASO 1: DOMINIO PROPIO
-        // ==========================================
-        if (host !== "zippy-727d5.web.app" && host !== "localhost") {
+       // ==========================================
+// CASO 1: DOMINIO PROPIO
+// ==========================================
+if (host !== "zippy-727d5.web.app" && host !== "localhost") {
 
-            const dominioKey = host.replaceAll(".", "_");
+    const dominioKey = host.replaceAll(".", "_");
 
-            console.log("🔎 Buscando dominio:", dominioKey);
+    console.log("🔎 Buscando dominio:", dominioKey);
 
-            // 🔥 Usamos TU variable global (dbFirestore)
-          const dominioRef = ref(db, `dominios/${dominioKey}`);
-            const snap = await get(dominioRef);
+    try {
+        // Consultamos el nodo específico del dominio
+        const dominioRef = ref(db, `dominios/${dominioKey}`);
+        const snap = await get(dominioRef);
 
-            if (!snap.exists()) {
-                console.error("❌ Dominio no registrado");
-                return irAMantenimiento("Dominio no registrado");
-            }
-
-            const data = snap.val();
-
-            console.log("✅ Dominio encontrado:", data);
-
-            if (!data.slug) {
-                console.error("❌ Dominio sin slug");
-                return irAMantenimiento("Slug no configurado");
-            }
-
-            slug = data.slug;
-
-            console.log("🎯 Slug obtenido desde dominio:", slug);
+        if (!snap.exists()) {
+            console.error("❌ Dominio no registrado");
+            return irAMantenimiento("Dominio no registrado");
         }
 
+        const data = snap.val();
+
+        // VALIDACIÓN: Solo extraemos ID y Slug. 
+        // Si el nodo dominio tuviera más datos, no nos interesan.
+        const { idEmpresa, slug: slugDominio } = data;
+
+        if (!slugDominio || !idEmpresa) {
+            console.error("❌ Datos de dominio incompletos");
+            return irAMantenimiento("Configuración incompleta");
+        }
+
+        // GUARDAMOS LAS LLAVES: idEmpresa es la clave para entrar a perfilempresa
+        window.idEmpresa = idEmpresa; 
+        slug = slugDominio;
+
+        console.log("🎯 Empresa identificada:", idEmpresa);
+        console.log("🎯 Slug obtenido:", slug);
+
+    } catch (err) {
+        console.error("🔥 Error al validar dominio:", err);
+        return irAMantenimiento("Error de validación");
+    }
+}
         // ==========================================
         // CASO 2: URL /t/slug
         // ==========================================
@@ -1658,7 +1668,7 @@ async function detectarEmpresaPorDominio() {
         // ==========================================
         if (!slug) {
             console.error("❌ No se pudo determinar el slug");
-            return window.location.replace("https://zippy-727d5.web.app/portal.html");
+            return window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
         }
 
         // ==========================================
