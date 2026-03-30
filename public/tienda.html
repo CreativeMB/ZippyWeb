@@ -1681,7 +1681,7 @@ async function detectarEmpresaPorDominio() {
 
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
-    const loader = document.getElementById("loaderTienda");
+    const loader = document.getElementById("loader");
 
     try {
         // ==========================================
@@ -1742,7 +1742,7 @@ async function detectarEmpresaPorDominio() {
 
 // ESTA FUNCIÓN ES LA QUE EVITA QUE SE QUEDE EL LOADER
 async function cargarTiendaSegura(id) {
-    const loader = document.getElementById("loaderTienda");
+    const loader = document.getElementById("loader");
     
     try {
         // Pedimos solo los nodos que las reglas permiten
