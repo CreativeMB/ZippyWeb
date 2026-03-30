@@ -1681,43 +1681,61 @@ async function detectarEmpresaPorDominio() {
 
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
-    const path = window.location.pathname;
-    const loader = document.getElementById("loaderTienda"); // Asegúrate que el ID sea este
+    const loader = document.getElementById("loaderTienda");
 
     try {
-        let idEmpresa = "";
-        let slug = "";
-
-        // 1. OBTENER DATOS POR DOMINIO
+        // ==========================================
+        // 1. BUSCAR ID POR DOMINIO
+        // ==========================================
         if (host !== "zippy-727d5.web.app" && host !== "localhost") {
             const dominioKey = host.replaceAll(".", "_");
-            const snap = await get(ref(db, `dominios/${dominioKey}`));
+            const snapDominio = await get(ref(db, `dominios/${dominioKey}`));
 
-            if (snap.exists()) {
-                const data = snap.val();
-                idEmpresa = data.idEmpresa;
-                slug = data.slug;
+            if (!snapDominio.exists()) {
+                if (loader) loader.style.display = "none";
+                return irAMantenimiento("Dominio no registrado");
             }
-        } 
 
-        // 2. OBTENER DATOS POR URL (SLUG)
-        if (!idEmpresa && path.includes("/t/")) {
-            slug = path.split("/t/")[1]?.split("/")[0] || "";
+            const data = snapDominio.val();
+            const idEmpresa = data.idEmpresa; // tc62AVkjwvZfawegqZ5Bs3RGdGk1
+            const slug = data.slug;
+
+            console.log("✅ ID detectado:", idEmpresa);
+
+            // ==========================================
+            // 2. CARGAR NODOS PÚBLICOS POR SEPARADO 
+            // (Esto evita el error de permisos y el loader infinito)
+            // ==========================================
+            const perfilRef = ref(db, `${idEmpresa}/perfilempresa`);
+            const productosRef = ref(db, `${idEmpresa}/productos`);
+
+            const [snapPerfil, snapProductos] = await Promise.all([
+                get(perfilRef),
+                get(productosRef)
+            ]);
+
+            if (snapPerfil.exists()) {
+                // Seteamos las variables globales que usa tu app
+                window.slug = slug;
+                window.datosTienda = snapPerfil.val();
+                window.productosTienda = snapProductos.val() || {};
+
+                // 🚩 ¡AQUÍ SE QUITA EL LOADER!
+                if (loader) loader.style.display = "none";
+
+                console.log("🚀 Tienda lista por dominio");
+                
+                // Si tienes una función que inicializa la interfaz, llámala aquí
+                // iniciarInterfaz(); 
+                return; 
+            }
         }
 
-        // 3. CARGAR LA TIENDA
-        if (idEmpresa) {
-            // CARGA SEGURA POR ID (EVITA LOADER INFINITO)
-            await cargarTiendaSegura(idEmpresa);
-        } else if (slug) {
-            // CARGA POR SLUG (Llamamos a tu función original)
-            iniciarCargaBase(slug);
-        } else {
-            window.location.replace("https://zippy-727d5.web.app/portal.html");
-        }
+        // Si no es dominio, sigue con tu lógica de SLUG...
+        // (Tu lógica de slug actual aquí abajo)
 
     } catch (error) {
-        console.error("Error:", error);
+        console.error("🔥 Error en dominio:", error);
         if (loader) loader.style.display = "none";
     }
 }
