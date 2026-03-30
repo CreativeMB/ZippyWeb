@@ -2096,7 +2096,7 @@ function render() {
         const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
         const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
 
- // --- LÓGICA DE BOTONES ---
+// --- LÓGICA DE BOTONES ---
 let botonesHtml = "";
 if (real.agotado) {
     botonesHtml = `
@@ -2107,17 +2107,19 @@ if (real.agotado) {
     </div>`;
 } else {
     botonesHtml = `
-    <div class="btn-container-responsive" style="display: flex; gap: 8px; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+    <div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
         
         <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
-                style="flex: 1; display: flex; align-items: center; justify-content: center; background: #E5C453; color: #000; font-size: 14px; padding: 8px; border-radius: 6px; border: none;">
+                style="flex: 1; display: flex; align-items: center; justify-content: center; min-width: 35px; background: #E5C453; color: #000; font-size: 14px; padding: 8px; border-radius: 6px; border: none;">
             <i class="fas fa-cart-plus"></i>
         </button>
 
         <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" 
-                style="flex: 3; display: flex; align-items: center; justify-content: center; gap: 6px; background: #25D366; color: #fff; font-size: 12px; padding: 8px; border-radius: 6px; border: none; white-space: nowrap; text-transform: none;">
-            <i class="fab fa-whatsapp" style="font-size: 15px;"></i> 
-            <span class="btn-text-responsive" style="font-weight: 600;">Pedir por WhatsApp</span>
+                style="flex: 2.5; display: flex; align-items: center; justify-content: center; gap: 4px; min-width: 0; background: #25D366; color: #fff; padding: 8px; border-radius: 6px; border: none; text-transform: none;">
+            <i class="fab fa-whatsapp" style="font-size: 14px;"></i> 
+            <span class="btn-text-responsive" style="font-weight: 600; font-size: clamp(10px, 2.5vw, 12px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                Pedir ahora
+            </span>
         </button>
         
     </div>`;
