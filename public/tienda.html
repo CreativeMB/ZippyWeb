@@ -2096,28 +2096,31 @@ function render() {
         const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
         const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
 
-        // --- LÓGICA DE BOTONES ---
-        let botonesHtml = "";
-        if (real.agotado) {
-            botonesHtml = `<button class="btn" style="background:#888; color:white; cursor:not-allowed; margin: 10px;" disabled>Agotado</button>`;
-        } else {
-            botonesHtml = `
+       // --- LÓGICA DE BOTONES ---
+let botonesHtml = "";
+if (real.agotado) {
+    // Agregamos el contenedor flex para centrarlo y darle el ancho correcto
+    botonesHtml = `
+    <div class="btn-container-responsive" style="display: flex; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+        <button class="btn" style="flex: 1; background:#888; color:white; cursor:not-allowed; padding: 8px; border-radius: 6px; border: none; font-size: 11px; font-weight: bold; text-transform: uppercase;" disabled>
+            Agotado
+        </button>
+    </div>`;
+} else {
+    botonesHtml = `
     <div class="btn-container-responsive" style="display: flex; gap: 8px; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
-    
-    <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
-            style="flex: 1; display: flex; align-items: center; justify-content: center; min-width: 0; background: #E5C453; color: #000; font-size: 11px; padding: 8px; border-radius: 6px; border: none;">
-        <i class="fas fa-cart-plus"></i>
-    </button>
+        <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
+                style="flex: 1; display: flex; align-items: center; justify-content: center; min-width: 0; background: #E5C453; color: #000; font-size: 11px; padding: 8px; border-radius: 6px; border: none;">
+            <i class="fas fa-cart-plus"></i>
+        </button>
 
-    <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" 
-            style="flex: 2; display: flex; align-items: center; justify-content: center; gap: 5px; min-width: 0; background: #25D366; color: #fff; font-size: 11px; padding: 8px; border-radius: 6px; border: none; white-space: nowrap;">
-        <i class="fab fa-whatsapp"></i> 
-        <span class="btn-text-responsive" style="transition: font-size 0.2s;">WhatsApp</span>
-    </button>
-    
-</div>
-            `;
-        }
+        <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" 
+                style="flex: 2; display: flex; align-items: center; justify-content: center; gap: 5px; min-width: 0; background: #25D366; color: #fff; font-size: 11px; padding: 8px; border-radius: 6px; border: none; white-space: nowrap;">
+            <i class="fab fa-whatsapp"></i> 
+            <span class="btn-text-responsive">WhatsApp</span>
+        </button>
+    </div>`;
+}
 
         // --- VARIABLES DE CONTROL (CORREGIDAS) ---
         const eventoClickImagen = real.agotado 
