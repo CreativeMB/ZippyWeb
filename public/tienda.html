@@ -1678,78 +1678,85 @@ async function detectarEmpresaPorDominio() {
         irAMantenimiento("Error de conexión");
     }
 }*/
-// Importar funciones necesarias de Firebase SDK si usas v9+
-// import { ref, get, query, orderByChild, equalTo } from "firebase/database";
-
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
     const path = window.location.pathname;
     const loader = document.getElementById("loaderTienda");
 
+    console.log("Iniciando detección...");
+
     try {
         let idEmpresa = "";
 
-        // --- PASO 1: OBTENER EL ID DE LA EMPRESA ---
-        
-        // Caso A: Dominio Propio
+        // --- CASO 1: DOMINIO ---
         if (host !== "zippy-727d5.web.app" && host !== "localhost") {
             const dominioKey = host.replaceAll(".", "_");
             const snapDominio = await get(ref(db, `dominios/${dominioKey}`));
             
             if (snapDominio.exists()) {
                 idEmpresa = snapDominio.val().idEmpresa;
-            } else {
-                throw new Error("Dominio no registrado");
+                console.log("ID encontrado por dominio:", idEmpresa);
             }
         } 
-        // Caso B: Por Slug en la URL (/t/slug)
-        else if (path.includes("/t/")) {
-            const slug = path.split("/t/")[1]?.split("/")[0] || "";
-            // Buscamos el ID que le pertenece a ese slug
-            const consulta = query(ref(db), orderByChild("perfilempresa/slug"), equalTo(slug));
+        
+        // --- CASO 2: SLUG (Si no se encontró por dominio) ---
+        if (!idEmpresa && path.includes("/t/")) {
+            const slugBuscado = path.split("/t/")[1]?.split("/")[0] || "";
+            console.log("Buscando por slug:", slugBuscado);
+
+            // IMPORTANTE: Buscamos el ID usando la consulta permitida en las reglas
+            const consulta = query(ref(db), orderByChild("perfilempresa/slug"), equalTo(slugBuscado));
             const snapSlug = await get(consulta);
             
             if (snapSlug.exists()) {
-                // Sacamos el primer ID que coincida
+                // Obtenemos la llave (ID) del primer resultado
                 idEmpresa = Object.keys(snapSlug.val())[0];
-            } else {
-                throw new Error("Slug no encontrado");
+                console.log("ID encontrado por slug:", idEmpresa);
             }
         }
 
-        // --- PASO 2: CARGAR LOS PRODUCTOS Y PERFIL (POR SEPARADO) ---
+        // --- CARGAR DATOS SI TENEMOS EL ID ---
         if (idEmpresa) {
-            // IMPORTANTE: Pedimos nodos especificos para que NO de error de permiso
+            // Pedimos los nodos por separado para evitar el error de "Permission Denied"
+            const perfilRef = ref(db, `${idEmpresa}/perfilempresa`);
+            const productosRef = ref(db, `${idEmpresa}/productos`);
+
             const [snapPerfil, snapProductos] = await Promise.all([
-                get(ref(db, `${idEmpresa}/perfilempresa`)),
-                get(ref(db, `${idEmpresa}/productos`))
+                get(perfilRef),
+                get(productosRef)
             ]);
 
             if (snapPerfil.exists()) {
                 window.perfilTienda = snapPerfil.val();
                 window.productosTienda = snapProductos.val() || {};
                 
-                console.log("✅ Tienda cargada:", window.perfilTienda.nombreTienda);
-                
-                // --- PASO 3: OCULTAR LOADER Y MOSTRAR WEB ---
+                // OCULTAR LOADER ANTES DE RENDERIZAR
                 if (loader) loader.style.display = "none";
                 
-                // Aquí llamas a tus funciones para pintar los productos
+                console.log("Cargando tienda...");
+                // Aquí llamas a tu función de dibujo
                 if (typeof iniciarTienda === "function") {
                     iniciarTienda(window.perfilTienda, window.productosTienda);
                 }
+            } else {
+                throw new Error("El ID existe pero no tiene perfil público");
             }
         } else {
+            console.error("No se encontró idEmpresa");
+            // Si no hay ID, mandamos al portal
             window.location.replace("https://zippy-727d5.web.app/portal.html");
         }
 
     } catch (error) {
-        console.error("🔥 Error en carga:", error);
+        console.error("🔥 Error crítico:", error);
+        // Si hay error, quitamos el loader para no dejar la pantalla bloqueada
         if (loader) loader.style.display = "none";
-        irAMantenimiento("Tienda no encontrada o error de conexión");
+        irAMantenimiento("Error al cargar la tienda");
+    } finally {
+        // Garantizamos que el loader se oculte si llegamos aquí
+        if (loader) loader.style.display = "none";
     }
 }
-
 // Función SEGURA para cargar por ID
 async function cargarTiendaPorID(idEmpresa) {
     // Pedimos los nodos por separado para que Firebase bloquee los privados
