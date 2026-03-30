@@ -2223,10 +2223,9 @@ window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
     });
 };
 
-// 2. ABRIR FORMULARIO (Al tocar imagen o botón carrito)
 window.abrirPestañaProducto = (nombre, imagen, precio, descripcion) => {
-    // Si viene de tocar una imagen y el carrito está vacío, lo agregamos automáticamente
-    if (nombre && carrito.length === 0) {
+    // Si se pasan datos de un producto, lo agregamos SIEMPRE (tenga o no otros productos)
+    if (nombre) {
         window.agregarAlCarrito(nombre, imagen, precio, descripcion);
     }
 
@@ -2235,10 +2234,10 @@ window.abrirPestañaProducto = (nombre, imagen, precio, descripcion) => {
     document.getElementById("empresa-tab").style.display = "none";
     document.getElementById("modalPedido").style.display = "block";
     
+    // Renderizamos el contenido actualizado
     window.renderizarCarritoEnForm();
     window.scrollTo(0, 0);
 };
-
 // 3. RENDERIZAR LA LISTA EN EL FORMULARIO
 window.renderizarCarritoEnForm = () => {
     const contenedor = document.getElementById("lista-carrito-form");
