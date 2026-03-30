@@ -1683,68 +1683,60 @@ async function detectarEmpresaPorDominio() {
     const path = window.location.pathname;
 
     try {
-        let idEmpresa = ""; 
-        let slug = "";
-
-        // ==========================================
         // CASO 1: DOMINIO PROPIO
-        // ==========================================
         if (host !== "zippy-727d5.web.app" && host !== "localhost") {
             const dominioKey = host.replaceAll(".", "_");
-            const dominioRef = ref(db, `dominios/${dominioKey}`);
-            const snap = await get(dominioRef);
+            const snap = await get(ref(db, `dominios/${dominioKey}`));
 
-            if (!snap.exists()) return irAMantenimiento("Dominio no registrado");
-
-            const data = snap.val();
-            idEmpresa = data.idEmpresa; // <--- OBTENEMOS EL ID DIRECTO
-            slug = data.slug;
+            if (snap.exists()) {
+                const data = snap.val();
+                console.log("✅ Empresa encontrada por ID:", data.idEmpresa);
+                
+                // 🔥 AQUÍ ESTÁ EL TRUCO: Carga usando el ID, no el slug
+                return cargarTiendaPorID(data.idEmpresa);
+            }
         }
 
-        // ==========================================
-        // CARGA DE DATOS SEGURA
-        // ==========================================
-        
-        // IMPORTANTE: No llames a una función que busque por slug en la raíz.
-        // Llama a una función que pida los nodos específicos usando el idEmpresa.
-        
-        if (idEmpresa) {
-            cargarTiendaSegura(idEmpresa); 
-        } else {
-            // Si vienes por SLUG (/t/slug), primero busca el UID de ese slug
-            // o usa una consulta limitada.
-            buscarUidPorSlug(slug);
+        // CASO 2: URL POR SLUG (/t/nombre-tienda)
+        if (path.includes("/t/")) {
+            const slug = path.split("/t/")[1]?.split("/")[0] || "";
+            return cargarTiendaPorSlug(slug);
         }
 
     } catch (error) {
-        console.error("🔥 Error:", error);
+        console.error("Error:", error);
     }
 }
 
-// ESTA ES LA FUNCIÓN QUE REALMENTE PROTEGE TUS DATOS
-async function cargarTiendaSegura(idEmpresa) {
-    console.log("🛡️ Cargando de forma segura para ID:", idEmpresa);
+// Función SEGURA para cargar por ID
+async function cargarTiendaPorID(idEmpresa) {
+    // Pedimos los nodos por separado para que Firebase bloquee los privados
+    const perfilSnap = await get(ref(db, `${idEmpresa}/perfilempresa`));
+    const productosSnap = await get(ref(db, `${idEmpresa}/productos`));
 
-    // 1. Pedimos SOLO el perfil (esto NO trae la base de datos)
-    const perfilRef = ref(db, `${idEmpresa}/perfilempresa`);
-    const productosRef = ref(db, `${idEmpresa}/productos`);
+    if (perfilSnap.exists()) {
+        window.datosTienda = perfilSnap.val();
+        window.productosTienda = productosSnap.val();
+        // Llama aquí a tu función que dibuja los productos en el HTML
+        renderizarProductos(window.productosTienda);
+    }
+}
 
-    const [snapPerfil, snapProductos] = await Promise.all([
-        get(perfilRef),
-        get(productosRef)
-    ]);
+// Función para cuando entran por SLUG (ej: zippy.app/t/tienda)
+async function cargarTiendaPorSlug(slug) {
+    // Esta búsqueda es permitida por las reglas (.indexOn)
+    const consulta = query(ref(db), orderByChild("perfilempresa/slug"), equalTo(slug));
+    const snap = await get(consulta);
 
-    if (snapPerfil.exists()) {
-        console.log("✅ Datos públicos cargados. Los privados están bloqueados por las reglas.");
-        const perfil = snapPerfil.val();
-        const productos = snapProductos.val();
+    if (snap.exists()) {
+        const fullData = snap.val(); 
+        const idEmpresa = Object.keys(fullData)[0];
         
-        // Aquí disparas tu lógica de mostrar productos y logo
-        renderizarTienda(perfil, productos);
+        // Para evitar que se vean datos privados en el JSON de respuesta:
+        // Una vez que tienes el idEmpresa, limpia y usa solo lo público
+        cargarTiendaPorID(idEmpresa);
     }
 }
-
-
 
 
 // Función de mantenimiento sin redirección externa
