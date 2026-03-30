@@ -1678,33 +1678,75 @@ async function detectarEmpresaPorDominio() {
         irAMantenimiento("Error de conexión");
     }
 }*/
+// Importar funciones necesarias de Firebase SDK si usas v9+
+// import { ref, get, query, orderByChild, equalTo } from "firebase/database";
+
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
     const path = window.location.pathname;
+    const loader = document.getElementById("loaderTienda");
 
     try {
-        // CASO 1: DOMINIO PROPIO
+        let idEmpresa = "";
+
+        // --- PASO 1: OBTENER EL ID DE LA EMPRESA ---
+        
+        // Caso A: Dominio Propio
         if (host !== "zippy-727d5.web.app" && host !== "localhost") {
             const dominioKey = host.replaceAll(".", "_");
-            const snap = await get(ref(db, `dominios/${dominioKey}`));
-
-            if (snap.exists()) {
-                const data = snap.val();
-                console.log("✅ Empresa encontrada por ID:", data.idEmpresa);
-                
-                // 🔥 AQUÍ ESTÁ EL TRUCO: Carga usando el ID, no el slug
-                return cargarTiendaPorID(data.idEmpresa);
+            const snapDominio = await get(ref(db, `dominios/${dominioKey}`));
+            
+            if (snapDominio.exists()) {
+                idEmpresa = snapDominio.val().idEmpresa;
+            } else {
+                throw new Error("Dominio no registrado");
+            }
+        } 
+        // Caso B: Por Slug en la URL (/t/slug)
+        else if (path.includes("/t/")) {
+            const slug = path.split("/t/")[1]?.split("/")[0] || "";
+            // Buscamos el ID que le pertenece a ese slug
+            const consulta = query(ref(db), orderByChild("perfilempresa/slug"), equalTo(slug));
+            const snapSlug = await get(consulta);
+            
+            if (snapSlug.exists()) {
+                // Sacamos el primer ID que coincida
+                idEmpresa = Object.keys(snapSlug.val())[0];
+            } else {
+                throw new Error("Slug no encontrado");
             }
         }
 
-        // CASO 2: URL POR SLUG (/t/nombre-tienda)
-        if (path.includes("/t/")) {
-            const slug = path.split("/t/")[1]?.split("/")[0] || "";
-            return cargarTiendaPorSlug(slug);
+        // --- PASO 2: CARGAR LOS PRODUCTOS Y PERFIL (POR SEPARADO) ---
+        if (idEmpresa) {
+            // IMPORTANTE: Pedimos nodos especificos para que NO de error de permiso
+            const [snapPerfil, snapProductos] = await Promise.all([
+                get(ref(db, `${idEmpresa}/perfilempresa`)),
+                get(ref(db, `${idEmpresa}/productos`))
+            ]);
+
+            if (snapPerfil.exists()) {
+                window.perfilTienda = snapPerfil.val();
+                window.productosTienda = snapProductos.val() || {};
+                
+                console.log("✅ Tienda cargada:", window.perfilTienda.nombreTienda);
+                
+                // --- PASO 3: OCULTAR LOADER Y MOSTRAR WEB ---
+                if (loader) loader.style.display = "none";
+                
+                // Aquí llamas a tus funciones para pintar los productos
+                if (typeof iniciarTienda === "function") {
+                    iniciarTienda(window.perfilTienda, window.productosTienda);
+                }
+            }
+        } else {
+            window.location.replace("https://zippy-727d5.web.app/portal.html");
         }
 
     } catch (error) {
-        console.error("Error:", error);
+        console.error("🔥 Error en carga:", error);
+        if (loader) loader.style.display = "none";
+        irAMantenimiento("Tienda no encontrada o error de conexión");
     }
 }
 
