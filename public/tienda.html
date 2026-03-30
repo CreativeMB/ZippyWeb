@@ -1613,46 +1613,49 @@ async function detectarEmpresaPorDominio() {
     try {
         let slug = "";
 
-       // ==========================================
-// CASO 1: DOMINIO PROPIO
+      // ==========================================
+// CASO 1: DOMINIO PROPIO (CORREGIDO - SIN EXPOSICIÓN)
 // ==========================================
 if (host !== "zippy-727d5.web.app" && host !== "localhost") {
 
     const dominioKey = host.replaceAll(".", "_");
 
-    console.log("🔎 Buscando dominio:", dominioKey);
-
     try {
-        // Consultamos el nodo específico del dominio
+        // 1. Buscamos específicamente el nodo del dominio
         const dominioRef = ref(db, `dominios/${dominioKey}`);
         const snap = await get(dominioRef);
 
         if (!snap.exists()) {
-            console.error("❌ Dominio no registrado");
-            return irAMantenimiento("Dominio no registrado");
+            // No damos detalles del error, solo redirigimos
+            return irAMantenimiento("Acceso no autorizado");
         }
 
-        const data = snap.val();
+        // 2. EXTRACCIÓN QUIRÚRGICA: 
+        // Solo sacamos idEmpresa y slug. 'snap.val()' no se guarda en ninguna variable global.
+        const { idEmpresa, slug: slugObtenido } = snap.val();
 
-        // VALIDACIÓN: Solo extraemos ID y Slug. 
-        // Si el nodo dominio tuviera más datos, no nos interesan.
-        const { idEmpresa, slug: slugDominio } = data;
-
-        if (!slugDominio || !idEmpresa) {
-            console.error("❌ Datos de dominio incompletos");
-            return irAMantenimiento("Configuración incompleta");
+        if (!idEmpresa || !slugObtenido) {
+            return irAMantenimiento("Error de configuración");
         }
 
-        // GUARDAMOS LAS LLAVES: idEmpresa es la clave para entrar a perfilempresa
+        // 3. ASIGNACIÓN DISCRETA:
+        // Guardamos solo los strings necesarios para las consultas públicas posteriores.
         window.idEmpresa = idEmpresa; 
-        slug = slugDominio;
+        window.slug = slugObtenido;
+        slug = slugObtenido; // Para compatibilidad con tu código actual
 
-        console.log("🎯 Empresa identificada:", idEmpresa);
-        console.log("🎯 Slug obtenido:", slug);
+        // 4. LOG LIMPIO:
+        // No imprimimos 'data' ni 'snap.val()'. Solo confirmamos el éxito.
+        console.log("✅ Dominio validado y vinculado correctamente.");
+
+        // 5. CARGA CONTROLADA:
+        // Llamamos a la función que pide específicamente 'perfilempresa' y 'productos'
+        iniciarCargaPublica(idEmpresa);
 
     } catch (err) {
-        console.error("🔥 Error al validar dominio:", err);
-        return irAMantenimiento("Error de validación");
+        // Error genérico para no dar pistas de la estructura de la DB
+        console.error("🔥 Error de validación."); 
+        return irAMantenimiento("Error de conexión");
     }
 }
         // ==========================================
