@@ -1612,6 +1612,17 @@ function registrarVisitaAnalytics(slugIdentificado) {
         empresa_slug: slugIdentificado,
         hostname: window.location.hostname
     });
+// 2. REGISTRO EN BASE DE DATOS (Para ver en tiempo real en tu App Kotlin)
+    // Ruta: ID_DE_LA_EMPRESA / perfilempresa
+    const perfilRef = ref(db, `${idEmpresa}/perfilempresa`);
+
+    update(perfilRef, {
+        visitas: increment(1) // Solo el campo "visitas"
+    }).then(() => {
+        console.log("✅ Campo 'visitas' actualizado en Firebase");
+    }).catch((error) => {
+        console.error("❌ Error al actualizar visitas:", error);
+    });
 }
 // 🔥 ESTA ES LA LÍNEA QUE FALTA:
 window.registrarVisitaAnalytics = registrarVisitaAnalytics;
