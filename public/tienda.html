@@ -1604,7 +1604,7 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     let procesadoExitoso = false;
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
-/*
+
     // Función reutilizable para registrar el evento
 function registrarVisitaAnalytics(slugIdentificado) {
     console.log("📊 Analytics: Registrando visita para", slugIdentificado);
@@ -1613,7 +1613,7 @@ function registrarVisitaAnalytics(slugIdentificado) {
         hostname: window.location.hostname
     });
 }
-*/
+
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
     const path = window.location.pathname;
@@ -1675,7 +1675,7 @@ async function detectarEmpresaPorDominio() {
 // ==========================================
         // 🚀 INSERTAR AQUÍ: REGISTRO DE ANALYTICS
         // ==========================================
-       /* registrarVisitaAnalytics(slug); */
+        registrarVisitaAnalytics(slug); 
 
         // ==========================================
         // INICIAR TIENDA
