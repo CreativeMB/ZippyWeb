@@ -1612,6 +1612,11 @@ function registrarVisitaAnalytics(slugIdentificado) {
         empresa_slug: slugIdentificado,
         hostname: window.location.hostname
     });
+// 2. Realtime Database (Solo sumamos el campo visitas)
+    const perfilRef = ref(db, `${idEmpresa}/perfilempresa`);
+    update(perfilRef, {
+        visitas: increment(1)
+    }).catch(e => console.error("Error sumando visita:", e));
 }
 // 🔥 ESTA ES LA LÍNEA QUE FALTA:
 window.registrarVisitaAnalytics = registrarVisitaAnalytics;
