@@ -1602,7 +1602,7 @@ import {
     let procesadoExitoso = false;
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
-
+/*
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
     const path = window.location.pathname;
@@ -1613,47 +1613,38 @@ async function detectarEmpresaPorDominio() {
     try {
         let slug = "";
 
-     // ==========================================
-// CASO 1: DOMINIO PROPIO (VERSIÓN FINAL)
-// ==========================================
-if (host !== "zippy-727d5.web.app" && host !== "localhost") {
-    // 1. Limpiamos el host para que coincida con la llave de Firebase
-    const dominioKey = host.replaceAll(".", "_"); 
+        // ==========================================
+        // CASO 1: DOMINIO PROPIO
+        // ==========================================
+        if (host !== "zippy-727d5.web.app" && host !== "localhost") {
 
-    try {
-        // 2. IMPORTANTE: Usamos 'get' con la ruta completa al hijo
-        // Si usas dbFirestore (Firestore) en lugar de db (Realtime), esto fallará.
-        // Asegúrate de que 'db' es la instancia de Realtime Database.
-        const dominioRef = ref(db, `dominios/${dominioKey}`);
-        const snap = await get(dominioRef);
+            const dominioKey = host.replaceAll(".", "_");
 
-        if (!snap.exists()) {
-            console.warn("⚠️ El dominio no existe en el nodo /dominios/");
-            return irAMantenimiento("Dominio no registrado");
+            console.log("🔎 Buscando dominio:", dominioKey);
+
+            // 🔥 Usamos TU variable global (dbFirestore)
+          const dominioRef = ref(db, `dominios/${dominioKey}`);
+            const snap = await get(dominioRef);
+
+            if (!snap.exists()) {
+                console.error("❌ Dominio no registrado");
+                return irAMantenimiento("Dominio no registrado");
+            }
+
+            const data = snap.val();
+
+            console.log("✅ Dominio encontrado:", data);
+
+            if (!data.slug) {
+                console.error("❌ Dominio sin slug");
+                return irAMantenimiento("Slug no configurado");
+            }
+
+            slug = data.slug;
+
+            console.log("🎯 Slug obtenido desde dominio:", slug);
         }
 
-        const data = snap.val();
-        const { idEmpresa, slug: slugObtenido } = data;
-
-        if (!idEmpresa || !slugObtenido) {
-            return irAMantenimiento("Error de configuración interna");
-        }
-
-        // Guardamos los datos necesarios
-        window.idEmpresa = idEmpresa;
-        window.slug = slugObtenido;
-        slug = slugObtenido;
-
-        console.log("✅ Conexión exitosa con la tienda");
-
-        // 3. Iniciamos la carga de los datos públicos (Perfil y Productos)
-        iniciarCargaPublica(idEmpresa);
-
-    } catch (err) {
-        console.error("🔥 Error de Firebase:", err);
-        return irAMantenimiento("Error de conexión");
-    }
-}
         // ==========================================
         // CASO 2: URL /t/slug
         // ==========================================
@@ -1688,45 +1679,36 @@ if (host !== "zippy-727d5.web.app" && host !== "localhost") {
     }
 }
 
-// ✅ Agrega esta función a tu script
-async function iniciarCargaPublica(idEmpresa) {
-    console.log("🛠️ Iniciando carga segura para ID:", idEmpresa);
-    
+*/
+async function detectarEmpresaPorDominio() {
+    const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
+    const dominioKey = host.replaceAll(".", "_");
+
     try {
-        // Referencias específicas a los nodos PÚBLICOS
-        const perfilRef = ref(db, `${idEmpresa}/perfilempresa`);
-        const productosRef = ref(db, `${idEmpresa}/productos`);
+        // 1. Buscamos el ID en el nodo dominios
+        const snapDominio = await get(ref(db, `dominios/${dominioKey}`));
+        
+        if (snapDominio.exists()) {
+            const { idEmpresa, slug } = snapDominio.val();
+            window.idEmpresa = idEmpresa;
+            window.slug = slug;
 
-        // Pedimos ambos al mismo tiempo para mayor velocidad
-        const [perfilSnap, productosSnap] = await Promise.all([
-            get(perfilRef),
-            get(productosRef)
-        ]);
+            // 2. 🔥 CARGA SEGURA: Pedimos solo el hijo 'perfilempresa'
+            // Al pedir la ruta completa /ID/perfilempresa, Firebase NO envía los pedidos.
+            const snapPerfil = await get(ref(db, `${idEmpresa}/perfilempresa`));
 
-        if (perfilSnap.exists()) {
-            const datosPerfil = perfilSnap.val();
-            const datosProductos = productosSnap.exists() ? productosSnap.val() : {};
-
-            console.log("✅ Datos públicos obtenidos. Renderizando tienda...");
-            
-            // Aquí llamas a tu función original que dibuja la tienda en el HTML
-            // Asegúrate de que el nombre coincida con la que ya usas (ej: iniciarCargaBase o renderizar)
-            if (typeof iniciarCargaBase === "function") {
-                iniciarCargaBase(window.slug, datosPerfil, datosProductos);
-            } else {
-                console.error("❌ No se encontró la función para mostrar la tienda (iniciarCargaBase)");
+            if (snapPerfil.exists()) {
+                const datos = snapPerfil.val();
+                console.log("✅ Perfil cargado sin exponer nodos privados");
+                
+                // Aquí continúas con tu lógica de renderizado
+                iniciarTienda(datos); 
             }
-        } else {
-            console.error("❌ El perfil de la empresa no existe.");
-            irAMantenimiento("Tienda no encontrada");
         }
-
     } catch (error) {
-        console.error("🔥 Error de seguridad o red:", error);
-        irAMantenimiento("Error de acceso");
+        console.error("Error de acceso.");
     }
 }
-
 // Función para cuando entran por SLUG (ej: zippy.app/t/tienda)
 async function cargarTiendaPorSlug(slug) {
     // Esta búsqueda es permitida por las reglas (.indexOn)
