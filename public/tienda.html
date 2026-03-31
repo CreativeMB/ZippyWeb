@@ -1613,48 +1613,44 @@ async function detectarEmpresaPorDominio() {
     try {
         let slug = "";
 
-      // ==========================================
-// CASO 1: DOMINIO PROPIO (CORREGIDO - SIN EXPOSICIÓN)
+     // ==========================================
+// CASO 1: DOMINIO PROPIO (VERSIÓN FINAL)
 // ==========================================
 if (host !== "zippy-727d5.web.app" && host !== "localhost") {
-
-    const dominioKey = host.replaceAll(".", "_");
+    // 1. Limpiamos el host para que coincida con la llave de Firebase
+    const dominioKey = host.replaceAll(".", "_"); 
 
     try {
-        // 1. Buscamos específicamente el nodo del dominio
+        // 2. IMPORTANTE: Usamos 'get' con la ruta completa al hijo
+        // Si usas dbFirestore (Firestore) en lugar de db (Realtime), esto fallará.
+        // Asegúrate de que 'db' es la instancia de Realtime Database.
         const dominioRef = ref(db, `dominios/${dominioKey}`);
         const snap = await get(dominioRef);
 
         if (!snap.exists()) {
-            // No damos detalles del error, solo redirigimos
-            return irAMantenimiento("Acceso no autorizado");
+            console.warn("⚠️ El dominio no existe en el nodo /dominios/");
+            return irAMantenimiento("Dominio no registrado");
         }
 
-        // 2. EXTRACCIÓN QUIRÚRGICA: 
-        // Solo sacamos idEmpresa y slug. 'snap.val()' no se guarda en ninguna variable global.
-        const { idEmpresa, slug: slugObtenido } = snap.val();
+        const data = snap.val();
+        const { idEmpresa, slug: slugObtenido } = data;
 
         if (!idEmpresa || !slugObtenido) {
-            return irAMantenimiento("Error de configuración");
+            return irAMantenimiento("Error de configuración interna");
         }
 
-        // 3. ASIGNACIÓN DISCRETA:
-        // Guardamos solo los strings necesarios para las consultas públicas posteriores.
-        window.idEmpresa = idEmpresa; 
+        // Guardamos los datos necesarios
+        window.idEmpresa = idEmpresa;
         window.slug = slugObtenido;
-        slug = slugObtenido; // Para compatibilidad con tu código actual
+        slug = slugObtenido;
 
-        // 4. LOG LIMPIO:
-        // No imprimimos 'data' ni 'snap.val()'. Solo confirmamos el éxito.
-        console.log("✅ Dominio validado y vinculado correctamente.");
+        console.log("✅ Conexión exitosa con la tienda");
 
-        // 5. CARGA CONTROLADA:
-        // Llamamos a la función que pide específicamente 'perfilempresa' y 'productos'
+        // 3. Iniciamos la carga de los datos públicos (Perfil y Productos)
         iniciarCargaPublica(idEmpresa);
 
     } catch (err) {
-        // Error genérico para no dar pistas de la estructura de la DB
-        console.error("🔥 Error de validación."); 
+        console.error("🔥 Error de Firebase:", err);
         return irAMantenimiento("Error de conexión");
     }
 }
