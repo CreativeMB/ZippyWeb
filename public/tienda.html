@@ -1571,8 +1571,7 @@ import {
     getFirestore, collection, query, where, getDocs 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// --- IMPORT DE ANALYTICS ---
-    import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+
     const firebaseConfig = {
         apiKey: "TU_API_KEY",
         authDomain: "zippy-727d5.firebaseapp.com",
@@ -1583,8 +1582,7 @@ import {
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const dbFirestore = getFirestore(app);
-// Inicializar Analytics globalmente
-    const analytics = getAnalytics(app);
+
     // --- VARIABLES GLOBALES ---
     let productosJson = {};
     let productosRealtime = {};
@@ -1601,22 +1599,6 @@ import {
     let menuCategoriasAbierto = false;
     let carrito = [];
     let procesadoExitoso = false;
-
-/**
-     * FUNCIÓN PARA REGISTRAR EN ANALYTICS
-     */
-    function registrarVisitaEmpresa(slugIdentificado) {
-        if (!slugIdentificado) return;
-        
-        console.log("📊 Registrando visita en Analytics para:", slugIdentificado);
-        logEvent(analytics, 'visita_empresa', {
-            empresa_slug: slugIdentificado,
-            dominio_actual: window.location.hostname,
-            url_path: window.location.pathname
-        });
-    }
-
-
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
@@ -1678,10 +1660,6 @@ async function detectarEmpresaPorDominio() {
             return window.location.replace("https://zippy-727d5.web.app/mantenimiento.html");
         }
 
-        // ==========================================
-        // 🚀 INSERTAR AQUÍ: REGISTRO DE ANALYTICS
-        // ==========================================
-       /* registrarVisitaAnalytics(slug);*/
         // ==========================================
         // INICIAR TIENDA
         // ==========================================
