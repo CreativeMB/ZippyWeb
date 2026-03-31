@@ -1688,7 +1688,44 @@ if (host !== "zippy-727d5.web.app" && host !== "localhost") {
     }
 }
 
+// ✅ Agrega esta función a tu script
+async function iniciarCargaPublica(idEmpresa) {
+    console.log("🛠️ Iniciando carga segura para ID:", idEmpresa);
+    
+    try {
+        // Referencias específicas a los nodos PÚBLICOS
+        const perfilRef = ref(db, `${idEmpresa}/perfilempresa`);
+        const productosRef = ref(db, `${idEmpresa}/productos`);
 
+        // Pedimos ambos al mismo tiempo para mayor velocidad
+        const [perfilSnap, productosSnap] = await Promise.all([
+            get(perfilRef),
+            get(productosRef)
+        ]);
+
+        if (perfilSnap.exists()) {
+            const datosPerfil = perfilSnap.val();
+            const datosProductos = productosSnap.exists() ? productosSnap.val() : {};
+
+            console.log("✅ Datos públicos obtenidos. Renderizando tienda...");
+            
+            // Aquí llamas a tu función original que dibuja la tienda en el HTML
+            // Asegúrate de que el nombre coincida con la que ya usas (ej: iniciarCargaBase o renderizar)
+            if (typeof iniciarCargaBase === "function") {
+                iniciarCargaBase(window.slug, datosPerfil, datosProductos);
+            } else {
+                console.error("❌ No se encontró la función para mostrar la tienda (iniciarCargaBase)");
+            }
+        } else {
+            console.error("❌ El perfil de la empresa no existe.");
+            irAMantenimiento("Tienda no encontrada");
+        }
+
+    } catch (error) {
+        console.error("🔥 Error de seguridad o red:", error);
+        irAMantenimiento("Error de acceso");
+    }
+}
 
 // Función para cuando entran por SLUG (ej: zippy.app/t/tienda)
 async function cargarTiendaPorSlug(slug) {
