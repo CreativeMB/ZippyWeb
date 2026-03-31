@@ -1605,14 +1605,16 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
-    // Función reutilizable para registrar el evento
-function registrarVisitaAnalytics(slugIdentificado) {
-    console.log("📊 Analytics: Registrando visita para", slugIdentificado);
+ function registrarVisitaAnalytics(idEmpresa, slugIdentificado) {
+    if (!idEmpresa || !slugIdentificado) return;
+
+    // 1. Google Analytics
     logEvent(analytics, 'visita_empresa', {
         empresa_slug: slugIdentificado,
         hostname: window.location.hostname
     });
-// 2. Realtime Database (Solo sumamos el campo visitas)
+
+    // 2. Realtime Database (Solo sumamos el campo visitas)
     const perfilRef = ref(db, `${idEmpresa}/perfilempresa`);
     update(perfilRef, {
         visitas: increment(1)
