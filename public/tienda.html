@@ -1602,7 +1602,7 @@ import {
     let procesadoExitoso = false;
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
-/*
+
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
     const path = window.location.pathname;
@@ -1679,36 +1679,8 @@ async function detectarEmpresaPorDominio() {
     }
 }
 
-*/
-async function detectarEmpresaPorDominio() {
-    const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
-    const dominioKey = host.replaceAll(".", "_");
 
-    try {
-        // 1. Buscamos el ID en el nodo dominios
-        const snapDominio = await get(ref(db, `dominios/${dominioKey}`));
-        
-        if (snapDominio.exists()) {
-            const { idEmpresa, slug } = snapDominio.val();
-            window.idEmpresa = idEmpresa;
-            window.slug = slug;
 
-            // 2. 🔥 CARGA SEGURA: Pedimos solo el hijo 'perfilempresa'
-            // Al pedir la ruta completa /ID/perfilempresa, Firebase NO envía los pedidos.
-            const snapPerfil = await get(ref(db, `${idEmpresa}/perfilempresa`));
-
-            if (snapPerfil.exists()) {
-                const datos = snapPerfil.val();
-                console.log("✅ Perfil cargado sin exponer nodos privados");
-                
-                // Aquí continúas con tu lógica de renderizado
-                iniciarTienda(datos); 
-            }
-        }
-    } catch (error) {
-        console.error("Error de acceso.");
-    }
-}
 // Función para cuando entran por SLUG (ej: zippy.app/t/tienda)
 async function cargarTiendaPorSlug(slug) {
     // Esta búsqueda es permitida por las reglas (.indexOn)
