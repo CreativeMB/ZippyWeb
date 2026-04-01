@@ -1605,22 +1605,39 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
- function registrarVisitaAnalytics(idEmpresa, slugIdentificado) {
+function registrarVisitaAnalytics(idEmpresa, slugIdentificado) {
     if (!idEmpresa || !slugIdentificado) return;
 
-    // 1. Google Analytics
-    logEvent(analytics, 'visita_empresa', {
-        empresa_slug: slugIdentificado,
-        hostname: window.location.hostname
-    });
+    // 1. Obtener Año y Mes actual (Ejemplo: "2026_03")
+    // Esto garantiza que el contador sea mensual y se "resetee" el día 1 de cada mes
+    const fecha = new Date();
+    const mesAnio = `${fecha.getFullYear()}_${String(fecha.getMonth() + 1).padStart(2, '0')}`;
 
-    // 2. Realtime Database (Solo sumamos el campo visitas)
-    const perfilRef = ref(db, `${idEmpresa}/perfilempresa`);
-    update(perfilRef, {
+    console.log(`📊 Zippy: Registrando visita mensual (${mesAnio}) para ${slugIdentificado}`);
+
+    // 2. Registro en Google Analytics (Reportes detallados)
+    if (typeof logEvent === 'function' && analytics) {
+        logEvent(analytics, 'visita_empresa', {
+            empresa_slug: slugIdentificado,
+            mes_registro: mesAnio,
+            hostname: window.location.hostname
+        });
+    }
+
+    // 3. Registro en Firebase Realtime (Para tu App Kotlin)
+    // Ruta: ID_EMPRESA / estadisticas / 2026_03
+    const statsRef = ref(db, `${idEmpresa}/estadisticas/${mesAnio}`);
+
+    update(statsRef, {
         visitas: increment(1)
-    }).catch(e => console.error("Error sumando visita:", e));
+    }).then(() => {
+        console.log("✅ Visita mensual actualizada");
+    }).catch(e => {
+        console.error("❌ Error en contador mensual:", e);
+    });
 }
-// 🔥 ESTA ES LA LÍNEA QUE FALTA:
+
+// Hacerla accesible globalmente
 window.registrarVisitaAnalytics = registrarVisitaAnalytics;
 
 function gestionarPresenciaEnVivo(idEmpresa) {
