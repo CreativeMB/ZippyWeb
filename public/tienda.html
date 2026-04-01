@@ -1761,6 +1761,12 @@ async function iniciarCargaBase(slugDesdeURL) {
             const perfil = data.perfilempresa;
 
             empresaId = id;
+            // 🚀 --- AQUÍ INSERTAMOS EL REGISTRO DE VISITA ---
+            // Usamos el ID de la empresa y el slug que viene del perfil
+            if (typeof registrarVisitaAnalytics === 'function') {
+                registrarVisitaAnalytics(id, perfil.slug);
+            }
+            //
 
             aplicarSEO(perfil);
             validarYContinuar(perfil, data);
