@@ -1561,7 +1561,7 @@ body {
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     // --- IMPORT DE DATABASE (Añadimos el alias as queryDB) ---
 import { 
-    getDatabase, ref, onValue, push, set, get, update, increment,
+    getDatabase, ref, onValue, push, set, get, update, increment, onDisconnect,
     query as queryDB, // <--- Aquí le ponemos el apodo
     orderByChild, equalTo 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -1622,6 +1622,34 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
 }
 // 🔥 ESTA ES LA LÍNEA QUE FALTA:
 window.registrarVisitaAnalytics = registrarVisitaAnalytics;
+
+function gestionarPresenciaEnVivo(idEmpresa) {
+    if (!idEmpresa || !db) return;
+
+    // 1. Ruta donde guardaremos quién está conectado ahora
+    // [ID_EMPRESA] / presencia / [ID_SESION_ALEATORIO]
+    const presenciaRef = ref(db, `${idEmpresa}/presencia`);
+    
+    // 2. Nodo especial de Firebase que detecta si el cliente tiene internet
+    const conectadoRef = ref(db, ".info/connected");
+
+    onValue(conectadoRef, (snap) => {
+        if (snap.val() === true) {
+            // El cliente se conectó: Creamos una entrada única para esta pestaña
+            const miSesionRef = push(presenciaRef);
+
+            // 🔥 TRUCO MAESTRO: Si el cliente cierra el navegador, 
+            // Firebase borra este nodo automáticamente desde el servidor.
+            onDisconnect(miSesionRef).remove();
+
+            // Marcamos la sesión como activa
+            set(miSesionRef, {
+                estado: "online",
+                timestamp: Date.now()
+            });
+        }
+    });
+}
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
     const path = window.location.pathname;
@@ -1765,6 +1793,8 @@ async function iniciarCargaBase(slugDesdeURL) {
             // Usamos el ID de la empresa y el slug que viene del perfil
             if (typeof registrarVisitaAnalytics === 'function') {
                 registrarVisitaAnalytics(id, perfil.slug);
+                // 2. Muestra que hay alguien conectado AHORA
+                gestionarPresenciaEnVivo(id);
             }
             //
 
