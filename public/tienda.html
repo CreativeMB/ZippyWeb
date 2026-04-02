@@ -1640,8 +1640,6 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     const db = getDatabase(app);
     const dbFirestore = getFirestore(app);
     const analytics = getAnalytics(app);
-
-
     // --- VARIABLES GLOBALES ---
     let productosJson = {};
     let productosRealtime = {};
@@ -1672,13 +1670,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-
-// 2. buscar pot referencia por la url
-const productosRef = ref(db, 'productos');
-onValue(productosRef, (snapshot) => {
-    const data = snapshot.val();
-    const contenedor = document.getElementById('contenedor-productos');
-    if (!contenedor) return;
 
 
 // --- 1. ARRANQUE Y DETECCIÓN ---
