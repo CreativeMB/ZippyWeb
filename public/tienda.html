@@ -1684,55 +1684,48 @@ const productosRef = ref(db, 'productos');
 onValue(productosRef, (snapshot) => {
     const data = snapshot.val();
     const contenedor = document.getElementById('contenedor-productos');
-    if (!contenedor) return; 
-    
+    if (!contenedor) return;
+
+    // 1. Limpiar la pantalla COMPLETAMENTE antes de empezar
     contenedor.innerHTML = ""; 
 
-    // 1. Capturamos la categoría de la URL y la limpiamos a fondo
+    // 2. Obtener la categoría de la URL y limpiarla
     const urlParams = new URLSearchParams(window.location.search);
-    const rawCategoria = urlParams.get('categoria');
-    
-    // Si no hay categoría en URL, categoriaBuscada será null
-    const categoriaBuscada = rawCategoria ? rawCategoria.toLowerCase().trim() : null;
+    const categoriaBuscada = urlParams.get('categoria')?.toLowerCase().trim();
 
-    console.log("🎯 Buscando exactamente:", `"${categoriaBuscada}"`);
+    console.log("🎯 Buscando productos para:", `"${categoriaBuscada}"`);
 
     if (data) {
-        // Convertimos el objeto de Firebase en Array para iterar mejor
-        const listaProductos = Object.values(data);
-
-        listaProductos.forEach(producto => {
-            // 2. Limpiar las categorías que vienen de la Base de Datos
-            // Si el campo no existe, devolvemos un array vacío
+        Object.values(data).forEach(producto => {
+            // 3. Convertimos la categoría de la DB en un array limpio
+            // Maneja casos donde el producto tenga varias: "Rosas, Chocolates"
             const categoriasDelProducto = producto.categoria 
-                ? producto.categoria.split(',').map(cat => cat.toLowerCase().trim()) 
+                ? producto.categoria.split(',').map(c => c.toLowerCase().trim()) 
                 : [];
 
-            // 3. LA LÓGICA DE FILTRADO BLINDADA
-            let debeMostrarse = false;
+            // 4. LÓGICA DE FILTRADO ESTRICTA
+            let mostrarEsteProducto = false;
 
             if (!categoriaBuscada) {
-                // Si la URL no tiene ?categoria=, mostramos todo
-                debeMostrarse = true;
-            } else {
-                // Si el array de categorías del producto contiene la de la URL
-                if (categoriasDelProducto.includes(categoriaBuscada)) {
-                    debeMostrarse = true;
-                }
+                // Si la URL no tiene filtro, se muestran todos
+                mostrarEsteProducto = true;
+            } else if (categoriasDelProducto.includes(categoriaBuscada)) {
+                // Si la URL pide "adicional" y el producto la tiene, se muestra
+                mostrarEsteProducto = true;
             }
 
-            // 4. EJECUCIÓN
-            if (debeMostrarse) {
+            // 5. SOLO si pasa el filtro, se dibuja en pantalla
+            if (mostrarEsteProducto) {
                 renderizarCard(producto);
             } else {
-                // Log opcional para depurar por qué no entra
-                // console.log(`🚫 Omitido: ${producto.nombre} (Categorías: ${categoriasDelProducto.join('|')})`);
+                // Opcional: ver qué se está ignorando
+                console.log(`🚫 Omitido por categoría: ${producto.nombre}`);
             }
         });
-        
-        // Si después de filtrar no hay nada, avisamos
+
+        // 6. Si al final nada coincidió, avisar al cliente
         if (contenedor.innerHTML === "" && categoriaBuscada) {
-            contenedor.innerHTML = `<p class="error-msg">No se encontraron productos en "${rawCategoria}"</p>`;
+            contenedor.innerHTML = `<div class="no-results">No hay productos en la categoría "${categoriaBuscada}"</div>`;
         }
     }
 });
