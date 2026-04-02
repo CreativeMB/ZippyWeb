@@ -1680,54 +1680,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 2. buscar pot referencia por la url
 const productosRef = ref(db, 'productos');
-
 onValue(productosRef, (snapshot) => {
     const data = snapshot.val();
     const contenedor = document.getElementById('contenedor-productos');
     if (!contenedor) return;
 
-    // 1. Limpiar la pantalla COMPLETAMENTE antes de empezar
+    // 1. Limpieza total antes de empezar
     contenedor.innerHTML = ""; 
 
-    // 2. Obtener la categoría de la URL y limpiarla
+    // 2. Captura y limpieza de la URL
     const urlParams = new URLSearchParams(window.location.search);
     const categoriaBuscada = urlParams.get('categoria')?.toLowerCase().trim();
 
-    console.log("🎯 Buscando productos para:", `"${categoriaBuscada}"`);
+    console.log("--- INICIO DE FILTRADO ZIPPY ---");
+    console.log("🎯 Buscando productos que contengan:", `"${categoriaBuscada}"`);
 
     if (data) {
         Object.values(data).forEach(producto => {
-            // 3. Convertimos la categoría de la DB en un array limpio
-            // Maneja casos donde el producto tenga varias: "Rosas, Chocolates"
+            // 3. Procesar categorías del producto (Base de Datos)
+            // Convertimos "Rosas, Chocolates" -> ["rosas", "chocolates"]
             const categoriasDelProducto = producto.categoria 
                 ? producto.categoria.split(',').map(c => c.toLowerCase().trim()) 
                 : [];
 
             // 4. LÓGICA DE FILTRADO ESTRICTA
-            let mostrarEsteProducto = false;
+            let mostrar = false;
 
             if (!categoriaBuscada) {
-                // Si la URL no tiene filtro, se muestran todos
-                mostrarEsteProducto = true;
+                // Si no hay categoría en URL, mostramos todo
+                mostrar = true;
             } else if (categoriasDelProducto.includes(categoriaBuscada)) {
-                // Si la URL pide "adicional" y el producto la tiene, se muestra
-                mostrarEsteProducto = true;
+                // Si la categoría de la URL está en la lista del producto
+                mostrar = true;
             }
 
-            // 5. SOLO si pasa el filtro, se dibuja en pantalla
-            if (mostrarEsteProducto) {
-                renderizarCard(producto);
+            // 5. RENDERIZADO CONDICIONAL
+            if (mostrar) {
+                console.log(`✅ MOSTRANDO: ${producto.nombre} | Categorías: [${categoriasDelProducto}]`);
+                renderizarCard(producto); 
             } else {
-                // Opcional: ver qué se está ignorando
-                console.log(`🚫 Omitido por categoría: ${producto.nombre}`);
+                console.log(`🚫 OMITIDO: ${producto.nombre} | No coincide con "${categoriaBuscada}"`);
             }
         });
 
-        // 6. Si al final nada coincidió, avisar al cliente
+        // 6. Validar si el contenedor quedó vacío
         if (contenedor.innerHTML === "" && categoriaBuscada) {
-            contenedor.innerHTML = `<div class="no-results">No hay productos en la categoría "${categoriaBuscada}"</div>`;
+            contenedor.innerHTML = `<div class="alerta">No se encontraron productos en "${categoriaBuscada}"</div>`;
+            console.warn("⚠️ Filtro finalizado: 0 coincidencias.");
         }
     }
+    console.log("--- FIN DE FILTRADO ---");
 });
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
