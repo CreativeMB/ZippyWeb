@@ -1676,21 +1676,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
 onValue(productosRef, (snapshot) => {
     const todosLosProductos = snapshot.val();
     const filtrados = {};
+    const categoriaUrl = new URLSearchParams(window.location.search).get('categoria');
+
+    console.log("--- DEBUG ZIPPY ---");
+    console.log("Categoría buscada desde URL:", `"${categoriaUrl}"`);
 
     if (todosLosProductos) {
         Object.keys(todosLosProductos).forEach(key => {
             const p = todosLosProductos[key];
-            // Aquí está la magia: dividimos por coma y buscamos la categoría
-            if (p.categoria && p.categoria.split(', ').includes(categoriaUrl)) {
-                filtrados[key] = p;
+            
+            if (p.categoria) {
+                // Limpiamos espacios extras con .trim() por si acaso
+                const listaCategorias = p.categoria.split(',').map(cat => cat.trim());
+                
+                console.log(`Producto: ${p.nombre} | Categorías en DB:`, listaCategorias);
+
+                if (listaCategorias.includes(categoriaUrl)) {
+                    console.log("✅ ¡COINCIDENCIA ENCONTRADA!");
+                    filtrados[key] = p;
+                }
             }
         });
         
-        renderizarCatalogo(filtrados); // Tu función para mostrar en pantalla
+        console.log("Total productos filtrados:", Object.keys(filtrados).length);
+        renderizarCatalogo(filtrados);
+    } else {
+        console.error("❌ No se encontraron productos en el nodo de la base de datos.");
     }
+    console.log("-------------------");
 });
 
 // --- 1. ARRANQUE Y DETECCIÓN ---
