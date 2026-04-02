@@ -1641,11 +1641,6 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     const dbFirestore = getFirestore(app);
     const analytics = getAnalytics(app);
 
-// 1. Obtener la categoría de la URL de forma limpia
-const urlParams = new URLSearchParams(window.location.search);
-const categoriaBuscada = urlParams.get('categoria')?.toLowerCase().trim();
-
-
 
     // --- VARIABLES GLOBALES ---
     let productosJson = {};
@@ -1685,52 +1680,7 @@ onValue(productosRef, (snapshot) => {
     const contenedor = document.getElementById('contenedor-productos');
     if (!contenedor) return;
 
-    // 1. Limpieza total antes de empezar
-    contenedor.innerHTML = ""; 
 
-    // 2. Captura y limpieza de la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const categoriaBuscada = urlParams.get('categoria')?.toLowerCase().trim();
-
-    console.log("--- INICIO DE FILTRADO ZIPPY ---");
-    console.log("🎯 Buscando productos que contengan:", `"${categoriaBuscada}"`);
-
-    if (data) {
-        Object.values(data).forEach(producto => {
-            // 3. Procesar categorías del producto (Base de Datos)
-            // Convertimos "Rosas, Chocolates" -> ["rosas", "chocolates"]
-            const categoriasDelProducto = producto.categoria 
-                ? producto.categoria.split(',').map(c => c.toLowerCase().trim()) 
-                : [];
-
-            // 4. LÓGICA DE FILTRADO ESTRICTA
-            let mostrar = false;
-
-            if (!categoriaBuscada) {
-                // Si no hay categoría en URL, mostramos todo
-                mostrar = true;
-            } else if (categoriasDelProducto.includes(categoriaBuscada)) {
-                // Si la categoría de la URL está en la lista del producto
-                mostrar = true;
-            }
-
-            // 5. RENDERIZADO CONDICIONAL
-            if (mostrar) {
-                console.log(`✅ MOSTRANDO: ${producto.nombre} | Categorías: [${categoriasDelProducto}]`);
-                renderizarCard(producto); 
-            } else {
-                console.log(`🚫 OMITIDO: ${producto.nombre} | No coincide con "${categoriaBuscada}"`);
-            }
-        });
-
-        // 6. Validar si el contenedor quedó vacío
-        if (contenedor.innerHTML === "" && categoriaBuscada) {
-            contenedor.innerHTML = `<div class="alerta">No se encontraron productos en "${categoriaBuscada}"</div>`;
-            console.warn("⚠️ Filtro finalizado: 0 coincidencias.");
-        }
-    }
-    console.log("--- FIN DE FILTRADO ---");
-});
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
