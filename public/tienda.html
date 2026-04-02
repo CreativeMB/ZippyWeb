@@ -1683,28 +1683,34 @@ const productosRef = ref(db, 'productos');
 
 onValue(productosRef, (snapshot) => {
     const data = snapshot.val();
-    const contenedor = document.getElementById('contenedor-productos'); // Asegúrate que este ID exista
-    contenedor.innerHTML = ""; // Limpiar pantalla antes de cargar
+    const contenedor = document.getElementById('contenedor-productos'); // Ajusta a tu ID
+    contenedor.innerHTML = ""; // 1. Limpiar todo antes de empezar
+
+    // 2. Obtener lo que el usuario quiere ver (ej: "adicional")
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoriaBuscada = urlParams.get('categoria')?.toLowerCase().trim();
 
     if (data) {
-        Object.keys(data).forEach(key => {
-            const producto = data[key];
-            
-            // Si no hay categoría en la URL, mostramos todo. 
-            // Si hay, filtramos buscando en el string separado por comas.
-            if (!categoriaBuscada) {
-                renderizarCard(producto);
-            } else if (producto.categoria) {
-                // Convertimos "Rosas, Anchetas" en ["rosas", "anchetas"]
-                const listaCategoriasDB = producto.categoria.split(',').map(c => c.toLowerCase().trim());
+        Object.values(data).forEach(producto => {
+            // 3. Limpiar las categorías del producto de la DB
+            const categoriasProducto = producto.categoria 
+                ? producto.categoria.split(',').map(c => c.toLowerCase().trim()) 
+                : [];
+
+            // 4. EL FILTRO CRÍTICO:
+            // Si NO hay categoría en la URL -> muestra todo.
+            // Si HAY categoría -> SOLO muestra si el producto la tiene.
+            if (!categoriaBuscada || categoriasProducto.includes(categoriaBuscada)) {
                 
-                if (listaCategoriasDB.includes(categoriaBuscada)) {
-                    renderizarCard(producto);
-                }
+                // AQUÍ VA TU FUNCIÓN QUE PINTA EL PRODUCTO
+                // Ejemplo: contenedor.innerHTML += `<div>${producto.nombre}</div>`;
+                renderizarCard(producto); 
+                
+            } else {
+                // Si entra aquí, el producto se ignora y NO se muestra.
+                console.log(`Omitiendo: ${producto.nombre} (no es ${categoriaBuscada})`);
             }
         });
-    } else {
-        contenedor.innerHTML = "<p>No hay productos disponibles.</p>";
     }
 });
 // --- 1. ARRANQUE Y DETECCIÓN ---
