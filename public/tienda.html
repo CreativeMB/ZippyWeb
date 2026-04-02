@@ -272,31 +272,32 @@ body {
             border-color: transparent;
         }
 
- .producto img {
+.producto img {
     width: 100%;
     aspect-ratio: 3 / 4;
     object-fit: contain;
     object-position: center;
     display: block;
-    margin: 0;
+    /* Marcamos el margen en 0 para evitar que se separe del texto abajo */
+    margin: 0; 
     background-color: #ffffff;
-    border-radius: 12px; /* Un poco más redondeado para suavidad */
+    border-radius: 12px;
     
-    /* 1. Transición suave y profesional */
+    /* Mantenemos tus efectos premium */
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
-    
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
     cursor: pointer;
+    
+    /* 🛠️ SOLUCIÓN PARA LA FRANJA: */
+    /* Evita bordes fantasma y asegura que el color sea sólido */
+    border: none;
+    outline: none;
 }
 
-/* --- TOQUES ELEGANTES AL PASAR EL MOUSE (HOVER) --- */
 .producto img:hover {
-    /* 3. Elevación ligera (da sensación de que el producto se acerca) */
+    /* Mantenemos tu elevación elegante */
     transform: translateY(-8px) scale(1.03);
-    
-    /* 4. Sombra de profundidad (estilo Apple/Lujo) */
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-    
-    /* 5. Brillo sutil para resaltar los colores del ramo/oso */
     filter: brightness(1.05);
 }
 
@@ -2241,7 +2242,13 @@ function render() {
 // 💡 CALCULO DEL PORCENTAJE DE AHORRO
     const porcentajeAhorro = Math.round(100 - (real.valorPromocion * 100 / real.valor));
 
-            precioHTML = `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>`;
+            precioHTML = `<div class="precio-contenedor">
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <span class="precioViejo">${formatearPrecio(real.valor)}</span>
+                <span style="color: #25D366; font-size: 12px; font-weight: 800;">-${porcentaje}%</span>
+            </div>
+            <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
+        </div>`;
         } else if (real.valor > 0) {
             precioFinal = real.valor;
             precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
