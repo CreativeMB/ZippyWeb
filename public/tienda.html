@@ -1602,6 +1602,22 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     let menuCategoriasAbierto = false;
     let carrito = [];
     let procesadoExitoso = false;
+
+
+// Al cargar la página, recuperamos lo que haya en el almacenamiento
+document.addEventListener('DOMContentLoaded', () => {
+    const carritoGuardado = localStorage.getItem('zippy_cart');
+    if (carritoGuardado) {
+        // Cargamos los datos en la variable global
+        carrito = JSON.parse(carritoGuardado);
+        // Refrescamos el número rojo del carrito
+        if (window.actualizarBadgeCarrito) {
+            window.actualizarBadgeCarrito();
+        }
+    }
+});
+
+
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
@@ -2317,7 +2333,8 @@ window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
             descripcion: descripcion // <-- MUY IMPORTANTE
         });
     }
-    
+    // 💾 PERSISTENCIA: Guardamos el estado actual del carrito en el navegador
+    localStorage.setItem('zippy_cart', JSON.stringify(carrito));
     window.actualizarBadgeCarrito();
     
     Swal.fire({
@@ -2385,7 +2402,9 @@ window.cambiarCantidadCarrito = (index, valor) => {
     if (carrito[index].cantidad <= 0) {
         carrito.splice(index, 1);
     }
-    
+    // 💾 3. PERSISTENCIA: Guardamos el estado actual del carrito
+    // Esto asegura que si el usuario refresca, los cambios se mantengan.
+    localStorage.setItem('zippy_cart', JSON.stringify(carrito));
     // Si ya no hay productos, cerramos y volvemos a la tienda
     if (carrito.length === 0) {
         window.cerrarModal();
@@ -2763,6 +2782,8 @@ if (!idDomiciliarioAsignado) {
 
                     // LIMPIEZA TOTAL
                     carrito = [];
+                    // 💾 PERSISTENCIA: Borramos el carrito del almacenamiento para que no reaparezca al recargar
+        localStorage.removeItem('zippy_cart');
                     window.actualizarBadgeCarrito();
                     
                     const idsParaLimpiar = [
