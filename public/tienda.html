@@ -1641,8 +1641,9 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     const dbFirestore = getFirestore(app);
     const analytics = getAnalytics(app);
 
-
-const categoriaUrl = urlParams.get('categoria')
+// 1. Obtener la categoría de la URL de forma limpia
+const urlParams = new URLSearchParams(window.location.search);
+const categoriaBuscada = urlParams.get('categoria')?.toLowerCase().trim();
 
 
 
@@ -1677,25 +1678,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// 2. Referencia a tus productos en Firebase
+const productosRef = ref(db, 'productos');
+
 onValue(productosRef, (snapshot) => {
-    const todosLosProductos = snapshot.val();
-    const contenedor = document.getElementById('contenedor-productos');
-    const categoriaBuscada = new URLSearchParams(window.location.search).get('categoria')?.toLowerCase().trim();
+    const data = snapshot.val();
+    const contenedor = document.getElementById('contenedor-productos'); // Asegúrate que este ID exista
+    contenedor.innerHTML = ""; // Limpiar pantalla antes de cargar
 
-    contenedor.innerHTML = ""; // Limpiamos pantalla
-
-    if (!todosLosProductos) return;
-
-    Object.values(todosLosProductos).forEach(p => {
-        // Procesamos las categorías del producto (limpiando espacios y pasamos a minúsculas)
-        const categoriasProducto = p.categoria ? p.categoria.split(',').map(cat => cat.trim().toLowerCase()) : [];
-
-        // Si no hay categoría en la URL (ver todo) o si el producto incluye la categoría buscada
-        if (!categoriaBuscada || categoriasProducto.includes(categoriaBuscada)) {
-            const card = crearCardProducto(p);
-            contenedor.innerHTML += card;
-        }
-    });
+    if (data) {
+        Object.keys(data).forEach(key => {
+            const producto = data[key];
+            
+            // Si no hay categoría en la URL, mostramos todo. 
+            // Si hay, filtramos buscando en el string separado por comas.
+            if (!categoriaBuscada) {
+                renderizarCard(producto);
+            } else if (producto.categoria) {
+                // Convertimos "Rosas, Anchetas" en ["rosas", "anchetas"]
+                const listaCategoriasDB = producto.categoria.split(',').map(c => c.toLowerCase().trim());
+                
+                if (listaCategoriasDB.includes(categoriaBuscada)) {
+                    renderizarCard(producto);
+                }
+            }
+        });
+    } else {
+        contenedor.innerHTML = "<p>No hay productos disponibles.</p>";
+    }
 });
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
