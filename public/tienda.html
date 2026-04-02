@@ -1679,37 +1679,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 onValue(productosRef, (snapshot) => {
     const todosLosProductos = snapshot.val();
-    const filtrados = {};
-    const categoriaUrl = new URLSearchParams(window.location.search).get('categoria');
+    const contenedor = document.getElementById('contenedor-productos');
+    const categoriaBuscada = new URLSearchParams(window.location.search).get('categoria')?.toLowerCase().trim();
 
-    console.log("--- DEBUG ZIPPY ---");
-    console.log("Categoría buscada desde URL:", `"${categoriaUrl}"`);
+    contenedor.innerHTML = ""; // Limpiamos pantalla
 
-    if (todosLosProductos) {
-        Object.keys(todosLosProductos).forEach(key => {
-            const p = todosLosProductos[key];
-            
-            if (p.categoria) {
-                // Limpiamos espacios extras con .trim() por si acaso
-                const listaCategorias = p.categoria.split(',').map(cat => cat.trim());
-                
-                console.log(`Producto: ${p.nombre} | Categorías en DB:`, listaCategorias);
+    if (!todosLosProductos) return;
 
-                if (listaCategorias.includes(categoriaUrl)) {
-                    console.log("✅ ¡COINCIDENCIA ENCONTRADA!");
-                    filtrados[key] = p;
-                }
-            }
-        });
-        
-        console.log("Total productos filtrados:", Object.keys(filtrados).length);
-        renderizarCatalogo(filtrados);
-    } else {
-        console.error("❌ No se encontraron productos en el nodo de la base de datos.");
-    }
-    console.log("-------------------");
+    Object.values(todosLosProductos).forEach(p => {
+        // Procesamos las categorías del producto (limpiando espacios y pasamos a minúsculas)
+        const categoriasProducto = p.categoria ? p.categoria.split(',').map(cat => cat.trim().toLowerCase()) : [];
+
+        // Si no hay categoría en la URL (ver todo) o si el producto incluye la categoría buscada
+        if (!categoriaBuscada || categoriasProducto.includes(categoriaBuscada)) {
+            const card = crearCardProducto(p);
+            contenedor.innerHTML += card;
+        }
+    });
 });
-
 // --- 1. ARRANQUE Y DETECCIÓN ---
     detectarEmpresaPorDominio();
 
