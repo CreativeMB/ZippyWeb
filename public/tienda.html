@@ -331,6 +331,23 @@ body {
             font-weight: 400;
             line-height: 1;
         }
+        /* Añade esto a tu bloque de CSS */
+.ahorro-texto {
+    color: #25D366; /* Verde éxito (tipo WhatsApp) para que resalte la ganancia */
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Ajuste para que el precio viejo y el ahorro salgan en la misma línea */
+.precioViejo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2px;
+}
 
         .precio {
             color: #111;
@@ -2220,6 +2237,10 @@ function render() {
         
         if (real.promocion && real.valorPromocion > 0) {
             precioFinal = real.valorPromocion;
+
+// 💡 CALCULO DEL PORCENTAJE DE AHORRO
+    const porcentajeAhorro = Math.round(100 - (real.valorPromocion * 100 / real.valor));
+
             precioHTML = `<div class="precio">${formatearPrecio(real.valorPromocion)}</div><div class="precioViejo">${formatearPrecio(real.valor)}</div>`;
         } else if (real.valor > 0) {
             precioFinal = real.valor;
