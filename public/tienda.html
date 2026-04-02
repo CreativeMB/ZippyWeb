@@ -325,43 +325,49 @@ body {
             align-items: center;
         }
 
-       /* Contenedor para alinear el tachado con el globo */
-.precioViejo-container {
+/* Contenedor principal del precio */
+.precio-contenedor-premium {
     display: flex;
-    align-items: center;
-    gap: 8px; /* Espacio entre el precio y el globo */
+    flex-direction: column;
+    align-items: center; /* Centrado para el catálogo */
+    margin-top: 5px;
+}
+
+/* El precio que paga el cliente (ARRIBA) */
+.precio {
+    color: #111;
+    font-size: 22px; /* Un poco más grande para ser el protagonista */
+    font-weight: 800;
+    line-height: 1;
     margin-bottom: 4px;
 }
 
-/* El "Globo" Premium */
-.badge-ahorro-premium {
-    background-color: #e8f5e9; /* Un verde menta muy pálido y elegante */
-    color: #2e7d32;           /* Un verde bosque profundo para el texto */
-    font-size: 10px;          /* Letra pequeña como pediste */
-    font-weight: 700;
-    padding: 2px 10px;        /* Espaciado interno para forma de pastilla */
-    border-radius: 20px;      /* Bordes totalmente circulares */
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    border: 1px solid #c8e6c9; /* Un borde casi invisible para dar textura */
-    display: inline-block;
+/* Contenedor de la oferta (DEBAJO) */
+.precioViejo-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-/* Ajuste al precio viejo para que no compita */
+/* Precio tachado más discreto */
 .precioViejo {
     text-decoration: line-through;
-    color: #9e9e9e;
-    font-size: 13px;
+    color: #a0a0a0;
+    font-size: 12px;
     font-weight: 400;
 }
 
-        .precio {
-            color: #111;
-            font-size: 20px;
-            font-weight: 800;
-            margin: 2px 0 0 0;
-            line-height: 1;
-        }
+/* El Globo de Ahorro (Pequeño y elegante) */
+.badge-ahorro-premium {
+    background-color: #f0fdf4; /* Verde menta muy suave */
+    color: #16a34a;           /* Verde bosque elegante */
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 12px;      /* Forma de pastilla */
+    border: 1px solid #dcfce7;
+    text-transform: uppercase;
+}
 
         /* ETIQUETAS */
         .etiquetaPromo,
