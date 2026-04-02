@@ -272,13 +272,23 @@ body {
             border-color: transparent;
         }
 
-        .producto img {
-            width: 100%;
-            aspect-ratio: 3 / 4;
-           object-fit: contain;
-            display: block;
-            margin: 0;
-        }
+       .producto img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    margin: 0;
+    /* 👇 Sugerencia para mejorar la estética */
+    background-color: #ffffff; /* O el color de fondo de tu tienda */
+    border-radius: 8px;        /* Bordes redondeados sutiles */
+    transition: transform 0.3s ease; /* Para un efecto suave al pasar el mouse */
+}
+
+/* Efecto Hover para resaltar el producto */
+.producto img:hover {
+    transform: scale(1.02);
+}
 
         .nombre {
             font-family: 'Montserrat', sans-serif;
