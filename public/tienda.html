@@ -2238,17 +2238,17 @@ function render() {
         
         if (real.promocion && real.valorPromocion > 0) {
             precioFinal = real.valorPromocion;
-
-// 💡 CALCULO DEL PORCENTAJE DE AHORRO
+// 1. Calculamos el porcentaje
     const porcentajeAhorro = Math.round(100 - (real.valorPromocion * 100 / real.valor));
-
-            precioHTML = `<div class="precio-contenedor">
-            <div style="display: flex; align-items: center; gap: 5px;">
-                <span class="precioViejo">${formatearPrecio(real.valor)}</span>
-                <span style="color: #25D366; font-size: 12px; font-weight: 800;">-${porcentaje}%</span>
-            </div>
-            <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
-        </div>`;
+    
+    // 2. Armamos el HTML (El mensaje de ahorro va junto al precio viejo)
+    precioHTML = `
+        <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
+        <div class="precio-oferta-info">
+            <span class="texto-ahorro">¡Ahorras ${porcentajeAhorro}%!</span>
+            <span class="precioViejo">${formatearPrecio(real.valor)}</span>
+        </div>
+    `;
         } else if (real.valor > 0) {
             precioFinal = real.valor;
             precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
