@@ -2248,11 +2248,14 @@ function render() {
     
     // 2. Armamos el HTML (El mensaje de ahorro va junto al precio viejo)
     precioHTML = `
-    <div class="precioViejo-container">
-        <span class="precioViejo">${formatearPrecio(real.valor)}</span>
-        <span class="badge-ahorro-premium">¡Ahorras ${porcentajeAhorro}%!</span>
-    </div>
-    <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
+   <div class="precio-contenedor-premium">
+            <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
+            
+            <div class="precioViejo-container">
+                <span class="precioViejo">${formatearPrecio(real.valor)}</span>
+                <span class="badge-ahorro-premium">-${porcentajeAhorro}% OFF</span>
+            </div>
+        </div>
 `;
         } else if (real.valor > 0) {
             precioFinal = real.valor;
