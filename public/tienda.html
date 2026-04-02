@@ -1678,39 +1678,62 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 2. Referencia a tus productos en Firebase
+// 2. buscar pot referencia por la url
 const productosRef = ref(db, 'productos');
 
 onValue(productosRef, (snapshot) => {
     const data = snapshot.val();
-    const contenedor = document.getElementById('contenedor-productos'); // Ajusta a tu ID
-    contenedor.innerHTML = ""; // 1. Limpiar todo antes de empezar
+    const contenedor = document.getElementById('contenedor-productos');
+    if (!contenedor) return; 
+    
+    contenedor.innerHTML = ""; 
 
-    // 2. Obtener lo que el usuario quiere ver (ej: "adicional")
+    // 1. Capturamos la categoría de la URL y la limpiamos a fondo
     const urlParams = new URLSearchParams(window.location.search);
-    const categoriaBuscada = urlParams.get('categoria')?.toLowerCase().trim();
+    const rawCategoria = urlParams.get('categoria');
+    
+    // Si no hay categoría en URL, categoriaBuscada será null
+    const categoriaBuscada = rawCategoria ? rawCategoria.toLowerCase().trim() : null;
+
+    console.log("🎯 Buscando exactamente:", `"${categoriaBuscada}"`);
 
     if (data) {
-        Object.values(data).forEach(producto => {
-            // 3. Limpiar las categorías del producto de la DB
-            const categoriasProducto = producto.categoria 
-                ? producto.categoria.split(',').map(c => c.toLowerCase().trim()) 
+        // Convertimos el objeto de Firebase en Array para iterar mejor
+        const listaProductos = Object.values(data);
+
+        listaProductos.forEach(producto => {
+            // 2. Limpiar las categorías que vienen de la Base de Datos
+            // Si el campo no existe, devolvemos un array vacío
+            const categoriasDelProducto = producto.categoria 
+                ? producto.categoria.split(',').map(cat => cat.toLowerCase().trim()) 
                 : [];
 
-            // 4. EL FILTRO CRÍTICO:
-            // Si NO hay categoría en la URL -> muestra todo.
-            // Si HAY categoría -> SOLO muestra si el producto la tiene.
-            if (!categoriaBuscada || categoriasProducto.includes(categoriaBuscada)) {
-                
-                // AQUÍ VA TU FUNCIÓN QUE PINTA EL PRODUCTO
-                // Ejemplo: contenedor.innerHTML += `<div>${producto.nombre}</div>`;
-                renderizarCard(producto); 
-                
+            // 3. LA LÓGICA DE FILTRADO BLINDADA
+            let debeMostrarse = false;
+
+            if (!categoriaBuscada) {
+                // Si la URL no tiene ?categoria=, mostramos todo
+                debeMostrarse = true;
             } else {
-                // Si entra aquí, el producto se ignora y NO se muestra.
-                console.log(`Omitiendo: ${producto.nombre} (no es ${categoriaBuscada})`);
+                // Si el array de categorías del producto contiene la de la URL
+                if (categoriasDelProducto.includes(categoriaBuscada)) {
+                    debeMostrarse = true;
+                }
+            }
+
+            // 4. EJECUCIÓN
+            if (debeMostrarse) {
+                renderizarCard(producto);
+            } else {
+                // Log opcional para depurar por qué no entra
+                // console.log(`🚫 Omitido: ${producto.nombre} (Categorías: ${categoriasDelProducto.join('|')})`);
             }
         });
+        
+        // Si después de filtrar no hay nada, avisamos
+        if (contenedor.innerHTML === "" && categoriaBuscada) {
+            contenedor.innerHTML = `<p class="error-msg">No se encontraron productos en "${rawCategoria}"</p>`;
+        }
     }
 });
 // --- 1. ARRANQUE Y DETECCIÓN ---
