@@ -1640,6 +1640,11 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     const db = getDatabase(app);
     const dbFirestore = getFirestore(app);
     const analytics = getAnalytics(app);
+const params = new URLSearchParams(window.location.search);
+const cat = params.get('categoria'); // Esto te devolverá "Adicional"
+
+
+
     // --- VARIABLES GLOBALES ---
     let productosJson = {};
     let productosRealtime = {};
