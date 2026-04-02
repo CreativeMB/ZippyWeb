@@ -272,22 +272,40 @@ body {
             border-color: transparent;
         }
 
-       .producto img {
+ .producto img {
     width: 100%;
     aspect-ratio: 3 / 4;
     object-fit: contain;
     object-position: center;
     display: block;
     margin: 0;
-    /* 👇 Sugerencia para mejorar la estética */
-    background-color: #ffffff; /* O el color de fondo de tu tienda */
-    border-radius: 8px;        /* Bordes redondeados sutiles */
-    transition: transform 0.3s ease; /* Para un efecto suave al pasar el mouse */
+    background-color: #ffffff;
+    border-radius: 12px; /* Un poco más redondeado para suavidad */
+    
+    /* 1. Transición suave y profesional */
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
+    
+    /* 2. Sombra base muy sutil (casi invisible) */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    
+    cursor: pointer;
 }
 
-/* Efecto Hover para resaltar el producto */
+/* --- TOQUES ELEGANTES AL PASAR EL MOUSE (HOVER) --- */
 .producto img:hover {
-    transform: scale(1.02);
+    /* 3. Elevación ligera (da sensación de que el producto se acerca) */
+    transform: translateY(-8px) scale(1.03);
+    
+    /* 4. Sombra de profundidad (estilo Apple/Lujo) */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    
+    /* 5. Brillo sutil para resaltar los colores del ramo/oso */
+    filter: brightness(1.05);
+}
+
+/* Opcional: Si quieres que toda la tarjeta reaccione */
+.producto:hover {
+    border-color: #E5C453; /* El dorado que usas en tus botones */
 }
 
         .nombre {
