@@ -1952,28 +1952,29 @@ window.procesarProductoDirecto = function() {
     const urlParams = new URLSearchParams(window.location.search);
     const productosParam = urlParams.get('producto'); 
     
-    // Si no hay parámetro o ya se procesó con éxito, salimos
-    if (!productosParam || procesadoExitoso) return;
+    // Si no hay parámetro o ya se procesó, abortamos
+    if (!productosParam || window.zippyYaProcesado) return;
 
-    console.log("%c🚀 Procesador Zippy Activo", "color: #E5C453; font-weight: bold;");
+    console.log("%c🚀 Zippy: Procesando enlace directo...", "color: #E5C453; font-weight: bold;");
 
     const ejecutarCargaMasiva = () => {
-        // Doble verificación: Si ya se procesó mientras esperábamos el intervalo, frenamos
-        if (procesadoExitoso) return true;
+        // Doble validación de seguridad
+        if (window.zippyYaProcesado) return true;
 
         const jsonListo = Object.keys(productosJson).length > 0;
         const realtimeListo = Object.keys(productosRealtime).length > 0;
 
         if (!jsonListo || !realtimeListo) {
-            console.warn("⏳ Esperando carga de Firebase...");
+            console.warn("⏳ Esperando datos de Firebase para procesar URL...");
             return false; 
         }
 
-        // --- INICIO DE PROCESAMIENTO ---
-        procesadoExitoso = true; // ACTIVAMOS EL CANDADO INMEDIATAMENTE
+        // --- BLOQUEO DE PROCESAMIENTO ---
+        window.zippyYaProcesado = true; 
         
         const itemsRaw = productosParam.split(',');
         let totalEncontrados = 0;
+        
         const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
         itemsRaw.forEach((itemRaw) => {
@@ -1990,7 +1991,10 @@ window.procesarProductoDirecto = function() {
 
             const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
 
+            // 1. Búsqueda exacta
             let mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
+            
+            // 2. Búsqueda difusa (ADN)
             if (!mejorMatch) {
                 mejorMatch = listaRefs.find(ref => {
                     const refADN = buscarLimpio(ref).replace(/[^a-z0-9]/g, "");
@@ -2003,7 +2007,7 @@ window.procesarProductoDirecto = function() {
                 const nombreFinal = real.referenciaReal || mejorMatch;
                 const precioFinal = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
 
-                // Verificamos si ya existe en el carrito para no duplicar por error de lógica
+                // Evitar duplicados en el carrito
                 const existeEnCarrito = carrito.find(item => item.nombre === nombreFinal);
                 
                 if (!existeEnCarrito) {
@@ -2015,34 +2019,40 @@ window.procesarProductoDirecto = function() {
                         descripcion: (real.descripcion || "Sin descripción")
                     });
                     totalEncontrados++;
-                    console.log(`%c✅ Agregado: ${nombreFinal} (Cant: ${cantidadFinal})`, "color: #25D366;");
                 }
             }
         });
 
         if (totalEncontrados > 0) {
+            // Guardar en LocalStorage para que no se pierda al recargar
+            localStorage.setItem('zippy_cart', JSON.stringify(carrito));
+            
             if (typeof actualizarBadgeCarrito === 'function') actualizarBadgeCarrito();
             
+            // Limpiamos la URL inmediatamente para evitar re-procesos si el usuario navega
+            window.history.replaceState({}, document.title, window.location.pathname);
+
             setTimeout(() => {
+                // Abrimos el carrito para mostrarle al usuario que su producto ya está ahí
                 if (typeof abrirPestañaProducto === 'function') {
-                    abrirPestañaProducto("", "", 0, ""); 
+                    abrirPestañaProducto(); 
                 }
-                // Limpiamos la URL para que el parámetro 'producto' desaparezca
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }, 800);
+            }, 500);
             return true;
         }
         
-        // Si no encontró nada, liberamos el candado para que el siguiente intervalo intente de nuevo
-        procesadoExitoso = false; 
+        // Si falló la búsqueda, liberamos para reintento
+        window.zippyYaProcesado = false; 
         return false;
     };
 
-   let intervaloBusqueda = setInterval(() => {
+    // Intervalo de búsqueda para esperar a Firebase
+    let intervaloBusqueda = setInterval(() => {
         if (ejecutarCargaMasiva()) clearInterval(intervaloBusqueda);
-    }, 1500);
+    }, 1000);
 
-    setTimeout(() => clearInterval(intervaloBusqueda), 12000);
+    // Timeout de 10 segundos por si no carga nada
+    setTimeout(() => clearInterval(intervaloBusqueda), 10000);
 };
 
 document.addEventListener('DOMContentLoaded', window.procesarProductoDirecto);
