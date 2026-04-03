@@ -2233,16 +2233,21 @@ function render() {
         if (refP === "images") continue;
        
         const claveBusqueda = refP.trim().toLowerCase();
+        
+        // Si ya lo dibujamos, saltamos al siguiente
+        if (productosDibujados.has(claveBusqueda)) continue;
+        productosDibujados.add(claveBusqueda);
+
         const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
         
-        if (categoriaSeleccionada !== null && categoriaSeleccionada !== "" && categoriaSeleccionada !== "Todas") {
+        // Filtro de categorías
+        if (categoriaSeleccionada && categoriaSeleccionada !== "Todas") {
             const categoriasProducto = (real.categoria || "").split(",").map(c => c.trim().toLowerCase());
-            const esProductoDirecto = (claveBusqueda === productoEnUrl);
-            if (!esProductoDirecto && !categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
+            // Si no es el producto directo de la URL y no coincide la categoría, ocultar
+            if (claveBusqueda !== productoEnUrl && !categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
                 continue;
             }
         }
-
         const imgUrl = productosJson[refP];
         let precioHTML = "";
         let precioFinal = 0;
