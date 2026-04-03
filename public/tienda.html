@@ -1952,29 +1952,28 @@ window.procesarProductoDirecto = function() {
     const urlParams = new URLSearchParams(window.location.search);
     const productosParam = urlParams.get('producto'); 
     
-    // Si no hay parámetro o ya se procesó, abortamos
-    if (!productosParam || window.zippyYaProcesado) return;
+    // Si no hay parámetro o ya se procesó con éxito, salimos
+    if (!productosParam || procesadoExitoso) return;
 
-    console.log("%c🚀 Zippy: Procesando enlace directo...", "color: #E5C453; font-weight: bold;");
+    console.log("%c🚀 Procesador Zippy Activo", "color: #E5C453; font-weight: bold;");
 
     const ejecutarCargaMasiva = () => {
-        // Doble validación de seguridad
-        if (window.zippyYaProcesado) return true;
+        // Doble verificación: Si ya se procesó mientras esperábamos el intervalo, frenamos
+        if (procesadoExitoso) return true;
 
         const jsonListo = Object.keys(productosJson).length > 0;
         const realtimeListo = Object.keys(productosRealtime).length > 0;
 
         if (!jsonListo || !realtimeListo) {
-            console.warn("⏳ Esperando datos de Firebase para procesar URL...");
+            console.warn("⏳ Esperando carga de Firebase...");
             return false; 
         }
 
-        // --- BLOQUEO DE PROCESAMIENTO ---
-        window.zippyYaProcesado = true; 
+        // --- INICIO DE PROCESAMIENTO ---
+        procesadoExitoso = true; // ACTIVAMOS EL CANDADO INMEDIATAMENTE
         
         const itemsRaw = productosParam.split(',');
         let totalEncontrados = 0;
-        
         const buscarLimpio = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
         itemsRaw.forEach((itemRaw) => {
@@ -1991,10 +1990,7 @@ window.procesarProductoDirecto = function() {
 
             const listaRefs = Object.keys(productosJson).filter(ref => ref !== "images");
 
-            // 1. Búsqueda exacta
             let mejorMatch = listaRefs.find(ref => ref.trim().toLowerCase() === buscadoOriginal);
-            
-            // 2. Búsqueda difusa (ADN)
             if (!mejorMatch) {
                 mejorMatch = listaRefs.find(ref => {
                     const refADN = buscarLimpio(ref).replace(/[^a-z0-9]/g, "");
@@ -2007,7 +2003,7 @@ window.procesarProductoDirecto = function() {
                 const nombreFinal = real.referenciaReal || mejorMatch;
                 const precioFinal = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
 
-                // Evitar duplicados en el carrito
+                // Verificamos si ya existe en el carrito para no duplicar por error de lógica
                 const existeEnCarrito = carrito.find(item => item.nombre === nombreFinal);
                 
                 if (!existeEnCarrito) {
@@ -2019,40 +2015,34 @@ window.procesarProductoDirecto = function() {
                         descripcion: (real.descripcion || "Sin descripción")
                     });
                     totalEncontrados++;
+                    console.log(`%c✅ Agregado: ${nombreFinal} (Cant: ${cantidadFinal})`, "color: #25D366;");
                 }
             }
         });
 
         if (totalEncontrados > 0) {
-            // Guardar en LocalStorage para que no se pierda al recargar
-            localStorage.setItem('zippy_cart', JSON.stringify(carrito));
-            
             if (typeof actualizarBadgeCarrito === 'function') actualizarBadgeCarrito();
             
-            // Limpiamos la URL inmediatamente para evitar re-procesos si el usuario navega
-            window.history.replaceState({}, document.title, window.location.pathname);
-
             setTimeout(() => {
-                // Abrimos el carrito para mostrarle al usuario que su producto ya está ahí
                 if (typeof abrirPestañaProducto === 'function') {
-                    abrirPestañaProducto(); 
+                    abrirPestañaProducto("", "", 0, ""); 
                 }
-            }, 500);
+                // Limpiamos la URL para que el parámetro 'producto' desaparezca
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }, 800);
             return true;
         }
         
-        // Si falló la búsqueda, liberamos para reintento
-        window.zippyYaProcesado = false; 
+        // Si no encontró nada, liberamos el candado para que el siguiente intervalo intente de nuevo
+        procesadoExitoso = false; 
         return false;
     };
 
-    // Intervalo de búsqueda para esperar a Firebase
-    let intervaloBusqueda = setInterval(() => {
+   let intervaloBusqueda = setInterval(() => {
         if (ejecutarCargaMasiva()) clearInterval(intervaloBusqueda);
-    }, 1000);
+    }, 1500);
 
-    // Timeout de 10 segundos por si no carga nada
-    setTimeout(() => clearInterval(intervaloBusqueda), 10000);
+    setTimeout(() => clearInterval(intervaloBusqueda), 12000);
 };
 
 document.addEventListener('DOMContentLoaded', window.procesarProductoDirecto);
@@ -2225,38 +2215,30 @@ function configurarRedesNav(perfil) {
         procesarProductoDirecto();
     });
 }
+*/
 function render() {
     if (bloqueoActivo) return;
     const contenedor = document.getElementById("productos");
     if (!contenedor) return;
-    
-    // Limpiamos el contenedor para evitar duplicados visuales de renders anteriores
-    contenedor.innerHTML = ""; 
+    contenedor.innerHTML = "";
     
     renderizarMenuCategorias();
 
     const urlParams = new URLSearchParams(window.location.search);
     const productoEnUrl = urlParams.get('producto')?.trim().toLowerCase();
 
-    // CLAVE: Inicializamos el set de control AQUÍ para que cada render sea limpio
-    const productosDibujados = new Set();
     let indice = 0;
 
     for (const refP in productosJson) {
         if (refP === "images") continue;
        
         const claveBusqueda = refP.trim().toLowerCase();
-        
-        // CORRECCIÓN DE DUPLICIDAD: Si la referencia ya se procesó en este ciclo, saltamos
-        if (productosDibujados.has(claveBusqueda)) continue;
-        productosDibujados.add(claveBusqueda);
-
         const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
         
-        // Filtro de categorías (Mantenemos tu lógica intacta)
-        if (categoriaSeleccionada && categoriaSeleccionada !== "Todas") {
+        if (categoriaSeleccionada !== null && categoriaSeleccionada !== "" && categoriaSeleccionada !== "Todas") {
             const categoriasProducto = (real.categoria || "").split(",").map(c => c.trim().toLowerCase());
-            if (claveBusqueda !== productoEnUrl && !categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
+            const esProductoDirecto = (claveBusqueda === productoEnUrl);
+            if (!esProductoDirecto && !categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
                 continue;
             }
         }
@@ -2265,19 +2247,22 @@ function render() {
         let precioHTML = "";
         let precioFinal = 0;
         
-        // Lógica de Precios y Promociones (Intacta)
         if (real.promocion && real.valorPromocion > 0) {
             precioFinal = real.valorPromocion;
-            const porcentajeAhorro = Math.round(100 - (real.valorPromocion * 100 / real.valor));
+// 1. Calculamos el porcentaje
+    const porcentajeAhorro = Math.round(100 - (real.valorPromocion * 100 / real.valor));
+    
+    // 2. Armamos el HTML (El mensaje de ahorro va junto al precio viejo)
+    precioHTML = `
+   <div class="precio-contenedor-premium">
+            <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
             
-            precioHTML = `
-            <div class="precio-contenedor-premium">
-                <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
-                <div class="precioViejo-container">
-                    <span class="precioViejo">${formatearPrecio(real.valor)}</span>
-                    <span class="badge-ahorro-premium">¡Ahorras ${porcentajeAhorro}%!</span>
-                </div>
-            </div>`;
+            <div class="precioViejo-container">
+                <span class="precioViejo">${formatearPrecio(real.valor)}</span>
+                <span class="badge-ahorro-premium">¡Ahorras ${porcentajeAhorro}%!</span>
+            </div>
+        </div>
+`;
         } else if (real.valor > 0) {
             precioFinal = real.valor;
             precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
@@ -2291,64 +2276,76 @@ function render() {
         const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
         const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
 
-        // Lógica de Botones (Intacta)
-        let botonesHtml = "";
-        if (real.agotado) {
-            botonesHtml = `
-            <div class="btn-container-responsive" style="display: flex; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
-                <button class="btn" style="flex: 1; background:#888; color:white; cursor:not-allowed; padding: 8px; border-radius: 6px; border: none; font-size: 11px; font-weight: 500; text-transform: none;" disabled>
-                    Agotado
-                </button>
-            </div>`;
-        } else {
-            botonesHtml = `
-            <div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
-                <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
-                        style="flex: 1; display: flex; align-items: center; justify-content: center; min-width: 35px; background: #E5C453; color: #000; font-size: 14px; padding: 8px; border-radius: 6px; border: none;">
-                    <i class="fas fa-cart-plus"></i>
-                </button>
-                <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" 
-                        style="flex: 2.5; display: flex; align-items: center; justify-content: center; gap: 4px; min-width: 0; background: #25D366; color: #fff; padding: 8px; border-radius: 6px; border: none; text-transform: none;">
-                    <i class="fab fa-whatsapp" style="font-size: 14px;"></i> 
-                    <span class="btn-text-responsive" style="font-weight: 600; font-size: clamp(10px, 2.5vw, 12px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        Pedir ahora
-                    </span>
-                </button>
-            </div>`;
-        }
+// --- LÓGICA DE BOTONES ---
+let botonesHtml = "";
+if (real.agotado) {
+    botonesHtml = `
+    <div class="btn-container-responsive" style="display: flex; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+        <button class="btn" style="flex: 1; background:#888; color:white; cursor:not-allowed; padding: 8px; border-radius: 6px; border: none; font-size: 11px; font-weight: 500; text-transform: none;" disabled>
+            Agotado
+        </button>
+    </div>`;
+} else {
+    botonesHtml = `
+    <div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+        
+        <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" 
+                style="flex: 1; display: flex; align-items: center; justify-content: center; min-width: 35px; background: #E5C453; color: #000; font-size: 14px; padding: 8px; border-radius: 6px; border: none;">
+            <i class="fas fa-cart-plus"></i>
+        </button>
 
-        const eventoClickImagen = real.agotado ? "" : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')"`;
+        <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" 
+                style="flex: 2.5; display: flex; align-items: center; justify-content: center; gap: 4px; min-width: 0; background: #25D366; color: #fff; padding: 8px; border-radius: 6px; border: none; text-transform: none;">
+            <i class="fab fa-whatsapp" style="font-size: 14px;"></i> 
+            <span class="btn-text-responsive" style="font-weight: 600; font-size: clamp(10px, 2.5vw, 12px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                Pedir ahora
+            </span>
+        </button>
+        
+    </div>`;
+}
+
+        // --- VARIABLES DE CONTROL (CORREGIDAS) ---
+        const eventoClickImagen = real.agotado 
+            ? "" 
+            : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')"`;
+        
         const estiloCursor = real.agotado ? 'cursor: default' : 'cursor: pointer';
         const estiloImagen = real.agotado ? 'filter: grayscale(100%); opacity: 0.7;' : '';
         const prioridadAttr = indice < 4 ? 'fetchpriority="high"' : 'loading="lazy"';
 
-        card.innerHTML = `
-            <div class="img-container" style="position: relative; overflow: hidden; border-radius: 8px 8px 0 0;">
-                ${real.promocion ? '<div class="etiquetaPromo" style="position: absolute; top: 10px; left: 10px; z-index: 2;">PROMO</div>' : ''}
-                <img src="${normalizarImagen(imgUrl)}" 
-                     style="${estiloImagen} ${estiloCursor} display: block; width: 100%; height: auto; object-fit: cover;" 
-                     loading="lazy" 
-                     ${prioridadAttr} 
-                     alt="${refProd}"
-                     ${eventoClickImagen}
-                     onerror="this.src='https://via.placeholder.com/300?text=Imagen+No+Disponible'"> 
-            </div>
-            <div class="nombre" style="padding: 10px 10px 0; font-weight: bold; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                ${real.referenciaReal || refP}
-            </div>
-            <div class="precio-contenedor" style="padding: 0 10px; margin-bottom: 5px;">
-                ${precioHTML}
-            </div>
-            <div class="botones-container" style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: auto;">
-                ${botonesHtml}
-            </div>
-        `;
+   card.innerHTML = `
+    <div class="img-container" style="position: relative; overflow: hidden; border-radius: 8px 8px 0 0;">
+        ${real.promocion ? '<div class="etiquetaPromo" style="position: absolute; top: 10px; left: 10px; z-index: 2;">PROMO</div>' : ''}
+        
+        <img src="${normalizarImagen(imgUrl)}" 
+             style="${estiloImagen} ${estiloCursor} display: block; width: 100%; height: auto; object-fit: cover;" 
+             loading="lazy" 
+             ${prioridadAttr} 
+             alt="${refProd}"
+             ${eventoClickImagen}
+             onerror="this.src='https://via.placeholder.com/300?text=Imagen+No+Disponible'"> 
+    </div>
+
+    <div class="nombre" style="padding: 10px 10px 0; font-weight: bold; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        ${real.referenciaReal || refP}
+    </div>
+
+    <div class="precio-contenedor" style="padding: 0 10px; margin-bottom: 5px;">
+        ${precioHTML}
+    </div>
+
+    <div class="botones-container" style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: auto;">
+        ${botonesHtml}
+    </div>
+`;
+       
 
         contenedor.appendChild(card);
         indice++;
     }
 
-    // Animación y cierre de loader (Intacto)
+   // Animación y loader
     setTimeout(() => {
         if (bloqueoActivo) return;
         document.querySelectorAll(".producto:not(.visible)").forEach((el, i) => {
@@ -2358,7 +2355,6 @@ function render() {
         if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
     }, 100); 
 }
-window.render = render;
 window.render = render;
 
 // 1. WHATSAPP DIRECTO (Botón Verde de la tarjeta)
