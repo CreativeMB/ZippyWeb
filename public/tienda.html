@@ -1406,56 +1406,65 @@ body {
 
 
 /* Slider de Promociones */
-.promo-slider::-webkit-scrollbar { display: none; }
+/* Estilos del Slider de Promociones */
+.promo-slider {
+    display: flex;
+    gap: 15px;
+    padding: 0 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Oculta scroll en Firefox */
+}
+.promo-slider::-webkit-scrollbar { display: none; } /* Oculta scroll en Chrome/Safari */
 
 .promo-item {
-    min-width: 260px; /* Tamaño ideal para que en PC se vean varios y en móvil 1 y medio */
-    background: #1a1a1a;
+    min-width: 280px;
+    max-width: 300px;
+    background: #fff;
     border-radius: 12px;
-    border: 1px solid #333;
     display: flex;
     align-items: center;
-    padding: 8px;
-    cursor: pointer;
-    transition: 0.3s ease;
+    padding: 10px;
     flex-shrink: 0;
+    border: 1px solid rgba(229, 196, 83, 0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: 0.3s;
 }
 
-.promo-item:hover {
-    border-color: #E5C453;
-    transform: translateY(-3px);
-}
+.promo-item:hover { transform: scale(1.02); border-color: #E5C453; }
 
 .promo-img {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     object-fit: cover;
     border-radius: 8px;
     margin-right: 12px;
 }
 
-.promo-nombre {
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 2px;
+.promo-info { flex: 1; }
+.promo-nombre { 
+    font-size: 14px; 
+    font-weight: 700; 
+    color: #1a1a1a; 
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
+.promo-precios { margin-top: 4px; }
+.promo-actual { color: #16a34a; font-weight: 800; font-size: 16px; }
+.promo-viejo { color: #888; text-decoration: line-through; font-size: 11px; margin-left: 5px; }
 
-.promo-precios { display: flex; flex-direction: column; }
-.promo-actual { color: #25D366; font-weight: 800; font-size: 15px; }
-.promo-viejo { color: #888; text-decoration: line-through; font-size: 10px; }
-
-/* En PC el banner ocupa todo el ancho disponible */
-@media screen and (min-width: 768px) {
+/* Ajuste Móvil: 2 productos */
+@media screen and (max-width: 767px) {
     .promo-item {
-        min-width: 300px;
+        min-width: calc(50vw - 30px); /* Ajusta para que quepan casi 2 */
+        max-width: calc(50vw - 30px);
+        flex-direction: column;
+        text-align: center;
     }
+    .promo-img { margin-right: 0; margin-bottom: 8px; width: 100px; height: 100px; }
 }
-
 
 
     </style>
@@ -2431,7 +2440,7 @@ function render() {
                     <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
                     <div class="precioViejo-container">
                         <span class="precioViejo">${formatearPrecio(real.valor)}</span>
-                        <span class="badge-ahorro-premium">-${porcentaje}%</span>
+                        <span class="badge-ahorro-premium">¡Ahorras ${porcentaje}%</span>
                     </div>
                 </div>`;
         } else {
