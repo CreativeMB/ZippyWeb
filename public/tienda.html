@@ -3260,7 +3260,7 @@ function actualizarFavicon(url) {
     // Usamos tu función normalizarImagen para que si es Google Drive funcione
     const urlFinal = normalizarImagen(url);
     link.href = urlFinal;
-    
+     console.log("✅ FAVICON CARGADO DESDE:", urlFinal); 
     // También actualizamos el de Apple (para móviles)
     let appleIcon = document.querySelector("link[rel='apple-touch-icon']");
     if (!appleIcon) {
