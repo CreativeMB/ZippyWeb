@@ -2221,12 +2221,12 @@ function render() {
     const contenedor = document.getElementById("productos");
     if (!contenedor) return;
     
-    // 1. LIMPIEZA TOTAL: Esto es lo más importante para evitar duplicados
+    // 1. LIMPIEZA ABSOLUTA: Esto garantiza que NUNCA haya duplicados
     contenedor.innerHTML = "";
     
     renderizarMenuCategorias();
 
-    // 2. CAPTURAMOS el texto del buscador
+    // 2. OBTENER TEXTO DE BÚSQUEDA
     const inputBusqueda = document.getElementById('contenedorBusqueda');
     const textoBusqueda = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : "";
 
@@ -2241,10 +2241,10 @@ function render() {
         const claveBusqueda = refP.trim().toLowerCase();
         const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
         
-        // El nombre real del producto para comparar
+        // El nombre para filtrar
         const nombreProducto = (real.referenciaReal || refP).toLowerCase();
 
-        // --- FILTRO A: CATEGORÍA ---
+        // --- FILTRO 1: POR CATEGORÍA ---
         if (categoriaSeleccionada !== null && categoriaSeleccionada !== "" && categoriaSeleccionada !== "Todas") {
             const categoriasProducto = (real.categoria || "").split(",").map(c => c.trim().toLowerCase());
             const esProductoDirecto = (claveBusqueda === productoEnUrl);
@@ -2253,9 +2253,9 @@ function render() {
             }
         }
 
-        // --- FILTRO B: BÚSQUEDA (ESTO CORRIGE TU ERROR) ---
+        // --- FILTRO 2: POR BUSCADOR (CORRECCIÓN DE DUPLICADOS) ---
         if (textoBusqueda !== "" && !nombreProducto.includes(textoBusqueda)) {
-            continue; // Si el nombre no incluye lo buscado, saltamos este producto
+            continue; // Si no coincide, pasamos al siguiente sin dibujar nada
         }
 
         const imgUrl = productosJson[refP];
@@ -2309,7 +2309,7 @@ function render() {
         indice++;
     }
 
-    // Loader
+    // Ocultar el loader una vez terminado el renderizado
     const ld = document.getElementById("loader");
     if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
 }
@@ -2927,22 +2927,20 @@ window.cerrarModal = () => {
         if (document.getElementById('shareWA')) document.getElementById('shareWA').href = `https://api.whatsapp.com/send?text=${msg}`;
     });
 
-    // --- 3. LÓGICA DE BÚSQUEDA INTEGRADA EN LA NAV ---
-// --- 3. LÓGICA DE BÚSQUEDA SIMPLIFICADA Y CORREGIDA ---
+   // --- 3. LÓGICA DE BÚSQUEDA CORREGIDA (SIN CONFLICTOS) ---
 let timeoutBusqueda;
 const inputBusquedaNav = document.getElementById('contenedorBusqueda');
 
 if (inputBusquedaNav) {
     inputBusquedaNav.addEventListener('input', (e) => {
-        // Detenemos el renderizado anterior para no saturar
+        // Detenemos cualquier renderizado pendiente para no saturar la memoria
         clearTimeout(timeoutBusqueda);
         
         timeoutBusqueda = setTimeout(() => {
-            // Simplemente llamamos a render(). 
-            // Como render() ahora limpia el HTML y filtra por el texto del input, 
-            // los duplicados desaparecen y la búsqueda es exacta.
+            // No manipulamos el DOM aquí. Dejamos que render() lo haga todo.
+            // render() limpiará el contenedor y dibujará solo lo que coincida.
             render(); 
-        }, 300); // 300ms es el tiempo ideal de espera
+        }, 300); // 300ms es el tiempo ideal para esperar a que el usuario termine de teclear
     });
 }
 
