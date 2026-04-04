@@ -1368,60 +1368,45 @@ body {
 /* ============================================================ */
 /* 2. SECCIÓN: BANNER DE PROMOCIONES (OPTIMIZADO E INDEPENDIENTE)*/
 /* ============================================================ */
-
-#promo-banner-container {
-    width: 100%;
-    position: relative; 
-    /* Z-index bajo para que se deslice por DEBAJO de las categorías */
-    z-index: 10 !important; 
-    background: #000;
-    margin-top: 5px;
-    margin-bottom: 15px;
-    /* IMPORTANTE: Aísla el banner para que sus efectos no afecten a capas superiores */
-    isolation: isolate; 
-    overflow: hidden;
-}
-
 .promo-slider {
     display: flex;
-    gap: 15px;
-    padding: 10px 20px;
+    gap: 10px;
     overflow-x: auto;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
     scrollbar-width: none;
-    /* Asegura que el slider no bloquee el click global */
-    pointer-events: auto;
+    padding: 5px 15px;
+    -webkit-overflow-scrolling: touch;
 }
 .promo-slider::-webkit-scrollbar { display: none; }
 
 .promo-item {
-    min-width: 300px; 
-    max-width: 320px;
+    flex: 0 0 auto;
+    width: 260px; /* Tamaño compacto */
+    height: 75px; /* Ultra delgado */
     background: #ffffff;
-    border-radius: 12px;
+    border-radius: 4px; /* Cuadrado moderno */
     display: flex;
     align-items: center;
-    padding: 10px;
-    flex-shrink: 0;
-    border: 1px solid rgba(229, 196, 83, 0.3);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 5px;
     cursor: pointer;
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    border: 1px solid #333;
 }
 
-.promo-item:hover {
-    transform: translateY(-3px);
-    border-color: #E5C453;
+.promo-img-box {
+    width: 65px;
+    height: 65px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-right: 10px;
+    flex-shrink: 0;
 }
 
-.promo-img {
-    width: 70px;
-    height: 70px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-right: 12px;
-    background: #f1f1f1;
+.promo-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Se ve toda la imagen siempre */
 }
 
 .promo-info {
@@ -1429,65 +1414,39 @@ body {
     overflow: hidden;
 }
 
-.promo-nombre { 
-    font-size: 13px; 
-    font-weight: 700; 
-    color: #111; 
+.p-name-slim {
+    font-size: 11px;
+    font-weight: 700;
+    color: #000;
+    display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-transform: uppercase;
 }
 
-.promo-precios { 
-    margin-top: 4px;
+/* Botón Moderno de Compra + Ahorro */
+.btn-promo-buy {
+    background: #25d366;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 3px;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    margin-top: 4px;
 }
 
-.promo-actual { color: #16a34a; font-weight: 800; font-size: 16px; }
-.promo-viejo { color: #a0a0a0; text-decoration: line-through; font-size: 11px; }
-
-/* ========================================= */
-/* AJUSTES MÓVIL (PANTALLA PEQUEÑA)          */
-/* ========================================= */
-@media screen and (max-width: 767px) {
-    .menu-categorias {
-        top: auto;
-        bottom: 175px; /* Sube un poco para no tapar el botón de WhatsApp flotante */
-    }
-
-    #promo-banner-container {
-        margin-top: 0;
-    }
-    
-    .promo-slider {
-        gap: 10px;
-        padding: 10px;
-    }
-
-    .promo-item {
-        /* En móvil exactamente 2 productos visibles */
-        min-width: calc(50% - 15px); 
-        flex-direction: column;
-        text-align: center;
-        padding: 8px;
-    }
-
-    .promo-img {
-        width: 100%;
-        height: 110px;
-        margin-right: 0;
-        margin-bottom: 8px;
-    }
-    
-    .promo-nombre {
-        font-size: 11px;
-        white-space: normal;
-        height: 32px;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-    }
+.ahorro-bubble {
+    background: #000;
+    color: #E5C453;
+    font-size: 8px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin-top: 2px;
 }
 
     </style>
@@ -1554,12 +1513,10 @@ body {
 
 
 <!-- BANNER DE PROMOCIONES PREMIUM -->
-<div id="promo-banner-container" style="display:none; margin-bottom: 20px; overflow: hidden; background: linear-gradient(135deg, #000 0%, #1a1a1a 100%); padding: 20px 0; border-bottom: 2px solid #E5C453;">
-    <div style="text-align: center; margin-bottom: 15px;">
-        <span style="color: #E5C453; font-family: 'Montserrat'; font-weight: 800; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 4px;">🔥 Ofertas Especiales</span>
-    </div>
+<!-- BANNER DE PROMOCIONES INFINITO SLIM -->
+<div id="promo-banner-container" style="display:none; overflow: hidden; background: #000; padding: 5px 0; border-bottom: 2px solid #E5C453;">
     <div id="promo-track" class="promo-slider">
-        <!-- Los productos de promo se cargarán aquí -->
+        <!-- JS cargará los productos aquí -->
     </div>
 </div>
 
@@ -2323,101 +2280,89 @@ function configurarRedesNav(perfil) {
 }
 
 */
+
+let promoScrollId;
+
 function renderizarPromoBanner() {
-    const contenedorBanner = document.getElementById("promo-banner-container");
+    const contenedor = document.getElementById("promo-banner-container");
     const track = document.getElementById("promo-track");
     if (!track) return;
 
-    // 1. Filtrar solo productos en promoción que NO estén agotados
-    let productosPromo = [];
+    // 1. Filtrar promos y barajar (aleatorio)
+    let promos = [];
     for (const ref in productosJson) {
         const clave = ref.trim().toLowerCase();
         const real = productosRealtime[clave];
         if (real && real.promocion && !real.agotado) {
-            productosPromo.push({
+            // Calcular % de ahorro
+            const ahorro = Math.round(100 - (real.valorPromocion * 100 / real.valor));
+            promos.push({
                 ref: real.referenciaReal || ref,
                 img: productosJson[ref],
                 precio: real.valorPromocion,
-                precioViejo: real.valor,
-                desc: (real.descripcion || "Oferta especial").replace(/'/g, "\\'")
+                porcentaje: ahorro,
+                desc: (real.descripcion || "").replace(/'/g, "\\'")
             });
         }
     }
 
-    if (productosPromo.length === 0) {
-        contenedorBanner.style.display = "none";
+    if (promos.length === 0) {
+        contenedor.style.display = "none";
         return;
     }
 
-    // 2. Mostrar contenedor y Barajar (Shuffle) para que siempre sea distinto
-    contenedorBanner.style.display = "block";
-    productosPromo.sort(() => Math.random() - 0.5);
+    // 2. Aleatorizar
+    promos.sort(() => Math.random() - 0.5);
 
-    // 3. Si es móvil, solo tomamos una cantidad pequeña pero rotativa (o todos en slider)
-    // Para cumplir tu petición de "PC llena orilla a orilla y móvil 2", el CSS ya lo maneja
-    
+    // 3. Limpiar e inyectar duplicando el contenido para el efecto infinito
+    contenedor.style.display = "block";
     track.innerHTML = "";
-    productosPromo.forEach(p => {
-        const item = document.createElement("div");
-        item.className = "promo-item";
-        item.onclick = () => window.abrirPestañaProducto(p.ref, p.img, p.precio, p.desc);
-        
-        item.innerHTML = `
-            <img src="${normalizarImagen(p.img)}" class="promo-img">
-            <div class="promo-info">
-                <div class="promo-nombre">${p.ref}</div>
-                <div class="promo-precios">
-                    <span class="promo-actual">${formatearPrecio(p.precio)}</span>
-                    <span class="promo-viejo">${formatearPrecio(p.precioViejo)}</span>
-                </div>
-                <div style="background: #E5C453; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; display: inline-block; margin-top: 5px;">
-                    VER OFERTA
-                </div>
+    
+    // Función para crear la tarjeta HTML
+    const crearCard = (p) => `
+        <div class="promo-item" onclick="window.abrirPestañaProducto('${p.ref}','${p.img}','${p.precio}','${p.desc}')">
+            <div class="promo-img-box">
+                <img src="${normalizarImagen(p.img)}">
             </div>
-        `;
-        track.appendChild(item);
-    });
+            <div class="promo-info">
+                <span class="p-name-slim">${p.ref}</span>
+                <span style="color: #16a34a; font-weight: 800; font-size: 14px;">${formatearPrecio(p.precio)}</span>
+            </div>
+            <div class="btn-promo-buy">
+                COMPRAR
+                <span class="ahorro-bubble">AHORRA ${p.porcentaje}%</span>
+            </div>
+        </div>
+    `;
 
-    // 4. Animación de scroll automático (opcional)
-    iniciarAutoScrollPromo();
+    // Inyectamos dos veces para que cuando termine la primera tanda, la segunda ya esté entrando
+    const htmlContenido = promos.map(p => crearCard(p)).join('');
+    track.innerHTML = htmlContenido + htmlContenido;
+
+    // 4. Iniciar Animación Infinita
+    iniciarMovimientoPerpetuo(track);
 }
 
-let promoAnimationId; // Cambiamos el interval por un ID de animación
-let isPromoHovered = false;
-
-function iniciarAutoScrollPromo() {
-    const track = document.getElementById("promo-track");
-    if (!track) return;
-
-    // Detenemos cualquier animación previa para evitar duplicados
-    cancelAnimationFrame(promoAnimationId);
+function iniciarMovimientoPerpetuo(track) {
+    cancelAnimationFrame(promoScrollId);
+    let scrollPos = 0;
 
     function step() {
-        // REGLAS DE ORO:
-        // 1. No scroll si el mouse está encima del banner (isPromoHovered)
-        // 2. No scroll si el menú de categorías está abierto (menuCategoriasAbierto)
-        if (!isPromoHovered && !menuCategoriasAbierto) {
-            track.scrollLeft += 0.8; // Velocidad suave (ajusta a 1 o 1.5 si quieres más rápido)
-
-            // Si llega al final, reinicia suavemente
-            if (track.scrollLeft + track.offsetWidth >= track.scrollWidth - 1) {
-                track.scrollLeft = 0;
+        if (!menuCategoriasAbierto) {
+            scrollPos += 0.8; // Velocidad de la seda
+            // Si llegamos a la mitad (donde empieza el clon), reseteamos a 0 sin que se note
+            if (scrollPos >= track.scrollWidth / 2) {
+                scrollPos = 0;
             }
+            track.scrollLeft = scrollPos;
         }
-        // Continuar el bucle de animación
-        promoAnimationId = requestAnimationFrame(step);
+        promoScrollId = requestAnimationFrame(step);
     }
-
-    // Iniciar el bucle
-    promoAnimationId = requestAnimationFrame(step);
-
-    // Configurar detectores de mouse una sola vez
-    track.onmouseenter = () => { isPromoHovered = true; };
-    track.onmouseleave = () => { isPromoHovered = false; };
+    promoScrollId = requestAnimationFrame(step);
     
-    // Soporte para móviles: detener si el usuario toca para deslizar
-    track.ontouchstart = () => { isPromoHovered = true; };
-    track.ontouchend = () => { isPromoHovered = false; };
+    // Pausar al tocar
+    track.onmouseenter = () => cancelAnimationFrame(promoScrollId);
+    track.onmouseleave = () => promoScrollId = requestAnimationFrame(step);
 }
 
 
