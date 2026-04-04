@@ -1403,6 +1403,72 @@ body {
             gap: 3px !important; /* Reduce el espacio entre botones */
         }
     }
+
+
+
+/* Estilos del Slider de Promociones */
+.promo-slider {
+    display: flex;
+    gap: 15px;
+    padding: 0 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Oculta scroll en Firefox */
+}
+.promo-slider::-webkit-scrollbar { display: none; } /* Oculta scroll en Chrome/Safari */
+
+.promo-item {
+    min-width: 280px;
+    max-width: 300px;
+    background: #fff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    flex-shrink: 0;
+    border: 1px solid rgba(229, 196, 83, 0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: 0.3s;
+}
+
+.promo-item:hover { transform: scale(1.02); border-color: #E5C453; }
+
+.promo-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 12px;
+}
+
+.promo-info { flex: 1; }
+.promo-nombre { 
+    font-size: 14px; 
+    font-weight: 700; 
+    color: #1a1a1a; 
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.promo-precios { margin-top: 4px; }
+.promo-actual { color: #16a34a; font-weight: 800; font-size: 16px; }
+.promo-viejo { color: #888; text-decoration: line-through; font-size: 11px; margin-left: 5px; }
+
+/* Ajuste Móvil: 2 productos */
+@media screen and (max-width: 767px) {
+    .promo-item {
+        min-width: calc(50vw - 30px); /* Ajusta para que quepan casi 2 */
+        max-width: calc(50vw - 30px);
+        flex-direction: column;
+        text-align: center;
+    }
+    .promo-img { margin-right: 0; margin-bottom: 8px; width: 100px; height: 100px; }
+}
+
+
+
+
     </style>
 </head>
 
@@ -1438,6 +1504,7 @@ body {
 </div>
  
     <div id="productos-tab" class="tab-content">
+
         <div id="menu-categorias-flotante" class="menu-categorias"></div>
 
 <!-- Botón Flotante Carrito -->
@@ -1463,6 +1530,20 @@ body {
                 <div id="info-destacada" class="texto-destacado"></div>
             </div>
         </div>
+
+
+<!-- BANNER DE PROMOCIONES PREMIUM -->
+<div id="promo-banner-container" style="display:none; margin-bottom: 20px; overflow: hidden; background: linear-gradient(135deg, #000 0%, #1a1a1a 100%); padding: 20px 0; border-bottom: 2px solid #E5C453;">
+    <div style="text-align: center; margin-bottom: 15px;">
+        <span style="color: #E5C453; font-family: 'Montserrat'; font-weight: 800; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 4px;">🔥 Ofertas Especiales</span>
+    </div>
+    <div id="promo-track" class="promo-slider">
+        <!-- Los productos de promo se cargarán aquí -->
+    </div>
+</div>
+
+
+
 
         <div id="productos" class="productos"></div>
         <div class="footer">
@@ -2215,7 +2296,86 @@ function configurarRedesNav(perfil) {
         procesarProductoDirecto();
     });
 }
+
 */
+function renderizarPromoBanner() {
+    const contenedorBanner = document.getElementById("promo-banner-container");
+    const track = document.getElementById("promo-track");
+    if (!track) return;
+
+    // 1. Filtrar solo productos en promoción que NO estén agotados
+    let productosPromo = [];
+    for (const ref in productosJson) {
+        const clave = ref.trim().toLowerCase();
+        const real = productosRealtime[clave];
+        if (real && real.promocion && !real.agotado) {
+            productosPromo.push({
+                ref: real.referenciaReal || ref,
+                img: productosJson[ref],
+                precio: real.valorPromocion,
+                precioViejo: real.valor,
+                desc: (real.descripcion || "Oferta especial").replace(/'/g, "\\'")
+            });
+        }
+    }
+
+    if (productosPromo.length === 0) {
+        contenedorBanner.style.display = "none";
+        return;
+    }
+
+    // 2. Mostrar contenedor y Barajar (Shuffle) para que siempre sea distinto
+    contenedorBanner.style.display = "block";
+    productosPromo.sort(() => Math.random() - 0.5);
+
+    // 3. Si es móvil, solo tomamos una cantidad pequeña pero rotativa (o todos en slider)
+    // Para cumplir tu petición de "PC llena orilla a orilla y móvil 2", el CSS ya lo maneja
+    
+    track.innerHTML = "";
+    productosPromo.forEach(p => {
+        const item = document.createElement("div");
+        item.className = "promo-item";
+        item.onclick = () => window.abrirPestañaProducto(p.ref, p.img, p.precio, p.desc);
+        
+        item.innerHTML = `
+            <img src="${normalizarImagen(p.img)}" class="promo-img">
+            <div class="promo-info">
+                <div class="promo-nombre">${p.ref}</div>
+                <div class="promo-precios">
+                    <span class="promo-actual">${formatearPrecio(p.precio)}</span>
+                    <span class="promo-viejo">${formatearPrecio(p.precioViejo)}</span>
+                </div>
+                <div style="background: #E5C453; color: #000; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; display: inline-block; margin-top: 5px;">
+                    VER OFERTA
+                </div>
+            </div>
+        `;
+        track.appendChild(item);
+    });
+
+    // 4. Animación de scroll automático (opcional)
+    iniciarAutoScrollPromo();
+}
+
+let scrollInterval;
+function iniciarAutoScrollPromo() {
+    const track = document.getElementById("promo-track");
+    clearInterval(scrollInterval);
+    scrollInterval = setInterval(() => {
+        if (track.scrollLeft + track.offsetWidth >= track.scrollWidth) {
+            track.scrollLeft = 0;
+        } else {
+            track.scrollLeft += 1;
+        }
+    }, 30); // Velocidad del scroll
+    
+    track.onmouseenter = () => clearInterval(scrollInterval);
+    track.onmouseleave = () => iniciarAutoScrollPromo();
+}
+
+
+
+
 function render() {
     if (bloqueoActivo) return;
     const contenedor = document.getElementById("productos");
@@ -2227,15 +2387,24 @@ function render() {
     // 2. SEGURO ANTI-DUPLICADOS: Rastreamos nombres ya dibujados
     const productosDibujados = new Set();
     
-    renderizarMenuCategorias();
-
     // 3. OBTENER TEXTO DE BÚSQUEDA
     const inputBusqueda = document.getElementById('contenedorBusqueda');
     const textoBusqueda = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : "";
 
+    // --- 🚀 NUEVA LÓGICA DEL BANNER DE PROMOCIONES ---
+    const bannerContainer = document.getElementById("promo-banner-container");
+    // El banner solo se muestra si NO estamos buscando nada y NO hay categoría seleccionada
+    if (textoBusqueda === "" && (!categoriaSeleccionada || categoriaSeleccionada === "Todas")) {
+        renderizarPromoBanner(); 
+    } else if (bannerContainer) {
+        bannerContainer.style.display = "none"; 
+    }
+    // ------------------------------------------------
+
+    renderizarMenuCategorias();
+
     const urlParams = new URLSearchParams(window.location.search);
     const productoEnUrl = urlParams.get('producto')?.trim().toLowerCase();
-
     for (const refP in productosJson) {
         if (refP === "images") continue;
        
