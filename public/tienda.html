@@ -1306,64 +1306,54 @@ body {
 #menu-categorias-flotante {
     width: 100%;
     background: #ffffff;
-    border-bottom: 1px solid #ececec;
+    border-bottom: 1px solid #eee;
     position: sticky;
     top: 75px; 
     z-index: 1000;
-    overflow: hidden; /* Esconde el exceso para la animación */
-    padding: 8px 0;
+    padding: 10px 0;
 }
 
-/* ENVOLTORIO PARA EL SCROLL Y ANIMACIÓN */
+/* ENVOLTORIO CON SCROLL HORIZONTAL */
 .categorias-wrapper-tags {
     display: flex;
-    gap: 8px; /* Margen pequeño entre etiquetas */
-    padding: 0 10px;
-    overflow-x: auto;
-    cursor: grab;
+    gap: 8px;
+    padding: 0 15px;
+    overflow-x: auto; /* Permite scroll manual */
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none; /* Oculta scroll en Firefox */
-    
-    /* ANIMACIÓN INFINITA */
-    /* Nota: La velocidad depende del tiempo (60s). Ajusta a 30s si quieres más rápido */
-    animation: scrollInfinito 60s linear infinite;
     white-space: nowrap;
-    width: max-content;
-}
-
-/* PAUSAR ANIMACIÓN AL PASAR EL MOUSE O TOCAR */
-.categorias-wrapper-tags:hover {
-    animation-play-state: paused;
 }
 
 .categorias-wrapper-tags::-webkit-scrollbar {
     display: none; /* Oculta scroll en Chrome/Safari */
 }
 
-/* ESTILO DE CADA ETIQUETA (TAG) */
+/* BOTONES ESTILO CUADRADO MODERNO */
 .cat-tag {
     flex: 0 0 auto;
     background: #f8f9fa;
     color: #333;
-    border: 1px solid #e0e0e0;
-    padding: 6px 14px; /* Padding reducido para que sea compacto */
-    border-radius: 4px; /* Radio pequeño para look cuadrado y elegante */
-    font-size: 12px;
+    border: 1px solid #ddd;
+    padding: 7px 15px;
+    border-radius: 4px; /* Menos redondeado, más elegante */
+    font-size: 13px;
     font-weight: 600;
-    white-space: nowrap;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease;
     font-family: 'Montserrat', sans-serif;
-    text-transform: uppercase; /* Opcional: le da un toque más profesional */
-    letter-spacing: 0.5px;
 }
 
-/* EFECTO HOVER */
+/* ETIQUETA ACTIVA */
+.cat-tag.activo {
+    background: #000 !important; /* Fondo Negro */
+    color: #E5C453 !important;   /* Texto Dorado */
+    border-color: #000 !important;
+    transform: scale(1.02);
+}
+
 .cat-tag:hover {
     border-color: #E5C453;
-    background: #ffffff;
-    color: #E5C453;
 }
 
 /* ETIQUETA ACTIVA (Seleccionada) */
@@ -2756,40 +2746,58 @@ function renderizarMenuCategorias() {
     }
 
     contenedor.style.display = "block";
-    contenedor.innerHTML = "";
 
-    const wrapper = document.createElement("div");
-    wrapper.className = "categorias-wrapper-tags";
+    // 1. Si el contenedor está vacío, creamos los botones por primera vez
+    if (contenedor.innerHTML === "") {
+        const wrapper = document.createElement("div");
+        wrapper.className = "categorias-wrapper-tags";
 
-    // Función interna para crear los botones
-    const crearBotones = (lista) => {
-        // Añadimos "Todas"
-        const btnTodas = document.createElement("button");
-        btnTodas.className = `cat-tag ${(!categoriaSeleccionada || categoriaSeleccionada === "Todas") ? 'activo' : ''}`;
-        btnTodas.innerText = "Todas";
-        btnTodas.onclick = () => { categoriaSeleccionada = null; render(); };
-        wrapper.appendChild(btnTodas);
-
-        lista.forEach(cat => {
+        const crearBoton = (texto, valorFiltro) => {
             const boton = document.createElement("button");
-            boton.innerText = cat;
-            boton.className = `cat-tag ${(categoriaSeleccionada === cat) ? 'activo' : ''}`;
+            boton.innerText = texto;
+            boton.className = "cat-tag";
+            // Guardamos el valor original para identificarlo luego
+            boton.dataset.categoria = valorFiltro; 
+
             boton.onclick = (e) => {
                 e.preventDefault();
-                categoriaSeleccionada = (categoriaSeleccionada === cat) ? null : cat;
-                render();
+                // Cambiamos la categoría seleccionada
+                categoriaSeleccionada = (categoriaSeleccionada === valorFiltro) ? null : valorFiltro;
+                
+                // Refrescamos solo los productos
+                render(); 
             };
-            wrapper.appendChild(boton);
+            return boton;
+        };
+
+        // Añadimos "Todas"
+        wrapper.appendChild(crearBoton("Todas", "Todas"));
+
+        // Añadimos las demás categorías
+        categorias.forEach(cat => {
+            wrapper.appendChild(crearBoton(cat, cat));
         });
-    };
 
-    // LLAMAMOS DOS VECES (Para efecto infinito espejo)
-    crearBotones(categorias);
-    crearBotones(categorias); // El clon permite que no haya huecos al terminar la animación
+        contenedor.appendChild(wrapper);
+    }
 
-    contenedor.appendChild(wrapper);
+    // 2. ACTUALIZACIÓN VISUAL (Sin borrar el HTML)
+    // Buscamos todos los botones y solo cambiamos la clase 'activo'
+    const botones = contenedor.querySelectorAll(".cat-tag");
+    botones.forEach(btn => {
+        const catValor = btn.dataset.categoria;
+        
+        // Lógica para marcar cuál está activo
+        const esTodasActivo = (catValor === "Todas" && (!categoriaSeleccionada || categoriaSeleccionada === "Todas"));
+        const esCatActiva = (catValor === categoriaSeleccionada);
+
+        if (esTodasActivo || esCatActiva) {
+            btn.classList.add("activo");
+        } else {
+            btn.classList.remove("activo");
+        }
+    });
 }
-
    // --- 5. SISTEMA DE PEDIDOS ---
 function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
