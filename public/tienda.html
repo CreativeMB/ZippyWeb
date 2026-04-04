@@ -2980,19 +2980,19 @@ if (!idDomiciliarioAsignado) {
 const normalizarImagen = (url) => {
     if (!url) return "";
     
-    // CASO 1: Si ya es una URL de Drive, extraemos el ID y creamos el link directo
+    // Si ya es una URL de Drive completa, extraemos el ID y creamos el link miniatura
     if (url.includes("drive.google.com")) {
         const id = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
         return id ? `https://drive.google.com/thumbnail?id=${id[1]}&sz=w1000` : url;
     }
     
-    // CASO 2: SI ES SOLO EL ID (como el que tienes: 19YYbkiw...)
-    // Si no tiene "http" y es un texto largo, lo convertimos en link de Drive automáticamente
+    // --- ESTA ES LA PARTE NUEVA PARA TUS IDS ---
+    // Si el texto NO tiene "http" y es largo (como tu ID de 28 caracteres)
     if (!url.includes("http") && url.length > 20) {
+        // Le construimos la URL de Google Drive manualmente
         return `https://drive.google.com/thumbnail?id=${url.trim()}&sz=w1000`;
     }
     
-    // CASO 3: Es una URL normal o una imagen directa
     return url;
 };
 
