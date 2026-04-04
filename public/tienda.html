@@ -622,7 +622,6 @@ button[onclick*="whatsappDirecto"] {
     color: white !important;
     font-size: 14px !important;          /* Texto un poco más grande */
     font-weight: bold;
-    text-transform: uppercase;
 }
 
 button[onclick*="whatsappDirecto"] i {
@@ -2460,7 +2459,7 @@ function render() {
             `<button class="btn" style="background:#888; color:white; width:90%; margin:10px auto;" disabled>Agotado</button>` : 
             `<div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 10px; width: 100%; box-sizing: border-box;">
                 <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" style="flex: 1; background: #E5C453;"><i class="fas fa-cart-plus"></i></button>
-                <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;"><i class="fab fa-whatsapp"></i> Pedir</button>
+                <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;"><i class="fab fa-whatsapp"></i> Me interesa</button>
             </div>`;
 
         card.innerHTML = `
