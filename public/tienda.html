@@ -2221,12 +2221,12 @@ function render() {
     const contenedor = document.getElementById("productos");
     if (!contenedor) return;
     
-    // Limpiamos el contenedor para evitar duplicados
+    // LIMPIEZA TOTAL: Esto evita que los productos se dupliquen
     contenedor.innerHTML = "";
     
     renderizarMenuCategorias();
 
-    // 1. Capturamos lo que el usuario escribió en el buscador
+    // Capturamos lo que el usuario escribió en el buscador
     const inputBusqueda = document.getElementById('contenedorBusqueda');
     const textoBusqueda = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : "";
 
@@ -2243,20 +2243,19 @@ function render() {
         
         const nombreProducto = (real.referenciaReal || refP).toLowerCase();
 
-        // --- FILTRO DE CATEGORÍA ---
+        // --- FILTRO 1: CATEGORÍA ---
         if (categoriaSeleccionada !== null && categoriaSeleccionada !== "" && categoriaSeleccionada !== "Todas") {
             const categoriasProducto = (real.categoria || "").split(",").map(c => c.trim().toLowerCase());
             if (!categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
-                continue; // Si no es la categoría, saltamos al siguiente
+                continue; // Saltar si no es la categoría
             }
         }
 
-        // --- FILTRO DE BÚSQUEDA (CORRECCIÓN AQUÍ) ---
+        // --- FILTRO 2: BÚSQUEDA (LA CLAVE) ---
         if (textoBusqueda !== "" && !nombreProducto.includes(textoBusqueda)) {
-            continue; // Si no coincide con la búsqueda, saltamos al siguiente
+            continue; // Saltar si no coincide con el buscador
         }
 
-        // Si pasó los filtros, creamos la tarjeta...
         const imgUrl = productosJson[refP];
         let precioHTML = "";
         let precioFinal = 0;
@@ -2269,38 +2268,54 @@ function render() {
                     <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
                     <div class="precioViejo-container">
                         <span class="precioViejo">${formatearPrecio(real.valor)}</span>
-                        <span class="badge-ahorro-premium">-${porcentajeAhorro}%</span>
+                        <span class="badge-ahorro-premium">¡Ahorras ${porcentajeAhorro}%!</span>
                     </div>
                 </div>`;
+        } else if (real.valor > 0) {
+            precioFinal = real.valor;
+            precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
         } else {
-            precioFinal = real.valor || 0;
-            precioHTML = `<div class="precio">${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}</div>`;
+            precioHTML = `<div class="precio">Consultar precio</div>`;
         }
 
         const card = document.createElement("div");
-        card.className = `producto ${real.agotado ? 'agotado' : ''} visible`; // Añadimos visible de una vez
+        card.className = `producto ${real.agotado ? 'agotado' : ''} visible`;
 
-        const descProd = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
+        const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
         const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
 
-        // Botones y contenido...
-        let botonesHtml = real.agotado ? 
-            `<button class="btn" style="flex:1; background:#888; color:white; cursor:not-allowed;" disabled>Agotado</button>` :
-            `<div class="btn-container-responsive" style="display: flex; gap: 5px; width: 100%;">
-                <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" style="flex:1; background:#E5C453;"><i class="fas fa-cart-plus"></i></button>
-                <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex:2.5; background:#25D366; color:white;"><i class="fab fa-whatsapp"></i> Pedir</button>
+        let botonesHtml = real.agotado ? `
+            <div class="btn-container-responsive" style="display: flex; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+                <button class="btn" style="flex: 1; background:#888; color:white; cursor:not-allowed;" disabled>Agotado</button>
+            </div>` : `
+            <div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+                <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" style="flex: 1; background: #E5C453; color: #000;"><i class="fas fa-cart-plus"></i></button>
+                <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color: #fff;"><i class="fab fa-whatsapp"></i> Pedir ahora</button>
             </div>`;
 
         card.innerHTML = `
-            <img src="${normalizarImagen(imgUrl)}" onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" style="width:100%; cursor:pointer;">
+            <div class="img-container">
+                ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+                <img src="${normalizarImagen(imgUrl)}" onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" loading="lazy" alt="${refProd}"> 
+            </div>
             <div class="nombre">${real.referenciaReal || refP}</div>
             <div class="precio-contenedor">${precioHTML}</div>
-            <div style="padding:10px;">${botonesHtml}</div>
+            ${botonesHtml}
         `;
 
         contenedor.appendChild(card);
         indice++;
     }
+
+   // Animación y loader
+    setTimeout(() => {
+        if (bloqueoActivo) return;
+        document.querySelectorAll(".producto:not(.visible)").forEach((el, i) => {
+            setTimeout(() => el.classList.add("visible"), i * 30);
+        });
+        const ld = document.getElementById("loader");
+        if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
+    }, 100); 
 }
 window.render = render;
 
@@ -2506,17 +2521,16 @@ function renderizarMenuCategorias() {
     const contenedor = document.getElementById("menu-categorias-flotante");
     if (!contenedor) return;
 
-    // 1. Sincronización de estado para CSS (especialmente en móviles)
+    // 🔥 SINCRONIZACIÓN DE CLASE PARA MÓVIL
+    // Esto es lo que activa el 'pointer-events: auto' en el CSS del móvil
     if (menuCategoriasAbierto) {
         contenedor.classList.add("abierto");
     } else {
         contenedor.classList.remove("abierto");
     }
 
-    // 2. Obtener la lista de categorías desde los productos cargados
     const categorias = obtenerCategoriasUnicas();
 
-    // Si no hay categorías, ocultamos el menú por completo
     if (categorias.length === 0) {
         contenedor.style.display = "none";
         return;
@@ -2525,7 +2539,7 @@ function renderizarMenuCategorias() {
     contenedor.style.display = "flex";
     contenedor.innerHTML = "";
 
-    // 3. Crear el Botón Principal (☰ Categorías)
+    // 🔥 BOTÓN PRINCIPAL
     const btnMain = document.createElement("button");
     btnMain.className = "cat-btn cat-main";
     btnMain.innerHTML = `☰ Categorías`;
@@ -2534,12 +2548,12 @@ function renderizarMenuCategorias() {
         e.preventDefault();
         e.stopPropagation();
         menuCategoriasAbierto = !menuCategoriasAbierto;
-        renderizarMenuCategorias(); // Refrescar para abrir/cerrar
+        renderizarMenuCategorias();
     };
 
-    // Lógica de Hover para Escritorio (PC)
+    // Mantener compatibilidad con Hover en Escritorio
     contenedor.onmouseenter = () => {
-        if (window.innerWidth > 767) { 
+        if (window.innerWidth > 767) { // Solo en PC
             clearTimeout(window.timerCierre);
             if (!menuCategoriasAbierto) {
                 menuCategoriasAbierto = true;
@@ -2549,7 +2563,7 @@ function renderizarMenuCategorias() {
     };
 
     contenedor.onmouseleave = () => {
-        if (window.innerWidth > 767) { 
+        if (window.innerWidth > 767) { // Solo en PC
             window.timerCierre = setTimeout(() => {
                 menuCategoriasAbierto = false;
                 renderizarMenuCategorias();
@@ -2559,45 +2573,26 @@ function renderizarMenuCategorias() {
 
     contenedor.appendChild(btnMain);
 
-    // 4. Crear el Wrapper del Acordeón (donde van los botones)
+    // 🔥 CONTENEDOR INTERNO (ACORDEÓN)
     const wrapper = document.createElement("div");
     wrapper.className = "cat-wrapper";
 
-    // Animación de apertura/cierre
+    // Lógica de altura dinámica
     if (!menuCategoriasAbierto) {
         wrapper.style.maxHeight = "0px";
         wrapper.style.opacity = "0";
-        wrapper.style.pointerEvents = "none"; // Evita clics accidentales cuando está cerrado
     } else {
+        // En móvil el CSS ya limita a 50vh, aquí aseguramos que se vea
         wrapper.style.maxHeight = window.innerWidth < 767 ? "50vh" : "60vh";
         wrapper.style.opacity = "1";
-        wrapper.style.pointerEvents = "auto";
     }
 
-    // 5. Botón especial: "Todas las categorías" (Para limpiar el filtro)
-    const btnTodas = document.createElement("button");
-    btnTodas.innerText = "Ver Todo";
-    btnTodas.className = "cat-btn";
-    if (categoriaSeleccionada === null || categoriaSeleccionada === "" || categoriaSeleccionada === "Todas") {
-        btnTodas.classList.add("activo");
-    }
-    btnTodas.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        categoriaSeleccionada = null; // Resetea el filtro
-        menuCategoriasAbierto = false;
-        if (typeof render === "function") render(); // Vuelve a dibujar los productos
-        renderizarMenuCategorias();
-    };
-    wrapper.appendChild(btnTodas);
-
-    // 6. Generar botones para cada Categoría detectada
-    categorias.forEach((cat) => {
+    // 🔥 RENDERIZADO DE BOTONES
+    categorias.forEach((cat, i) => {
         const boton = document.createElement("button");
         boton.innerText = cat;
         boton.className = "cat-btn";
 
-        // Marcar como activo si es la categoría actual
         if (categoriaSeleccionada === cat) {
             boton.classList.add("activo");
         }
@@ -2606,20 +2601,13 @@ function renderizarMenuCategorias() {
             e.preventDefault();
             e.stopPropagation();
 
-            // Seguridad: Si el menú se está cerrando, ignorar clics
+            // Bloqueo de seguridad: si no está abierto (clics fantasma), no hace nada
             if (!menuCategoriasAbierto) return; 
 
-            // Si haces clic en la que ya está activa, se desmarca (vuelve a null)
             categoriaSeleccionada = (categoriaSeleccionada === cat) ? null : cat;
             
-            // Cerrar el menú tras elegir
             menuCategoriasAbierto = false; 
-            
-            // --- IMPORTANTE: Llamar al render para filtrar los productos ---
-            // Esto asegura que no haya duplicados y que el buscador se respete
-            if (typeof render === "function") render(); 
-            
-            // Refrescar el menú para actualizar los colores (activo/inactivo)
+            if (typeof render === "function") render(); // Llamar a tu función de filtrado
             renderizarMenuCategorias();
         };
 
@@ -2949,8 +2937,7 @@ const inputBusquedaNav = document.getElementById('contenedorBusqueda');
 
 if (inputBusquedaNav) {
     inputBusquedaNav.addEventListener('input', (e) => {
-        // DEBOUNCE: Espera 100ms después de que dejas de escribir para procesar
-        // Esto evita que el navegador se trabe en cada tecla
+     
         clearTimeout(timeoutBusqueda);
         
         timeoutBusqueda = setTimeout(() => {
@@ -2973,7 +2960,7 @@ if (inputBusquedaNav) {
                     }
                 });
             });
-          render(); 
+        render(); 
         }, 300);// 100 milisegundos de espera
     });
 }
