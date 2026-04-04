@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+      <link rel="icon" type="image/png" href="">
     <title>Tienda Virtual | Pedidos por WhatsApp</title>
     <meta name="description" content="Explora productos y realiza tu compra de forma rápida por WhatsApp.">
     
@@ -1735,7 +1735,6 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     let carrito = [];
     let procesadoExitoso = false;
 
-
 // Al cargar la página, recuperamos lo que haya en el almacenamiento
 document.addEventListener('DOMContentLoaded', () => {
     const carritoGuardado = localStorage.getItem('zippy_cart');
@@ -3247,6 +3246,30 @@ if (contenedorRedes) {
         }
     }
 }
+function actualizarFavicon(url) {
+    if (!url) return;
+    
+    // Seleccionamos o creamos el tag <link rel="icon">
+    let link = document.querySelector("link[rel*='icon']");
+    if (!link) {
+        link = document.createElement('link');
+        link.rel = 'shortcut icon';
+        document.head.appendChild(link);
+    }
+
+    // Usamos tu función normalizarImagen para que si es Google Drive funcione
+    const urlFinal = normalizarImagen(url);
+    link.href = urlFinal;
+    
+    // También actualizamos el de Apple (para móviles)
+    let appleIcon = document.querySelector("link[rel='apple-touch-icon']");
+    if (!appleIcon) {
+        appleIcon = document.createElement('link');
+        appleIcon.rel = 'apple-touch-icon';
+        document.head.appendChild(appleIcon);
+    }
+    appleIcon.href = urlFinal;
+}
 function aplicarSEO(data) {
     console.group("🚀 Sistema SEO Dinámico"); // Agrupa los logs para que se vean ordenados
     
@@ -3257,6 +3280,12 @@ function aplicarSEO(data) {
     const nombre = data.nombreEmpresa || "Catálogo online";
     const descripcion = data.descripcionEmpresa || "Compra productos online fácil y rápido";
     const ciudad = data.ciudad || "";
+
+     // --- NUEVA LÓGICA PARA EL FAVICON ---
+    if (data.urlLogo) {
+        actualizarFavicon(data.urlLogo); // <--- Llamada a la función
+        console.log("🎯 Favicon actualizado con el logo de la empresa");
+    }
     
     let imagenSEO = "";
     if (data.urlLogo) {
