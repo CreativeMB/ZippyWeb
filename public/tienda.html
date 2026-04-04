@@ -2221,12 +2221,12 @@ function render() {
     const contenedor = document.getElementById("productos");
     if (!contenedor) return;
     
-    // LIMPIEZA TOTAL: Esto evita que los productos se dupliquen
+    // 1. LIMPIEZA TOTAL: Esto es lo más importante para evitar duplicados
     contenedor.innerHTML = "";
     
     renderizarMenuCategorias();
 
-    // Capturamos lo que el usuario escribió en el buscador
+    // 2. CAPTURAMOS el texto del buscador
     const inputBusqueda = document.getElementById('contenedorBusqueda');
     const textoBusqueda = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : "";
 
@@ -2241,19 +2241,21 @@ function render() {
         const claveBusqueda = refP.trim().toLowerCase();
         const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
         
+        // El nombre real del producto para comparar
         const nombreProducto = (real.referenciaReal || refP).toLowerCase();
 
-        // --- FILTRO 1: CATEGORÍA ---
+        // --- FILTRO A: CATEGORÍA ---
         if (categoriaSeleccionada !== null && categoriaSeleccionada !== "" && categoriaSeleccionada !== "Todas") {
             const categoriasProducto = (real.categoria || "").split(",").map(c => c.trim().toLowerCase());
-            if (!categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
-                continue; // Saltar si no es la categoría
+            const esProductoDirecto = (claveBusqueda === productoEnUrl);
+            if (!esProductoDirecto && !categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
+                continue;
             }
         }
 
-        // --- FILTRO 2: BÚSQUEDA (LA CLAVE) ---
+        // --- FILTRO B: BÚSQUEDA (ESTO CORRIGE TU ERROR) ---
         if (textoBusqueda !== "" && !nombreProducto.includes(textoBusqueda)) {
-            continue; // Saltar si no coincide con el buscador
+            continue; // Si el nombre no incluye lo buscado, saltamos este producto
         }
 
         const imgUrl = productosJson[refP];
@@ -2289,12 +2291,12 @@ function render() {
                 <button class="btn" style="flex: 1; background:#888; color:white; cursor:not-allowed;" disabled>Agotado</button>
             </div>` : `
             <div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
-                <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" style="flex: 1; background: #E5C453; color: #000;"><i class="fas fa-cart-plus"></i></button>
+                <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" style="flex: 1; background: #E5C453;"><i class="fas fa-cart-plus"></i></button>
                 <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color: #fff;"><i class="fab fa-whatsapp"></i> Pedir ahora</button>
             </div>`;
 
         card.innerHTML = `
-            <div class="img-container">
+            <div class="img-container" style="position: relative; overflow: hidden; border-radius: 8px 8px 0 0;">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
                 <img src="${normalizarImagen(imgUrl)}" onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" loading="lazy" alt="${refProd}"> 
             </div>
@@ -2307,15 +2309,9 @@ function render() {
         indice++;
     }
 
-   // Animación y loader
-    setTimeout(() => {
-        if (bloqueoActivo) return;
-        document.querySelectorAll(".producto:not(.visible)").forEach((el, i) => {
-            setTimeout(() => el.classList.add("visible"), i * 30);
-        });
-        const ld = document.getElementById("loader");
-        if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
-    }, 100); 
+    // Loader
+    const ld = document.getElementById("loader");
+    if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
 }
 window.render = render;
 
@@ -2932,36 +2928,21 @@ window.cerrarModal = () => {
     });
 
     // --- 3. LÓGICA DE BÚSQUEDA INTEGRADA EN LA NAV ---
+// --- 3. LÓGICA DE BÚSQUEDA SIMPLIFICADA Y CORREGIDA ---
 let timeoutBusqueda;
 const inputBusquedaNav = document.getElementById('contenedorBusqueda');
 
 if (inputBusquedaNav) {
     inputBusquedaNav.addEventListener('input', (e) => {
-     
+        // Detenemos el renderizado anterior para no saturar
         clearTimeout(timeoutBusqueda);
         
         timeoutBusqueda = setTimeout(() => {
-            const texto = e.target.value.toLowerCase().trim();
-            const productos = document.querySelectorAll('.producto');
-
-            // Usamos un fragmento de memoria para que sea más rápido
-            requestAnimationFrame(() => {
-                productos.forEach(card => {
-                    const nombreElemento = card.querySelector('.nombre');
-                    if (nombreElemento) {
-                        const coincide = nombreElemento.innerText.toLowerCase().includes(texto);
-                        
-                        // Solo cambiamos el estilo si es estrictamente necesario
-                        // (esto ahorra mucha energía al procesador)
-                        const displayActual = coincide ? 'flex' : 'none';
-                        if (card.style.display !== displayActual) {
-                            card.style.display = displayActual;
-                        }
-                    }
-                });
-            });
-        render(); 
-        }, 300);// 100 milisegundos de espera
+            // Simplemente llamamos a render(). 
+            // Como render() ahora limpia el HTML y filtra por el texto del input, 
+            // los duplicados desaparecen y la búsqueda es exacta.
+            render(); 
+        }, 300); // 300ms es el tiempo ideal de espera
     });
 }
 
