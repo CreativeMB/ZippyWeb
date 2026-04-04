@@ -1301,100 +1301,64 @@ body {
         }
     }
 
-/* Contenedor principal categoria flotante */
-/* ============================================================ */
-/* 1. SECCIÓN: MENÚ DE CATEGORÍAS (FLOTANTE Y SIEMPRE ENCIMA)   */
-/* ============================================================ */
-.menu-categorias {
-    position: fixed;
-    top: 75px; 
-    right: 0; 
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end; 
-    gap: 8px;
-    /* Z-index extremo para que nada lo tape */
-    z-index: 99999 !important; 
-    /* No bloquea clics en el resto de la página */
-    pointer-events: none; 
-    width: auto;
-    padding-right: 0;
-}
-
-/* BOTÓN BASE (Categorías e ítems) */
-.cat-btn {
-    /* Reactiva los clics solo para los botones */
-    pointer-events: auto !important; 
-    font-family: 'Montserrat', sans-serif;
-    background: rgba(0, 0, 0, 0.95); /* Un poco más sólido para legibilidad */
-    color: #E5C453;
-    border: 1px solid rgba(229, 196, 83, 0.4);
-    border-radius: 6px 0 0 6px; 
-    padding: 10px 18px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: -3px 3px 10px rgba(0,0,0,0.5);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
-    text-align: right;
-    width: fit-content;    
-    min-width: 150px;      
-    align-self: flex-end;  
-    display: block;
-}
-
-.cat-btn:hover {
-    background: #2a2a2a;
-    color: #fff;
-    padding-right: 25px;
-}
-
-/* BOTÓN PRINCIPAL (☰ Categorías) */
-.cat-main {
-    background: linear-gradient(135deg, #E5C453, #caa93a) !important;
-    color: #000 !important;
-    border: none !important;
-    box-shadow: -4px 6px 20px rgba(229, 196, 83, 0.4) !important;
-    width: fit-content !important; 
-    min-width: 150px; 
-    padding-left: 25px !important;
-}
-
-/* CONTENEDOR DEL ACORDEÓN */
-.cat-wrapper {
+/* CONTENEDOR PRINCIPAL (Ubicado debajo del banner) */
+#menu-categorias-flotante {
     width: 100%;
+    background: #ffffff; /* Fondo limpio */
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    position: sticky; /* Se queda fijo al hacer scroll */
+    top: 75px; /* Altura de tu nav bar */
+    z-index: 1000;
+    overflow: hidden;
+}
+
+/* ENVOLTORIO DEL SCROLL */
+.categorias-wrapper-tags {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    max-height: 0; 
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
-    transition: max-height 0.4s ease, opacity 0.3s ease;
-    background: transparent; 
-    padding: 0;
-    opacity: 0;
+    gap: 10px;
+    overflow-x: auto; /* Permite mover de un lado a otro */
+    padding: 5px 20px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iPhone */
+    scrollbar-width: none; /* Oculta barra en Firefox */
 }
 
-/* Cuando el menú está abierto (clase controlada por JS) */
-.menu-categorias.abierto .cat-wrapper {
-    opacity: 1;
-    max-height: 60vh; /* Se expande */
+.categorias-wrapper-tags::-webkit-scrollbar {
+    display: none; /* Oculta barra en Chrome/Safari */
 }
 
-.cat-btn.activo {
+/* ESTILO DE CADA ETIQUETA */
+.cat-tag {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    padding: 8px 18px;
+    border-radius: 20px; /* Forma de píldora */
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap; /* Evita que el texto se parta en dos líneas */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* EFECTO HOVER */
+.cat-tag:hover {
+    border-color: #E5C453;
+    background: #fffdf5;
+}
+
+/* ETIQUETA ACTIVA (Seleccionada) */
+.cat-tag.activo {
     background: #E5C453 !important;
     color: #000 !important;
     border-color: #E5C453 !important;
-    transform: translateX(-5px);
-}
-
-.cat-wrapper::-webkit-scrollbar { width: 4px; }
-.cat-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(229, 196, 83, 0.5);
-    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(229, 196, 83, 0.2);
+    transform: scale(1.05);
 }
 
 /* ============================================================ */
@@ -1558,7 +1522,7 @@ body {
  
     <div id="productos-tab" class="tab-content">
 
-        <div id="menu-categorias-flotante" class="menu-categorias"></div>
+       
 
 <!-- Botón Flotante Carrito -->
 <div id="btnCarritoFlotante" onclick="window.abrirCarrito()" style="position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px; background: #E5C453; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 999999; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
@@ -1595,6 +1559,8 @@ body {
     </div>
 </div>
 
+<div id="menu-categorias-flotante" class="categorias-tags-container">
+    <div class="categorias-wrapper" id="tags-track">
 
 
 
@@ -2757,94 +2723,46 @@ function renderizarMenuCategorias() {
     const contenedor = document.getElementById("menu-categorias-flotante");
     if (!contenedor) return;
 
-    // 🔥 SINCRONIZACIÓN DE CLASE PARA MÓVIL
-    // Esto es lo que activa el 'pointer-events: auto' en el CSS del móvil
-    if (menuCategoriasAbierto) {
-        contenedor.classList.add("abierto");
-    } else {
-        contenedor.classList.remove("abierto");
-    }
-
     const categorias = obtenerCategoriasUnicas();
 
+    // Si no hay categorías, ocultamos el contenedor
     if (categorias.length === 0) {
         contenedor.style.display = "none";
         return;
     }
 
-    contenedor.style.display = "flex";
+    contenedor.style.display = "block";
     contenedor.innerHTML = "";
 
-    // 🔥 BOTÓN PRINCIPAL
-    const btnMain = document.createElement("button");
-    btnMain.className = "cat-btn cat-main";
-    btnMain.innerHTML = `☰ Categorías`;
-
-    btnMain.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        menuCategoriasAbierto = !menuCategoriasAbierto;
-        renderizarMenuCategorias();
-    };
-
-    // Mantener compatibilidad con Hover en Escritorio
-    contenedor.onmouseenter = () => {
-        if (window.innerWidth > 767) { // Solo en PC
-            clearTimeout(window.timerCierre);
-            if (!menuCategoriasAbierto) {
-                menuCategoriasAbierto = true;
-                renderizarMenuCategorias();
-            }
-        }
-    };
-
-    contenedor.onmouseleave = () => {
-        if (window.innerWidth > 767) { // Solo en PC
-            window.timerCierre = setTimeout(() => {
-                menuCategoriasAbierto = false;
-                renderizarMenuCategorias();
-            }, 500);
-        }
-    };
-
-    contenedor.appendChild(btnMain);
-
-    // 🔥 CONTENEDOR INTERNO (ACORDEÓN)
+    // Creamos el envoltorio para el scroll horizontal
     const wrapper = document.createElement("div");
-    wrapper.className = "cat-wrapper";
+    wrapper.className = "categorias-wrapper-tags";
 
-    // Lógica de altura dinámica
-    if (!menuCategoriasAbierto) {
-        wrapper.style.maxHeight = "0px";
-        wrapper.style.opacity = "0";
-    } else {
-        // En móvil el CSS ya limita a 50vh, aquí aseguramos que se vea
-        wrapper.style.maxHeight = window.innerWidth < 767 ? "50vh" : "60vh";
-        wrapper.style.opacity = "1";
-    }
+    // 1. Botón de "Todas" (Resetea el filtro)
+    const btnTodas = document.createElement("button");
+    btnTodas.className = `cat-tag ${(!categoriaSeleccionada || categoriaSeleccionada === "Todas") ? 'activo' : ''}`;
+    btnTodas.innerHTML = `<i class="fas fa-th-large"></i> Todas`;
+    btnTodas.onclick = (e) => {
+        e.preventDefault();
+        categoriaSeleccionada = null;
+        render(); // Vuelve a filtrar y dibujar
+    };
+    wrapper.appendChild(btnTodas);
 
-    // 🔥 RENDERIZADO DE BOTONES
-    categorias.forEach((cat, i) => {
+    // 2. Botones para cada Categoría detectada
+    categorias.forEach(cat => {
         const boton = document.createElement("button");
         boton.innerText = cat;
-        boton.className = "cat-btn";
-
-        if (categoriaSeleccionada === cat) {
-            boton.classList.add("activo");
-        }
+        boton.className = `cat-tag ${(categoriaSeleccionada === cat) ? 'activo' : ''}`;
 
         boton.onclick = (e) => {
             e.preventDefault();
-            e.stopPropagation();
-
-            // Bloqueo de seguridad: si no está abierto (clics fantasma), no hace nada
-            if (!menuCategoriasAbierto) return; 
-
+            // Si hace clic en la que ya está activa, la desactiva (vuelve a null)
             categoriaSeleccionada = (categoriaSeleccionada === cat) ? null : cat;
+            render();
             
-            menuCategoriasAbierto = false; 
-            if (typeof render === "function") render(); // Llamar a tu función de filtrado
-            renderizarMenuCategorias();
+            // Centrar la etiqueta seleccionada automáticamente al hacer clic
+            boton.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         };
 
         wrapper.appendChild(boton);
@@ -2852,6 +2770,7 @@ function renderizarMenuCategorias() {
 
     contenedor.appendChild(wrapper);
 }
+
    // --- 5. SISTEMA DE PEDIDOS ---
 function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
