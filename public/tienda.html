@@ -2394,7 +2394,7 @@ function render() {
     // 3. LÓGICA DEL BANNER DE PROMOCIONES
     const bannerContainer = document.getElementById("promo-banner-container");
     if (textoBusqueda === "" && (!categoriaSeleccionada || categoriaSeleccionada === "Todas")) {
-        renderizarPromoBanner(); // Se muestra en la página principal
+        renderizarPromoBanner(); 
     } else if (bannerContainer) {
         bannerContainer.style.display = "none"; 
     }
@@ -2427,7 +2427,6 @@ function render() {
             continue;
         }
 
-        // Si pasó los filtros, lo marcamos como "dibujado" y lo creamos
         productosDibujados.add(nombreParaFiltrar);
 
         const imgUrl = productosJson[refP];
@@ -2461,12 +2460,16 @@ function render() {
                 <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;"><i class="fab fa-whatsapp"></i> Me interesa</button>
             </div>`;
 
-        // CORRECCIÓN AQUÍ: El onclick solo se activa si real.agotado es falso
+        // LÓGICA DE IMAGEN: Filtro gris/negativo si está agotado + quitar clic
+        const estiloImagen = real.agotado ? 'filter: grayscale(100%) brightness(0.8); opacity: 0.6; cursor: default;' : 'cursor: pointer;';
+        const accionImagen = real.agotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')"`;
+
         card.innerHTML = `
             <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
                 <img src="${normalizarImagen(imgUrl)}" 
-                     ${real.agotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" style="cursor:pointer;"`} 
+                     ${accionImagen} 
+                     style="${estiloImagen}"
                      loading="lazy"> 
             </div>
             <div class="nombre">${nombreReal}</div>
@@ -2477,7 +2480,6 @@ function render() {
         contenedor.appendChild(card);
     }
 
-    // Ocultar loader
     const ld = document.getElementById("loader");
     if (ld) { ld.style.display = "none"; }
 }
