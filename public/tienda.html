@@ -971,109 +971,6 @@ button[onclick*="whatsappDirecto"] i {
 .red-item.tiktok:hover { color: #00f2ea !important; }
 
 
-/* Contenedor principal categoria flotante */
-/* CONTENEDOR PRINCIPAL */
-.menu-categorias {
-    position: fixed;
-    top: 75px; 
-    right: 0; 
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end; /* Alinea todo a la derecha */
-    gap: 8px;
-    z-index: 1090;
-    pointer-events: none;
-    width: auto; /* Evita que ocupe todo el ancho */
-    padding-right: 0;
-}
-
-/* BOTÓN BASE (Ancho dinámico según el texto) */
-.cat-btn {
-    pointer-events: auto;
-    font-family: 'Montserrat', sans-serif;
-    background: rgba(0, 0, 0, 0.9);
-    color: #E5C453;
-    border: 1px solid rgba(229, 196, 83, 0.25);
-    border-radius: 6px 0 0 6px; 
-    padding: 10px 18px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    white-space: nowrap; /* Evita que el texto salte de línea */
-    text-align: right;
-    
-    /* 🔥 CAMBIOS CLAVE AQUÍ */
-    width: fit-content;    /* Se ajusta al tamaño del texto */
-    min-width: 150px;      /* (Opcional) Un mínimo para que no se vea muy flaco */
-    align-self: flex-end;  /* Empuja el botón contra el borde derecho */
-    display: block;
-}
-
-/* EFECTO HOVER ATENUADO */
-.cat-btn:hover {
-    background: #2a2a2a;
-    color: #fff;
-    padding-right: 25px; /* Pequeño efecto de desplazamiento */
-}
-
-/* BOTÓN PRINCIPAL (☰ Categorías) */
-.cat-main {
-    background: linear-gradient(135deg, #E5C453, #caa93a) !important;
-    color: #000 !important;
-    border: none !important;
-    box-shadow: 0 6px 20px rgba(229, 196, 83, 0.4) !important;
-    
-    /* 🔥 ELIMINAMOS EL WIDTH FIJO DE 240px */
-    width: fit-content !important; 
-    min-width: 150px; /* Mismo mínimo que los otros botones */
-    align-self: flex-end; /* Lo mantiene pegado a la derecha */
-}
-
-/* Ajuste adicional para que el icono y el texto no queden pegados */
-.cat-main {
-    padding-left: 25px !important; /* Un poco más de aire a la izquierda */
-}
-
-/* CONTENEDOR DEL ACORDEÓN (Wrapper) */
-.cat-wrapper {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    max-height: 0; /* Controlado por JS */
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
-    transition: max-height 0.4s ease;
-    
-    /* Fondo transparente para que solo se vean los botones */
-    background: transparent; 
-    padding: 0;
-}
-
-/* CATEGORÍA ACTIVA */
-.cat-btn.activo {
-    background: #E5C453 !important;
-    color: #000 !important;
-    border-color: #E5C453 !important;
-    transform: translateX(-5px); /* Sobresale un poco a la izquierda */
-}
-
-/* SCROLLBAR MINIMALISTA */
-.cat-wrapper::-webkit-scrollbar {
-    width: 4px;
-}
-.cat-wrapper::-webkit-scrollbar-track {
-    background: transparent;
-}
-.cat-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(229, 196, 83, 0.3); /* Color dorado suave */
-    border-radius: 10px;
-}
 /* ========================================= */
 /* ========================================= */
 /* --- 1. BARRA PRINCIPAL (PC Y BASE) ---    */
@@ -1404,66 +1301,239 @@ body {
         }
     }
 
+/* Contenedor principal categoria flotante */
+/* CONTENEDOR PRINCIPAL */
+.menu-categorias {
+    position: fixed;
+    top: 75px; 
+    right: 0; 
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Alinea todo a la derecha */
+    gap: 8px;
+    z-index: 1090;
+    pointer-events: none;
+    width: auto; /* Evita que ocupe todo el ancho */
+    padding-right: 0;
+}
 
-/* Slider de Promociones */
-/* Estilos del Slider de Promociones */
+/* BOTÓN BASE (Ancho dinámico según el texto) */
+.cat-btn {
+    pointer-events: auto;
+    font-family: 'Montserrat', sans-serif;
+    background: rgba(0, 0, 0, 0.9);
+    color: #E5C453;
+    border: 1px solid rgba(229, 196, 83, 0.25);
+    border-radius: 6px 0 0 6px; 
+    padding: 10px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    white-space: nowrap; /* Evita que el texto salte de línea */
+    text-align: right;
+    
+    /* 🔥 CAMBIOS CLAVE AQUÍ */
+    width: fit-content;    /* Se ajusta al tamaño del texto */
+    min-width: 150px;      /* (Opcional) Un mínimo para que no se vea muy flaco */
+    align-self: flex-end;  /* Empuja el botón contra el borde derecho */
+    display: block;
+}
+
+/* EFECTO HOVER ATENUADO */
+.cat-btn:hover {
+    background: #2a2a2a;
+    color: #fff;
+    padding-right: 25px; /* Pequeño efecto de desplazamiento */
+}
+
+/* BOTÓN PRINCIPAL (☰ Categorías) */
+.cat-main {
+    background: linear-gradient(135deg, #E5C453, #caa93a) !important;
+    color: #000 !important;
+    border: none !important;
+    box-shadow: 0 6px 20px rgba(229, 196, 83, 0.4) !important;
+    
+    /* 🔥 ELIMINAMOS EL WIDTH FIJO DE 240px */
+    width: fit-content !important; 
+    min-width: 150px; /* Mismo mínimo que los otros botones */
+    align-self: flex-end; /* Lo mantiene pegado a la derecha */
+}
+
+/* Ajuste adicional para que el icono y el texto no queden pegados */
+.cat-main {
+    padding-left: 25px !important; /* Un poco más de aire a la izquierda */
+}
+
+/* CONTENEDOR DEL ACORDEÓN (Wrapper) */
+.cat-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    max-height: 0; /* Controlado por JS */
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    transition: max-height 0.4s ease;
+    
+    /* Fondo transparente para que solo se vean los botones */
+    background: transparent; 
+    padding: 0;
+}
+
+/* CATEGORÍA ACTIVA */
+.cat-btn.activo {
+    background: #E5C453 !important;
+    color: #000 !important;
+    border-color: #E5C453 !important;
+    transform: translateX(-5px); /* Sobresale un poco a la izquierda */
+}
+
+/* SCROLLBAR MINIMALISTA */
+.cat-wrapper::-webkit-scrollbar {
+    width: 4px;
+}
+.cat-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+.cat-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(229, 196, 83, 0.3); /* Color dorado suave */
+    border-radius: 10px;
+}
+
+/* ========================================= */
+/* CONFIGURACIÓN DEL BANNER (SOLO BANNER)    */
+/* ========================================= */
+
+/* Contenedor externo del banner para evitar saltos en el layout */
+#promo-banner-container {
+    width: 100%;
+    position: relative; /* Para que fluya con el scroll y no tape a las categorías */
+    z-index: 1; /* Mucho menor que el 1090 de las categorías */
+    background: #000;
+    margin-top: 5px; /* Pequeña separación del header */
+}
+
+/* Track o carrusel interno */
 .promo-slider {
     display: flex;
     gap: 15px;
-    padding: 0 20px;
+    padding: 10px 20px 20px 20px;
     overflow-x: auto;
     scroll-behavior: smooth;
-    scrollbar-width: none; /* Oculta scroll en Firefox */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
 }
-.promo-slider::-webkit-scrollbar { display: none; } /* Oculta scroll en Chrome/Safari */
+.promo-slider::-webkit-scrollbar { display: none; } /* Chrome/Safari */
 
+/* Tarjeta de producto en promoción */
 .promo-item {
-    min-width: 280px;
-    max-width: 300px;
-    background: #fff;
+    /* En PC: Llenará el banner de forma elegante */
+    min-width: 300px; 
+    max-width: 320px;
+    background: #ffffff;
     border-radius: 12px;
     display: flex;
     align-items: center;
     padding: 10px;
     flex-shrink: 0;
-    border: 1px solid rgba(229, 196, 83, 0.3);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    transition: 0.3s;
+    border: 1px solid rgba(229, 196, 83, 0.4);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.3s ease;
 }
 
-.promo-item:hover { transform: scale(1.02); border-color: #E5C453; }
+.promo-item:hover {
+    transform: translateY(-3px);
+    border-color: #E5C453;
+}
 
 .promo-img {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     object-fit: cover;
     border-radius: 8px;
     margin-right: 12px;
+    background: #f9f9f9;
 }
 
-.promo-info { flex: 1; }
-.promo-nombre { 
-    font-size: 14px; 
-    font-weight: 700; 
-    color: #1a1a1a; 
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
+.promo-info {
+    flex: 1;
     overflow: hidden;
 }
-.promo-precios { margin-top: 4px; }
-.promo-actual { color: #16a34a; font-weight: 800; font-size: 16px; }
-.promo-viejo { color: #888; text-decoration: line-through; font-size: 11px; margin-left: 5px; }
 
-/* Ajuste Móvil: 2 productos */
+.promo-nombre { 
+    font-size: 13px; 
+    font-weight: 700; 
+    color: #111; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.promo-precios { 
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+.promo-actual { 
+    color: #16a34a; 
+    font-weight: 800; 
+    font-size: 16px; 
+}
+
+.promo-viejo { 
+    color: #a0a0a0; 
+    text-decoration: line-through; 
+    font-size: 11px; 
+}
+
+/* ========================================= */
+/* AJUSTES MÓVIL (PANTALLA PEQUEÑA)          */
+/* ========================================= */
 @media screen and (max-width: 767px) {
+    #promo-banner-container {
+        margin-top: 0;
+    }
+    
+    .promo-slider {
+        gap: 10px;
+        padding: 10px;
+    }
+
     .promo-item {
-        min-width: calc(50vw - 30px); /* Ajusta para que quepan casi 2 */
-        max-width: calc(50vw - 30px);
+        /* Fuerza a que quepan exactamente 2 o se vean 2 en pantalla */
+        min-width: calc(50% - 15px); 
         flex-direction: column;
         text-align: center;
+        padding: 8px;
     }
-    .promo-img { margin-right: 0; margin-bottom: 8px; width: 100px; height: 100px; }
+
+    .promo-img {
+        width: 100%;
+        height: 110px; /* Un poco más alto para móvil */
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+    
+    .promo-nombre {
+        font-size: 11px;
+        white-space: normal;
+        height: 32px; /* Altura fija para que los botones alineen */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    
+    .promo-actual {
+        font-size: 14px;
+    }
 }
 
 
