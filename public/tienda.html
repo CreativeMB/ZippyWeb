@@ -1368,113 +1368,63 @@ body {
 /* ============================================================ */
 /* 2. SECCIÓN: BANNER DE PROMOCIONES (OPTIMIZADO E INDEPENDIENTE)*/
 /* ============================================================ */
-/* CONTENEDOR CON MÁSCARA PROFESIONAL */
-#promo-banner-container {
-    width: 100%;
-    background: #121212; /* Un gris casi negro más profundo */
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(229, 196, 83, 0.3);
-    position: relative;
-    overflow: hidden;
-
-    /* EFECTO DE DESVANECIMIENTO EN LOS BORDES */
-    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+/* GRID DINÁMICO */
+.promo-grid-fade {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    padding: 0 20px;
+    transition: opacity 0.8s ease-in-out; /* Transición suave de salida/entrada */
 }
 
-.promo-slider {
-    display: flex;
-    gap: 20px; /* Más espacio entre tarjetas para que respiren */
-    overflow-x: hidden; /* Ocultamos el scroll manual para que la animación mande */
-    white-space: nowrap;
-    padding: 10px 0;
-}
-
-/* TARJETA CON EFECTO DE APARICIÓN */
-.promo-item {
-    flex: 0 0 auto;
-    width: 300px;
-    height: 85px;
+/* LA TARJETA DE PROMO */
+.promo-item-fade {
     background: #ffffff;
-    border-radius: 10px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 8px;
     cursor: pointer;
-    border: 1px solid rgba(0,0,0,0.05);
-    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border: 1px solid #e0e0e0;
+    animation: zoomInFade 0.8s ease forwards; /* Animación de entrada */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* Efecto Hover: La tarjeta se eleva y resalta */
-.promo-item:hover {
-    transform: translateY(-5px) scale(1.03);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    z-index: 10;
+/* ANIMACIÓN DE ENTRADA ELEGANTE */
+@keyframes zoomInFade {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
 .promo-img-box {
-    width: 65px;
-    height: 65px;
-    border-radius: 6px;
-    overflow: hidden;
-    margin-right: 12px;
-    background: #fff;
+    width: 65px; height: 65px;
     flex-shrink: 0;
+    margin-right: 12px;
 }
+.promo-img-box img { width: 100%; height: 100%; object-fit: contain; }
 
-.promo-img-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
+.promo-info { flex: 1; min-width: 0; }
+.p-name-slim { font-size: 13px; font-weight: 700; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p-price-big { color: #000; font-size: 18px; font-weight: 800; }
 
-.promo-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.p-name-slim {
-    font-size: 13px;
-    font-weight: 700;
-    color: #222;
-    margin-bottom: 2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.p-price-big {
-    color: #000;
-    font-size: 18px;
-    font-weight: 900;
-}
-
+/* BOTÓN DE ACCIÓN */
 .btn-promo-action {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #f8f9fa;
-    padding: 5px 12px;
-    border-radius: 8px;
-    border: 1px solid #eee;
-    margin-left: 8px;
+    display: flex; flex-direction: column; align-items: center;
+    background: #f8f9fa; border: 1px solid #eee;
+    padding: 6px; border-radius: 6px; min-width: 95px; flex-shrink: 0;
 }
+.buy-text { font-size: 12px; font-weight: 700; color: #16a34a; text-transform: uppercase; }
+.save-badge { background: #ef4444; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-top: 3px; }
 
-.buy-text {
-    font-size: 11px;
-    font-weight: 700;
-    color: #16a34a;
-    text-transform: uppercase;
-}
-
-.save-badge {
-    background: #ef4444;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 800;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-top: 2px;
+/* RESPONSIVO: 2 productos en celular */
+@media screen and (max-width: 767px) {
+    .promo-grid-fade {
+        grid-template-columns: repeat(2, 1fr); /* Fuerza 2 columnas */
+        gap: 8px; padding: 0 10px;
+    }
+    .promo-item-fade { flex-direction: column; text-align: center; height: auto; padding: 10px 5px; }
+    .promo-img-box { margin-right: 0; margin-bottom: 8px; width: 80px; height: 80px; }
+    .btn-promo-action { min-width: 100%; margin-top: 8px; }
 }
     </style>
 </head>
@@ -1539,11 +1489,10 @@ body {
         </div>
 
 
-<!-- BANNER DE PROMOCIONES PREMIUM -->
-<!-- BANNER DE PROMOCIONES INFINITO SLIM -->
-<div id="promo-banner-container" style="display:none; overflow: hidden; background: #000; padding: 5px 0; border-bottom: 2px solid #E5C453;">
-    <div id="promo-track" class="promo-slider">
-        <!-- JS cargará los productos aquí -->
+<!-- BANNER DE PROMOCIONES CON TRANSICIÓN FADE -->
+<div id="promo-banner-container" style="display:none; background: #1a1a1a; padding: 12px 0; border-bottom: 2px solid #E5C453; overflow: hidden;">
+    <div id="promo-stage" class="promo-grid-fade">
+        <!-- Los productos aparecerán aquí en grupos -->
     </div>
 </div>
 
@@ -2307,24 +2256,23 @@ function configurarRedesNav(perfil) {
 }
 
 */
-let promoFrame;
-let scrollPos = 0;
-let isPaused = false;
+let promoTimer;
+let indiceGrupo = 0;
 
 function renderizarPromoBanner() {
     const contenedor = document.getElementById("promo-banner-container");
-    const track = document.getElementById("promo-track");
-    if (!track) return;
+    const stage = document.getElementById("promo-stage");
+    if (!stage) return;
 
-    // 1. Obtener productos de promo
-    let promos = [];
+    // 1. Obtener TODOS los productos de promo
+    let todosLosPromos = [];
     for (const ref in productosJson) {
         if (ref === "images") continue;
         const clave = ref.trim().toLowerCase();
         const real = productosRealtime[clave];
         if (real && real.promocion && !real.agotado) {
             const ahorro = Math.round(100 - (real.valorPromocion * 100 / real.valor));
-            promos.push({
+            todosLosPromos.push({
                 ref: real.referenciaReal || ref,
                 img: productosJson[ref],
                 precio: real.valorPromocion,
@@ -2334,63 +2282,60 @@ function renderizarPromoBanner() {
         }
     }
 
-    if (promos.length === 0) {
+    if (todosLosPromos.length === 0) {
         contenedor.style.display = "none";
         return;
     }
 
-    // 2. Mezclar aleatoriamente
-    promos.sort(() => Math.random() - 0.5);
+    // 2. Mezclar aleatoriamente al inicio
+    todosLosPromos.sort(() => Math.random() - 0.5);
 
-    // 3. Inyectar con clones para el loop infinito
-    contenedor.style.display = "block";
-    const generarHTML = (lista) => lista.map(p => `
-        <div class="promo-item" onclick="window.abrirPestañaProducto('${p.ref}','${p.img}','${p.precio}','${p.desc}')">
-            <div class="promo-img-box"><img src="${normalizarImagen(p.img)}"></div>
-            <div class="promo-info">
-                <div class="p-name-slim">${p.ref}</div>
-                <div class="p-price-big">${formatearPrecio(p.precio)}</div>
-            </div>
-            <div class="btn-promo-action">
-                <span class="buy-text">Comprar</span>
-                <span class="save-badge">¡Ahorras ${p.ahorro}%!</span>
-            </div>
-        </div>
-    `).join('');
+    // 3. Función para mostrar grupos
+    const cambiarCiclo = () => {
+        // Determinamos cuántos mostrar (PC: 4, Tablet: 3, Móvil: 2)
+        let cantidadXGrupo = window.innerWidth > 1024 ? 4 : (window.innerWidth > 768 ? 3 : 2);
+        
+        // Obtenemos el segmento de la lista
+        let inicio = indiceGrupo * cantidadXGrupo;
+        let grupoActual = todosLosPromos.slice(inicio, inicio + cantidadXGrupo);
 
-    // Metemos el contenido 3 veces para asegurar que en pantallas gigantes no haya huecos
-    track.innerHTML = generarHTML(promos) + generarHTML(promos) + generarHTML(promos);
-
-    // 4. Iniciar animación
-    iniciarScrollProfesional(track);
-}
-
-function iniciarScrollProfesional(track) {
-    cancelAnimationFrame(promoFrame);
-    
-    function animar() {
-        if (!isPaused && !menuCategoriasAbierto) {
-            scrollPos += 0.7; // Velocidad de crucero profesional
-            
-            // Si recorrimos el primer set completo, reseteamos posición
-            // Dividimos por 3 porque pusimos 3 copias
-            if (scrollPos >= track.scrollWidth / 3) {
-                scrollPos = 0;
-            }
-            track.scrollLeft = scrollPos;
+        // Si el grupo está vacío (llegamos al final), reiniciamos y mezclamos de nuevo
+        if (grupoActual.length === 0) {
+            indiceGrupo = 0;
+            todosLosPromos.sort(() => Math.random() - 0.5);
+            cambiarCiclo();
+            return;
         }
-        promoFrame = requestAnimationFrame(animar);
-    }
-    
-    promoFrame = requestAnimationFrame(animar);
 
-    // PAUSA INTELIGENTE
-    track.onmouseenter = () => { isPaused = true; };
-    track.onmouseleave = () => { isPaused = false; };
+        // Efecto de desvanecimiento de salida
+        stage.style.opacity = "0";
+
+        setTimeout(() => {
+            stage.innerHTML = grupoActual.map(p => `
+                <div class="promo-item-fade" onclick="window.abrirPestañaProducto('${p.ref}','${p.img}','${p.precio}','${p.desc}')">
+                    <div class="promo-img-box"><img src="${normalizarImagen(p.img)}"></div>
+                    <div class="promo-info">
+                        <div class="p-name-slim">${p.ref}</div>
+                        <div class="p-price-big">${formatearPrecio(p.precio)}</div>
+                    </div>
+                    <div class="btn-promo-action">
+                        <span class="buy-text">Comprar</span>
+                        <span class="save-badge">¡Ahorras ${p.ahorro}%!</span>
+                    </div>
+                </div>
+            `).join('');
+
+            stage.style.opacity = "1";
+            indiceGrupo++;
+        }, 800); // Tiempo que dura el fade out
+    };
+
+    // 4. Iniciar ciclo
+    contenedor.style.display = "block";
+    cambiarCiclo(); // Primera ejecución
     
-    // Móvil
-    track.ontouchstart = () => { isPaused = true; };
-    track.ontouchend = () => { isPaused = false; };
+    clearInterval(promoTimer);
+    promoTimer = setInterval(cambiarCiclo, 6000); // Cambia cada 6 segundos (tiempo suficiente para ver)
 }
 
 function render() {
