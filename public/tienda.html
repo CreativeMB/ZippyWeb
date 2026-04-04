@@ -3259,7 +3259,6 @@ if (contenedorRedes) {
         }
     }
 }
-
 function actualizarFavicon(url) {
     if (!url) return;
     
@@ -3270,12 +3269,13 @@ function actualizarFavicon(url) {
         document.head.appendChild(link);
     }
 
-    // Aquí usamos la función mejorada:
-    // Si recibe "19YYbkiw...", devolverá "https://drive.google.com/thumbnail?id=19YYbkiw..."
-    const urlFinal = normalizarImagen(url); 
-    link.href = urlFinal;
+    const urlFinal = normalizarImagen(url);
     
-    console.log("✅ Favicon procesado:", urlFinal);
+    // 🚩 EL CAMBIO: Agregamos un número aleatorio para que el navegador no use el caché viejo
+    const cacheBuster = "?v=" + new Date().getTime();
+    link.href = urlFinal + cacheBuster;
+    
+    console.log("🎯 Favicon forzado con logo de empresa");
 }
 
 function aplicarSEO(data) {
