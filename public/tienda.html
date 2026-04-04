@@ -2977,13 +2977,24 @@ if (!idDomiciliarioAsignado) {
         return entrada;
     }
 
-    const normalizarImagen = (url) => {
-        if (url?.includes("drive.google.com")) {
-            const id = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-            return id ? `https://drive.google.com/thumbnail?id=${id[1]}&sz=w1000` : url;
-        }
-        return url || "";
-    };
+const normalizarImagen = (url) => {
+    if (!url) return "";
+    
+    // CASO 1: Si ya es una URL de Drive, extraemos el ID y creamos el link directo
+    if (url.includes("drive.google.com")) {
+        const id = url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        return id ? `https://drive.google.com/thumbnail?id=${id[1]}&sz=w1000` : url;
+    }
+    
+    // CASO 2: SI ES SOLO EL ID (como el que tienes: 19YYbkiw...)
+    // Si no tiene "http" y es un texto largo, lo convertimos en link de Drive automáticamente
+    if (!url.includes("http") && url.length > 20) {
+        return `https://drive.google.com/thumbnail?id=${url.trim()}&sz=w1000`;
+    }
+    
+    // CASO 3: Es una URL normal o una imagen directa
+    return url;
+};
 
     const formatearPrecio = (v) => "$" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
@@ -3246,10 +3257,10 @@ if (contenedorRedes) {
         }
     }
 }
+
 function actualizarFavicon(url) {
     if (!url) return;
     
-    // Seleccionamos o creamos el tag <link rel="icon">
     let link = document.querySelector("link[rel*='icon']");
     if (!link) {
         link = document.createElement('link');
@@ -3257,19 +3268,14 @@ function actualizarFavicon(url) {
         document.head.appendChild(link);
     }
 
-    // Usamos tu función normalizarImagen para que si es Google Drive funcione
-    const urlFinal = normalizarImagen(url);
+    // Aquí usamos la función mejorada:
+    // Si recibe "19YYbkiw...", devolverá "https://drive.google.com/thumbnail?id=19YYbkiw..."
+    const urlFinal = normalizarImagen(url); 
     link.href = urlFinal;
-     console.log("✅ FAVICON CARGADO DESDE:", urlFinal); 
-    // También actualizamos el de Apple (para móviles)
-    let appleIcon = document.querySelector("link[rel='apple-touch-icon']");
-    if (!appleIcon) {
-        appleIcon = document.createElement('link');
-        appleIcon.rel = 'apple-touch-icon';
-        document.head.appendChild(appleIcon);
-    }
-    appleIcon.href = urlFinal;
+    
+    console.log("✅ Favicon procesado:", urlFinal);
 }
+
 function aplicarSEO(data) {
     console.group("🚀 Sistema SEO Dinámico"); // Agrupa los logs para que se vean ordenados
     
