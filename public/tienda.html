@@ -1302,51 +1302,52 @@ body {
     }
 
 /* Contenedor principal categoria flotante */
-/* CONTENEDOR PRINCIPAL */
+/* ============================================================ */
+/* 1. SECCIÓN: MENÚ DE CATEGORÍAS (FLOTANTE Y SIEMPRE ENCIMA)   */
+/* ============================================================ */
 .menu-categorias {
     position: fixed;
     top: 75px; 
     right: 0; 
     display: flex;
     flex-direction: column;
-    align-items: flex-end; /* Alinea todo a la derecha */
+    align-items: flex-end; 
     gap: 8px;
-    z-index: 1090;
-    pointer-events: none;
-    width: auto; /* Evita que ocupe todo el ancho */
+    /* Z-index extremo para que nada lo tape */
+    z-index: 99999 !important; 
+    /* No bloquea clics en el resto de la página */
+    pointer-events: none; 
+    width: auto;
     padding-right: 0;
 }
 
-/* BOTÓN BASE (Ancho dinámico según el texto) */
+/* BOTÓN BASE (Categorías e ítems) */
 .cat-btn {
-    pointer-events: auto;
+    /* Reactiva los clics solo para los botones */
+    pointer-events: auto !important; 
     font-family: 'Montserrat', sans-serif;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.95); /* Un poco más sólido para legibilidad */
     color: #E5C453;
-    border: 1px solid rgba(229, 196, 83, 0.25);
+    border: 1px solid rgba(229, 196, 83, 0.4);
     border-radius: 6px 0 0 6px; 
     padding: 10px 18px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    box-shadow: -3px 3px 10px rgba(0,0,0,0.5);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    white-space: nowrap; /* Evita que el texto salte de línea */
+    white-space: nowrap;
     text-align: right;
-    
-    /* 🔥 CAMBIOS CLAVE AQUÍ */
-    width: fit-content;    /* Se ajusta al tamaño del texto */
-    min-width: 150px;      /* (Opcional) Un mínimo para que no se vea muy flaco */
-    align-self: flex-end;  /* Empuja el botón contra el borde derecho */
+    width: fit-content;    
+    min-width: 150px;      
+    align-self: flex-end;  
     display: block;
 }
 
-/* EFECTO HOVER ATENUADO */
 .cat-btn:hover {
     background: #2a2a2a;
     color: #fff;
-    padding-right: 25px; /* Pequeño efecto de desplazamiento */
+    padding-right: 25px;
 }
 
 /* BOTÓN PRINCIPAL (☰ Categorías) */
@@ -1354,85 +1355,79 @@ body {
     background: linear-gradient(135deg, #E5C453, #caa93a) !important;
     color: #000 !important;
     border: none !important;
-    box-shadow: 0 6px 20px rgba(229, 196, 83, 0.4) !important;
-    
-    /* 🔥 ELIMINAMOS EL WIDTH FIJO DE 240px */
+    box-shadow: -4px 6px 20px rgba(229, 196, 83, 0.4) !important;
     width: fit-content !important; 
-    min-width: 150px; /* Mismo mínimo que los otros botones */
-    align-self: flex-end; /* Lo mantiene pegado a la derecha */
+    min-width: 150px; 
+    padding-left: 25px !important;
 }
 
-/* Ajuste adicional para que el icono y el texto no queden pegados */
-.cat-main {
-    padding-left: 25px !important; /* Un poco más de aire a la izquierda */
-}
-
-/* CONTENEDOR DEL ACORDEÓN (Wrapper) */
+/* CONTENEDOR DEL ACORDEÓN */
 .cat-wrapper {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 4px;
-    max-height: 0; /* Controlado por JS */
+    max-height: 0; 
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
-    transition: max-height 0.4s ease;
-    
-    /* Fondo transparente para que solo se vean los botones */
+    transition: max-height 0.4s ease, opacity 0.3s ease;
     background: transparent; 
     padding: 0;
+    opacity: 0;
 }
 
-/* CATEGORÍA ACTIVA */
+/* Cuando el menú está abierto (clase controlada por JS) */
+.menu-categorias.abierto .cat-wrapper {
+    opacity: 1;
+    max-height: 60vh; /* Se expande */
+}
+
 .cat-btn.activo {
     background: #E5C453 !important;
     color: #000 !important;
     border-color: #E5C453 !important;
-    transform: translateX(-5px); /* Sobresale un poco a la izquierda */
+    transform: translateX(-5px);
 }
 
-/* SCROLLBAR MINIMALISTA */
-.cat-wrapper::-webkit-scrollbar {
-    width: 4px;
-}
-.cat-wrapper::-webkit-scrollbar-track {
-    background: transparent;
-}
+.cat-wrapper::-webkit-scrollbar { width: 4px; }
 .cat-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(229, 196, 83, 0.3); /* Color dorado suave */
+    background: rgba(229, 196, 83, 0.5);
     border-radius: 10px;
 }
 
-/* ========================================= */
-/* CONFIGURACIÓN DEL BANNER (SOLO BANNER)    */
-/* ========================================= */
+/* ============================================================ */
+/* 2. SECCIÓN: BANNER DE PROMOCIONES (OPTIMIZADO E INDEPENDIENTE)*/
+/* ============================================================ */
 
-/* Contenedor externo del banner para evitar saltos en el layout */
 #promo-banner-container {
     width: 100%;
-    position: relative; /* Para que fluya con el scroll y no tape a las categorías */
-    z-index: 1; /* Mucho menor que el 1090 de las categorías */
+    position: relative; 
+    /* Z-index bajo para que se deslice por DEBAJO de las categorías */
+    z-index: 10 !important; 
     background: #000;
-    margin-top: 5px; /* Pequeña separación del header */
+    margin-top: 5px;
+    margin-bottom: 15px;
+    /* IMPORTANTE: Aísla el banner para que sus efectos no afecten a capas superiores */
+    isolation: isolate; 
+    overflow: hidden;
 }
 
-/* Track o carrusel interno */
 .promo-slider {
     display: flex;
     gap: 15px;
-    padding: 10px 20px 20px 20px;
+    padding: 10px 20px;
     overflow-x: auto;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
+    /* Asegura que el slider no bloquee el click global */
+    pointer-events: auto;
 }
-.promo-slider::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+.promo-slider::-webkit-scrollbar { display: none; }
 
-/* Tarjeta de producto en promoción */
 .promo-item {
-    /* En PC: Llenará el banner de forma elegante */
     min-width: 300px; 
     max-width: 320px;
     background: #ffffff;
@@ -1441,10 +1436,10 @@ body {
     align-items: center;
     padding: 10px;
     flex-shrink: 0;
-    border: 1px solid rgba(229, 196, 83, 0.4);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border: 1px solid rgba(229, 196, 83, 0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
 .promo-item:hover {
@@ -1458,7 +1453,7 @@ body {
     object-fit: cover;
     border-radius: 8px;
     margin-right: 12px;
-    background: #f9f9f9;
+    background: #f1f1f1;
 }
 
 .promo-info {
@@ -1473,7 +1468,6 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: block;
 }
 
 .promo-precios { 
@@ -1482,22 +1476,18 @@ body {
     flex-direction: column;
 }
 
-.promo-actual { 
-    color: #16a34a; 
-    font-weight: 800; 
-    font-size: 16px; 
-}
-
-.promo-viejo { 
-    color: #a0a0a0; 
-    text-decoration: line-through; 
-    font-size: 11px; 
-}
+.promo-actual { color: #16a34a; font-weight: 800; font-size: 16px; }
+.promo-viejo { color: #a0a0a0; text-decoration: line-through; font-size: 11px; }
 
 /* ========================================= */
 /* AJUSTES MÓVIL (PANTALLA PEQUEÑA)          */
 /* ========================================= */
 @media screen and (max-width: 767px) {
+    .menu-categorias {
+        top: auto;
+        bottom: 175px; /* Sube un poco para no tapar el botón de WhatsApp flotante */
+    }
+
     #promo-banner-container {
         margin-top: 0;
     }
@@ -1508,7 +1498,7 @@ body {
     }
 
     .promo-item {
-        /* Fuerza a que quepan exactamente 2 o se vean 2 en pantalla */
+        /* En móvil exactamente 2 productos visibles */
         min-width: calc(50% - 15px); 
         flex-direction: column;
         text-align: center;
@@ -1517,7 +1507,7 @@ body {
 
     .promo-img {
         width: 100%;
-        height: 110px; /* Un poco más alto para móvil */
+        height: 110px;
         margin-right: 0;
         margin-bottom: 8px;
     }
@@ -1525,17 +1515,12 @@ body {
     .promo-nombre {
         font-size: 11px;
         white-space: normal;
-        height: 32px; /* Altura fija para que los botones alineen */
+        height: 32px;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
     }
-    
-    .promo-actual {
-        font-size: 14px;
-    }
 }
-
 
     </style>
 </head>
