@@ -1736,6 +1736,7 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     let menuCategoriasAbierto = false;
     let carrito = [];
     let procesadoExitoso = false;
+    let urlCategoriaProcesada = false;
 
 // Al cargar la página, recuperamos lo que haya en el almacenamiento
 document.addEventListener('DOMContentLoaded', () => {
@@ -2260,11 +2261,6 @@ function configurarRedesNav(perfil) {
             procesarProductoDirecto();
         }
 
-        // Procesamos si venía una categoría por URL
-        if (typeof procesarCategoriaDirecta === "function") {
-            procesarCategoriaDirecta();
-        }
-
     }).catch((error) => {
         console.error("❌ Error al cargar productos:", error);
     });
@@ -2396,6 +2392,32 @@ function render() {
     const textoBusqueda = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : "";
     const urlParams = new URLSearchParams(window.location.search);
     const productoEnUrl = urlParams.get('producto')?.trim().toLowerCase();
+
+
+ // ============================================================
+    // INICIO: BLOQUE NUEVO PARA CATEGORÍA POR URL
+    // ============================================================
+    if (!urlCategoriaProcesada) {
+        const catURL = urlParams.get('categoria');
+        if (catURL) {
+            const todasLasCats = obtenerCategoriasUnicas();
+            if (todasLasCats.length > 0) {
+                const buscado = decodeURIComponent(catURL).toLowerCase().trim();
+                const match = todasLasCats.find(c => c.toLowerCase().trim() === buscado);
+                if (match) {
+                    categoriaSeleccionada = match;
+                    console.log("%c🎯 Categoría URL detectada: " + match, "color: #25D366; font-weight: bold;");
+                }
+                urlCategoriaProcesada = true; // Candado para que no se repita
+            }
+        } else {
+            urlCategoriaProcesada = true; // Si no hay categoría en URL, también cerramos el candado
+        }
+    }
+    // ============================================================
+    // FIN: BLOQUE NUEVO
+    // ============================================================
+
 
     // 3. LÓGICA DEL BANNER DE PROMOCIONES
     const bannerContainer = document.getElementById("promo-banner-container");
@@ -2544,51 +2566,6 @@ window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
     });
 };
 
-
-// --- PROCESADOR DE CATEGORÍA POR URL (MEJORADO PARA DOMINIOS) ---
-window.procesarCategoriaDirecta = function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const catParam = urlParams.get('categoria'); 
-    
-    if (!catParam) return;
-
-    console.log("%c📂 Buscando categoría en URL: " + catParam, "color: #E5C453; font-weight: bold;");
-
-    let intentosCat = 0;
-    const intervaloCat = setInterval(() => {
-        // En dominios propios, a veces Realtime carga antes que el JSON o viceversa
-        // Esperamos a que los productos Realtime estén mapeados
-        const dataLista = Object.keys(productosRealtime).length > 0;
-
-        if (dataLista) {
-            const categoriasExistentes = obtenerCategoriasUnicas();
-            const buscado = decodeURIComponent(catParam).toLowerCase().trim();
-            
-            // Buscamos coincidencia flexible (sin tildes, minúsculas)
-            const match = categoriasExistentes.find(c => 
-                c.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 
-                buscado.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            );
-
-            if (match) {
-                console.log("%c✅ Categoría aplicada con éxito: " + match, "color: #25D366; font-weight: bold;");
-                categoriaSeleccionada = match;
-                render(); // Refresca los productos filtrados
-                renderizarMenuCategorias(); // Marca el botón como activo
-                clearInterval(intervaloCat);
-            } else {
-                // Si ya intentó muchas veces y no hay match, asumimos que no existe
-                if (intentosCat > 15) {
-                    console.warn("⚠️ La categoría '" + buscado + "' no se encontró en esta tienda.");
-                    clearInterval(intervaloCat);
-                }
-            }
-        }
-
-        intentosCat++;
-        if (intentosCat > 30) clearInterval(intervaloCat); // Timeout a los 15 segundos
-    }, 500);
-};
 
 window.abrirPestañaProducto = (nombre, imagen, precio, descripcion) => {
     // Si se pasan datos de un producto, lo agregamos SIEMPRE (tenga o no otros productos)
