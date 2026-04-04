@@ -1301,64 +1301,88 @@ body {
         }
     }
 
-/* CONTENEDOR PRINCIPAL (Ubicado debajo del banner) */
+/* categorias  */
+/* CONTENEDOR PRINCIPAL */
 #menu-categorias-flotante {
     width: 100%;
-    background: #ffffff; /* Fondo limpio */
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
-    position: sticky; /* Se queda fijo al hacer scroll */
-    top: 75px; /* Altura de tu nav bar */
+    background: #ffffff;
+    border-bottom: 1px solid #ececec;
+    position: sticky;
+    top: 75px; 
     z-index: 1000;
-    overflow: hidden;
+    overflow: hidden; /* Esconde el exceso para la animación */
+    padding: 8px 0;
 }
 
-/* ENVOLTORIO DEL SCROLL */
+/* ENVOLTORIO PARA EL SCROLL Y ANIMACIÓN */
 .categorias-wrapper-tags {
     display: flex;
-    gap: 10px;
-    overflow-x: auto; /* Permite mover de un lado a otro */
-    padding: 5px 20px;
+    gap: 8px; /* Margen pequeño entre etiquetas */
+    padding: 0 10px;
+    overflow-x: auto;
+    cursor: grab;
     scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch; /* Scroll suave en iPhone */
-    scrollbar-width: none; /* Oculta barra en Firefox */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Oculta scroll en Firefox */
+    
+    /* ANIMACIÓN INFINITA */
+    /* Nota: La velocidad depende del tiempo (60s). Ajusta a 30s si quieres más rápido */
+    animation: scrollInfinito 60s linear infinite;
+    white-space: nowrap;
+    width: max-content;
+}
+
+/* PAUSAR ANIMACIÓN AL PASAR EL MOUSE O TOCAR */
+.categorias-wrapper-tags:hover {
+    animation-play-state: paused;
 }
 
 .categorias-wrapper-tags::-webkit-scrollbar {
-    display: none; /* Oculta barra en Chrome/Safari */
+    display: none; /* Oculta scroll en Chrome/Safari */
 }
 
-/* ESTILO DE CADA ETIQUETA */
+/* ESTILO DE CADA ETIQUETA (TAG) */
 .cat-tag {
-    background: #f1f5f9;
-    color: #475569;
-    border: 1px solid #e2e8f0;
-    padding: 8px 18px;
-    border-radius: 20px; /* Forma de píldora */
-    font-size: 13px;
+    flex: 0 0 auto;
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #e0e0e0;
+    padding: 6px 14px; /* Padding reducido para que sea compacto */
+    border-radius: 4px; /* Radio pequeño para look cuadrado y elegante */
+    font-size: 12px;
     font-weight: 600;
-    white-space: nowrap; /* Evita que el texto se parta en dos líneas */
+    white-space: nowrap;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease-in-out;
     font-family: 'Montserrat', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    text-transform: uppercase; /* Opcional: le da un toque más profesional */
+    letter-spacing: 0.5px;
 }
 
 /* EFECTO HOVER */
 .cat-tag:hover {
     border-color: #E5C453;
-    background: #fffdf5;
+    background: #ffffff;
+    color: #E5C453;
 }
 
 /* ETIQUETA ACTIVA (Seleccionada) */
 .cat-tag.activo {
-    background: #E5C453 !important;
-    color: #000 !important;
-    border-color: #E5C453 !important;
-    box-shadow: 0 4px 10px rgba(229, 196, 83, 0.2);
-    transform: scale(1.05);
+    background: #000000 !important; /* Negro para contraste elegante */
+    color: #E5C453 !important;      /* Dorado */
+    border-color: #000000 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* KEYFRAMES PARA EL MOVIMIENTO INFINITO */
+@keyframes scrollInfinito {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        /* Desplaza hacia la izquierda. Ajusta el valor si tienes muchísimas categorías */
+        transform: translateX(-50%); 
+    }
 }
 
 /* ============================================================ */
@@ -2726,8 +2750,6 @@ function renderizarMenuCategorias() {
     if (!contenedor) return;
 
     const categorias = obtenerCategoriasUnicas();
-
-    // Si no hay categorías, ocultamos el contenedor
     if (categorias.length === 0) {
         contenedor.style.display = "none";
         return;
@@ -2736,39 +2758,34 @@ function renderizarMenuCategorias() {
     contenedor.style.display = "block";
     contenedor.innerHTML = "";
 
-    // Creamos el envoltorio para el scroll horizontal
     const wrapper = document.createElement("div");
     wrapper.className = "categorias-wrapper-tags";
 
-    // 1. Botón de "Todas" (Resetea el filtro)
-    const btnTodas = document.createElement("button");
-    btnTodas.className = `cat-tag ${(!categoriaSeleccionada || categoriaSeleccionada === "Todas") ? 'activo' : ''}`;
-    btnTodas.innerHTML = `<i class="fas fa-th-large"></i> Todas`;
-    btnTodas.onclick = (e) => {
-        e.preventDefault();
-        categoriaSeleccionada = null;
-        render(); // Vuelve a filtrar y dibujar
+    // Función interna para crear los botones
+    const crearBotones = (lista) => {
+        // Añadimos "Todas"
+        const btnTodas = document.createElement("button");
+        btnTodas.className = `cat-tag ${(!categoriaSeleccionada || categoriaSeleccionada === "Todas") ? 'activo' : ''}`;
+        btnTodas.innerText = "Todas";
+        btnTodas.onclick = () => { categoriaSeleccionada = null; render(); };
+        wrapper.appendChild(btnTodas);
+
+        lista.forEach(cat => {
+            const boton = document.createElement("button");
+            boton.innerText = cat;
+            boton.className = `cat-tag ${(categoriaSeleccionada === cat) ? 'activo' : ''}`;
+            boton.onclick = (e) => {
+                e.preventDefault();
+                categoriaSeleccionada = (categoriaSeleccionada === cat) ? null : cat;
+                render();
+            };
+            wrapper.appendChild(boton);
+        });
     };
-    wrapper.appendChild(btnTodas);
 
-    // 2. Botones para cada Categoría detectada
-    categorias.forEach(cat => {
-        const boton = document.createElement("button");
-        boton.innerText = cat;
-        boton.className = `cat-tag ${(categoriaSeleccionada === cat) ? 'activo' : ''}`;
-
-        boton.onclick = (e) => {
-            e.preventDefault();
-            // Si hace clic en la que ya está activa, la desactiva (vuelve a null)
-            categoriaSeleccionada = (categoriaSeleccionada === cat) ? null : cat;
-            render();
-            
-            // Centrar la etiqueta seleccionada automáticamente al hacer clic
-            boton.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        };
-
-        wrapper.appendChild(boton);
-    });
+    // LLAMAMOS DOS VECES (Para efecto infinito espejo)
+    crearBotones(categorias);
+    crearBotones(categorias); // El clon permite que no haya huecos al terminar la animación
 
     contenedor.appendChild(wrapper);
 }
