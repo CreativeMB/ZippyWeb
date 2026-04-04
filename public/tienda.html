@@ -2412,7 +2412,6 @@ function render() {
         const nombreParaFiltrar = nombreReal.toLowerCase();
 
         // --- FILTRO DE DUPLICADOS INTERNO ---
-        // Si este producto ya se dibujó en este renderizado, lo saltamos
         if (productosDibujados.has(nombreParaFiltrar)) continue;
 
         // --- FILTRO 1: POR CATEGORÍA ---
@@ -2462,10 +2461,13 @@ function render() {
                 <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;"><i class="fab fa-whatsapp"></i> Me interesa</button>
             </div>`;
 
+        // CORRECCIÓN AQUÍ: El onclick solo se activa si real.agotado es falso
         card.innerHTML = `
             <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-                <img src="${normalizarImagen(imgUrl)}" onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" loading="lazy"> 
+                <img src="${normalizarImagen(imgUrl)}" 
+                     ${real.agotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" style="cursor:pointer;"`} 
+                     loading="lazy"> 
             </div>
             <div class="nombre">${nombreReal}</div>
             <div class="precio-contenedor">${precioHTML}</div>
