@@ -1416,15 +1416,55 @@ body {
 .buy-text { font-size: 12px; font-weight: 700; color: #16a34a; text-transform: uppercase; }
 .save-badge { background: #ef4444; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-top: 3px; }
 
-/* RESPONSIVO: 2 productos en celular */
+/* RESPONSIVO: 1 solo producto en celular con formato horizontal */
 @media screen and (max-width: 767px) {
     .promo-grid-fade {
-        grid-template-columns: repeat(2, 1fr); /* Fuerza 2 columnas */
-        gap: 8px; padding: 0 10px;
+        grid-template-columns: 1fr; /* Una sola fila */
+        padding: 0 15px;
     }
-    .promo-item-fade { flex-direction: column; text-align: center; height: auto; padding: 10px 5px; }
-    .promo-img-box { margin-right: 0; margin-bottom: 8px; width: 80px; height: 80px; }
-    .btn-promo-action { min-width: 100%; margin-top: 8px; }
+
+    .promo-item-fade {
+        flex-direction: row; /* Mantiene formato horizontal como en PC */
+        text-align: left;
+        padding: 8px;
+        height: 85px; /* Altura fija para consistencia */
+        justify-content: space-between;
+    }
+
+    .promo-img-box {
+        width: 60px; /* Tamaño optimizado para pantalla angosta */
+        height: 60px;
+        margin-right: 10px;
+        margin-bottom: 0; /* Quitamos el margen inferior del diseño anterior */
+    }
+
+    .promo-info {
+        flex: 1;
+        padding-right: 5px;
+    }
+
+    .p-name-slim {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .p-price-big {
+        font-size: 16px;
+    }
+
+    .btn-promo-action {
+        min-width: 90px; /* Espacio suficiente para el texto de ahorro */
+        margin-top: 0;
+        padding: 4px;
+    }
+
+    .buy-text {
+        font-size: 11px;
+    }
+
+    .save-badge {
+        font-size: 9px;
+    }
 }
     </style>
 </head>
@@ -2290,45 +2330,44 @@ function renderizarPromoBanner() {
     // 2. Mezclar aleatoriamente al inicio
     todosLosPromos.sort(() => Math.random() - 0.5);
 
-    // 3. Función para mostrar grupos
     const cambiarCiclo = () => {
-        // Determinamos cuántos mostrar (PC: 4, Tablet: 3, Móvil: 2)
-        let cantidadXGrupo = window.innerWidth > 1024 ? 4 : (window.innerWidth > 768 ? 3 : 2);
-        
-        // Obtenemos el segmento de la lista
-        let inicio = indiceGrupo * cantidadXGrupo;
-        let grupoActual = todosLosPromos.slice(inicio, inicio + cantidadXGrupo);
+    // AJUSTE: PC: 4 productos, Tablet: 2, Celular: 1
+    let cantidadXGrupo = window.innerWidth > 1024 ? 4 : (window.innerWidth > 768 ? 2 : 1);
+    
+    // Obtenemos el segmento de la lista
+    let inicio = indiceGrupo * cantidadXGrupo;
+    let grupoActual = todosLosPromos.slice(inicio, inicio + cantidadXGrupo);
 
-        // Si el grupo está vacío (llegamos al final), reiniciamos y mezclamos de nuevo
-        if (grupoActual.length === 0) {
-            indiceGrupo = 0;
-            todosLosPromos.sort(() => Math.random() - 0.5);
-            cambiarCiclo();
-            return;
-        }
+    // Si llegamos al final, reiniciamos
+    if (grupoActual.length === 0) {
+        indiceGrupo = 0;
+        todosLosPromos.sort(() => Math.random() - 0.5); // Mezcla de nuevo para que no sea predecible
+        cambiarCiclo();
+        return;
+    }
 
-        // Efecto de desvanecimiento de salida
-        stage.style.opacity = "0";
+    const stage = document.getElementById("promo-stage");
+    stage.style.opacity = "0";
 
-        setTimeout(() => {
-            stage.innerHTML = grupoActual.map(p => `
-                <div class="promo-item-fade" onclick="window.abrirPestañaProducto('${p.ref}','${p.img}','${p.precio}','${p.desc}')">
-                    <div class="promo-img-box"><img src="${normalizarImagen(p.img)}"></div>
-                    <div class="promo-info">
-                        <div class="p-name-slim">${p.ref}</div>
-                        <div class="p-price-big">${formatearPrecio(p.precio)}</div>
-                    </div>
-                    <div class="btn-promo-action">
-                        <span class="buy-text">Comprar</span>
-                        <span class="save-badge">¡Ahorras ${p.ahorro}%!</span>
-                    </div>
+    setTimeout(() => {
+        stage.innerHTML = grupoActual.map(p => `
+            <div class="promo-item-fade" onclick="window.abrirPestañaProducto('${p.ref}','${p.img}','${p.precio}','${p.desc}')">
+                <div class="promo-img-box"><img src="${normalizarImagen(p.img)}"></div>
+                <div class="promo-info">
+                    <div class="p-name-slim">${p.ref}</div>
+                    <div class="p-price-big">${formatearPrecio(p.precio)}</div>
                 </div>
-            `).join('');
+                <div class="btn-promo-action">
+                    <span class="buy-text">Comprar</span>
+                    <span class="save-badge">¡Ahorras ${p.ahorro}%!</span>
+                </div>
+            </div>
+        `).join('');
 
-            stage.style.opacity = "1";
-            indiceGrupo++;
-        }, 800); // Tiempo que dura el fade out
-    };
+        stage.style.opacity = "1";
+        indiceGrupo++;
+    }, 800);
+};
 
     // 4. Iniciar ciclo
     contenedor.style.display = "block";
