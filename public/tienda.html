@@ -2221,19 +2221,20 @@ function render() {
     const contenedor = document.getElementById("productos");
     if (!contenedor) return;
     
-    // 1. LIMPIEZA ABSOLUTA: Esto garantiza que NUNCA haya duplicados
+    // 1. LIMPIEZA TOTAL DEL CONTENEDOR
     contenedor.innerHTML = "";
+    
+    // 2. SEGURO ANTI-DUPLICADOS: Rastreamos nombres ya dibujados
+    const productosDibujados = new Set();
     
     renderizarMenuCategorias();
 
-    // 2. OBTENER TEXTO DE BÚSQUEDA
+    // 3. OBTENER TEXTO DE BÚSQUEDA
     const inputBusqueda = document.getElementById('contenedorBusqueda');
     const textoBusqueda = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : "";
 
     const urlParams = new URLSearchParams(window.location.search);
     const productoEnUrl = urlParams.get('producto')?.trim().toLowerCase();
-
-    let indice = 0;
 
     for (const refP in productosJson) {
         if (refP === "images") continue;
@@ -2241,77 +2242,76 @@ function render() {
         const claveBusqueda = refP.trim().toLowerCase();
         const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
         
-        // El nombre para filtrar
-        const nombreProducto = (real.referenciaReal || refP).toLowerCase();
+        const nombreReal = (real.referenciaReal || refP);
+        const nombreParaFiltrar = nombreReal.toLowerCase();
+
+        // --- FILTRO DE DUPLICADOS INTERNO ---
+        // Si este producto ya se dibujó en este renderizado, lo saltamos
+        if (productosDibujados.has(nombreParaFiltrar)) continue;
 
         // --- FILTRO 1: POR CATEGORÍA ---
-        if (categoriaSeleccionada !== null && categoriaSeleccionada !== "" && categoriaSeleccionada !== "Todas") {
+        if (categoriaSeleccionada && categoriaSeleccionada !== "Todas") {
             const categoriasProducto = (real.categoria || "").split(",").map(c => c.trim().toLowerCase());
-            const esProductoDirecto = (claveBusqueda === productoEnUrl);
-            if (!esProductoDirecto && !categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
+            if (!categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
                 continue;
             }
         }
 
-        // --- FILTRO 2: POR BUSCADOR (CORRECCIÓN DE DUPLICADOS) ---
-        if (textoBusqueda !== "" && !nombreProducto.includes(textoBusqueda)) {
-            continue; // Si no coincide, pasamos al siguiente sin dibujar nada
+        // --- FILTRO 2: POR BUSCADOR ---
+        if (textoBusqueda !== "" && !nombreParaFiltrar.includes(textoBusqueda)) {
+            continue;
         }
+
+        // Si pasó los filtros, lo marcamos como "dibujado" y lo creamos
+        productosDibujados.add(nombreParaFiltrar);
 
         const imgUrl = productosJson[refP];
         let precioHTML = "";
-        let precioFinal = 0;
+        let precioFinal = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
         
         if (real.promocion && real.valorPromocion > 0) {
-            precioFinal = real.valorPromocion;
-            const porcentajeAhorro = Math.round(100 - (real.valorPromocion * 100 / real.valor));
+            const porcentaje = Math.round(100 - (real.valorPromocion * 100 / real.valor));
             precioHTML = `
                 <div class="precio-contenedor-premium">
                     <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
                     <div class="precioViejo-container">
                         <span class="precioViejo">${formatearPrecio(real.valor)}</span>
-                        <span class="badge-ahorro-premium">¡Ahorras ${porcentajeAhorro}%!</span>
+                        <span class="badge-ahorro-premium">-${porcentaje}%</span>
                     </div>
                 </div>`;
-        } else if (real.valor > 0) {
-            precioFinal = real.valor;
-            precioHTML = `<div class="precio">${formatearPrecio(real.valor)}</div>`;
         } else {
-            precioHTML = `<div class="precio">Consultar precio</div>`;
+            precioHTML = `<div class="precio">${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}</div>`;
         }
 
         const card = document.createElement("div");
         card.className = `producto ${real.agotado ? 'agotado' : ''} visible`;
 
-        const descProd = (real.descripcion || "Sin descripción disponible").replace(/'/g, "\\'");
-        const refProd = (real.referenciaReal || refP).replace(/'/g, "\\'");
+        const descProd = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
+        const refProd = nombreReal.replace(/'/g, "\\'");
 
-        let botonesHtml = real.agotado ? `
-            <div class="btn-container-responsive" style="display: flex; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
-                <button class="btn" style="flex: 1; background:#888; color:white; cursor:not-allowed;" disabled>Agotado</button>
-            </div>` : `
-            <div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 0 10px 10px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+        let botonesHtml = real.agotado ? 
+            `<button class="btn" style="background:#888; color:white; width:90%; margin:10px auto;" disabled>Agotado</button>` : 
+            `<div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 10px; width: 100%; box-sizing: border-box;">
                 <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" style="flex: 1; background: #E5C453;"><i class="fas fa-cart-plus"></i></button>
-                <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color: #fff;"><i class="fab fa-whatsapp"></i> Pedir ahora</button>
+                <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;"><i class="fab fa-whatsapp"></i> Pedir</button>
             </div>`;
 
         card.innerHTML = `
-            <div class="img-container" style="position: relative; overflow: hidden; border-radius: 8px 8px 0 0;">
+            <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-                <img src="${normalizarImagen(imgUrl)}" onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" loading="lazy" alt="${refProd}"> 
+                <img src="${normalizarImagen(imgUrl)}" onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" loading="lazy"> 
             </div>
-            <div class="nombre">${real.referenciaReal || refP}</div>
+            <div class="nombre">${nombreReal}</div>
             <div class="precio-contenedor">${precioHTML}</div>
             ${botonesHtml}
         `;
 
         contenedor.appendChild(card);
-        indice++;
     }
 
-    // Ocultar el loader una vez terminado el renderizado
+    // Ocultar loader
     const ld = document.getElementById("loader");
-    if (ld) { ld.style.opacity = "0"; setTimeout(() => ld.style.display = "none", 500); }
+    if (ld) { ld.style.display = "none"; }
 }
 window.render = render;
 
@@ -2927,20 +2927,17 @@ window.cerrarModal = () => {
         if (document.getElementById('shareWA')) document.getElementById('shareWA').href = `https://api.whatsapp.com/send?text=${msg}`;
     });
 
-   // --- 3. LÓGICA DE BÚSQUEDA CORREGIDA (SIN CONFLICTOS) ---
+// --- LÓGICA DE BÚSQUEDA LIMPIA ---
 let timeoutBusqueda;
 const inputBusquedaNav = document.getElementById('contenedorBusqueda');
 
 if (inputBusquedaNav) {
     inputBusquedaNav.addEventListener('input', (e) => {
-        // Detenemos cualquier renderizado pendiente para no saturar la memoria
         clearTimeout(timeoutBusqueda);
-        
         timeoutBusqueda = setTimeout(() => {
-            // No manipulamos el DOM aquí. Dejamos que render() lo haga todo.
-            // render() limpiará el contenedor y dibujará solo lo que coincida.
+            // CENTRALIZADO: render() se encarga de limpiar y filtrar.
             render(); 
-        }, 300); // 300ms es el tiempo ideal para esperar a que el usuario termine de teclear
+        }, 200); 
     });
 }
 
