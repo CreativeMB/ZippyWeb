@@ -2381,30 +2381,27 @@ function render() {
     const contenedor = document.getElementById("productos");
     if (!contenedor) return;
     
-    // 1. LIMPIEZA TOTAL DEL CONTENEDOR
+    // 1. LIMPIEZA TOTAL PARA EVITAR DUPLICADOS
     contenedor.innerHTML = "";
-    
-    // 2. SEGURO ANTI-DUPLICADOS: Rastreamos nombres ya dibujados
     const productosDibujados = new Set();
     
-    // 3. OBTENER TEXTO DE BÚSQUEDA
+    // 2. OBTENER ESTADO DE BÚSQUEDA Y URL
     const inputBusqueda = document.getElementById('contenedorBusqueda');
     const textoBusqueda = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : "";
+    const urlParams = new URLSearchParams(window.location.search);
+    const productoEnUrl = urlParams.get('producto')?.trim().toLowerCase();
 
-    // --- 🚀 NUEVA LÓGICA DEL BANNER DE PROMOCIONES ---
+    // 3. LÓGICA DEL BANNER DE PROMOCIONES
     const bannerContainer = document.getElementById("promo-banner-container");
-    // El banner solo se muestra si NO estamos buscando nada y NO hay categoría seleccionada
     if (textoBusqueda === "" && (!categoriaSeleccionada || categoriaSeleccionada === "Todas")) {
-        renderizarPromoBanner(); 
+        renderizarPromoBanner(); // Se muestra en la página principal
     } else if (bannerContainer) {
         bannerContainer.style.display = "none"; 
     }
-    // ------------------------------------------------
 
     renderizarMenuCategorias();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const productoEnUrl = urlParams.get('producto')?.trim().toLowerCase();
+    // 4. BUCLE PRINCIPAL DE PRODUCTOS
     for (const refP in productosJson) {
         if (refP === "images") continue;
        
