@@ -2410,22 +2410,43 @@ function renderizarPromoBanner() {
     iniciarAutoScrollPromo();
 }
 
-let scrollInterval;
+let promoAnimationId; // Cambiamos el interval por un ID de animación
+let isPromoHovered = false;
+
 function iniciarAutoScrollPromo() {
     const track = document.getElementById("promo-track");
-    clearInterval(scrollInterval);
-    scrollInterval = setInterval(() => {
-        if (track.scrollLeft + track.offsetWidth >= track.scrollWidth) {
-            track.scrollLeft = 0;
-        } else {
-            track.scrollLeft += 1;
-        }
-    }, 30); // Velocidad del scroll
-    
-    track.onmouseenter = () => clearInterval(scrollInterval);
-    track.onmouseleave = () => iniciarAutoScrollPromo();
-}
+    if (!track) return;
 
+    // Detenemos cualquier animación previa para evitar duplicados
+    cancelAnimationFrame(promoAnimationId);
+
+    function step() {
+        // REGLAS DE ORO:
+        // 1. No scroll si el mouse está encima del banner (isPromoHovered)
+        // 2. No scroll si el menú de categorías está abierto (menuCategoriasAbierto)
+        if (!isPromoHovered && !menuCategoriasAbierto) {
+            track.scrollLeft += 0.8; // Velocidad suave (ajusta a 1 o 1.5 si quieres más rápido)
+
+            // Si llega al final, reinicia suavemente
+            if (track.scrollLeft + track.offsetWidth >= track.scrollWidth - 1) {
+                track.scrollLeft = 0;
+            }
+        }
+        // Continuar el bucle de animación
+        promoAnimationId = requestAnimationFrame(step);
+    }
+
+    // Iniciar el bucle
+    promoAnimationId = requestAnimationFrame(step);
+
+    // Configurar detectores de mouse una sola vez
+    track.onmouseenter = () => { isPromoHovered = true; };
+    track.onmouseleave = () => { isPromoHovered = false; };
+    
+    // Soporte para móviles: detener si el usuario toca para deslizar
+    track.ontouchstart = () => { isPromoHovered = true; };
+    track.ontouchend = () => { isPromoHovered = false; };
+}
 
 
 
