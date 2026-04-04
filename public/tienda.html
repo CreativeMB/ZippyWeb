@@ -2545,49 +2545,50 @@ window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
 };
 
 
-// --- PROCESADOR DE CATEGORÍA POR URL (CON REINTENTOS) ---
+// --- PROCESADOR DE CATEGORÍA POR URL (MEJORADO PARA DOMINIOS) ---
 window.procesarCategoriaDirecta = function() {
     const urlParams = new URLSearchParams(window.location.search);
     const catParam = urlParams.get('categoria'); 
     
     if (!catParam) return;
 
-    console.log("%c📂 Buscando categoría en URL...", "color: #E5C453; font-weight: bold;");
+    console.log("%c📂 Buscando categoría en URL: " + catParam, "color: #E5C453; font-weight: bold;");
 
     let intentosCat = 0;
     const intervaloCat = setInterval(() => {
-        const jsonListo = Object.keys(productosJson).length > 0;
-        const realtimeListo = Object.keys(productosRealtime).length > 0;
+        // En dominios propios, a veces Realtime carga antes que el JSON o viceversa
+        // Esperamos a que los productos Realtime estén mapeados
+        const dataLista = Object.keys(productosRealtime).length > 0;
 
-        if (jsonListo && realtimeListo) {
+        if (dataLista) {
             const categoriasExistentes = obtenerCategoriasUnicas();
             const buscado = decodeURIComponent(catParam).toLowerCase().trim();
             
-            // Buscamos la categoría ignorando tildes y espacios
+            // Buscamos coincidencia flexible (sin tildes, minúsculas)
             const match = categoriasExistentes.find(c => 
                 c.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 
                 buscado.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             );
 
             if (match) {
-                console.log("%c✅ Categoría aplicada: " + match, "color: #25D366; font-weight: bold;");
+                console.log("%c✅ Categoría aplicada con éxito: " + match, "color: #25D366; font-weight: bold;");
                 categoriaSeleccionada = match;
-                render(); 
-                renderizarMenuCategorias();
+                render(); // Refresca los productos filtrados
+                renderizarMenuCategorias(); // Marca el botón como activo
                 clearInterval(intervaloCat);
             } else {
-                console.warn("⚠️ La categoría '" + buscado + "' no existe en esta tienda.");
-                clearInterval(intervaloCat);
+                // Si ya intentó muchas veces y no hay match, asumimos que no existe
+                if (intentosCat > 15) {
+                    console.warn("⚠️ La categoría '" + buscado + "' no se encontró en esta tienda.");
+                    clearInterval(intervaloCat);
+                }
             }
         }
 
         intentosCat++;
-        if (intentosCat > 20) { // Si después de 10 segundos no carga, se detiene
-            clearInterval(intervaloCat);
-        }
+        if (intentosCat > 30) clearInterval(intervaloCat); // Timeout a los 15 segundos
     }, 500);
 };
-
 
 window.abrirPestañaProducto = (nombre, imagen, precio, descripcion) => {
     // Si se pasan datos de un producto, lo agregamos SIEMPRE (tenga o no otros productos)
