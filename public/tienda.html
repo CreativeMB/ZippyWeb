@@ -1368,120 +1368,126 @@ body {
 /* ============================================================ */
 /* 2. SECCIÓN: BANNER DE PROMOCIONES (OPTIMIZADO E INDEPENDIENTE)*/
 /* ============================================================ */
-/* BANNER CONTENEDOR */
+/* CONTENEDOR CON NEGRO SUAVE */
 #promo-banner-container {
     width: 100%;
-    background: #000;
-    padding: 8px 0;
-    border-bottom: 2px solid #E5C453;
+    background: #1a1a1a; /* Negro mate suave */
+    padding: 10px 0;
+    border-bottom: 1px solid #E5C453;
     overflow: hidden;
 }
 
 .promo-slider {
     display: flex;
     gap: 12px;
-    padding: 5px 20px;
+    padding: 5px 15px;
     overflow-x: auto;
     scrollbar-width: none;
 }
 .promo-slider::-webkit-scrollbar { display: none; }
 
-/* LA TARJETA DE PROMO */
+/* TARJETA OPTIMIZADA */
 .promo-item {
     flex: 0 0 auto;
-    width: 290px;
-    height: 90px; /* Un poquito más alta para que respire el texto */
+    width: 310px; /* Un poco más ancha para evitar amontonamiento */
+    height: 85px;
     background: #ffffff;
-    border-radius: 12px; /* Más redondeado como pediste */
+    border-radius: 8px; /* Radio elegante, no tan circular */
     display: flex;
     align-items: center;
     padding: 8px;
     cursor: pointer;
-    position: relative;
-    border: 2px solid transparent;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* EFECTO AL PASAR EL MOUSE */
+/* EFECTO HOVER MODERNO */
 .promo-item:hover {
-    transform: scale(1.05); /* Se agranda */
-    border-color: #ef4444; /* Borde rojo vibrante */
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); /* Brillo rojo */
-    z-index: 100;
+    transform: translateY(-2px);
+    border-color: #E5C453; /* Dorado en lugar de rojo agresivo */
+    box-shadow: 0 5px 15px rgba(229, 196, 83, 0.2);
 }
 
 .promo-img-box {
-    width: 75px;
-    height: 75px;
+    width: 65px;
+    height: 65px;
     background: #fff;
-    border-radius: 8px;
+    border-radius: 6px;
     overflow: hidden;
-    margin-right: 12px;
-    flex-shrink: 0;
+    margin-right: 10px;
+    flex-shrink: 0; /* Evita que la imagen se aplaste */
 }
 
 .promo-img-box img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Imagen completa siempre */
+    object-fit: contain;
 }
 
+/* INFO CENTRAL FLEXIBLE */
 .promo-info {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    overflow: hidden;
+    min-width: 0; /* Permite que el texto se corte si es muy largo */
+    padding-right: 5px;
 }
 
-/* NOMBRE DEL PRODUCTO */
 .p-name-slim {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
-    color: #333;
+    color: #444;
     margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; /* Corta nombres largos con ... */
 }
 
-/* PRECIO GRANDE Y LLAMATIVO */
 .p-price-big {
-    color: #ef4444; /* Rojo moderno */
-    font-size: 20px; /* Palabra de precio más grande */
-    font-weight: 900;
-    line-height: 1;
+    color: #000;
+    font-size: 17px; /* Tamaño equilibrado */
+    font-weight: 800;
 }
 
-/* BOTÓN DE COMPRA + AHORRO */
+/* BLOQUE DE ACCIÓN (DERECHA) */
 .btn-promo-action {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #000;
-    padding: 6px 12px;
-    border-radius: 8px;
-    color: #fff;
-    margin-left: 5px;
-    min-width: 85px;
+    justify-content: center;
+    background: #f8f9fa; /* Fondo gris claro sutil */
+    border: 1px solid #eee;
+    padding: 5px;
+    border-radius: 6px;
+    min-width: 90px;
+    flex-shrink: 0; /* Evita que el botón se achique */
 }
 
 .buy-text {
-    font-size: 12px; /* Texto más grande */
-    font-weight: 800;
-    letter-spacing: 0.5px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #16a34a; /* Verde éxito */
+    text-transform: uppercase;
 }
 
 .save-badge {
-    background: #ef4444;
+    background: #ef4444; /* Rojo moderno */
     color: #fff;
     font-size: 10px;
     font-weight: 700;
-    padding: 1px 6px;
+    padding: 2px 6px;
     border-radius: 4px;
-    margin-top: 3px;
+    margin-top: 2px;
     white-space: nowrap;
+}
+
+/* Ajuste móvil */
+@media screen and (max-width: 400px) {
+    .promo-item { width: 280px; }
+    .p-price-big { font-size: 15px; }
+    .btn-promo-action { min-width: 80px; }
 }
     </style>
 </head>
@@ -2314,7 +2320,6 @@ function configurarRedesNav(perfil) {
 }
 
 */
-
 let promoScrollId;
 
 function renderizarPromoBanner() {
@@ -2327,7 +2332,6 @@ function renderizarPromoBanner() {
         const clave = ref.trim().toLowerCase();
         const real = productosRealtime[clave];
         if (real && real.promocion && !real.agotado) {
-            // Cálculo del porcentaje de ahorro
             const ahorro = Math.round(100 - (real.valorPromocion * 100 / real.valor));
             promos.push({
                 ref: real.referenciaReal || ref,
@@ -2344,13 +2348,13 @@ function renderizarPromoBanner() {
         return;
     }
 
-    // 1. Aleatorio para que siempre varíe
+    // Barajar aleatoriamente
     promos.sort(() => Math.random() - 0.5);
 
-    // 2. Limpiar y Duplicar contenido para efecto infinito
     contenedor.style.display = "block";
     track.innerHTML = "";
     
+    // El texto ahora es "¡Ahorras %!" como pediste
     const crearCard = (p) => `
         <div class="promo-item" onclick="window.abrirPestañaProducto('${p.ref}','${p.img}','${p.precio}','${p.desc}')">
             <div class="promo-img-box">
@@ -2362,29 +2366,28 @@ function renderizarPromoBanner() {
             </div>
             <div class="btn-promo-action">
                 <span class="buy-text">Comprar</span>
-                <span class="save-badge">-${p.ahorro}% dto.</span>
+                <span class="save-badge">¡Ahorras ${p.ahorro}%!</span>
             </div>
         </div>
     `;
 
-    // Inyectamos contenido duplicado para que el scroll nunca termine
+    // Duplicamos el contenido para el efecto infinito sin saltos
     const htmlContenido = promos.map(p => crearCard(p)).join('');
     track.innerHTML = htmlContenido + htmlContenido;
 
-    // 3. Iniciar movimiento infinito
     iniciarMovimientoInfinito(track);
 }
 
 function iniciarMovimientoInfinito(track) {
     cancelAnimationFrame(promoScrollId);
-    let scrollPos = 0;
+    let scrollPos = track.scrollLeft;
 
     function animar() {
-        // Solo se mueve si NO hay un filtro activo o búsqueda
+        // Pausar si el menú de categorías está abierto
         if (typeof menuCategoriasAbierto !== 'undefined' && !menuCategoriasAbierto) {
-            scrollPos += 0.85; // Velocidad de flujo suave
+            scrollPos += 0.75; // Velocidad muy fluida
             if (scrollPos >= track.scrollWidth / 2) {
-                scrollPos = 0; // Reset imperceptible
+                scrollPos = 0; 
             }
             track.scrollLeft = scrollPos;
         }
@@ -2393,14 +2396,11 @@ function iniciarMovimientoInfinito(track) {
     
     promoScrollId = requestAnimationFrame(animar);
 
-    // Pausar al pasar el mouse (para que el cliente pueda hacer click)
-    track.onmouseenter = () => cancelAnimationFrame(promoScrollId);
-    track.onmouseleave = () => promoScrollId = requestAnimationFrame(animar);
-    
-    // Soporte móvil
-    track.ontouchstart = () => cancelAnimationFrame(promoScrollId);
+    // Eventos para pausar manualmente
+    track.addEventListener('mouseenter', () => cancelAnimationFrame(promoScrollId));
+    track.addEventListener('mouseleave', () => promoScrollId = requestAnimationFrame(animar));
+    track.addEventListener('touchstart', () => cancelAnimationFrame(promoScrollId), {passive: true});
 }
-
 
 function render() {
     if (bloqueoActivo) return;
