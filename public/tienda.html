@@ -1302,79 +1302,69 @@ body {
     }
 
 /* categorias  */
-/* CONTENEDOR PRINCIPAL */
+/* ========================================= */
+/* CATEGORÍAS: ESTILO GRILLA AUTOMÁTICA      */
+/* ========================================= */
 #menu-categorias-flotante {
     width: 100%;
     background: #ffffff;
     border-bottom: 1px solid #eee;
     position: sticky;
-    top: 75px; 
+    top: 75px; /* Ajustado a tu barra de navegación */
     z-index: 1000;
     padding: 10px 0;
+    display: block; /* Aseguramos visibilidad */
 }
 
-/* ENVOLTORIO CON SCROLL HORIZONTAL */
 .categorias-wrapper-tags {
     display: flex;
-    gap: 8px;
+    flex-wrap: wrap; /* 🔥 CLAVE: Salta a la siguiente línea si no cabe */
+    gap: 6px; /* Espacio mínimo entre etiquetas */
     padding: 0 15px;
-    overflow-x: auto; /* Permite scroll manual */
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Oculta scroll en Firefox */
-    white-space: nowrap;
+    justify-content: center; /* Centra las categorías para que se vean elegantes */
 }
 
-.categorias-wrapper-tags::-webkit-scrollbar {
-    display: none; /* Oculta scroll en Chrome/Safari */
-}
-
-/* BOTONES ESTILO CUADRADO MODERNO */
+/* ETIQUETA ESTILO MODERNO CUADRADO */
 .cat-tag {
-    flex: 0 0 auto;
-    background: #f8f9fa;
+    flex: 0 1 auto; /* Permite que crezcan según el texto */
+    background: #f4f4f4;
     color: #333;
-    border: 1px solid #ddd;
-    padding: 7px 15px;
-    border-radius: 4px; /* Menos redondeado, más elegante */
-    font-size: 13px;
+    border: 1px solid #d1d1d1;
+    padding: 6px 12px;
+    border-radius: 2px; /* 🔥 Casi cuadrado para diseño premium */
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: 'Montserrat', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-/* ETIQUETA ACTIVA */
-.cat-tag.activo {
-    background: #000 !important; /* Fondo Negro */
-    color: #E5C453 !important;   /* Texto Dorado */
-    border-color: #000 !important;
-    transform: scale(1.02);
-}
-
+/* ESTADO HOVER */
 .cat-tag:hover {
     border-color: #E5C453;
+    background: #fafafa;
 }
 
-/* ETIQUETA ACTIVA (Seleccionada) */
+/* ETIQUETA ACTIVA (SELECCIONADA) */
 .cat-tag.activo {
-    background: #000000 !important; /* Negro para contraste elegante */
-    color: #E5C453 !important;      /* Dorado */
+    background: #000000 !important;
+    color: #E5C453 !important;
     border-color: #000000 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* KEYFRAMES PARA EL MOVIMIENTO INFINITO */
-@keyframes scrollInfinito {
-    0% {
-        transform: translateX(0);
+/* Optimizacion para moviles */
+@media screen and (max-width: 767px) {
+    #menu-categorias-flotante {
+        padding: 8px 0;
     }
-    100% {
-        /* Desplaza hacia la izquierda. Ajusta el valor si tienes muchísimas categorías */
-        transform: translateX(-50%); 
+    .cat-tag {
+        font-size: 11px;
+        padding: 5px 10px;
     }
 }
-
 /* ============================================================ */
 /* 2. SECCIÓN: BANNER DE PROMOCIONES (OPTIMIZADO E INDEPENDIENTE)*/
 /* ============================================================ */
@@ -2740,63 +2730,54 @@ function renderizarMenuCategorias() {
     if (!contenedor) return;
 
     const categorias = obtenerCategoriasUnicas();
+    
+    // Si no hay categorías en el JSON, ocultamos el div
     if (categorias.length === 0) {
         contenedor.style.display = "none";
         return;
     }
 
+    // Limpiamos siempre para que se refresque el estado 'activo'
     contenedor.style.display = "block";
+    contenedor.innerHTML = "";
 
-    // 1. Si el contenedor está vacío, creamos los botones por primera vez
-    if (contenedor.innerHTML === "") {
-        const wrapper = document.createElement("div");
-        wrapper.className = "categorias-wrapper-tags";
+    const wrapper = document.createElement("div");
+    wrapper.className = "categorias-wrapper-tags";
 
-        const crearBoton = (texto, valorFiltro) => {
-            const boton = document.createElement("button");
-            boton.innerText = texto;
-            boton.className = "cat-tag";
-            // Guardamos el valor original para identificarlo luego
-            boton.dataset.categoria = valorFiltro; 
-
-            boton.onclick = (e) => {
-                e.preventDefault();
-                // Cambiamos la categoría seleccionada
-                categoriaSeleccionada = (categoriaSeleccionada === valorFiltro) ? null : valorFiltro;
-                
-                // Refrescamos solo los productos
-                render(); 
-            };
-            return boton;
-        };
-
-        // Añadimos "Todas"
-        wrapper.appendChild(crearBoton("Todas", "Todas"));
-
-        // Añadimos las demás categorías
-        categorias.forEach(cat => {
-            wrapper.appendChild(crearBoton(cat, cat));
-        });
-
-        contenedor.appendChild(wrapper);
+    // 1. Crear botón "Todas"
+    const btnTodas = document.createElement("button");
+    btnTodas.innerText = "Todas";
+    btnTodas.className = "cat-tag";
+    if (!categoriaSeleccionada || categoriaSeleccionada === "Todas") {
+        btnTodas.classList.add("activo");
     }
+    btnTodas.onclick = (e) => {
+        e.preventDefault();
+        categoriaSeleccionada = null;
+        render(); // Refresca productos
+    };
+    wrapper.appendChild(btnTodas);
 
-    // 2. ACTUALIZACIÓN VISUAL (Sin borrar el HTML)
-    // Buscamos todos los botones y solo cambiamos la clase 'activo'
-    const botones = contenedor.querySelectorAll(".cat-tag");
-    botones.forEach(btn => {
-        const catValor = btn.dataset.categoria;
-        
-        // Lógica para marcar cuál está activo
-        const esTodasActivo = (catValor === "Todas" && (!categoriaSeleccionada || categoriaSeleccionada === "Todas"));
-        const esCatActiva = (catValor === categoriaSeleccionada);
+    // 2. Crear botones de categorías dinámicas
+    categorias.forEach(cat => {
+        const boton = document.createElement("button");
+        boton.innerText = cat;
+        boton.className = "cat-tag";
 
-        if (esTodasActivo || esCatActiva) {
-            btn.classList.add("activo");
-        } else {
-            btn.classList.remove("activo");
+        if (categoriaSeleccionada === cat) {
+            boton.classList.add("activo");
         }
+
+        boton.onclick = (e) => {
+            e.preventDefault();
+            // Cambiar categoría o deseleccionar
+            categoriaSeleccionada = (categoriaSeleccionada === cat) ? null : cat;
+            render(); // Refresca productos
+        };
+        wrapper.appendChild(boton);
     });
+
+    contenedor.appendChild(wrapper);
 }
    // --- 5. SISTEMA DE PEDIDOS ---
 function enviarPedido() {
