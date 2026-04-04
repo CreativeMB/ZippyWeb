@@ -2260,6 +2260,11 @@ function configurarRedesNav(perfil) {
             procesarProductoDirecto();
         }
 
+        // Procesamos si venía una categoría por URL
+        if (typeof procesarCategoriaDirecta === "function") {
+            procesarCategoriaDirecta();
+        }
+
     }).catch((error) => {
         console.error("❌ Error al cargar productos:", error);
     });
@@ -2538,6 +2543,51 @@ window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
         title: 'Añadido al carrito', showConfirmButton: false, timer: 1500
     });
 };
+
+
+// --- PROCESADOR DE CATEGORÍA POR URL (CON REINTENTOS) ---
+window.procesarCategoriaDirecta = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const catParam = urlParams.get('categoria'); 
+    
+    if (!catParam) return;
+
+    console.log("%c📂 Buscando categoría en URL...", "color: #E5C453; font-weight: bold;");
+
+    let intentosCat = 0;
+    const intervaloCat = setInterval(() => {
+        const jsonListo = Object.keys(productosJson).length > 0;
+        const realtimeListo = Object.keys(productosRealtime).length > 0;
+
+        if (jsonListo && realtimeListo) {
+            const categoriasExistentes = obtenerCategoriasUnicas();
+            const buscado = decodeURIComponent(catParam).toLowerCase().trim();
+            
+            // Buscamos la categoría ignorando tildes y espacios
+            const match = categoriasExistentes.find(c => 
+                c.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 
+                buscado.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            );
+
+            if (match) {
+                console.log("%c✅ Categoría aplicada: " + match, "color: #25D366; font-weight: bold;");
+                categoriaSeleccionada = match;
+                render(); 
+                renderizarMenuCategorias();
+                clearInterval(intervaloCat);
+            } else {
+                console.warn("⚠️ La categoría '" + buscado + "' no existe en esta tienda.");
+                clearInterval(intervaloCat);
+            }
+        }
+
+        intentosCat++;
+        if (intentosCat > 20) { // Si después de 10 segundos no carga, se detiene
+            clearInterval(intervaloCat);
+        }
+    }, 500);
+};
+
 
 window.abrirPestañaProducto = (nombre, imagen, precio, descripcion) => {
     // Si se pasan datos de un producto, lo agregamos SIEMPRE (tenga o no otros productos)
