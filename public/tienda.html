@@ -308,16 +308,23 @@ body {
     border-color: #E5C453; /* El dorado que usas en tus botones */
 }
 
-        .nombre {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            font-size: 15px;
-            color: #333;
-            margin: 8px 0 2px 0;
-            text-transform: capitalize;
-            line-height: 1.2;
-            padding: 0 5px;
-        }
+      .nombre {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    /* Explicación: 15px es el ideal, pero bajará hasta 12px si el espacio es poco */
+    font-size: clamp(12px, 2.5vw, 15px); 
+    color: #333;
+    margin: 8px 0 2px 0;
+    text-transform: capitalize;
+    line-height: 1.2;
+    padding: 0 5px;
+    
+    /* Esto asegura que si el nombre es MUY largo, se rompa en palabras 
+       y no desborde la tarjeta lateralmente */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
 
         .precio-contenedor {
             margin: 0;
