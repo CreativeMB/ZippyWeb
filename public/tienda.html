@@ -2863,7 +2863,8 @@ if (!idDomiciliarioAsignado) {
     
     // Crea: "url_imagen1, url_imagen2, url_imagen3"
     const imagenesUnificadas = carrito.map(item => item.imagen).join(', ');
-
+// NUEVO: Captura todas las descripciones de los productos del carrito
+const descripcionesUnificadas = carrito.map(item => item.descripcion || "Sin descripción").join(', ');
     let fechaFormateada = "";
     if (campos.fechaOriginal) {
         const partes = campos.fechaOriginal.split(/[-./]/); 
@@ -2899,6 +2900,8 @@ if (!idDomiciliarioAsignado) {
             nombreDomiciliario: nombreDomiciliarioAsignado,
             direccion: campos.direccion,
             imagenUrl: imagenesUnificadas, // TODAS LAS IMÁGENES CON COMA
+            // NUEVO: Guardamos la descripción capturada
+    descripcion: descripcionesUnificadas,
             nombreCliente: campos.nombreComprador,
             cliente: campos.cliente,
             nombreDestinatario: campos.nombreDestinatario,
