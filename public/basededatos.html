@@ -1718,6 +1718,11 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     const card = document.createElement('div');
     card.className = 'pedido-card';
+
+    // Definir el estado inicial del checkbox
+const checkedAtributo = p.pagoConfirmado ? 'checked' : '';
+const textoEstadoPago = p.pagoConfirmado ? 'PAGO CONFIRMADO ✅' : 'PAGO PENDIENTE ⏳';
+const colorEstadoPago = p.pagoConfirmado ? '#2E7D32' : '#D32F2F';
    // --- LÓGICA DE COLOR AUTOMÁTICO ---
     const hoy = obtenerFechaHoyFormateada();
     const COLOR_PROGRAMADO = "#FFF9C4"; // Amarillo
@@ -1753,7 +1758,15 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                 }
             </div>
             <div class="pedido-info">
-                <!-- Se eliminó la referencia de aquí -->
+               <div class="linea-pago" style="margin-top: 10px; padding: 5px; border-top: 1px dashed #ccc;">
+        <label class="switch-pago" style="display: flex; align-items: center; cursor: pointer;">
+            <input type="checkbox" class="chk-pago-realtime" ${checkedAtributo} 
+                style="width: 20px; height: 20px; margin-right: 10px;">
+            <span class="txt-pago" style="font-weight: bold; color: ${colorEstadoPago}; font-size: 13px;">
+                ${textoEstadoPago}
+            </span>
+        </label>
+    </div>
                 <div class="linea">
                     👤 ${p.nombreCliente || ''}
                     <div class="sub-linea">
@@ -1822,6 +1835,30 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             </div>
         </div>
     `;
+
+// --- LÓGICA DE ACTUALIZACIÓN EN TIEMPO REAL ---
+const checkbox = card.querySelector('.chk-pago-realtime');
+const etiquetaTexto = card.querySelector('.txt-pago');
+
+checkbox.addEventListener('change', (e) => {
+    const nuevoEstado = e.target.checked;
+    
+    // Actualizar Firebase Realtime Database
+    // Usamos la ruta exacta: Empresa -> Pedidos -> Domiciliario -> ID Pedido
+    db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}/pagoConfirmado`)
+        .set(nuevoEstado)
+        .then(() => {
+            // Cambio visual inmediato
+            etiquetaTexto.innerText = nuevoEstado ? 'PAGO CONFIRMADO ✅' : 'PAGO PENDIENTE ⏳';
+            etiquetaTexto.style.color = nuevoEstado ? '#2E7D32' : '#D32F2F';
+            console.log("Pago actualizado en Firebase");
+        })
+        .catch((error) => {
+            alert("Error al actualizar pago: " + error.message);
+            e.target.checked = !nuevoEstado; // Revertir si falla
+        });
+});
+
 
     /* ====== IMPRIMIR TARJETA ====== */
     const btnImprimir = card.querySelector('.btn-imprimir');
