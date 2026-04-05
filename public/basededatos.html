@@ -1775,11 +1775,11 @@ const colorEstadoPago = p.pagoConfirmado ? '#2E7D32' : '#D32F2F';
                 }
             </div>
             <div class="pedido-info">
-               <div class="linea-pago" style="margin-top: 10px; padding: 5px; border-top: 1px dashed #ccc;">
-        <label class="switch-pago" style="display: flex; align-items: center; cursor: pointer;">
+           <div class="linea-pago-mini" style="margin: 2px 0; display: flex; align-items: center;">
+        <label style="display: flex; align-items: center; cursor: pointer; gap: 5px; width: 100%;">
             <input type="checkbox" class="chk-pago-realtime" ${checkedAtributo} 
-                style="width: 20px; height: 20px; margin-right: 10px;">
-            <span class="txt-pago" style="font-weight: bold; color: ${colorEstadoPago}; font-size: 13px;">
+                style="width: 14px; height: 14px; margin: 0;">
+            <span class="txt-pago" style="font-size: 11px; font-weight: 900; color: ${colorEstadoPago}; letter-spacing: -0.3px;">
                 ${textoEstadoPago}
             </span>
         </label>
@@ -1853,26 +1853,19 @@ const colorEstadoPago = p.pagoConfirmado ? '#2E7D32' : '#D32F2F';
         </div>
     `;
 
-// --- LÓGICA DE ACTUALIZACIÓN EN TIEMPO REAL ---
+// --- LÓGICA DE ACTUALIZACIÓN EN TIEMPO REAL pago confirmado ---
 const checkbox = card.querySelector('.chk-pago-realtime');
 const etiquetaTexto = card.querySelector('.txt-pago');
 
 checkbox.addEventListener('change', (e) => {
     const nuevoEstado = e.target.checked;
     
-    // Actualizar Firebase Realtime Database
-    // Usamos la ruta exacta: Empresa -> Pedidos -> Domiciliario -> ID Pedido
     db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}/pagoConfirmado`)
         .set(nuevoEstado)
         .then(() => {
-            // Cambio visual inmediato
-            etiquetaTexto.innerText = nuevoEstado ? 'PAGO CONFIRMADO ✅' : 'PAGO PENDIENTE ⏳';
+            // Texto corto para ahorrar espacio
+            etiquetaTexto.innerText = nuevoEstado ? 'PAGADO' : 'PENDIENTE';
             etiquetaTexto.style.color = nuevoEstado ? '#2E7D32' : '#D32F2F';
-            console.log("Pago actualizado en Firebase");
-        })
-        .catch((error) => {
-            alert("Error al actualizar pago: " + error.message);
-            e.target.checked = !nuevoEstado; // Revertir si falla
         });
 });
 
