@@ -731,28 +731,26 @@ th {
     right: -52px;
     transform: rotate(45deg);
 
-    width: 140px; 
-    height: 48px; 
+    width: 140px;              /* 👈 cubre hasta la esquina */
+    height: 48px;              /* alto suficiente para 2 líneas */
 
     background: linear-gradient(135deg, #27ae60, #2ecc71);
     color: #fff;
 
-    font-size: 10px;
+    font-size: 8px;
     font-weight: 900;
+   
 
-    /* Cambia 'none' a 'flex' para ver los cambios */
-    display: flex; 
-    flex-direction: column;
+    display: none;
+    flex-direction: column;    /* 👈 texto en 2 líneas */
     align-items: center;
     justify-content: center;
 
-    /* --- ESTO ES LO QUE NECESITAS --- */
-    text-align: center;       /* Centra el texto horizontalmente */
-    word-break: break-word;   /* Rompe palabras largas si es necesario */
-    overflow: hidden;         /* Evita que el texto se salga del cuadro */
-    padding: 0 10px;          /* Espacio interno para que no pegue a los bordes */
-    line-height: 1.2;         /* Ajusta el espacio entre líneas */
+    line-height: 1.1;
+    box-shadow: 0 3px 8px rgba(0,0,0,.35);
+    z-index: 10;
 }
+
 .pedido-card.en-ruta .etiqueta-ruta {
     display: flex;
 }
