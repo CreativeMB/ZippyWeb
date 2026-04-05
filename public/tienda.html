@@ -2891,7 +2891,7 @@ const descripcionesUnificadas = carrito.map(item => item.descripcion || "Sin des
         const hoy = new Date();
         const fechaReg = hoy.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/-/g, '/');
         const horaReg = hoy.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-
+        const colorAsignado = (fechaFormateada === hoy) ? "#E0E0E0" : "#FFF9C4";
         // --- ESTRUCTURA DEL PEDIDO PARA FIREBASE ---
         const pedidoData = {
             idPedido: nuevoRef.key,
@@ -2917,7 +2917,7 @@ const descripcionesUnificadas = carrito.map(item => item.descripcion || "Sin des
             para: campos.paraTarjeta,
             posicion: maxPos + 1,
             notificado: false,
-            color: "#E0E0E0",
+            color: colorAsignado,
             fechaRegistro: fechaReg,
             horaRegistro: horaReg
         };
