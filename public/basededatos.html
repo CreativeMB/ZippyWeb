@@ -1706,11 +1706,38 @@ function generarMosaicoHTML(p) {
     return html;
 }
 
+function obtenerFechaHoyFormateada() {
+    const hoy = new Date();
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const anio = hoy.getFullYear();
+    return `${dia}/${mes}/${anio}`; // Formato exacto: dd/mm/yyyy
+}
+
 function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
 
     const card = document.createElement('div');
     card.className = 'pedido-card';
-    card.style.backgroundColor = obtenerColorPedido(p.color);
+   // --- LÓGICA DE COLOR AUTOMÁTICO ---
+    const hoy = obtenerFechaHoyFormateada();
+    const COLOR_PROGRAMADO = "#FFF9C4"; // Amarillo
+    const COLOR_RECIBIDO = "#E0E0E0";   // Gris
+    
+    let colorFinal = p.color || "#FFFFFF";
+
+    // Si es para hoy y el estado actual es "Programado" (Amarillo)
+    if (p.diaEntrega === hoy && colorFinal.toUpperCase() === COLOR_PROGRAMADO) {
+        colorFinal = COLOR_RECIBIDO; // Cambia visualmente a Gris
+    }
+
+    // Aplicamos el color (usando tu función existente o el colorFinal calculado)
+    card.style.backgroundColor = colorFinal;
+
+    // --- INDICADOR VISUAL PARA LA FECHA ---
+    const esHoy = p.diaEntrega === hoy;
+    const textoFechaUI = esHoy 
+        ? `<span style="color: #d32f2f; font-weight: 800;">⭐ HOY ${p.diaEntrega}</span>` 
+        : (p.diaEntrega || '');
 
     card.innerHTML = `
         <div class="pedido-top">
