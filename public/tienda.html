@@ -1702,7 +1702,7 @@ body {
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     // --- IMPORT DE DATABASE (Añadimos el alias as queryDB) ---
 import { 
-    getDatabase, ref, onValue, push, set, get, update, increment, onDisconnect,
+    getDatabase, ref, onValue, push, set, get, update, increment, onDisconnect, serverTimestamp,
     query as queryDB, // <--- Aquí le ponemos el apodo
     orderByChild, equalTo 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -1798,32 +1798,44 @@ function registrarVisitaAnalytics(idEmpresa, slugIdentificado) {
 window.registrarVisitaAnalytics = registrarVisitaAnalytics;
 
 function gestionarPresenciaEnVivo(idEmpresa) {
+    const db = getDatabase();
     if (!idEmpresa || !db) return;
 
-    // 1. Ruta donde guardaremos quién está conectado ahora
-    // [ID_EMPRESA] / presencia / [ID_SESION_ALEATORIO]
-    const presenciaRef = ref(db, `${idEmpresa}/presencia`);
+    // 1. Intentamos recuperar el ID de esta pestaña del buscador
+    // Esto evita que si el usuario presiona F5 se cree un SEGUNDO registro "online"
+    let sessionId = sessionStorage.getItem("presencia_session_id");
     
-    // 2. Nodo especial de Firebase que detecta si el cliente tiene internet
     const conectadoRef = ref(db, ".info/connected");
 
     onValue(conectadoRef, (snap) => {
         if (snap.val() === true) {
-            // El cliente se conectó: Creamos una entrada única para esta pestaña
-            const miSesionRef = push(presenciaRef);
+            
+            // 2. Si es la primera vez que entra en esta pestaña, generamos un ID
+            if (!sessionId) {
+                // Creamos una referencia temporal solo para obtener una KEY única de Firebase
+                const nuevaRef = push(ref(db, `${idEmpresa}/presencia`));
+                sessionId = nuevaRef.key;
+                // Guardamos el ID en la memoria de la pestaña del navegador (SessionStorage)
+                sessionStorage.setItem("presencia_session_id", sessionId);
+            }
 
-            // 🔥 TRUCO MAESTRO: Si el cliente cierra el navegador, 
-            // Firebase borra este nodo automáticamente desde el servidor.
+            // 3. Referencia exacta a ESTA sesión
+            const miSesionRef = ref(db, `${idEmpresa}/presencia/${sessionId}`);
+
+            // 4. CONFIGURAR DESCONEXIÓN (Muy importante)
+            // Esto le dice al servidor de Firebase: "Si este usuario se va, borra su ID"
             onDisconnect(miSesionRef).remove();
 
-            // Marcamos la sesión como activa
+            // 5. Marcar como Online usando el reloj de Google (ServerTimestamp)
             set(miSesionRef, {
                 estado: "online",
-                timestamp: Date.now()
+                // Usamos serverTimestamp() para que no importe si el reloj del usuario está mal
+                timestamp: serverTimestamp() 
             });
         }
     });
 }
+
 async function detectarEmpresaPorDominio() {
     const host = window.location.hostname.toLowerCase().replace("www.", "").trim();
     const path = window.location.pathname;
