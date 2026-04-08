@@ -2544,7 +2544,7 @@ window.whatsappDirecto = (nombre, precio, descripcion) => {
 
     const msg = `*¡Hola!* 👋 Me interesa este producto de tu tienda:\n\n` +
                 `*Producto:* ${nombre}\n` +
-                `*Precio:* ${textoPrecio}\n` +
+                `*Precio sin domicilio:* ${textoPrecio}\n` +
                 `*Descripción:* ${textoDescripcion}\n\n` +
                 `¿Me puedes colaborar?`;
     
@@ -2946,7 +2946,7 @@ const descripcionesUnificadas = carrito.map(item => item.descripcion || "Sin des
             const mensajeWa = encodeURIComponent(
                 `*NUEVO PEDIDO REGISTRADO*\n\n` +
                 `*PRODUCTOS:*\n${listaProductosTexto}\n\n` +
-                `*TOTAL A PAGAR: ${totalSuma}*\n\n` +
+                `*TOTAL A PAGAR SIN DOMICILIO: ${totalSuma}*\n\n` +
                 `*Cliente:* ${campos.nombreComprador}\n` +
                 `*Fecha Entrega:* ${fechaFormateada}\n` +
                 `*Medio de Pago:* ${campos.medioPago}\n\n` +
