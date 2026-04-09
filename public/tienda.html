@@ -1487,7 +1487,6 @@ body {
     padding: 4px 8px;
     border-radius: 4px;
     z-index: 10;
-    text-transform: uppercase;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -2673,7 +2672,7 @@ let stockEtiqueta = "";
 if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.stock <= 5) {
     stockEtiqueta = `
         <div class="badge-stock-urgente">
-            <i class="fas fa-fire-alt"></i> ¡Solo quedan ${real.stock}!
+            <i class="fas fa-fire-alt"></i> ¡Stock: ${real.stock} unidad!
         </div>`;
 }
 
