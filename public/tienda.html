@@ -2748,19 +2748,21 @@ window.agregarAlCarrito = (nombre, imagen, precio, descripcion, stock) => {
 };
 
 
-window.abrirPestañaProducto = (nombre, imagen, precio, descripcion) => {
-    // Si se pasan datos de un producto, lo agregamos SIEMPRE (tenga o no otros productos)
+window.abrirPestañaProducto = (nombre, imagen, precio, descripcion, stock) => {
+    // 1. Si se pasan datos de un producto, lo agregamos pasando también el STOCK
     if (nombre) {
-        window.agregarAlCarrito(nombre, imagen, precio, descripcion);
+        window.agregarAlCarrito(nombre, imagen, precio, descripcion, stock);
     }
 
-    // Ocultar tienda y mostrar sección de pedido
+    // 2. Ocultar tienda y mostrar sección de pedido (Formulario)
     document.getElementById("productos-tab").style.display = "none";
     document.getElementById("empresa-tab").style.display = "none";
     document.getElementById("modalPedido").style.display = "block";
     
-    // Renderizamos el contenido actualizado
+    // 3. Renderizamos el contenido actualizado del carrito en el formulario
     window.renderizarCarritoEnForm();
+    
+    // 4. Subir al inicio de la página
     window.scrollTo(0, 0);
 };
 // 3. RENDERIZAR LA LISTA EN EL FORMULARIO
