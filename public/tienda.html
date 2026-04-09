@@ -2271,6 +2271,7 @@ function configurarRedesNav(perfil) {
             render();
         } catch (e) { productosJson = {}; render(); }
     }
+
     function escucharCambios(id) {
     if (bloqueoActivo) return;
 
@@ -2285,12 +2286,14 @@ function configurarRedesNav(perfil) {
 
         if (snapshot.exists()) {
             snapshot.forEach((child) => {
+                
                 const p = child.val();
                 const refOriginal = p.nombre || p.Referencia || p.referencia || "";
 
                 if (refOriginal) {
                     const claveLimpia = String(refOriginal).trim().toLowerCase();
                     productosRealtime[claveLimpia] = p;
+                    productosRealtime[claveLimpia].idFirebase = child.key;
                     productosRealtime[claveLimpia].referenciaReal = refOriginal;
                 }
             });
@@ -3156,6 +3159,19 @@ const descripcionesUnificadas = carrito.map(item => item.descripcion || "Sin des
         };
 
         set(nuevoRef, pedidoData).then(() => {
+    
+    // --- BLOQUE PARA DESCONTAR STOCK ---
+    carrito.forEach(item => {
+        const infoProd = productosRealtime[item.nombre.toLowerCase().trim()];
+        // Solo descontamos si el producto existe y tiene el nodo stock en Firebase
+        if (infoProd && infoProd.idFirebase && infoProd.stock !== undefined && infoProd.stock !== null) {
+            const rutaProducto = ref(db, `${empresaId}/productos/${infoProd.idFirebase}`);
+            update(rutaProducto, {
+                stock: increment(-item.cantidad)
+            });
+        }
+    });
+    // --- FIN BLOQUE DESCUENTO ---
             
             // --- CONSTRUCCIÓN DEL MENSAJE PARA WHATSAPP ---
             let listaProductosTexto = carrito.map(item => {
