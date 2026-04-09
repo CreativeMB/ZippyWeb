@@ -2799,52 +2799,52 @@ window.renderizarCarritoEnForm = () => {
     if (totalElem) totalElem.innerText = formatearPrecio(total);
 };
 
-// 4. CAMBIAR CANTIDADES (+ / -) con Validación de Stock
+// 4. CAMBIAR CANTIDADES (+ / -) con Validación de Stock Real
 window.cambiarCantidadCarrito = (index, valor) => {
     const item = carrito[index];
     
-    // 1. FORZAMOS QUE EL STOCK SEA TRATADO CORRECTAMENTE
-    // Si item.stock es la palabra "null" (string) o undefined, lo tratamos como null real
-    let stockLimite = (item.stock === "null" || item.stock === undefined) ? null : item.stock;
+    // Si queremos sumar (+)
+    if (valor > 0) {
+        // Convertimos a número para asegurar la comparación (evita errores de texto "null")
+        const stockActual = (item.stock === null || item.stock === undefined || item.stock === "null") 
+                            ? Infinity 
+                            : Number(item.stock);
 
-    if (valor > 0) { // Si intenta sumar (+)
-        // 2. SOLO BLOQUEAMOS SI EL STOCK ES UN NÚMERO REAL
-        if (stockLimite !== null) {
-            const limiteNum = parseInt(stockLimite);
-            const cantidadActual = parseInt(item.cantidad);
-
-            if (cantidadActual >= limiteNum) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Límite de stock',
-                    text: `Lo sentimos, solo hay ${limiteNum} disponibles.`,
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2500
-                });
-                return; // Bloqueo absoluto
-            }
+        // VALIDACIÓN CRÍTICA:
+        if (item.cantidad + 1 > stockActual) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Límite de stock',
+                text: `Lo sentimos, solo hay ${stockActual} unidades disponibles de este producto.`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2500
+            });
+            return; // Bloquea el aumento y sale de la función
         }
     }
 
-    // --- LÓGICA DE CAMBIO ---
+    // Si pasó la validación o es resta, procedemos
     item.cantidad += valor;
 
+    // Si llega a cero, eliminamos el producto del carrito
     if (item.cantidad <= 0) {
         carrito.splice(index, 1);
     }
 
-    // 3. PERSISTENCIA (Esto guarda el stock para la siguiente recarga)
+    // Guardamos los cambios en el almacenamiento local
     localStorage.setItem('zippy_cart', JSON.stringify(carrito));
 
+    // Si el carrito se vacía del todo, cerramos el formulario
     if (carrito.length === 0) {
         window.cerrarModal();
     } else {
-        // Refrescamos la interfaz del modal
+        // Refrescamos la lista visual del formulario
         window.renderizarCarritoEnForm();
     }
     
+    // Actualizamos el número rojo del botón flotante
     window.actualizarBadgeCarrito();
 };
 // 5. ACTUALIZAR EL NÚMERO DEL BOTÓN FLOTANTE
