@@ -1474,6 +1474,33 @@ body {
         font-size: 9px;
     }
 }
+
+/* ETIQUETA DE STOCK PERSUASIVA */
+.badge-stock-urgente {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 68, 68, 0.9); /* Rojo vibrante suave */
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 10;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    backdrop-filter: blur(4px); /* Efecto cristal moderno */
+    animation: pulseUrgencia 2s infinite;
+}
+
+@keyframes pulseUrgencia {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
     </style>
 </head>
 
@@ -2641,15 +2668,19 @@ function render() {
                 <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;"><i class="fab fa-whatsapp"></i> Me interesa</button>
             </div>`;
 
-        // 5. ETIQUETA DE STOCK: Solo si queda poco
-        let stockEtiqueta = "";
-        if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.stock <= 5) {
-            stockEtiqueta = `<div class="stock-alerta" style="color: #FF6600; font-size: 0.85em; font-weight: bold; margin-bottom: 5px;">¡Solo quedan ${real.stock}!</div>`;
-        }
+       // --- LÓGICA DE STOCK PERSUASIVA (Dentro del for de render) ---
+let stockEtiqueta = "";
+if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.stock <= 5) {
+    stockEtiqueta = `
+        <div class="badge-stock-urgente">
+            <i class="fas fa-fire-alt"></i> ¡Solo quedan ${real.stock}!
+        </div>`;
+}
 
         card.innerHTML = `
             <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+                 ${stockEtiqueta}
                 <img src="${normalizarImagen(imgUrl)}" 
                      ${estaRealmenteAgotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})"`} 
                      style="${estaRealmenteAgotado ? 'filter: grayscale(100%) brightness(0.7); opacity: 0.7;' : 'cursor: pointer;'}"
