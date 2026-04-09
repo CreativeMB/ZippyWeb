@@ -2801,46 +2801,50 @@ window.renderizarCarritoEnForm = () => {
 
 // 4. CAMBIAR CANTIDADES (+ / -) con Validación de Stock
 window.cambiarCantidadCarrito = (index, valor) => {
-    const producto = carrito[index];
+    const item = carrito[index];
+    
+    // 1. FORZAMOS QUE EL STOCK SEA TRATADO CORRECTAMENTE
+    // Si item.stock es la palabra "null" (string) o undefined, lo tratamos como null real
+    let stockLimite = (item.stock === "null" || item.stock === undefined) ? null : item.stock;
 
-    // Debug: Esto te dirá en consola si el producto realmente tiene el stock guardado
-    console.log(`Validando stock de ${producto.nombre}: actual ${producto.cantidad}, disponible ${producto.stock}`);
+    if (valor > 0) { // Si intenta sumar (+)
+        // 2. SOLO BLOQUEAMOS SI EL STOCK ES UN NÚMERO REAL
+        if (stockLimite !== null) {
+            const limiteNum = parseInt(stockLimite);
+            const cantidadActual = parseInt(item.cantidad);
 
-    if (valor > 0) {
-        // IMPORTANTE: Verificamos si stock NO es null y NO es undefined
-        if (producto.stock !== null && producto.stock !== undefined) {
-            
-            // Si la cantidad actual ya es igual o mayor al stock, bloqueamos
-            if (producto.cantidad >= producto.stock) {
+            if (cantidadActual >= limiteNum) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Límite alcanzado',
-                    text: `Lo sentimos, solo contamos con ${producto.stock} unidades.`,
-                    confirmButtonColor: '#FF6600',
+                    title: 'Límite de stock',
+                    text: `Lo sentimos, solo hay ${limiteNum} disponibles.`,
                     toast: true,
                     position: 'top-end',
                     showConfirmButton: false,
-                    timer: 3000
+                    timer: 2500
                 });
-                return; // Detiene la suma
+                return; // Bloqueo absoluto
             }
         }
     }
 
-    // Si pasó la validación o es restar/ilimitado, procedemos
-    producto.cantidad += valor;
+    // --- LÓGICA DE CAMBIO ---
+    item.cantidad += valor;
 
-    if (producto.cantidad <= 0) {
+    if (item.cantidad <= 0) {
         carrito.splice(index, 1);
     }
 
+    // 3. PERSISTENCIA (Esto guarda el stock para la siguiente recarga)
     localStorage.setItem('zippy_cart', JSON.stringify(carrito));
 
     if (carrito.length === 0) {
         window.cerrarModal();
     } else {
+        // Refrescamos la interfaz del modal
         window.renderizarCarritoEnForm();
     }
+    
     window.actualizarBadgeCarrito();
 };
 // 5. ACTUALIZAR EL NÚMERO DEL BOTÓN FLOTANTE
