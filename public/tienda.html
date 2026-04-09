@@ -2453,8 +2453,12 @@ function render() {
         if (refP === "images") continue;
        
         const claveBusqueda = refP.trim().toLowerCase();
-        const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP };
-        
+    
+        const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP, stock: null };
+        // NUEVA LÓGICA: Un producto está agotado si el switch 'agotado' es true 
+// O si el nodo 'stock' existe y es menor o igual a 0.
+const estaRealmenteAgotado = real.agotado || (real.stock !== null && real.stock !== undefined && real.stock <= 0);
+
         const nombreReal = (real.referenciaReal || refP);
         const nombreParaFiltrar = nombreReal.toLowerCase();
 
@@ -2501,28 +2505,36 @@ function render() {
         const refProd = nombreReal.replace(/'/g, "\\'");
 
         let botonesHtml = real.agotado ? 
-            `<button class="btn" style="background:#888; color:white; width:90%; margin:10px auto;" disabled>Agotado</button>` : 
-            `<div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 10px; width: 100%; box-sizing: border-box;">
-                <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}')" style="flex: 1; background: #E5C453;"><i class="fas fa-cart-plus"></i></button>
-                <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;"><i class="fab fa-whatsapp"></i> Me interesa</button>
-            </div>`;
+           `<button class="btn" style="background:#888; color:white; width:90%; margin:10px auto;" disabled>Agotado</button>` : 
+    `<div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 10px; width: 100%; box-sizing: border-box;">
+        <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})" style="flex: 1; background: #E5C453;">
+            <i class="fas fa-cart-plus"></i>
+        </button>
+        <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;">
+            <i class="fab fa-whatsapp"></i> Me interesa
+        </button>
+    </div>`;
 
         // LÓGICA DE IMAGEN: Filtro gris/negativo si está agotado + quitar clic
         const estiloImagen = real.agotado ? 'filter: grayscale(100%) brightness(0.8); opacity: 0.6; cursor: default;' : 'cursor: pointer;';
         const accionImagen = real.agotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')"`;
-
-        card.innerHTML = `
-            <div class="img-container">
-                ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-                <img src="${normalizarImagen(imgUrl)}" 
-                     ${accionImagen} 
-                     style="${estiloImagen}"
-                     loading="lazy"> 
-            </div>
-            <div class="nombre">${nombreReal}</div>
-            <div class="precio-contenedor">${precioHTML}</div>
-            ${botonesHtml}
-        `;
+// Crea una etiqueta pequeña de stock
+let stockEtiqueta = "";
+if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.stock <= 5) {
+    stockEtiqueta = `<div style="color: #FF6600; font-size: 0.8em; font-weight: bold;">¡Solo quedan ${real.stock}!</div>`;
+}
+      card.innerHTML = `
+    <div class="img-container">
+        ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+        <img src="${normalizarImagen(imgUrl)}" 
+             ${estaRealmenteAgotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})"`} 
+             style="${estaRealmenteAgotado ? 'filter: grayscale(100%) opacity: 0.6;' : 'cursor: pointer;'}"
+             loading="lazy"> 
+    </div>
+    <div class="nombre">${nombreReal}</div>
+    <div class="precio-contenedor">${precioHTML}</div>
+    ${stockEtiqueta} ${botonesHtml}
+`;
 
         contenedor.appendChild(card);
     }
@@ -2637,17 +2649,43 @@ window.renderizarCarritoEnForm = () => {
     if (totalElem) totalElem.innerText = formatearPrecio(total);
 };
 
-// 4. CAMBIAR CANTIDADES (+ / -)
+// 4. CAMBIAR CANTIDADES (+ / -) con Validación de Stock
 window.cambiarCantidadCarrito = (index, valor) => {
-    carrito[index].cantidad += valor;
-    
+    const producto = carrito[index];
+
+    // --- VALIDACIÓN DE STOCK AL SUMAR ---
+    if (valor > 0) { // Solo validamos si el usuario intenta aumentar (+)
+        // Si el stock existe (no es nulo ni undefined), validamos el límite
+        if (producto.stock !== null && producto.stock !== undefined) {
+            if (producto.cantidad + 1 > producto.stock) {
+                // Si intenta sumar más de lo que hay, lanzamos aviso y frenamos
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Límite alcanzado',
+                    text: `Lo sentimos, solo contamos con ${producto.stock} unidades de este producto.`,
+                    confirmButtonColor: '#FF6600',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+                return; // Bloquea la ejecución aquí mismo
+            }
+        }
+        // Si es stock es nulo (ilimitado), el código sigue normal
+    }
+
+    // --- LÓGICA NORMAL DE CAMBIO ---
+    producto.cantidad += valor;
+
     // Si la cantidad es 0, lo quitamos del array
-    if (carrito[index].cantidad <= 0) {
+    if (producto.cantidad <= 0) {
         carrito.splice(index, 1);
     }
-    // 💾 3. PERSISTENCIA: Guardamos el estado actual del carrito
-    // Esto asegura que si el usuario refresca, los cambios se mantengan.
+
+    // 💾 PERSISTENCIA
     localStorage.setItem('zippy_cart', JSON.stringify(carrito));
+
     // Si ya no hay productos, cerramos y volvemos a la tienda
     if (carrito.length === 0) {
         window.cerrarModal();
