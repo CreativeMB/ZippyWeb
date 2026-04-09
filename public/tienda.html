@@ -2619,7 +2619,7 @@ function render() {
                             <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
                             <div class="precioViejo-container">
                                 <span class="precioViejo">${formatearPrecio(real.valor)}</span>
-                                <span class="badge-ahorro-premium">-${porcentaje}%</span>
+                                <span class="badge-ahorro-premium">¡Ahorras ${porcentaje}%!</span>
                             </div>
                          </div>`;
         } else {
@@ -2803,49 +2803,46 @@ window.renderizarCarritoEnForm = () => {
 window.cambiarCantidadCarrito = (index, valor) => {
     const producto = carrito[index];
 
-    // --- VALIDACIÓN DE STOCK AL SUMAR ---
-    if (valor > 0) { // Solo validamos si el usuario intenta aumentar (+)
-        // Si el stock existe (no es nulo ni undefined), validamos el límite
+    // Debug: Esto te dirá en consola si el producto realmente tiene el stock guardado
+    console.log(`Validando stock de ${producto.nombre}: actual ${producto.cantidad}, disponible ${producto.stock}`);
+
+    if (valor > 0) {
+        // IMPORTANTE: Verificamos si stock NO es null y NO es undefined
         if (producto.stock !== null && producto.stock !== undefined) {
-            if (producto.cantidad + 1 > producto.stock) {
-                // Si intenta sumar más de lo que hay, lanzamos aviso y frenamos
+            
+            // Si la cantidad actual ya es igual o mayor al stock, bloqueamos
+            if (producto.cantidad >= producto.stock) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Límite alcanzado',
-                    text: `Lo sentimos, solo contamos con ${producto.stock} unidades de este producto.`,
+                    text: `Lo sentimos, solo contamos con ${producto.stock} unidades.`,
                     confirmButtonColor: '#FF6600',
                     toast: true,
                     position: 'top-end',
                     showConfirmButton: false,
                     timer: 3000
                 });
-                return; // Bloquea la ejecución aquí mismo
+                return; // Detiene la suma
             }
         }
-        // Si es stock es nulo (ilimitado), el código sigue normal
     }
 
-    // --- LÓGICA NORMAL DE CAMBIO ---
+    // Si pasó la validación o es restar/ilimitado, procedemos
     producto.cantidad += valor;
 
-    // Si la cantidad es 0, lo quitamos del array
     if (producto.cantidad <= 0) {
         carrito.splice(index, 1);
     }
 
-    // 💾 PERSISTENCIA
     localStorage.setItem('zippy_cart', JSON.stringify(carrito));
 
-    // Si ya no hay productos, cerramos y volvemos a la tienda
     if (carrito.length === 0) {
         window.cerrarModal();
     } else {
         window.renderizarCarritoEnForm();
     }
-    
     window.actualizarBadgeCarrito();
 };
-
 // 5. ACTUALIZAR EL NÚMERO DEL BOTÓN FLOTANTE
 window.actualizarBadgeCarrito = () => {
     const totalItems = carrito.reduce((acc, item) => acc + item.cantidad, 0);
