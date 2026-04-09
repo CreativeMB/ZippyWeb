@@ -2396,7 +2396,7 @@ function renderizarPromoBanner() {
     clearInterval(promoTimer);
     promoTimer = setInterval(cambiarCiclo, 6000); // Cambia cada 6 segundos (tiempo suficiente para ver)
 }
-
+/*
 function render() {
     if (bloqueoActivo) return;
     const contenedor = document.getElementById("productos");
@@ -2541,7 +2541,133 @@ if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.st
 
     const ld = document.getElementById("loader");
     if (ld) { ld.style.display = "none"; }
+}*/
+
+function render() {
+    if (bloqueoActivo) return;
+    const contenedor = document.getElementById("productos");
+    if (!contenedor) return;
+    
+    contenedor.innerHTML = "";
+    const productosDibujados = new Set();
+    
+    const inputBusqueda = document.getElementById('contenedorBusqueda');
+    const textoBusqueda = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : "";
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // --- BLOQUE CATEGORÍA URL ---
+    if (!urlCategoriaProcesada) {
+        const catURL = urlParams.get('categoria');
+        if (catURL) {
+            const todasLasCats = obtenerCategoriasUnicas();
+            if (todasLasCats.length > 0) {
+                const buscado = decodeURIComponent(catURL).toLowerCase().trim();
+                const match = todasLasCats.find(c => c.toLowerCase().trim() === buscado);
+                if (match) {
+                    categoriaSeleccionada = match;
+                }
+                urlCategoriaProcesada = true;
+            }
+        } else {
+            urlCategoriaProcesada = true;
+        }
+    }
+
+    // --- BANNER Y MENÚ ---
+    const bannerContainer = document.getElementById("promo-banner-container");
+    if (textoBusqueda === "" && (!categoriaSeleccionada || categoriaSeleccionada === "Todas")) {
+        renderizarPromoBanner(); 
+    } else if (bannerContainer) {
+        bannerContainer.style.display = "none"; 
+    }
+
+    renderizarMenuCategorias();
+
+    // --- BUCLE PRINCIPAL ---
+    for (const refP in productosJson) {
+        if (refP === "images") continue;
+       
+        const claveBusqueda = refP.trim().toLowerCase();
+        // 1. IMPORTANTE: Aseguramos que stock venga del realtime
+        const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP, stock: null };
+        
+        // 2. Lógica de Agotado mejorada
+        const estaRealmenteAgotado = real.agotado || (real.stock !== null && real.stock !== undefined && real.stock <= 0);
+
+        const nombreReal = (real.referenciaReal || refP);
+        const nombreParaFiltrar = nombreReal.toLowerCase();
+
+        if (productosDibujados.has(nombreParaFiltrar)) continue;
+
+        // Filtros (Categoría y Buscador)
+        if (categoriaSeleccionada && categoriaSeleccionada !== "Todas") {
+            const categoriasProducto = (real.categoria || "").split(",").map(c => c.trim().toLowerCase());
+            if (!categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) continue;
+        }
+        if (textoBusqueda !== "" && !nombreParaFiltrar.includes(textoBusqueda)) continue;
+
+        productosDibujados.add(nombreParaFiltrar);
+
+        const imgUrl = productosJson[refP];
+        let precioFinal = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
+        
+        // Renderizado de Precio HTML (Se mantiene igual)
+        let precioHTML = "";
+        if (real.promocion && real.valorPromocion > 0) {
+            const porcentaje = Math.round(100 - (real.valorPromocion * 100 / real.valor));
+            precioHTML = `<div class="precio-contenedor-premium">
+                            <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
+                            <div class="precioViejo-container">
+                                <span class="precioViejo">${formatearPrecio(real.valor)}</span>
+                                <span class="badge-ahorro-premium">-${porcentaje}%</span>
+                            </div>
+                         </div>`;
+        } else {
+            precioHTML = `<div class="precio">${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}</div>`;
+        }
+
+        const card = document.createElement("div");
+        // 3. CLASE CSS: Usamos 'estaRealmenteAgotado' para aplicar el estilo visual
+        card.className = `producto ${estaRealmenteAgotado ? 'agotado' : ''} visible`;
+
+        const descProd = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
+        const refProd = nombreReal.replace(/'/g, "\\'");
+
+        // 4. BOTONES: Usamos el stock real para el carrito
+        let botonesHtml = estaRealmenteAgotado ? 
+            `<button class="btn" style="background:#888; color:white; width:90%; margin:10px auto;" disabled>Agotado</button>` : 
+            `<div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 10px; width: 100%; box-sizing: border-box;">
+                <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})" style="flex: 1; background: #E5C453;"><i class="fas fa-cart-plus"></i></button>
+                <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;"><i class="fab fa-whatsapp"></i> Me interesa</button>
+            </div>`;
+
+        // 5. ETIQUETA DE STOCK: Solo si queda poco
+        let stockEtiqueta = "";
+        if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.stock <= 5) {
+            stockEtiqueta = `<div class="stock-alerta" style="color: #FF6600; font-size: 0.85em; font-weight: bold; margin-bottom: 5px;">¡Solo quedan ${real.stock}!</div>`;
+        }
+
+        card.innerHTML = `
+            <div class="img-container">
+                ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+                <img src="${normalizarImagen(imgUrl)}" 
+                     ${estaRealmenteAgotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})"`} 
+                     style="${estaRealmenteAgotado ? 'filter: grayscale(100%) brightness(0.7); opacity: 0.7;' : 'cursor: pointer;'}"
+                     loading="lazy"> 
+            </div>
+            <div class="nombre">${nombreReal}</div>
+            <div class="precio-contenedor">${precioHTML}</div>
+            ${stockEtiqueta} 
+            ${botonesHtml}
+        `;
+
+        contenedor.appendChild(card);
+    }
+
+    const ld = document.getElementById("loader");
+    if (ld) { ld.style.display = "none"; }
 }
+
 window.render = render;
 
 // 1. WHATSAPP DIRECTO (Botón Verde de la tarjeta)
@@ -2564,36 +2690,60 @@ window.whatsappDirecto = (nombre, precio, descripcion) => {
     window.open(url, '_blank');
 };
 
-// =========================================
-// LÓGICA ÚNICA DEL CARRITO (SIN REPETICIONES)
-// =========================================
-// 1. AGREGAR AL CARRITO (Botón Dorado)
-window.agregarAlCarrito = (nombre, imagen, precio, descripcion) => {
+// 1. AGREGAR AL CARRITO (Botón Dorado) con Validación de Stock
+window.agregarAlCarrito = (nombre, imagen, precio, descripcion, stock) => {
     const precioNum = typeof precio === 'string' 
         ? parseFloat(precio.replace(/[^0-9.-]+/g,"")) 
         : precio;
 
+    // Buscamos si el producto ya está en el carrito
     const existe = carrito.find(item => item.nombre === nombre);
     
+    // --- LÓGICA DE VALIDACIÓN DE STOCK ---
+    // Si el stock no es null/undefined (es limitado)
+    if (stock !== null && stock !== undefined) {
+        const cantidadEnCarrito = existe ? existe.cantidad : 0;
+        
+        if (cantidadEnCarrito + 1 > stock) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Límite alcanzado',
+                text: `Lo sentimos, solo contamos con ${stock} unidades de este producto.`,
+                confirmButtonColor: '#FF6600',
+                toast: true,
+                position: 'bottom-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            return; // Bloquea la agregación
+        }
+    }
+
     if (existe) {
         existe.cantidad++;
     } else {
-        // AGREGAMOS "descripcion" al objeto que se guarda en el array
+        // AGREGAMOS "stock" al objeto para que cambiarCantidadCarrito() también pueda validar
         carrito.push({ 
             nombre, 
             imagen, 
             precio: precioNum, 
             cantidad: 1, 
-            descripcion: descripcion // <-- MUY IMPORTANTE
+            descripcion: descripcion,
+            stock: stock // <-- GUARDAMOS EL STOCK AQUÍ
         });
     }
-    // 💾 PERSISTENCIA: Guardamos el estado actual del carrito en el navegador
+
+    // 💾 PERSISTENCIA
     localStorage.setItem('zippy_cart', JSON.stringify(carrito));
     window.actualizarBadgeCarrito();
     
     Swal.fire({
-        toast: true, position: 'bottom-end', icon: 'success',
-        title: 'Añadido al carrito', showConfirmButton: false, timer: 1500
+        toast: true, 
+        position: 'bottom-end', 
+        icon: 'success',
+        title: 'Añadido al carrito', 
+        showConfirmButton: false, 
+        timer: 1500
     });
 };
 
