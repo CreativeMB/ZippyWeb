@@ -2260,7 +2260,7 @@ function configurarRedesNav(perfil) {
         if (snapshot.exists()) {
             snapshot.forEach((child) => {
                 const p = child.val();
-                const refOriginal = p.referencia || p.Referencia || p.nombre || "";
+                const refOriginal = p.nombre || p.Referencia || p.nombre || "";
 
                 if (refOriginal) {
                     const claveLimpia = String(refOriginal).trim().toLowerCase();
