@@ -1724,12 +1724,12 @@ body {
         </div>
     </div>
 
-    <div class="aviso-privacidad" style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 10px 0; background: transparent; border: none; padding: 0;">
-        <input type="checkbox" id="esRegalo" onchange="toggleRegalo()" style="width: 16px; height: 16px; cursor: pointer; margin: 0;">
-        <label for="esRegalo" style="cursor: pointer; margin: 0; font-size: inherit; color: inherit;">
-            ¿Es para un regalo?
-        </label>
-    </div>
+  <div class="aviso-privacidad" style="display: flex; align-items: center; justify-content: flex-start; gap: 8px; cursor: pointer; margin: 10px 0; background: transparent; border: none; padding: 0; text-align: left; white-space: nowrap;">
+    <input type="checkbox" id="esRegalo" onchange="toggleRegalo()" style="width: 16px; height: 16px; cursor: pointer; margin: 0; flex-shrink: 0;">
+    <label for="esRegalo" style="cursor: pointer; margin: 0; font-size: inherit; color: inherit; display: inline-block;">
+        ¿Este pedido es para regalo? (Obligatorio)
+    </label>
+</div>
 
     <button id="enviarPedidoBtn" onclick="enviarPedido()">Enviar pedido</button>
 </div>
