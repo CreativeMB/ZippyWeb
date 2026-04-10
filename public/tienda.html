@@ -3050,25 +3050,23 @@ window.renderizarCarritoEnForm = () => {
     // --- NUEVO: Cargar los complementos (Adicionales) ---
     renderizarAdicionales();
 };
-/**
- * Renderiza el banner horizontal de productos complementarios
- * en el formulario de pedido.
- */
-function renderizarAdicionales() {
+
+// Definición de la función dentro del objeto global window
+window.renderizarAdicionales = () => {
     const carrusel = document.getElementById("carrusel-adicionales");
     const seccion = document.getElementById("seccion-adicionales");
 
     // 1. Verificaciones de seguridad
     if (!carrusel || !seccion) return;
     
-    // Si los productos aún no cargan, intentamos de nuevo en 300ms
+    // Si los productos aún no cargan en el objeto global, reintentamos
     if (!window.productosRealtime || Object.keys(window.productosRealtime).length === 0) {
-        setTimeout(renderizarAdicionales, 300);
+        setTimeout(window.renderizarAdicionales, 300);
         return;
     }
 
     // 2. Filtrar productos de la categoría "adicional"
-    // Normalizamos para evitar errores por tildes, mayúsculas o espacios
+    // Normalizamos para evitar fallos por tildes o mayúsculas
     const adicionales = Object.values(window.productosRealtime).filter(p => {
         if (!p.categoria) return false;
         const catLimpia = p.categoria.toLowerCase()
@@ -3085,16 +3083,15 @@ function renderizarAdicionales() {
 
     // 4. Dibujar los productos
     seccion.style.display = "block";
-    carrusel.innerHTML = ""; // Limpiar contenido previo
+    carrusel.innerHTML = ""; // Limpiar contenido previo para evitar duplicados
 
     adicionales.forEach(prod => {
-        // Crear el contenedor de la tarjeta
         const item = document.createElement("div");
-        item.className = "card-adicional-item"; // Usa la clase CSS que definimos
+        item.className = "card-adicional-item"; // Clase CSS obligatoria
 
-        // Evento al tocar: Agrega al carrito y refresca la lista de arriba
+        // Acción al tocar el producto
         item.onclick = () => {
-            // Usamos la función global de tu app
+            // Agregamos al carrito usando la función global
             window.agregarAlCarrito(
                 prod.nombre, 
                 prod.imagen, 
@@ -3103,24 +3100,26 @@ function renderizarAdicionales() {
                 prod.stock
             );
             
-            // Refrescamos el formulario para que el usuario vea el cambio
+            // Refrescamos la lista superior del formulario automáticamente
             window.renderizarCarritoEnForm();
 
-            // Feedback visual opcional con SweetAlert Toast
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 1500,
-                timerProgressBar: true
-            });
-            Toast.fire({
-                icon: 'success',
-                title: `¡${prod.nombre} agregado!`
-            });
+            // Notificación visual rápida
+            if (typeof Swal !== 'undefined') {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: `¡${prod.nombre} agregado!`
+                });
+            }
         };
 
-        // Contenido de la tarjeta
+        // Renderizado del HTML interno de la card
         item.innerHTML = `
             <img src="${window.normalizarImagen ? window.normalizarImagen(prod.imagen) : prod.imagen}" 
                  alt="${prod.nombre}" 
@@ -3138,7 +3137,7 @@ function renderizarAdicionales() {
 
         carrusel.appendChild(item);
     });
-}
+};
 // 4. CAMBIAR CANTIDADES (+ / -) con Validación de Stock Real
 window.cambiarCantidadCarrito = (index, valor) => {
     const item = carrito[index];
