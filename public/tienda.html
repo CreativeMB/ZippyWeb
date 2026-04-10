@@ -3194,29 +3194,37 @@ if (!idDomiciliarioAsignado) {
     return;
 }
 
-    // 2. CAPTURA Y VALIDACIÓN DE CAMPOS OBLIGATORIOS
+   // 1. Verificar si es un regalo
+    const esRegalo = document.getElementById("esRegalo").checked;
+
+    // 2. CAPTURA DE CAMPOS
     const campos = {
         cliente: document.getElementById("celularComprador").value.trim(),
         direccion: document.getElementById("direccionEntrega").value.trim(),
         nombreComprador: document.getElementById("nombreComprador").value.trim(),
         fechaOriginal: document.getElementById("fechaEntrega").value,
-        nombreDestinatario: document.getElementById("nombreDestinatario").value.trim(),
-        celularDestinatario: document.getElementById("celularDestinatario").value.trim(),
         medioPago: document.getElementById("medioPago").value,
         horaEntrega: document.getElementById("horaEntrega").value,
-        notasPedido: document.getElementById("notasPedido").value.trim(),
-        mensajeTarjeta: document.getElementById("mensajeTarjeta").value.trim(),
-        deTarjeta: document.getElementById("deTarjeta").value.trim(),
-        paraTarjeta: document.getElementById("paraTarjeta").value.trim()
+        notasPedido: document.getElementById("notasPedido").value.trim()
     };
 
+    // 3. AGREGAR CAMPOS DE REGALO SOLO SI EL CHECK ESTÁ ACTIVO
+    if (esRegalo) {
+        campos.nombreDestinatario = document.getElementById("nombreDestinatario").value.trim();
+        campos.celularDestinatario = document.getElementById("celularDestinatario").value.trim();
+        campos.mensajeTarjeta = document.getElementById("mensajeTarjeta").value.trim();
+        campos.deTarjeta = document.getElementById("deTarjeta").value.trim();
+        campos.paraTarjeta = document.getElementById("paraTarjeta").value.trim();
+    }
+
+    // 4. FILTRAR CAMPOS VACÍOS
     const camposVacios = Object.keys(campos).filter(key => !campos[key]);
 
     if (camposVacios.length > 0) {
         Swal.fire({
             icon: 'warning',
             title: 'Campos Incompletos',
-            text: 'Por favor, rellena todos los datos de envío, fecha, hora y tarjeta para continuar. Solo el campo "Adicionales" es opcional.',
+            text: 'Por favor, rellena los datos obligatorios para continuar.',
             confirmButtonText: 'Revisar Formulario',
             confirmButtonColor: '#FF6600',
             target: 'body', 
