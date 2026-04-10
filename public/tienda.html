@@ -1510,6 +1510,10 @@ body {
     background: #e1efff;
     transform: scale(1.01);
 }
+/* Barner adicional en el formulario */
+#carrusel-adicionales::-webkit-scrollbar {
+        display: none;
+    }
     </style>
 </head>
 
@@ -1615,6 +1619,18 @@ body {
         <div class="total-pago-box" style="background: #fdfdfd; border: 1px solid #eee; padding: 10px; border-radius: 6px; text-align: right; font-weight: bold; margin-bottom: 15px;">
             Total a Pagar Sin Domicilio: <span id="total-pedido-suma" style="font-size: 18px; color: #27ae60;">$0</span>
         </div>
+
+      <div id="seccion-adicionales" style="display:none; margin: 15px 0;">
+    <p style="margin: 0 0 8px 10px; font-size: 12px; font-weight: bold; color: #666;">✨ Complementa tu pedido:</p>
+    <div id="carrusel-adicionales" style="
+        display: flex; 
+        gap: 10px; 
+        overflow-x: auto; 
+        padding: 5px 10px 15px 10px; 
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    "></div>
+</div>
 
         <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-left: 3px solid #e5c453; padding: 8px 12px; border-radius: 6px; margin-bottom: 10px;">
     <div style="display: flex; align-items: center; gap: 8px;">
@@ -2968,7 +2984,58 @@ window.renderizarCarritoEnForm = () => {
     
     const totalElem = document.getElementById("total-pedido-suma");
     if (totalElem) totalElem.innerText = formatearPrecio(total);
+    // --- NUEVO: Cargar los complementos (Adicionales) ---
+    renderizarAdicionales();
 };
+// FUNCIÓN PARA EL CARRETE DE ADICIONALES
+function renderizarAdicionales() {
+    const carrusel = document.getElementById("carrusel-adicionales");
+    const seccion = document.getElementById("seccion-adicionales");
+    if (!carrusel || !productosRealtime) return;
+
+    // Filtramos productos de la categoría "adicional"
+    const adicionales = Object.values(productosRealtime).filter(p => 
+        p.categoria && p.categoria.toLowerCase().trim() === "adicional"
+    );
+
+    if (adicionales.length === 0) {
+        seccion.style.display = "none";
+        return;
+    }
+
+    seccion.style.display = "block";
+    carrusel.innerHTML = ""; 
+
+    adicionales.forEach(prod => {
+        const item = document.createElement("div");
+        item.style = `
+            min-width: 100px; 
+            max-width: 100px; 
+            background: #fff; 
+            border: 1px solid #f0f0f0; 
+            border-radius: 10px; 
+            padding: 8px; 
+            text-align: center; 
+            flex-shrink: 0; 
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        `;
+        // Al tocar, se agrega y se refresca el formulario
+        item.onclick = () => {
+            window.agregarAlCarrito(prod.nombre, prod.imagen, prod.precio, prod.descripcion, prod.stock);
+            window.renderizarCarritoEnForm(); // Refrescar para ver el nuevo item arriba
+        };
+
+        item.innerHTML = `
+            <img src="${normalizarImagen(prod.imagen)}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-bottom: 5px;">
+            <div style="font-size: 10px; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${prod.nombre}</div>
+            <div style="font-size: 11px; color: #27ae60; font-weight: bold;">${formatearPrecio(prod.precio)}</div>
+            <div style="font-size: 9px; color: #aaa; margin-top:3px;">+ Agregar</div>
+        `;
+        carrusel.appendChild(item);
+    });
+}
+
 
 // 4. CAMBIAR CANTIDADES (+ / -) con Validación de Stock Real
 window.cambiarCantidadCarrito = (index, valor) => {
@@ -3771,7 +3838,49 @@ window.addEventListener("scroll", (e) => {
     }
 }, true); // El 'true' es para capturar el evento correctamente
 
+function cargarProductosAdicionales() {
+    const contenedor = document.getElementById("contenedor-categoria-adicional");
+    if (!contenedor) return;
 
+    // Limpiamos por si acaso
+    contenedor.innerHTML = "";
+
+    // Filtramos los productos que tengan la categoría "adicional"
+    // Asumimos que productosRealtime es un objeto donde están tus productos cargados
+    const adicionales = Object.values(productosRealtime).filter(p => 
+        p.categoria && p.categoria.toLowerCase().includes("adicional")
+    );
+
+    if (adicionales.length === 0) return; // Si no hay, no carga nada como pediste
+
+    // Título de la sección
+    let html = `<div style="margin-bottom: 10px; font-size: 13px; font-weight: bold; color: #555;">¿Deseas agregar algo más?</div>`;
+    
+    html += `<div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px;">`;
+
+    adicionales.forEach(prod => {
+        html += `
+            <div onclick="agregarAlCarritoDesdeAdicional('${prod.nombre}')" style="
+                min-width: 120px; 
+                background: white; 
+                border: 1px solid #eee; 
+                border-radius: 8px; 
+                padding: 8px; 
+                text-align: center; 
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            ">
+                <img src="${prod.imagen}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-bottom: 5px;">
+                <div style="font-size: 11px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${prod.nombre}</div>
+                <div style="font-size: 12px; color: #27ae60;">$${prod.precio.toLocaleString()}</div>
+                <button style="margin-top: 5px; background: #27ae60; color: white; border: none; border-radius: 4px; font-size: 10px; padding: 2px 8px; cursor: pointer;">+ Agregar</button>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    contenedor.innerHTML = html;
+}
 
 </script>
 </body>
