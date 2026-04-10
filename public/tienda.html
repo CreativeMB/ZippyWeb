@@ -3204,7 +3204,7 @@ function enviarPedido() {
         paraTarjeta: ""
     };
 
-    // --- CRÍTICO: VALIDACIÓN SI ES REGALO ---
+   // --- CRÍTICO: VALIDACIÓN SI ES REGALO ---
     if (esRegalo) {
         datosRegalo.nombreDestinatario = document.getElementById("nombreDestinatario").value.trim();
         datosRegalo.celularDestinatario = document.getElementById("celularDestinatario").value.trim();
@@ -3212,12 +3212,18 @@ function enviarPedido() {
         datosRegalo.deTarjeta = document.getElementById("deTarjeta").value.trim();
         datosRegalo.paraTarjeta = document.getElementById("paraTarjeta").value.trim();
 
-        // Si el check está activo, estos dos son OBLIGATORIOS
-        if (!datosRegalo.nombreDestinatario || !datosRegalo.celularDestinatario) {
+        // VALIDACIÓN: Ahora incluimos todos los campos de la tarjeta
+        if (
+            !datosRegalo.nombreDestinatario || 
+            !datosRegalo.celularDestinatario || 
+            !datosRegalo.mensajeTarjeta || 
+            !datosRegalo.deTarjeta || 
+            !datosRegalo.paraTarjeta
+        ) {
             Swal.fire({
                 icon: 'warning',
-                title: 'Datos del Destinatario',
-                text: 'Has marcado que es para un regalo. Por favor ingresa el NOMBRE y CELULAR de quien recibe.',
+                title: 'Datos de Regalo Incompletos',
+                text: 'Has marcado que es para un regalo. Por favor completa el NOMBRE, CELULAR y todos los datos de la TARJETA (Mensaje, De y Para).',
                 confirmButtonColor: '#FF6600'
             });
             return; // Detiene el envío
