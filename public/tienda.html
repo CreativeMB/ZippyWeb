@@ -1615,7 +1615,7 @@ body {
         </p>
     </div>
 </div>
-           
+          <!-- 
             <div class="formulario">
                 <div class="aviso-privacidad">
                     <span class="icono-check">✓</span> Pedido sujeto a validación previa de disponibilidad y pago.
@@ -1665,7 +1665,72 @@ body {
                 <button id="enviarPedidoBtn" onclick="enviarPedido()">Enviar pedido</button>
             </div>
         </div>
+    </div>-->
+
+<div class="formulario">
+    <div class="aviso-privacidad">
+        <span class="icono-check">✓</span> Pedido sujeto a validación previa de disponibilidad y pago.
     </div>
+
+    <div class="fila2">
+        <input id="productoAdicional" placeholder="Productos Adicionales (opcional)">
+        <select id="medioPago">
+            <option value="">Medio de pago</option>
+            <option>Bre-Be</option>
+            <option>Nequi</option>
+            <option>Bancolombia</option>
+            <option>Daviplata</option>
+            <option>Efectivo</option>
+        </select>
+    </div>
+
+    <div class="fila2">
+        <input id="nombreComprador" placeholder="Nombre comprador">
+        <input id="celularComprador" placeholder="Celular comprador">
+    </div>
+
+    <div style="margin: 15px 0; display: flex; align-items: center; gap: 10px;">
+        <input type="checkbox" id="esRegalo" onchange="toggleRegalo()">
+        <label for="esRegalo"><strong>¿Es para un regalo?</strong></label>
+    </div>
+
+    <div id="seccionDireccion">
+        <input id="direccionEntrega" placeholder="Direccion de entrega Exacta, Calle 140a#132-21">
+        <input id="notasPedido" placeholder="Casa primer piso, torre 5 Apartamen 201, Conjunto">
+    </div>
+
+    <div id="formularioRegalo" style="display: none; border-top: 1px solid #ddd; padding-top: 10px;">
+        <div class="separador-tarjeta"><strong>Datos del Destinatario</strong></div>
+        <div class="fila2">
+            <input id="nombreDestinatario" placeholder="Nombre destinatario">
+            <input id="celularDestinatario" placeholder="Celular destinatario">
+        </div>
+
+        <div class="separador-tarjeta"><strong>Tarjeta para el Regalo</strong></div>
+        <textarea id="mensajeTarjeta" placeholder="Mensaje tarjeta"></textarea>
+        <div class="fila2">
+            <input id="deTarjeta" placeholder="De">
+            <input id="paraTarjeta" placeholder="Para">
+        </div>
+    </div>
+
+    <div class="separador-entrega"><strong>Fecha y Hora de entrega</strong></div>
+    <div class="fila2">
+        <input type="date" id="fechaEntrega">
+        <select id="horaEntrega">
+            <option>8AM-10AM</option>
+            <option>10AM-12PM</option>
+            <option>12PM-2PM</option>
+            <option>2PM-4PM</option>
+            <option>4PM-6PM</option>
+            <option>6PM-8PM</option>
+            <option>8PM-10PM</option>
+        </select>
+    </div>
+
+    <button id="enviarPedidoBtn" onclick="enviarPedido()">Enviar pedido</button>
+</div>
+
 
 <div id="empresa-tab" class="tab-content" style="display: none; padding: 20px;">
    <div class="empresa-full">
@@ -1770,6 +1835,25 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     let carrito = [];
     let procesadoExitoso = false;
     let urlCategoriaProcesada = false;
+
+function toggleRegalo() {
+    const checkRegalo = document.getElementById('esRegalo');
+    const areaRegalo = document.getElementById('formularioRegalo');
+    const areaDireccion = document.getElementById('seccionDireccion');
+
+    if (checkRegalo.checked) {
+        // Mostrar sección de regalo con efecto simple
+        areaRegalo.style.display = 'block';
+        // Mover la dirección al final de la sección de regalo (antes de los datos de tarjeta)
+        areaRegalo.prepend(areaDireccion);
+    } else {
+        // Esconder sección de regalo
+        areaRegalo.style.display = 'none';
+        // Regresar la dirección a su posición original (antes del checkbox o área de regalo)
+        checkRegalo.parentElement.after(areaDireccion);
+    }
+}
+
 
 // Al cargar la página, recuperamos lo que haya en el almacenamiento
 document.addEventListener('DOMContentLoaded', () => {
