@@ -1514,6 +1514,75 @@ body {
 #carrusel-adicionales::-webkit-scrollbar {
         display: none;
     }
+    /* Contenedor principal del Banner */
+#seccion-adicionales {
+    background: #ffffff; /* Fondo blanco para resaltar */
+    border-radius: 12px;
+    margin: 15px 0;
+    padding: 10px 0;
+    border: 1px solid #f0f0f0;
+}
+
+/* Título del Banner */
+#seccion-adicionales p {
+    margin: 0 0 10px 15px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #444;
+    letter-spacing: 0.3px;
+}
+
+/* El carril donde deslizan los productos */
+#carrusel-adicionales {
+    display: flex;
+    flex-wrap: nowrap; /* Obliga a que se mantengan en una sola línea */
+    gap: 12px;
+    overflow-x: auto; /* Habilita el deslizamiento horizontal */
+    padding: 5px 15px 15px 15px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; /* Scroll ultra suave en iPhone */
+}
+
+/* Ocultar la barra de scroll para que se vea premium */
+#carrusel-adicionales::-webkit-scrollbar {
+    display: none;
+}
+#carrusel-adicionales {
+    -ms-overflow-style: none;  /* IE y Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Estilo de cada tarjeta de producto */
+.card-adicional-item {
+    min-width: 105px;
+    max-width: 105px;
+    background: #fff;
+    border: 1px solid #ebebeb;
+    border-radius: 12px;
+    padding: 10px 5px;
+    text-align: center;
+    flex-shrink: 0; /* Evita que las tarjetas se encojan */
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.03);
+    transition: all 0.2s ease;
+}
+
+/* Efecto al tocar o hacer clic */
+.card-adicional-item:active {
+    transform: scale(0.95);
+    background-color: #fcfcfc;
+    border-color: #e5c453; /* Color de tu marca */
+}
+
+/* Imagen dentro de la tarjeta */
+.card-adicional-item img {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    background: #f9f9f9;
+}
     </style>
 </head>
 
@@ -1620,16 +1689,10 @@ body {
             Total a Pagar Sin Domicilio: <span id="total-pedido-suma" style="font-size: 18px; color: #27ae60;">$0</span>
         </div>
 
-      <div id="seccion-adicionales" style="display:none; margin: 15px 0;">
-    <p style="margin: 0 0 8px 10px; font-size: 12px; font-weight: bold; color: #666;">✨ Complementa tu pedido:</p>
-    <div id="carrusel-adicionales" style="
-        display: flex; 
-        gap: 10px; 
-        overflow-x: auto; 
-        padding: 5px 10px 15px 10px; 
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-    "></div>
+    <div id="seccion-adicionales" style="display:none; width: 100%; overflow: hidden; background: #f9f9f9; padding: 10px 0; border-radius: 8px;">
+    <p style="margin: 0 0 8px 10px; font-size: 12px; font-weight: bold; color: #444;">🚀 ¡Completa tu pedido!</p>
+    <div id="carrusel-adicionales" style="display: flex; overflow-x: auto; padding: 5px 10px; gap: 10px; -webkit-overflow-scrolling: touch;">
+        </div>
 </div>
 
         <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-left: 3px solid #e5c453; padding: 8px 12px; border-radius: 6px; margin-bottom: 10px;">
@@ -2987,56 +3050,95 @@ window.renderizarCarritoEnForm = () => {
     // --- NUEVO: Cargar los complementos (Adicionales) ---
     renderizarAdicionales();
 };
-// FUNCIÓN PARA EL CARRETE DE ADICIONALES
+/**
+ * Renderiza el banner horizontal de productos complementarios
+ * en el formulario de pedido.
+ */
 function renderizarAdicionales() {
     const carrusel = document.getElementById("carrusel-adicionales");
     const seccion = document.getElementById("seccion-adicionales");
-    if (!carrusel || !productosRealtime) return;
 
-    // Filtramos productos de la categoría "adicional"
-    const adicionales = Object.values(productosRealtime).filter(p => 
-        p.categoria && p.categoria.toLowerCase().trim() === "adicional"
-    );
+    // 1. Verificaciones de seguridad
+    if (!carrusel || !seccion) return;
+    
+    // Si los productos aún no cargan, intentamos de nuevo en 300ms
+    if (!window.productosRealtime || Object.keys(window.productosRealtime).length === 0) {
+        setTimeout(renderizarAdicionales, 300);
+        return;
+    }
 
+    // 2. Filtrar productos de la categoría "adicional"
+    // Normalizamos para evitar errores por tildes, mayúsculas o espacios
+    const adicionales = Object.values(window.productosRealtime).filter(p => {
+        if (!p.categoria) return false;
+        const catLimpia = p.categoria.toLowerCase()
+                            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                            .trim();
+        return catLimpia === "adicional" || catLimpia === "adicionales";
+    });
+
+    // 3. Control de visibilidad
     if (adicionales.length === 0) {
         seccion.style.display = "none";
         return;
     }
 
+    // 4. Dibujar los productos
     seccion.style.display = "block";
-    carrusel.innerHTML = ""; 
+    carrusel.innerHTML = ""; // Limpiar contenido previo
 
     adicionales.forEach(prod => {
+        // Crear el contenedor de la tarjeta
         const item = document.createElement("div");
-        item.style = `
-            min-width: 100px; 
-            max-width: 100px; 
-            background: #fff; 
-            border: 1px solid #f0f0f0; 
-            border-radius: 10px; 
-            padding: 8px; 
-            text-align: center; 
-            flex-shrink: 0; 
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        `;
-        // Al tocar, se agrega y se refresca el formulario
+        item.className = "card-adicional-item"; // Usa la clase CSS que definimos
+
+        // Evento al tocar: Agrega al carrito y refresca la lista de arriba
         item.onclick = () => {
-            window.agregarAlCarrito(prod.nombre, prod.imagen, prod.precio, prod.descripcion, prod.stock);
-            window.renderizarCarritoEnForm(); // Refrescar para ver el nuevo item arriba
+            // Usamos la función global de tu app
+            window.agregarAlCarrito(
+                prod.nombre, 
+                prod.imagen, 
+                prod.precio, 
+                prod.descripcion, 
+                prod.stock
+            );
+            
+            // Refrescamos el formulario para que el usuario vea el cambio
+            window.renderizarCarritoEnForm();
+
+            // Feedback visual opcional con SweetAlert Toast
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true
+            });
+            Toast.fire({
+                icon: 'success',
+                title: `¡${prod.nombre} agregado!`
+            });
         };
 
+        // Contenido de la tarjeta
         item.innerHTML = `
-            <img src="${normalizarImagen(prod.imagen)}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-bottom: 5px;">
-            <div style="font-size: 10px; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${prod.nombre}</div>
-            <div style="font-size: 11px; color: #27ae60; font-weight: bold;">${formatearPrecio(prod.precio)}</div>
-            <div style="font-size: 9px; color: #aaa; margin-top:3px;">+ Agregar</div>
+            <img src="${window.normalizarImagen ? window.normalizarImagen(prod.imagen) : prod.imagen}" 
+                 alt="${prod.nombre}" 
+                 onerror="this.src='https://via.placeholder.com/60?text=Prod'">
+            <div style="font-size: 10px; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; margin-bottom: 2px;">
+                ${prod.nombre}
+            </div>
+            <div style="font-size: 11px; color: #27ae60; font-weight: bold;">
+                ${window.formatearPrecio ? window.formatearPrecio(prod.precio) : '$' + prod.precio}
+            </div>
+            <div style="font-size: 9px; color: #e5c453; font-weight: bold; margin-top: 4px; text-transform: uppercase;">
+                + Agregar
+            </div>
         `;
+
         carrusel.appendChild(item);
     });
 }
-
-
 // 4. CAMBIAR CANTIDADES (+ / -) con Validación de Stock Real
 window.cambiarCantidadCarrito = (index, valor) => {
     const item = carrito[index];
