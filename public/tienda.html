@@ -1666,7 +1666,6 @@ body {
             </div>
         </div>
     </div>-->
-
 <div class="formulario">
     <div class="aviso-privacidad">
         <span class="icono-check">✓</span> Pedido sujeto a validación previa de disponibilidad y pago.
@@ -1694,12 +1693,21 @@ body {
         <input id="notasPedido" placeholder="Casa primer piso, torre 5 Apartamen 201, Conjunto">
     </div>
 
-    <div style="margin: 15px 0; background: #eee; padding: 10px; border-radius: 5px;">
-        <input type="checkbox" id="esRegalo" onchange="toggleRegalo()">
-        <label for="esRegalo"><strong>¿Es para un regalo?</strong></label>
+    <div class="separador-entrega"><strong>Fecha y Hora de entrega</strong></div>
+    <div class="fila2">
+        <input type="date" id="fechaEntrega">
+        <select id="horaEntrega">
+            <option>8AM-10AM</option>
+            <option>10AM-12PM</option>
+            <option>12PM-2PM</option>
+            <option>2PM-4PM</option>
+            <option>4PM-6PM</option>
+            <option>6PM-8PM</option>
+            <option>8PM-10PM</option>
+        </select>
     </div>
 
-    <div id="formularioRegalo" style="display: none; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+    <div id="formularioRegalo" style="display: none; border-top: 1px solid #ccc; margin-top: 10px; padding-top: 10px;">
         <div class="separador-tarjeta"><strong>Datos del Destinatario</strong></div>
         <div class="fila2">
             <input id="nombreDestinatario" placeholder="Nombre destinatario">
@@ -1716,18 +1724,9 @@ body {
         </div>
     </div>
 
-    <div class="separador-entrega"><strong>Fecha y Hora de entrega</strong></div>
-    <div class="fila2">
-        <input type="date" id="fechaEntrega">
-        <select id="horaEntrega">
-            <option>8AM-10AM</option>
-            <option>10AM-12PM</option>
-            <option>12PM-2PM</option>
-            <option>2PM-4PM</option>
-            <option>4PM-6PM</option>
-            <option>6PM-8PM</option>
-            <option>8PM-10PM</option>
-        </select>
+    <div style="margin: 15px 0; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <input type="checkbox" id="esRegalo" onchange="toggleRegalo()" style="width: 18px; height: 18px;">
+        <label for="esRegalo" style="cursor: pointer;"><strong>¿Es para un regalo?</strong></label>
     </div>
 
     <button id="enviarPedidoBtn" onclick="enviarPedido()">Enviar pedido</button>
@@ -1838,24 +1837,24 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     let urlCategoriaProcesada = false;
 
 function toggleRegalo() {
-    const esRegalo = document.getElementById('esRegalo').checked;
+    const checkElement = document.getElementById('esRegalo');
     const formRegalo = document.getElementById('formularioRegalo');
     const bloqueDireccion = document.getElementById('bloqueDireccion');
     
-    // Puntos de anclaje
+    // Contenedores de destino
     const destinoRegalo = document.getElementById('contenedorDireccionRegalo');
-    const destinoComprador = document.getElementById('filaDatosComprador');
+    const destinoOriginal = document.getElementById('filaDatosComprador');
 
-    if (esRegalo) {
-        // 1. Mostrar el acordeón
+    if (checkElement.checked) {
+        // Mostrar campos ocultos
         formRegalo.style.display = 'block';
-        // 2. Mover la dirección adentro de la sección de regalo
+        // Mover dirección a la sección de regalo
         destinoRegalo.appendChild(bloqueDireccion);
     } else {
-        // 1. Ocultar el acordeón
+        // Ocultar campos
         formRegalo.style.display = 'none';
-        // 2. Devolver la dirección a debajo de los datos del comprador
-        destinoComprador.after(bloqueDireccion);
+        // Regresar dirección a su lugar original (después de datos comprador)
+        destinoOriginal.after(bloqueDireccion);
     }
 }
 
