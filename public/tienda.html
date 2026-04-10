@@ -1502,7 +1502,7 @@ body {
 }
 /* ETIQUETA DE chekc para destinatario */
 @keyframes sutil-pulso {
-    0% { box-shadow: 0 0 0 0 cubic-bezier(0, 0, 0, 0.2); }
+    0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4); }
     70% { box-shadow: 0 0 0 6px rgba(0, 123, 255, 0); }
     100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
 }
@@ -1739,19 +1739,21 @@ body {
     align-items: center; 
     gap: 10px; 
     margin: 15px 0; 
-    padding: 12px; 
+    padding: 10px; 
     background: #f0f7ff; 
     border: 1px solid #007bff; 
     border-radius: 8px; 
     cursor: pointer;
-    transition: all 0.3s ease;
     animation: sutil-pulso 2s infinite;
+    width: 100%;
+    box-sizing: border-box;
 ">
     <input type="checkbox" id="esRegalo" onchange="toggleRegalo()" style="
-        width: 20px; 
-        height: 20px; 
+        width: 20px !important; 
+        height: 20px !important; 
+        min-width: 20px;
         cursor: pointer; 
-        accent-color: #007bff;
+        margin: 0;
         flex-shrink: 0;
     ">
     <label for="esRegalo" style="
@@ -1759,9 +1761,11 @@ body {
         font-size: 14px; 
         color: #0056b3; 
         font-weight: bold;
-        line-height: 1.2;
+        margin: 0;
+        white-space: normal;
+        flex-grow: 1;
     ">
-        ¿Este pedido es para un regalo? <span style="color: #d9534f;">(Selecciona aquí)</span>
+        ¿Este pedido es para un regalo? <span style="color: #d9534f;">(Clic aquí)</span>
     </label>
 </div>
 
