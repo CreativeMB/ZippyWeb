@@ -1836,28 +1836,6 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     let procesadoExitoso = false;
     let urlCategoriaProcesada = false;
 
-function toggleRegalo() {
-    const checkElement = document.getElementById('esRegalo');
-    const formRegalo = document.getElementById('formularioRegalo');
-    const bloqueDireccion = document.getElementById('bloqueDireccion');
-    
-    // Contenedores de destino
-    const destinoRegalo = document.getElementById('contenedorDireccionRegalo');
-    const destinoOriginal = document.getElementById('filaDatosComprador');
-
-    if (checkElement.checked) {
-        // Mostrar campos ocultos
-        formRegalo.style.display = 'block';
-        // Mover dirección a la sección de regalo
-        destinoRegalo.appendChild(bloqueDireccion);
-    } else {
-        // Ocultar campos
-        formRegalo.style.display = 'none';
-        // Regresar dirección a su lugar original (después de datos comprador)
-        destinoOriginal.after(bloqueDireccion);
-    }
-}
-
 // Al cargar la página, recuperamos lo que haya en el almacenamiento
 document.addEventListener('DOMContentLoaded', () => {
     const carritoGuardado = localStorage.getItem('zippy_cart');
@@ -3761,6 +3739,29 @@ window.addEventListener("scroll", (e) => {
         renderizarMenuCategorias();
     }
 }, true); // El 'true' es para capturar el evento correctamente
+
+
+function toggleRegalo() {
+    const checkElement = document.getElementById('esRegalo');
+    const formRegalo = document.getElementById('formularioRegalo');
+    const bloqueDireccion = document.getElementById('bloqueDireccion');
+    
+    // Contenedores de destino
+    const destinoRegalo = document.getElementById('contenedorDireccionRegalo');
+    const destinoOriginal = document.getElementById('filaDatosComprador');
+
+    if (checkElement.checked) {
+        // Mostrar campos ocultos
+        formRegalo.style.display = 'block';
+        // Mover dirección a la sección de regalo
+        destinoRegalo.appendChild(bloqueDireccion);
+    } else {
+        // Ocultar campos
+        formRegalo.style.display = 'none';
+        // Regresar dirección a su lugar original (después de datos comprador)
+        destinoOriginal.after(bloqueDireccion);
+    }
+}
 </script>
 </body>
 
