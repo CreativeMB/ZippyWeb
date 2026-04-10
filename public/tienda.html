@@ -1724,9 +1724,11 @@ body {
         </div>
     </div>
 
-    <div style="margin: 20px 0; display: flex; align-items: center; gap: 10px;">
-        <input type="checkbox" id="esRegalo" onchange="toggleRegalo()" style="width: 20px; height: 20px; cursor: pointer;">
-        <label for="esRegalo" style="cursor: pointer;"><strong>¿Es para un regalo?</strong></label>
+    <div class="aviso-privacidad" style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 10px 0; background: transparent; border: none; padding: 0;">
+        <input type="checkbox" id="esRegalo" onchange="toggleRegalo()" style="width: 16px; height: 16px; cursor: pointer; margin: 0;">
+        <label for="esRegalo" style="cursor: pointer; margin: 0; font-size: inherit; color: inherit;">
+            ¿Es para un regalo?
+        </label>
     </div>
 
     <button id="enviarPedidoBtn" onclick="enviarPedido()">Enviar pedido</button>
