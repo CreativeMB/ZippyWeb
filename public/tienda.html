@@ -3056,23 +3056,23 @@ window.renderizarAdicionales = () => {
     const carrusel = document.getElementById("carrusel-adicionales");
     const seccion = document.getElementById("seccion-adicionales");
 
-    // 1. Verificaciones de seguridad
     if (!carrusel || !seccion) return;
-    
-    // Si los productos aún no cargan en el objeto global, reintentamos
+
+    // 1. Verificación de carga
     if (!window.productosRealtime || Object.keys(window.productosRealtime).length === 0) {
         setTimeout(window.renderizarAdicionales, 300);
         return;
     }
 
-    // 2. Filtrar productos de la categoría "adicional"
-    // Normalizamos para evitar fallos por tildes o mayúsculas
+    // 2. Filtrado con la misma lógica que usas en el render principal
     const adicionales = Object.values(window.productosRealtime).filter(p => {
         if (!p.categoria) return false;
-        const catLimpia = p.categoria.toLowerCase()
-                            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                            .trim();
-        return catLimpia === "adicional" || catLimpia === "adicionales";
+        
+        // Convertimos "categoria1, categoria2" en un array como haces en el render
+        const categoriasProducto = p.categoria.split(",").map(c => c.trim().toLowerCase());
+        
+        // Buscamos si incluye "adicional"
+        return categoriasProducto.includes("adicional");
     });
 
     // 3. Control de visibilidad
@@ -3081,57 +3081,56 @@ window.renderizarAdicionales = () => {
         return;
     }
 
-    // 4. Dibujar los productos
     seccion.style.display = "block";
-    carrusel.innerHTML = ""; // Limpiar contenido previo para evitar duplicados
+    carrusel.innerHTML = ""; 
 
     adicionales.forEach(prod => {
-        const item = document.createElement("div");
-        item.className = "card-adicional-item"; // Clase CSS obligatoria
+        // Usamos el nombre real del producto o la clave
+        const nombreProd = prod.referenciaReal || prod.nombre || "Producto";
+        const precioFinal = (prod.promocion && prod.valorPromocion > 0) ? prod.valorPromocion : (prod.valor || 0);
+        const imgUrl = prod.imagen || (typeof productosJson !== 'undefined' ? productosJson[nombreProd] : '');
+        const descProd = (prod.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
-        // Acción al tocar el producto
+        const item = document.createElement("div");
+        item.className = "card-adicional-item"; 
+
         item.onclick = () => {
-            // Agregamos al carrito usando la función global
+            // Usamos tu función global agregarAlCarrito
             window.agregarAlCarrito(
-                prod.nombre, 
-                prod.imagen, 
-                prod.precio, 
-                prod.descripcion, 
-                prod.stock
+                nombreProd.replace(/'/g, "\\'"), 
+                imgUrl, 
+                precioFinal, 
+                descProd, 
+                prod.stock ?? null
             );
             
-            // Refrescamos la lista superior del formulario automáticamente
+            // Refrescamos el formulario
             window.renderizarCarritoEnForm();
 
-            // Notificación visual rápida
+            // Feedback visual
             if (typeof Swal !== 'undefined') {
-                const Toast = Swal.mixin({
+                Swal.fire({
                     toast: true,
                     position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 1500,
-                    timerProgressBar: true
-                });
-                Toast.fire({
                     icon: 'success',
-                    title: `¡${prod.nombre} agregado!`
+                    title: `Sumaste ${nombreProd}`,
+                    showConfirmButton: false,
+                    timer: 1000
                 });
             }
         };
 
-        // Renderizado del HTML interno de la card
         item.innerHTML = `
-            <img src="${window.normalizarImagen ? window.normalizarImagen(prod.imagen) : prod.imagen}" 
-                 alt="${prod.nombre}" 
+            <img src="${window.normalizarImagen ? window.normalizarImagen(imgUrl) : imgUrl}" 
                  onerror="this.src='https://via.placeholder.com/60?text=Prod'">
             <div style="font-size: 10px; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; margin-bottom: 2px;">
-                ${prod.nombre}
+                ${nombreProd}
             </div>
             <div style="font-size: 11px; color: #27ae60; font-weight: bold;">
-                ${window.formatearPrecio ? window.formatearPrecio(prod.precio) : '$' + prod.precio}
+                ${window.formatearPrecio ? window.formatearPrecio(precioFinal) : '$' + precioFinal}
             </div>
             <div style="font-size: 9px; color: #e5c453; font-weight: bold; margin-top: 4px; text-transform: uppercase;">
-                + Agregar
+                + AGREGAR
             </div>
         `;
 
