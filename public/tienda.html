@@ -1874,32 +1874,34 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
 
 
 window.toggleRegalo = function() {
-    const checkElement = document.getElementById('esRegalo');
+    const check = document.getElementById('esRegalo');
     const formRegalo = document.getElementById('formularioRegalo');
     const bloqueDireccion = document.getElementById('bloqueDireccion');
     
-    // Contenedores de destino
+    // Puntos de anclaje
     const destinoRegalo = document.getElementById('contenedorDireccionRegalo');
     const destinoOriginal = document.getElementById('filaDatosComprador');
 
-    if (!checkElement || !formRegalo || !bloqueDireccion) {
-        console.error("Error: Algunos elementos del formulario no se encontraron.");
-        return;
-    }
-
-    if (checkElement.checked) {
-        // 1. Mostrar la sección de regalo
+    if (check.checked) {
+        // ACTIVADO: Mostrar regalo y mover dirección
         formRegalo.style.display = 'block';
-        // 2. Mover físicamente la dirección al área de regalo
-        destinoRegalo.appendChild(bloqueDireccion);
+        if (destinoRegalo) destinoRegalo.appendChild(bloqueDireccion);
+        
+        // Detener animación cuando ya se seleccionó
+        document.getElementById('contenedor-check-regalo').style.animation = 'none';
+        document.getElementById('contenedor-check-regalo').style.background = '#e8f5e9';
+        document.getElementById('contenedor-check-regalo').style.borderColor = '#4caf50';
     } else {
-        // 1. Ocultar la sección de regalo
+        // DESACTIVADO: Ocultar y devolver dirección arriba
         formRegalo.style.display = 'none';
-        // 2. Regresar la dirección a su posición original arriba
-        destinoOriginal.after(bloqueDireccion);
+        if (destinoOriginal) destinoOriginal.after(bloqueDireccion);
+        
+        // Reiniciar estilo visual
+        document.getElementById('contenedor-check-regalo').style.animation = 'sutil-pulso 2s infinite';
+        document.getElementById('contenedor-check-regalo').style.background = '#f0f7ff';
+        document.getElementById('contenedor-check-regalo').style.borderColor = '#007bff';
     }
 };
-
 
 // Al cargar la página, recuperamos lo que haya en el almacenamiento
 document.addEventListener('DOMContentLoaded', () => {
