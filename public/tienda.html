@@ -3741,34 +3741,32 @@ window.addEventListener("scroll", (e) => {
 }, true); // El 'true' es para capturar el evento correctamente
 
 
-// Opción recomendada: Envolverla en un listener para asegurar que el HTML esté listo
-document.addEventListener('DOMContentLoaded', () => {
-    // Aquí puedes dejar la función o simplemente asegurarte de que el checkbox responda
-});
-
-function toggleRegalo() {
-    console.log("El checkbox cambió de estado"); // Si ves esto en la consola (F12), la función sirve.
-
+window.toggleRegalo = function() {
     const checkElement = document.getElementById('esRegalo');
     const formRegalo = document.getElementById('formularioRegalo');
     const bloqueDireccion = document.getElementById('bloqueDireccion');
+    
+    // Contenedores de destino
     const destinoRegalo = document.getElementById('contenedorDireccionRegalo');
     const destinoOriginal = document.getElementById('filaDatosComprador');
 
-    // Validación de seguridad
     if (!checkElement || !formRegalo || !bloqueDireccion) {
-        console.error("Faltan elementos en el HTML. Revisa los IDs.");
+        console.error("Error: Algunos elementos del formulario no se encontraron.");
         return;
     }
 
     if (checkElement.checked) {
+        // 1. Mostrar la sección de regalo
         formRegalo.style.display = 'block';
+        // 2. Mover físicamente la dirección al área de regalo
         destinoRegalo.appendChild(bloqueDireccion);
     } else {
+        // 1. Ocultar la sección de regalo
         formRegalo.style.display = 'none';
+        // 2. Regresar la dirección a su posición original arriba
         destinoOriginal.after(bloqueDireccion);
     }
-}
+};
 </script>
 </body>
 
