@@ -1707,7 +1707,7 @@ body {
         </select>
     </div>
 
-    <div id="formularioRegalo" style="display: none; border-top: 1px solid #ccc; margin-top: 10px; padding-top: 10px;">
+    <div id="formularioRegalo" style="display: none; border-top: 1px solid #ccc; margin-top: 15px; padding-top: 10px;">
         <div class="separador-tarjeta"><strong>Datos del Destinatario</strong></div>
         <div class="fila2">
             <input id="nombreDestinatario" placeholder="Nombre destinatario">
@@ -1724,8 +1724,8 @@ body {
         </div>
     </div>
 
-    <div style="margin: 15px 0; display: flex; align-items: center; gap: 10px; cursor: pointer;">
-        <input type="checkbox" id="esRegalo" onchange="toggleRegalo()" style="width: 18px; height: 18px;">
+    <div style="margin: 20px 0; display: flex; align-items: center; gap: 10px;">
+        <input type="checkbox" id="esRegalo" onchange="toggleRegalo()" style="width: 20px; height: 20px; cursor: pointer;">
         <label for="esRegalo" style="cursor: pointer;"><strong>¿Es para un regalo?</strong></label>
     </div>
 
@@ -3747,22 +3747,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function toggleRegalo() {
+    console.log("El checkbox cambió de estado"); // Si ves esto en la consola (F12), la función sirve.
+
     const checkElement = document.getElementById('esRegalo');
     const formRegalo = document.getElementById('formularioRegalo');
     const bloqueDireccion = document.getElementById('bloqueDireccion');
-    
-    // Validamos que los elementos existan antes de moverlos para evitar errores en consola
-    if (!checkElement || !formRegalo || !bloqueDireccion) return;
-
     const destinoRegalo = document.getElementById('contenedorDireccionRegalo');
     const destinoOriginal = document.getElementById('filaDatosComprador');
 
+    // Validación de seguridad
+    if (!checkElement || !formRegalo || !bloqueDireccion) {
+        console.error("Faltan elementos en el HTML. Revisa los IDs.");
+        return;
+    }
+
     if (checkElement.checked) {
         formRegalo.style.display = 'block';
-        if (destinoRegalo) destinoRegalo.appendChild(bloqueDireccion);
+        destinoRegalo.appendChild(bloqueDireccion);
     } else {
         formRegalo.style.display = 'none';
-        if (destinoOriginal) destinoOriginal.after(bloqueDireccion);
+        destinoOriginal.after(bloqueDireccion);
     }
 }
 </script>
