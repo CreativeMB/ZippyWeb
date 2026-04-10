@@ -3741,25 +3741,28 @@ window.addEventListener("scroll", (e) => {
 }, true); // El 'true' es para capturar el evento correctamente
 
 
+// Opción recomendada: Envolverla en un listener para asegurar que el HTML esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    // Aquí puedes dejar la función o simplemente asegurarte de que el checkbox responda
+});
+
 function toggleRegalo() {
     const checkElement = document.getElementById('esRegalo');
     const formRegalo = document.getElementById('formularioRegalo');
     const bloqueDireccion = document.getElementById('bloqueDireccion');
     
-    // Contenedores de destino
+    // Validamos que los elementos existan antes de moverlos para evitar errores en consola
+    if (!checkElement || !formRegalo || !bloqueDireccion) return;
+
     const destinoRegalo = document.getElementById('contenedorDireccionRegalo');
     const destinoOriginal = document.getElementById('filaDatosComprador');
 
     if (checkElement.checked) {
-        // Mostrar campos ocultos
         formRegalo.style.display = 'block';
-        // Mover dirección a la sección de regalo
-        destinoRegalo.appendChild(bloqueDireccion);
+        if (destinoRegalo) destinoRegalo.appendChild(bloqueDireccion);
     } else {
-        // Ocultar campos
         formRegalo.style.display = 'none';
-        // Regresar dirección a su lugar original (después de datos comprador)
-        destinoOriginal.after(bloqueDireccion);
+        if (destinoOriginal) destinoOriginal.after(bloqueDireccion);
     }
 }
 </script>
