@@ -3307,19 +3307,17 @@ function enviarPedido() {
                 }
             });
 
-            // --- MENSAJE WHATSAPP ---
+           // --- CONSTRUCCIÓN MENSAJE WHATSAPP (SOLO LO SOLICITADO) ---
             let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre}`).join('\n');
-            let totalSuma = document.getElementById("total-pedido-suma").innerText;
-            let infoRegaloWa = esRegalo ? `*ES PARA REGALO:* ${datosRegalo.nombreDestinatario}\n*MENSAJE:* ${datosRegalo.mensajeTarjeta}\n` : "";
 
             const mensajeWa = encodeURIComponent(
                 `*NUEVO PEDIDO REGISTRADO*\n\n` +
-                `*PRODUCTOS:*\n${listaProductosTexto}\n\n` +
-                `*TOTAL: ${totalSuma}*\n\n` +
+                `*PRODUCTOS:*\n${listaProductosTexto}\n` +
                 `*CLIENTE:* ${campos.nombreComprador}\n` +
-                `*ENTREGA:* ${fechaFormateada} (${campos.horaEntrega})\n` +
-                infoRegaloWa +
-                `*PAGO:* ${campos.medioPago}\n\n` +
+                `*FECHA ENTREGA:* ${fechaFormateada}\n` +
+                `*HORA:* ${campos.horaEntrega}\n` +
+                `*DIRECCIÓN:* ${campos.direccion}\n` +
+                `*MEDIO DE PAGO:* ${campos.medioPago}\n\n` +
                 `_Por favor confirma mi pedido._`
             );
 
