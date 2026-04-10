@@ -3145,11 +3145,11 @@ function renderizarMenuCategorias() {
 
     contenedor.appendChild(wrapper);
 }
-// --- 5. SISTEMA DE PEDIDOS ---
+// --- 5. SISTEMA DE PEDIDOS (VERSIÓN FINAL INTEGRADA) ---
 function enviarPedido() {
     const btn = document.getElementById("enviarPedidoBtn");
 
-    // 0. VALIDACIÓN ADICIONAL: CARRITO VACÍO
+    // 0. VALIDACIÓN: CARRITO VACÍO
     if (carrito.length === 0) {
         Swal.fire({
             icon: 'warning',
@@ -3162,14 +3162,36 @@ function enviarPedido() {
 
     // 1. VALIDACIÓN DE DOMICILIARIOS
     if (!idDomiciliarioAsignado) {
-        // ... (Tu código de validación de domiciliarios se mantiene igual)
+        const modal = document.getElementById("modalPedido");
+        if (modal) {
+            modal.style.display = "none";
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = 'auto';
+        }
+
+        Swal.close(); 
+        Swal.fire({
+            icon: 'info',
+            title: '📍 Sin Domiciliarios',
+            text: 'Lo sentimos, no hay domiciliarios activos en este momento. Por favor, contacta a la tienda directamente.',
+            confirmButtonText: 'Volver a la tienda',
+            confirmButtonColor: '#FF6600',
+            target: 'body',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.reload(); 
+            }
+        });
         return;
     }
 
-    // --- NUEVA LÓGICA DE CAPTURA Y VALIDACIÓN DINÁMICA ---
+    // 2. CAPTURA DE DATOS Y VALIDACIÓN DINÁMICA
     const esRegalo = document.getElementById("esRegalo").checked;
 
-    // Campos que SIEMPRE son obligatorios
+    // Campos base obligatorios
     const campos = {
         cliente: document.getElementById("celularComprador").value.trim(),
         direccion: document.getElementById("direccionEntrega").value.trim(),
@@ -3180,7 +3202,7 @@ function enviarPedido() {
         notasPedido: document.getElementById("notasPedido").value.trim()
     };
 
-    // Campos de regalo: Se validan solo si esRegalo es true, si no, se inicializan vacíos
+    // Objeto de regalo inicializado vacío
     let datosRegalo = {
         nombreDestinatario: "",
         celularDestinatario: "",
@@ -3189,6 +3211,7 @@ function enviarPedido() {
         paraTarjeta: ""
     };
 
+    // Si es regalo, capturamos y validamos estos campos específicos
     if (esRegalo) {
         datosRegalo.nombreDestinatario = document.getElementById("nombreDestinatario").value.trim();
         datosRegalo.celularDestinatario = document.getElementById("celularDestinatario").value.trim();
@@ -3196,11 +3219,10 @@ function enviarPedido() {
         datosRegalo.deTarjeta = document.getElementById("deTarjeta").value.trim();
         datosRegalo.paraTarjeta = document.getElementById("paraTarjeta").value.trim();
 
-        // Validar que los datos del destinatario no estén vacíos si es regalo
         if (!datosRegalo.nombreDestinatario || !datosRegalo.celularDestinatario) {
             Swal.fire({
                 icon: 'warning',
-                title: 'Datos de Regalo Incompletos',
+                title: 'Datos de Regalo',
                 text: 'Por favor, ingresa el nombre y celular de quien recibe el regalo.',
                 confirmButtonColor: '#FF6600'
             });
@@ -3208,33 +3230,34 @@ function enviarPedido() {
         }
     }
 
-    // Validar campos obligatorios generales
+    // Validar que los campos base no estén vacíos
     const camposVacios = Object.keys(campos).filter(key => !campos[key]);
     if (camposVacios.length > 0) {
         Swal.fire({
             icon: 'warning',
             title: 'Campos Incompletos',
-            text: 'Por favor, rellena los datos de contacto y entrega.',
+            text: 'Por favor, rellena todos los datos de envío para continuar.',
             confirmButtonColor: '#FF6600'
         });
         return;
     }
 
-    // --- PROCESAMIENTO DE DATOS ---
+    // 3. PROCESAMIENTO DE TEXTOS Y FECHAS
     const referenciaUnificada = carrito.map(item => `${item.nombre} ${item.cantidad}`).join(', ');
     const imagenesUnificadas = carrito.map(item => item.imagen).join(', ');
     const descripcionesUnificadas = carrito.map(item => item.descripcion || "Sin descripción").join(', ');
-    
+
     let fechaFormateada = "";
     if (campos.fechaOriginal) {
         const partes = campos.fechaOriginal.split(/[-./]/); 
         fechaFormateada = partes.reverse().join("/");
     }
 
+    // Bloqueo visual del botón
     btn.disabled = true;
     btn.innerText = "Enviando...";
 
-    // 4. CONEXIÓN CON FIREBASE
+    // 4. GUARDAR EN FIREBASE
     const pedidosRef = ref(db, `${empresaId}/Pedidos/${idDomiciliarioAsignado}`);
     
     get(pedidosRef).then((snapshot) => {
@@ -3251,7 +3274,6 @@ function enviarPedido() {
         const fechaReg = hoy.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/-/g, '/');
         const horaReg = hoy.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
         
-        // Estructura final combinando campos fijos + datos de regalo (vacíos o llenos)
         const pedidoData = {
             idPedido: nuevoRef.key,
             idEmpresa: empresaId,
@@ -3262,7 +3284,6 @@ function enviarPedido() {
             descripcion: descripcionesUnificadas,
             nombreCliente: campos.nombreComprador,
             cliente: campos.cliente,
-            // Datos del destinatario (se guardan aunque estén vacíos)
             nombreDestinatario: datosRegalo.nombreDestinatario,
             destinatario: datosRegalo.celularDestinatario,
             referencia: referenciaUnificada,
@@ -3282,48 +3303,62 @@ function enviarPedido() {
         };
 
         set(nuevoRef, pedidoData).then(() => {
-            // ... (Bloque de stock se mantiene igual)
+            
+            // --- BLOQUE DESCUENTO DE STOCK ---
+            carrito.forEach(item => {
+                const nombreLimpio = item.nombre.toLowerCase().trim();
+                const infoProd = productosRealtime[nombreLimpio];
+                
+                if (infoProd && infoProd.idFirebase) {
+                    const rutaProducto = ref(db, `${empresaId}/productos/${infoProd.idFirebase}`);
+                    update(rutaProducto, {
+                        stock: increment(-item.cantidad)
+                    }).catch(errStock => console.error("Error stock en " + item.nombre, errStock));
+                }
+            });
 
-            // --- WHATSAPP DINÁMICO ---
+            // --- CONSTRUCCIÓN WHATSAPP ---
             let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre}`).join('\n');
             let totalSuma = document.getElementById("total-pedido-suma").innerText;
 
-            let textoRegalo = esRegalo ? `*PARA:* ${datosRegalo.nombreDestinatario}\n*MENSAJE:* ${datosRegalo.mensajeTarjeta}\n` : "";
+            let infoRegaloWa = esRegalo ? `*ES UN REGALO PARA:* ${datosRegalo.nombreDestinatario}\n*MENSAJE:* ${datosRegalo.mensajeTarjeta}\n` : "";
 
             const mensajeWa = encodeURIComponent(
                 `*NUEVO PEDIDO REGISTRADO*\n\n` +
                 `*PRODUCTOS:*\n${listaProductosTexto}\n\n` +
-                `*TOTAL:* ${totalSuma}\n\n` +
+                `*TOTAL A PAGAR: ${totalSuma}*\n\n` +
                 `*CLIENTE:* ${campos.nombreComprador}\n` +
-                `*ENTREGA:* ${fechaFormateada} (${campos.horaEntrega})\n` +
+                `*FECHA ENTREGA:* ${fechaFormateada}\n` +
+                `*HORA:* ${campos.horaEntrega}\n` +
                 `*DIRECCIÓN:* ${campos.direccion}\n` +
-                textoRegalo + // Solo aparece si es regalo
-                `*PAGO:* ${campos.medioPago}\n\n` +
+                infoRegaloWa +
+                `*MEDIO DE PAGO:* ${campos.medioPago}\n\n` +
                 `_Por favor confirma mi pedido._`
             );
 
             const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
 
-            // Alerta de éxito
+            // Alerta de éxito y limpieza
             Swal.fire({
                 icon: 'success',
-                title: `¡Listo ${campos.nombreComprador}!`,
-                text: 'Pedido registrado. Finaliza confirmando por WhatsApp.',
+                title: `¡Gracias ${campos.nombreComprador}!`,
+                text: 'Tu pedido ha sido guardado. Haz clic para confirmar por WhatsApp.',
                 confirmButtonText: 'Confirmar en WhatsApp 📱',
                 confirmButtonColor: '#25D366',
                 allowOutsideClick: false
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.open(linkWa, '_blank');
-                    // Limpieza y recarga (Tu código de limpieza se mantiene igual)
-                    location.reload(); 
+                    // Limpieza total y recarga
+                    localStorage.removeItem('zippy_cart');
+                    window.location.reload();
                 }
             });
 
         }).catch(err => {
             btn.disabled = false;
             btn.innerText = "Enviar pedido";
-            console.error(err);
+            alert("Error al procesar: " + err.message);
         });
     });
 }
