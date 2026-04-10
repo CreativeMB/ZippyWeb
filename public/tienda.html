@@ -1500,6 +1500,16 @@ body {
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
 }
+/* ETIQUETA DE chekc para destinatario */
+@keyframes sutil-pulso {
+    0% { box-shadow: 0 0 0 0 cubic-bezier(0, 0, 0, 0.2); }
+    70% { box-shadow: 0 0 0 6px rgba(0, 123, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
+}
+#contenedor-check-regalo:hover {
+    background: #e1efff;
+    transform: scale(1.01);
+}
     </style>
 </head>
 
@@ -1724,10 +1734,34 @@ body {
         </div>
     </div>
 
-  <div class="aviso-privacidad" style="display: flex; align-items: center; justify-content: flex-start; gap: 8px; cursor: pointer; margin: 10px 0; background: transparent; border: none; padding: 0; text-align: left; white-space: nowrap;">
-    <input type="checkbox" id="esRegalo" onchange="toggleRegalo()" style="width: 16px; height: 16px; cursor: pointer; margin: 0; flex-shrink: 0;">
-    <label for="esRegalo" style="cursor: pointer; margin: 0; font-size: inherit; color: inherit; display: inline-block;">
-        ¿Este pedido es para regalo? (Obligatorio)
+<div id="contenedor-check-regalo" style="
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    margin: 15px 0; 
+    padding: 12px; 
+    background: #f0f7ff; 
+    border: 1px solid #007bff; 
+    border-radius: 8px; 
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: sutil-pulso 2s infinite;
+">
+    <input type="checkbox" id="esRegalo" onchange="toggleRegalo()" style="
+        width: 20px; 
+        height: 20px; 
+        cursor: pointer; 
+        accent-color: #007bff;
+        flex-shrink: 0;
+    ">
+    <label for="esRegalo" style="
+        cursor: pointer; 
+        font-size: 14px; 
+        color: #0056b3; 
+        font-weight: bold;
+        line-height: 1.2;
+    ">
+        ¿Este pedido es para un regalo? <span style="color: #d9534f;">(Selecciona aquí)</span>
     </label>
 </div>
 
