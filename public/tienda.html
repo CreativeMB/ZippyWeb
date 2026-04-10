@@ -1836,6 +1836,35 @@ import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12
     let procesadoExitoso = false;
     let urlCategoriaProcesada = false;
 
+
+window.toggleRegalo = function() {
+    const checkElement = document.getElementById('esRegalo');
+    const formRegalo = document.getElementById('formularioRegalo');
+    const bloqueDireccion = document.getElementById('bloqueDireccion');
+    
+    // Contenedores de destino
+    const destinoRegalo = document.getElementById('contenedorDireccionRegalo');
+    const destinoOriginal = document.getElementById('filaDatosComprador');
+
+    if (!checkElement || !formRegalo || !bloqueDireccion) {
+        console.error("Error: Algunos elementos del formulario no se encontraron.");
+        return;
+    }
+
+    if (checkElement.checked) {
+        // 1. Mostrar la sección de regalo
+        formRegalo.style.display = 'block';
+        // 2. Mover físicamente la dirección al área de regalo
+        destinoRegalo.appendChild(bloqueDireccion);
+    } else {
+        // 1. Ocultar la sección de regalo
+        formRegalo.style.display = 'none';
+        // 2. Regresar la dirección a su posición original arriba
+        destinoOriginal.after(bloqueDireccion);
+    }
+};
+
+
 // Al cargar la página, recuperamos lo que haya en el almacenamiento
 document.addEventListener('DOMContentLoaded', () => {
     const carritoGuardado = localStorage.getItem('zippy_cart');
@@ -3741,32 +3770,7 @@ window.addEventListener("scroll", (e) => {
 }, true); // El 'true' es para capturar el evento correctamente
 
 
-window.toggleRegalo = function() {
-    const checkElement = document.getElementById('esRegalo');
-    const formRegalo = document.getElementById('formularioRegalo');
-    const bloqueDireccion = document.getElementById('bloqueDireccion');
-    
-    // Contenedores de destino
-    const destinoRegalo = document.getElementById('contenedorDireccionRegalo');
-    const destinoOriginal = document.getElementById('filaDatosComprador');
 
-    if (!checkElement || !formRegalo || !bloqueDireccion) {
-        console.error("Error: Algunos elementos del formulario no se encontraron.");
-        return;
-    }
-
-    if (checkElement.checked) {
-        // 1. Mostrar la sección de regalo
-        formRegalo.style.display = 'block';
-        // 2. Mover físicamente la dirección al área de regalo
-        destinoRegalo.appendChild(bloqueDireccion);
-    } else {
-        // 1. Ocultar la sección de regalo
-        formRegalo.style.display = 'none';
-        // 2. Regresar la dirección a su posición original arriba
-        destinoOriginal.after(bloqueDireccion);
-    }
-};
 </script>
 </body>
 
