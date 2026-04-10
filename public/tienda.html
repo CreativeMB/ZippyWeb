@@ -2216,6 +2216,16 @@ async function iniciarCargaBase(slugDesdeURL) {
             const perfil = data.perfilempresa;
 
             empresaId = id;
+
+            // --- ASIGNACIÓN CRÍTICA PARA ADICIONALES ---
+// Guardamos los productos en las variables globales que declaraste con 'let'
+// y también en 'window' para que la función de adicionales los vea siempre.
+if (data.productos) {
+    productosRealtime = data.productos;
+    window.productosRealtime = data.productos; 
+    console.log("📦 Productos Realtime vinculados a window correctamente.");
+}
+// ------------------------------------------
             // 🚀 --- AQUÍ INSERTAMOS EL REGISTRO DE VISITA ---
             // Usamos el ID de la empresa y el slug que viene del perfil
             if (typeof registrarVisitaAnalytics === 'function') {
@@ -3055,47 +3065,25 @@ window.renderizarAdicionales = () => {
     const carrusel = document.getElementById("carrusel-adicionales");
     const seccion = document.getElementById("seccion-adicionales");
 
-    console.log("%c🔍 INICIANDO SEGUIMIENTO DE ADICIONALES", "color: blue; font-weight: bold;");
+    if (!carrusel || !seccion) return;
 
-    // 1. Verificación de elementos HTML
-    if (!carrusel || !seccion) {
-        console.error("❌ ERROR: No se encontraron los elementos HTML 'carrusel-adicionales' o 'seccion-adicionales'.");
+    // Ya no usamos el setTimeout infinito, solo validamos si existen los datos
+    const datos = window.productosRealtime || productosRealtime;
+
+    if (!datos || Object.keys(datos).length === 0) {
+        console.warn("⚠️ Aún no hay productos en productosRealtime.");
+        seccion.style.display = "none";
         return;
     }
 
-    // 2. Verificación de datos globales
-    if (!window.productosRealtime || Object.keys(window.productosRealtime).length === 0) {
-        console.warn("⚠️ ADVERTENCIA: 'window.productosRealtime' está vacío o no definido. Reintentando...");
-        setTimeout(window.renderizarAdicionales, 1000);
-        return;
-    }
-
-    // 3. Verificación de contenido de productos
-    const todosLosProductos = Object.values(window.productosRealtime);
-    console.log(`📦 Total productos en Realtime: ${todosLosProductos.length}`);
-
-    // 4. Intento de filtrado con LOG detallado
-    const adicionales = todosLosProductos.filter(p => {
-        if (!p.categoria) {
-            // console.log(`- Producto sin categoría: ${p.referenciaReal || 'Sin nombre'}`);
-            return false;
-        }
-
-        const categoriasProducto = p.categoria.split(",").map(c => c.trim().toLowerCase());
-        const esAdicional = categoriasProducto.includes("adicional");
-
-        if (esAdicional) {
-            console.log(`%c✅ ¡ENCONTRADO!: ${p.referenciaReal || 'Producto'}`, "color: green;");
-        }
-        
-        return esAdicional;
+    // Filtramos usando tu lógica de comas
+    const adicionales = Object.values(datos).filter(p => {
+        if (!p.categoria) return false;
+        const categorias = p.categoria.split(",").map(c => c.trim().toLowerCase());
+        return categorias.includes("adicional");
     });
 
-    console.log(`📊 Resultado final: ${adicionales.length} productos adicionales listos para dibujar.`);
-
-    // 5. Dibujado o cierre
     if (adicionales.length === 0) {
-        console.log("%c🚫 No se detectaron productos con la categoría 'adicional'. Revisa la ortografía en tu base de datos.", "color: orange;");
         seccion.style.display = "none";
         return;
     }
@@ -3104,26 +3092,33 @@ window.renderizarAdicionales = () => {
     carrusel.innerHTML = ""; 
 
     adicionales.forEach(prod => {
-        const nombreProd = prod.referenciaReal || "Producto";
+        const nombreProd = prod.referenciaReal || prod.nombre || "Producto";
         const precioFinal = (prod.promocion && prod.valorPromocion > 0) ? prod.valorPromocion : (prod.valor || 0);
-        
+        // Si no tiene imagen propia, intentamos buscarla en productosJson (tu otra variable global)
+        const imgUrl = prod.imagen || (typeof productosJson !== 'undefined' ? productosJson[nombreProd] : '');
+        const descProd = (prod.descripcion || "Sin descripción").replace(/'/g, "\\'");
+
         const item = document.createElement("div");
         item.className = "card-adicional-item"; 
+        
         item.onclick = () => {
-            window.agregarAlCarrito(nombreProd, prod.imagen, precioFinal, prod.descripcion, prod.stock);
+            window.agregarAlCarrito(nombreProd, imgUrl, precioFinal, descProd, prod.stock ?? null);
             window.renderizarCarritoEnForm();
         };
 
         item.innerHTML = `
-            <img src="${window.normalizarImagen ? window.normalizarImagen(prod.imagen) : prod.imagen}" onerror="this.src='https://via.placeholder.com/60'">
-            <div style="font-size: 10px; font-weight: bold; color: #333;">${nombreProd}</div>
-            <div style="font-size: 11px; color: #27ae60; font-weight: bold;">$${precioFinal}</div>
-            <div style="font-size: 9px; color: #e5c453; font-weight: bold; margin-top: 4px;">+ AGREGAR</div>
+            <img src="${window.normalizarImagen ? window.normalizarImagen(imgUrl) : imgUrl}" 
+                 onerror="this.src='https://via.placeholder.com/60?text=Prod'">
+            <div style="font-size: 10px; font-weight: bold; color: #333; height: 24px; overflow: hidden; line-height: 1.2;">
+                ${nombreProd}
+            </div>
+            <div style="font-size: 11px; color: #27ae60; font-weight: bold; margin-top: 2px;">
+                ${window.formatearPrecio ? window.formatearPrecio(precioFinal) : '$' + precioFinal}
+            </div>
+            <div style="font-size: 9px; color: #e5c453; font-weight: bold; margin-top: 4px; text-transform: uppercase;">+ Agregar</div>
         `;
         carrusel.appendChild(item);
     });
-
-    console.log("%c✨ Renderizado de adicionales completado con éxito.", "color: green; font-weight: bold;");
 };
 // 4. CAMBIAR CANTIDADES (+ / -) con Validación de Stock Real
 window.cambiarCantidadCarrito = (index, valor) => {
