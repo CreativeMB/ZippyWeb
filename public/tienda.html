@@ -3200,11 +3200,14 @@ if (!idDomiciliarioAsignado) {
         direccion: document.getElementById("direccionEntrega").value.trim(),
         nombreComprador: document.getElementById("nombreComprador").value.trim(),
         fechaOriginal: document.getElementById("fechaEntrega").value,
-    
+        nombreDestinatario: document.getElementById("nombreDestinatario").value.trim(),
+        celularDestinatario: document.getElementById("celularDestinatario").value.trim(),
         medioPago: document.getElementById("medioPago").value,
         horaEntrega: document.getElementById("horaEntrega").value,
         notasPedido: document.getElementById("notasPedido").value.trim(),
-        
+        mensajeTarjeta: document.getElementById("mensajeTarjeta").value.trim(),
+        deTarjeta: document.getElementById("deTarjeta").value.trim(),
+        paraTarjeta: document.getElementById("paraTarjeta").value.trim()
     };
 
     const camposVacios = Object.keys(campos).filter(key => !campos[key]);
