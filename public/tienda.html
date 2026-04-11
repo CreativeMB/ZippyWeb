@@ -3276,8 +3276,9 @@ const totalPuntoMil = totalSinDomicilio.toLocaleString('es-CO', { maximumFractio
 // 2. Lista de productos compacta
 let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre}`).join('\n');
 
+// 3. Construcción del mensaje (CORREGIDO con campos.cliente)
 const mensajeWa = encodeURIComponent(
-    `*NUEVO PEDIDO REGISTRADO N°${cliente}*\n\n` +
+    `*NUEVO PEDIDO REGISTRADO N°${campos.cliente}*\n\n` + // <--- Aquí usamos campos.cliente
     
     `*PRODUCTOS:*\n${listaProductosTexto}\n` +
     `*TOTAL:* $${totalPuntoMil} _(Sin domicilio)_\n\n` +
