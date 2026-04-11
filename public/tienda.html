@@ -3269,22 +3269,33 @@ carrito.forEach(item => {
 });
 // --- CONSTRUCCIÓN MENSAJE COMPACTO ---
 
-// 1. Calcular total y formatear con punto de mil
+// 1. Determinar quién recibe (Escenario Regalo vs Personal)
+// Si hay un nombre de destinatario, usamos ese. Si no, es el mismo comprador.
+const nombreQuienRecibe = datosRegalo.nombreDestinatario || campos.nombreComprador;
+
+// Si es regalo, añadimos el móvil del destinatario. Si no, lo dejamos vacío (porque ya está arriba).
+const movilDestinatario = datosRegalo.celularDestinatario ? ` (${datosRegalo.celularDestinatario})` : "";
+
+const entregaA = `${nombreQuienRecibe}${movilDestinatario}`;
+
+// 2. Calcular total y formatear
 const totalSinDomicilio = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
 const totalPuntoMil = totalSinDomicilio.toLocaleString('es-CO', { maximumFractionDigits: 0 });
 
-// 2. Lista de productos compacta
+// 3. Lista de productos
 let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre}`).join('\n');
 
-// 3. Construcción del mensaje (CORREGIDO con campos.cliente)
+// 4. Construcción del mensaje
 const mensajeWa = encodeURIComponent(
     `*PEDIDO REGISTRADO N°${campos.cliente}*\n\n` + 
     
     `*PRODUCTOS:*\n${listaProductosTexto}\n` +
     `*TOTAL:* $${totalPuntoMil} _(Sin domicilio)_\n\n` +
-    `*CLIENTE:* ${campos.nombreComprador}\n` +
+    
+    `*PAGA:* ${campos.nombreComprador}\n` +
+    `*RECIBE:* ${entregaA}\n` +
+    `*DIRECCIÓN:* ${campos.direccion}\n` +
     `*ENTREGA:* ${fechaFormateada} (${campos.horaEntrega})\n` +
-    `*DIRECCION:* ${campos.direccion}\n` +
     `*PAGO:* ${campos.medioPago}\n\n` +
     
     `_Por favor confirma mi pedido._`
