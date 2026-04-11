@@ -3039,6 +3039,10 @@ window.abrirPestañaProducto = (nombre, imagen, precio, descripcion, stock) => {
     
     // 3. Renderizamos el contenido actualizado del carrito en el formulario
     window.renderizarCarritoEnForm();
+    // 🔥 Aseguramos adicionales al abrir el modal
+    if (typeof window.renderizarAdicionales === "function") {
+        window.renderizarAdicionales();
+    }
     
     // 4. Subir al inicio de la página
     window.scrollTo(0, 0);
