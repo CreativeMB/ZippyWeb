@@ -3270,26 +3270,22 @@ carrito.forEach(item => {
 // --- CONSTRUCCIÓN MENSAJE COMPACTO ---
 
 // 1. Lógica dinámica para el destinatario
-// Si nombreDestinatario tiene contenido, asumimos que es un regalo.
 const esRegalo = datosRegalo.nombreDestinatario && datosRegalo.nombreDestinatario.trim() !== "";
+let lineaDestinatario = esRegalo 
+    ? `*RECIBE:* ${datosRegalo.nombreDestinatario} (${datosRegalo.celularDestinatario})`
+    : `*CLIENTE:* ${campos.nombreComprador}`;
 
-let lineaDestinatario;
-if (esRegalo) {
-    // Escenario Regalo: Mostramos quién recibe y su celular
-    lineaDestinatario = `*RECIBE:* ${datosRegalo.nombreDestinatario} (${datosRegalo.celularDestinatario})`;
-} else {
-    // Escenario Personal: Solo mostramos el nombre del cliente (el número ya está arriba)
-    lineaDestinatario = `*CLIENTE:* ${campos.nombreComprador}`;
-}
+// 2. Formatear Notas (Si existen, se añaden al frente de la dirección)
+const notaTexto = campos.notesPedido ? ` - _Obs: ${campos.notesPedido}_` : "";
 
-// 2. Calcular total y formatear con punto de mil
+// 3. Calcular total y formatear
 const totalSinDomicilio = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
 const totalPuntoMil = totalSinDomicilio.toLocaleString('es-CO', { maximumFractionDigits: 0 });
 
-// 3. Lista de productos compacta
+// 4. Lista de productos
 let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre}`).join('\n');
 
-// 4. Construcción del mensaje final
+// 5. Construcción del mensaje final
 const mensajeWa = encodeURIComponent(
     `*PEDIDO REGISTRADO N°${campos.cliente}*\n\n` + 
     
@@ -3297,7 +3293,7 @@ const mensajeWa = encodeURIComponent(
     `*TOTAL:* $${totalPuntoMil} _(Sin domicilio)_\n\n` +
     
     `${lineaDestinatario}\n` + 
-    `*DIRECCIÓN:* ${campos.direccion}\n` +
+    `*DIRECCIÓN:* ${campos.direccion}${notaTexto}\n` + // <--- Notas al frente de dirección
     `*ENTREGA:* ${fechaFormateada} (${campos.horaEntrega})\n` +
     `*PAGO:* ${campos.medioPago}\n\n` +
     
