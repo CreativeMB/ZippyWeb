@@ -3057,7 +3057,6 @@ window.renderizarCarritoEnForm = () => {
     // --- NUEVO: Cargar los complementos (Adicionales) ---
     renderizarAdicionales();
 };
-
 window.renderizarAdicionales = () => {
     const carrusel = document.getElementById("carrusel-adicionales");
     const seccion = document.getElementById("seccion-adicionales");
@@ -3082,16 +3081,28 @@ window.renderizarAdicionales = () => {
         return;
     }
 
+    // --- EVITAR PARPADEO ---
+    // Si ya hay el mismo número de elementos dibujados, no borramos nada
+    if (carrusel.children.length === adicionales.length) {
+        seccion.style.display = "block";
+        return; 
+    }
+
     seccion.style.display = "block";
     carrusel.innerHTML = ""; 
 
     adicionales.forEach(prod => {
-        const nombreProd = prod.referenciaReal || prod.nombre || "Producto";
+        const nombreProd = prod.referenciaReal || prod.nombre || "";
         const precioFinal = (prod.promocion && prod.valorPromocion > 0) ? prod.valorPromocion : (prod.valor || 0);
-        const imgUrl = prod.imagen || (typeof productosJson !== 'undefined' ? productosJson[nombreProd] : '');
-        const descProd = (prod.descripcion || "Sin descripción").replace(/'/g, "\\'");
+        
+        // --- BUSQUEDA SEGURA DE IMAGEN ---
+        // 1. Prioridad: prod.imagen del realtime
+        // 2. Segunda opción: buscar en productosJson por el nombre exacto
+        let imgUrl = prod.imagen;
+        if (!imgUrl && typeof productosJson !== 'undefined') {
+            imgUrl = productosJson[nombreProd] || productosJson[nombreProd.trim()];
+        }
 
-        // Formateamos el precio usando tu función global
         const precioFormateado = window.formatearPrecio ? window.formatearPrecio(precioFinal) : '$ ' + precioFinal.toLocaleString();
 
         const item = document.createElement("div");
@@ -3102,29 +3113,19 @@ window.renderizarAdicionales = () => {
                 nombreProd.replace(/'/g, "\\'"), 
                 imgUrl, 
                 precioFinal, 
-                descProd, 
+                (prod.descripcion || '').replace(/'/g, "\\'"), 
                 prod.stock ?? null
             );
+            // Al agregar, refrescamos el formulario
             window.renderizarCarritoEnForm();
-            
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: `Agregado`,
-                    showConfirmButton: false,
-                    timer: 700
-                });
-            }
         };
 
-        // DISEÑO MICRO: Imagen y Precio Formateado con punto y signo
         item.innerHTML = `
             <img src="${window.normalizarImagen ? window.normalizarImagen(imgUrl) : imgUrl}" 
-                 onerror="this.src='https://via.placeholder.com/45?text=Prod'"
+                 onerror="this.src='https://via.placeholder.com/45?text=No+Img'"
+                 loading="lazy"
                  style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px; display: block; margin: 0 auto 3px auto;">
-            <div style="font-size: 9px; color: #27ae60; font-weight: 800; text-align: center; white-space: nowrap;">
+            <div style="font-size: 9px; color: #27ae60; font-weight: 800; text-align: center;">
                 ${precioFormateado}
             </div>
         `;
