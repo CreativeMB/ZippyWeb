@@ -2160,14 +2160,11 @@ async function iniciarCargaBase(slugDesdeURL) {
 
     try {
         const baseRef = ref(db); 
-
-        // 1. Usamos queryDB (el alias que creamos en el import)
         const consultaSlug = queryDB(baseRef, orderByChild("perfilempresa/slug"), equalTo(slugDesdeURL));
         let snapshot = await get(consultaSlug);
 
         if (!snapshot.exists()) {
             console.log("⚠️ No encontrado por slug, buscando por dominio...");
-            // Usamos queryDB aquí también
             const consultaDominio = queryDB(baseRef, orderByChild("perfilempresa/dominio"), equalTo(dominioLimpioDB));
             snapshot = await get(consultaDominio);
         }
@@ -2180,33 +2177,23 @@ async function iniciarCargaBase(slugDesdeURL) {
 
             empresaId = id;
 
-            // --- ASIGNACIÓN CRÍTICA PARA ADICIONALES ---
-// Guardamos los productos en las variables globales que declaraste con 'let'
-// y también en 'window' para que la función de adicionales los vea siempre.
-if (data.productos) {
-    productosRealtime = data.productos;
-    window.productosRealtime = data.productos; 
-    console.log("📦 Productos Realtime vinculados a window correctamente.");
-}
-// ------------------------------------------
-            // 🚀 --- AQUÍ INSERTAMOS EL REGISTRO DE VISITA ---
-            // Usamos el ID de la empresa y el slug que viene del perfil
+            if (data.productos) {
+                productosRealtime = data.productos;
+                window.productosRealtime = data.productos; 
+            }
+
             if (typeof registrarVisitaAnalytics === 'function') {
                 registrarVisitaAnalytics(id, perfil.slug);
-                // 2. Muestra que hay alguien conectado AHORA
                 gestionarPresenciaEnVivo(id);
             }
-            //
 
             aplicarSEO(perfil);
+            
+            // 🔥 LA CLAVE: Esta función decidirá cuándo llamar a la carga de la UI
             validarYContinuar(perfil, data);
-    
+            
             renderizarMenuCategorias();
-            // 💡 CAMBIO: Llama a la pestaña con un pequeño delay para asegurar que el DOM esté listo
-setTimeout(() => {
-    llenarPestañaEmpresa(perfil);
-}, 100);
-            console.log("✅ Empresa cargada exitosamente.");
+            console.log("✅ Proceso de carga iniciado...");
         } else {
             console.error("🚫 No se encontró la empresa.");
         }
