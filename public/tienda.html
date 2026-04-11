@@ -3288,13 +3288,13 @@ let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre
 
 // 5. Construcción del mensaje final
 const mensajeWa = encodeURIComponent(
-    `*PEDIDO REGISTRADO N°${campos.cliente}*\n\n` + 
+    `_*Pedido Registrado N°_ ${campos.cliente}*\n\n` + 
     
     `*PRODUCTOS:*\n${listaProductosTexto}\n` +
     `*TOTAL:* $${totalPuntoMil} _(Sin domicilio)_\n\n` +
     
     `${lineaDestinatario}\n` + 
-    `*DIR:* ${campos.direccion}(${notaTexto})\n` + 
+    `*DIR:* ${campos.direccion} (${notaTexto})\n` + 
     `*ENTREGA:* ${fechaFormateada} (${campos.horaEntrega})\n` +
     `*PAGO:* ${campos.medioPago}\n\n` +
     
