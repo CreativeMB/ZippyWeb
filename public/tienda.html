@@ -2155,15 +2155,12 @@ async function iniciarCargaBase(slugDesdeURL) {
     const loader = document.getElementById('loader');
     const dominioLimpioDB = window.location.hostname.replace(/\./g, '_');
     
-    console.log("🔍 Buscando tienda...");
-
     try {
         const baseRef = ref(db); 
         const consultaSlug = queryDB(baseRef, orderByChild("perfilempresa/slug"), equalTo(slugDesdeURL));
         let snapshot = await get(consultaSlug);
 
         if (!snapshot.exists()) {
-            console.log("⚠️ No encontrado por slug, buscando por dominio...");
             const consultaDominio = queryDB(baseRef, orderByChild("perfilempresa/dominio"), equalTo(dominioLimpioDB));
             snapshot = await get(consultaDominio);
         }
@@ -2181,24 +2178,17 @@ async function iniciarCargaBase(slugDesdeURL) {
                 window.productosRealtime = data.productos; 
             }
 
-            if (typeof registrarVisitaAnalytics === 'function') {
-                registrarVisitaAnalytics(id, perfil.slug);
-                gestionarPresenciaEnVivo(id);
-            }
-
             aplicarSEO(perfil);
             
-            // 🔥 LA CLAVE: Esta función decidirá cuándo llamar a la carga de la UI
+            // 🔥 IMPORTANTE: validarYContinuar se encarga de llamar a continuarCarga
             validarYContinuar(perfil, data);
             
             renderizarMenuCategorias();
-            console.log("✅ Proceso de carga iniciado...");
         } else {
             console.error("🚫 No se encontró la empresa.");
         }
         
         if (loader) loader.style.display = 'none';
-
     } catch (err) {
         console.error("🔥 Error crítico:", err);
         if (loader) loader.style.display = 'none';
@@ -2356,53 +2346,46 @@ function configurarRedesNav(perfil) {
         }, { onlyOnce: true });
     }
 
-    // --- 3. CARGA DE INTERFAZ (UI) ---
     function continuarCarga(perfil, data) {
-        if (bloqueoActivo) return;
+    if (bloqueoActivo) return;
 
-        telefonoEmpresa = perfil.WhatsApp.replace("+", "");
-        // 🚀 RECONEXIÓN: Llenamos la pestaña aquí porque ya tenemos el 'perfil' validado
+    // 1. Preparamos el teléfono (lo que ya tenías)
+    telefonoEmpresa = perfil.WhatsApp.replace("+", "");
+
+    // 🚀 RECONEXIÓN: Llamamos a tu función de pestaña enviándole el objeto 'perfil'
+    // La llamamos aquí porque es cuando los DIVs ya están listos para recibir datos.
     if (typeof llenarPestañaEmpresa === 'function') {
         llenarPestañaEmpresa(perfil);
     }
 
-        // Logo
-        const imgElement = document.getElementById('logoEmpresa');
-        if (perfil.urlLogo && perfil.urlLogo.trim() !== "") {
-            const urlFinal = obtenerLinkDirecto(perfil.urlLogo);
-            imgElement.setAttribute('referrerpolicy', 'no-referrer');
-            imgElement.src = urlFinal;
-            imgElement.onload = () => { imgElement.style.display = 'inline-block'; imgElement.style.opacity = '1'; };
-            imgElement.onerror = () => { imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(urlFinal)}`; };
-        } else {
-            imgElement.style.display = 'none';
-        }
+    // 2. Mantenemos tu lógica de Logo e Interfaz (Home)
+    const imgElement = document.getElementById('logoEmpresa');
+    if (perfil.urlLogo && perfil.urlLogo.trim() !== "") {
+        const urlFinal = obtenerLinkDirecto(perfil.urlLogo);
+        imgElement.src = urlFinal;
+        imgElement.style.display = 'inline-block';
+        imgElement.style.opacity = '1';
+    }
 
-        // Domiciliario
-        if (data.Domiciliarios) {
-            const idDom = Object.keys(data.Domiciliarios)[0];
-            idDomiciliarioAsignado = idDom;
-            nombreDomiciliarioAsignado = data.Domiciliarios[idDom].nombre || "Domiciliario General";
-        }
+    // 3. Llenamos los textos de la Home (IDs antiguos)
+    document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
+    document.getElementById("eslogan").innerText = perfil.eslogan;
+    document.getElementById("direccion").innerText = "📍 " + perfil.direccion;
+    document.getElementById("ciudad").innerText = perfil.ciudad;
+    document.getElementById("telefono").innerText = "📞 " + perfil.WhatsApp;
+    document.getElementById("info-destacada").innerText = perfil.publicidad;
+    document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
 
-        // Textos
-        document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
-        document.getElementById("eslogan").innerText = perfil.eslogan;
-        document.getElementById("direccion").innerText = "📍 " + perfil.direccion;
-        document.getElementById("ciudad").innerText = perfil.ciudad;
-        document.getElementById("telefono").innerText = "📞 " + perfil.WhatsApp;
-        document.getElementById("info-destacada").innerText = perfil.publicidad;
-        document.getElementById("btnWhats").href = `https://wa.me/${telefonoEmpresa}`;
+    // 4. Cargamos productos y activamos adicionales
+    cargarProductosJSON(perfil.json_datos);
+    escucharCambios(empresaId);
 
-        cargarProductosJSON(perfil.json_datos);
-        escucharCambios(empresaId);
-        // 3. Llamada de seguridad por si el JSON tardó en procesarse
     setTimeout(() => {
         if (typeof window.renderizarAdicionales === 'function') {
             window.renderizarAdicionales();
         }
     }, 2000);
-    }
+}
 
     // --- 4. GESTIÓN DE PRODUCTOS ---
     function cargarProductosJSON(contenido) {
