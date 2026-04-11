@@ -3096,7 +3096,6 @@ window.renderizarAdicionales = () => {
 
     if (!carrusel || !seccion) return;
 
-    // 1. Verificación estricta de datos (Igual que en tu inicio)
     const tieneJson = typeof productosJson !== 'undefined' && Object.keys(productosJson).length > 0;
     const tieneRealtime = typeof productosRealtime !== 'undefined' && Object.keys(productosRealtime).length > 0;
 
@@ -3105,7 +3104,8 @@ window.renderizarAdicionales = () => {
         return;
     }
 
-    const adicionales = Object.values(productosRealtime).filter(p => {
+    // 1. Obtenemos los adicionales
+    let adicionales = Object.values(productosRealtime).filter(p => {
         const cats = (p.categoria || "").split(",").map(c => c.trim().toLowerCase());
         return cats.includes("adicional") && !p.agotado;
     });
@@ -3115,22 +3115,20 @@ window.renderizarAdicionales = () => {
         return;
     }
 
-    // Sistema antiparpadeo
-    const idUnico = adicionales.length + (adicionales[0].referenciaReal || "adj");
-    if (carrusel.getAttribute("data-id") === idUnico) {
-        seccion.style.display = "block";
-        return;
-    }
+    // 🔥 2. EL TOQUE ALEATORIO (Shuffle)
+    // Esto mezcla la lista cada vez que se llama la función
+    adicionales.sort(() => Math.random() - 0.5);
 
+    // 3. Sistema antiparpadeo (Modificado para que permita el cambio aleatorio)
+    // Solo bloqueamos si el número de productos cambió drásticamente, 
+    // pero dejamos que se redibuje para mostrar el nuevo orden.
     seccion.style.display = "block";
-    carrusel.innerHTML = ""; // Limpiamos para cargar de forma sincronizada
-    carrusel.setAttribute("data-id", idUnico);
+    carrusel.innerHTML = ""; 
 
     adicionales.forEach(prod => {
         const nombreLlave = (prod.referenciaReal || prod.nombre || "").trim();
         const precioFinal = (prod.promocion && prod.valorPromocion > 0) ? prod.valorPromocion : (prod.valor || 0);
         
-        // Buscamos la imagen en el JSON (donde dices que cargan bien)
         let imgRaw = prod.imagen || productosJson[nombreLlave];
         if (!imgRaw) {
             const llaveCerrada = Object.keys(productosJson).find(k => k.toLowerCase().trim() === nombreLlave.toLowerCase());
@@ -3139,18 +3137,17 @@ window.renderizarAdicionales = () => {
 
         const srcFinal = typeof normalizarImagen === 'function' ? normalizarImagen(imgRaw) : imgRaw;
 
-        // --- LÓGICA SINCRÓNICA: PRECARGA ---
+        // Carga Sincrónica
         const tempImg = new Image();
         tempImg.src = srcFinal;
 
-        // Solo cuando la imagen carga en memoria, creamos el elemento en el DOM
         tempImg.onload = () => {
             const precioFormateado = window.formatearPrecio ? window.formatearPrecio(precioFinal) : `$ ${precioFinal.toLocaleString()}`;
             
             const item = document.createElement("div");
             item.className = "card-adicional-item";
-            item.style.opacity = "0"; // Aparece suavemente
-            item.style.transition = "opacity 0.5s";
+            item.style.opacity = "0";
+            item.style.transition = "opacity 0.5s ease-in";
             
             item.onclick = () => {
                 window.agregarAlCarrito(nombreLlave.replace(/'/g, "\\'"), imgRaw, precioFinal, (prod.descripcion || '').replace(/'/g, "\\'"), prod.stock ?? null);
@@ -3158,25 +3155,21 @@ window.renderizarAdicionales = () => {
             };
 
             item.innerHTML = `
-                <div style="width: 45px; height: 45px; margin: 0 auto 3px auto; background: #fff; border-radius: 4px; overflow: hidden;">
+                <div style="width: 48px; height: 48px; margin: 0 auto 4px auto; background: #fff; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <img src="${srcFinal}" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
-                <div style="font-size: 9px; color: #27ae60; font-weight: 800; text-align: center;">
+                <div style="font-size: 10px; color: #2ecc71; font-weight: 800; text-align: center; letter-spacing: -0.3px;">
                     ${precioFormateado}
                 </div>
             `;
             
             carrusel.appendChild(item);
-            setTimeout(() => item.style.opacity = "1", 50); // Efecto de entrada
-        };
-
-        // Si la imagen falla definitivamente, no agregamos nada
-        tempImg.onerror = () => {
-            console.error("No se pudo cargar la imagen de: " + nombreLlave);
+            setTimeout(() => item.style.opacity = "1", 50);
         };
     });
-};
 
+    carrusel.onwheel = (e) => { if(e.deltaY !== 0) { e.preventDefault(); carrusel.scrollLeft += e.deltaY; } };
+};
 
 // 4. CAMBIAR CANTIDADES (+ / -) con Validación de Stock Real
 window.cambiarCantidadCarrito = (index, valor) => {
