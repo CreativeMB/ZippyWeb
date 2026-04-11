@@ -2357,6 +2357,11 @@ function configurarRedesNav(perfil) {
     if (typeof llenarPestañaEmpresa === 'function') {
         llenarPestañaEmpresa(perfil);
     }
+    // 2. 🔥 VALIDACIÓN DEL DOMICILIARIO (Aquí está el arreglo)
+    // Debes llamar a la función que revisa la carpeta /Domiciliarios en Firebase
+    if (typeof verificarDomiciliarios === 'function') {
+        verificarDomiciliarios(empresaId); 
+    }
 
     // 2. Mantenemos tu lógica de Logo e Interfaz (Home)
     const imgElement = document.getElementById('logoEmpresa');
