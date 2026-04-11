@@ -2151,7 +2151,6 @@ function irAMantenimiento(motivo) {
         </div>
     `;
 }
-
 async function iniciarCargaBase(slugDesdeURL) {
     const loader = document.getElementById('loader');
     const dominioLimpioDB = window.location.hostname.replace(/\./g, '_');
@@ -2205,7 +2204,6 @@ async function iniciarCargaBase(slugDesdeURL) {
         if (loader) loader.style.display = 'none';
     }
 }
-
 
 window.procesarProductoDirecto = function() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -2363,6 +2361,10 @@ function configurarRedesNav(perfil) {
         if (bloqueoActivo) return;
 
         telefonoEmpresa = perfil.WhatsApp.replace("+", "");
+        // 🚀 RECONEXIÓN: Llenamos la pestaña aquí porque ya tenemos el 'perfil' validado
+    if (typeof llenarPestañaEmpresa === 'function') {
+        llenarPestañaEmpresa(perfil);
+    }
 
         // Logo
         const imgElement = document.getElementById('logoEmpresa');
