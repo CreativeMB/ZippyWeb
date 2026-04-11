@@ -2200,9 +2200,12 @@ if (data.productos) {
 
             aplicarSEO(perfil);
             validarYContinuar(perfil, data);
-            llenarPestañaEmpresa(perfil);
+    
             renderizarMenuCategorias();
-            
+            // 💡 CAMBIO: Llama a la pestaña con un pequeño delay para asegurar que el DOM esté listo
+setTimeout(() => {
+    llenarPestañaEmpresa(perfil);
+}, 100);
             console.log("✅ Empresa cargada exitosamente.");
         } else {
             console.error("🚫 No se encontró la empresa.");
@@ -2216,50 +2219,6 @@ if (data.productos) {
     }
 }
 
-/*function iniciarCargaBase(slugDesdeURL) {
-    const loader = document.getElementById('loader');
-    const empresasRef = ref(db);
-    
-    // Tu lógica de dominio original (MANTENIDA)
-    const dominioLimpioDB = window.location.hostname.replace(/\./g, '_');
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const productoCodigo = urlParams.get('producto'); 
-
-    get(empresasRef).then((snapshot) => {
-        let empresaEncontrada = false;
-        
-        snapshot.forEach((child) => {
-            const data = child.val();
-            const perfil = data.perfilempresa;
-
-            // Tu lógica de comparación original (MANTENIDA)
-            if (perfil?.slug === slugDesdeURL || perfil?.dominio === dominioLimpioDB) {
-                
-                empresaId = child.key;
-                empresaEncontrada = true;
-
-                // --- TUS FUNCIONES ORIGINALES (INTACTAS) ---
-                aplicarSEO(perfil);
-                validarYContinuar(perfil, data);
-                llenarPestañaEmpresa(perfil);
-                renderizarMenuCategorias();
-                // -------------------------------------------
-
-                if(loader) loader.style.display = 'none';
-            }
-        });
-
-        if (!empresaEncontrada) {
-            console.error("🚫 No se detectó ninguna empresa para:", dominioLimpioDB);
-            if(loader) loader.style.display = 'none';
-        }
-    }).catch(err => {
-        console.error("❌ Error Firebase:", err);
-        if(loader) loader.style.display = 'none';
-    });
-}
-*/
 
 window.procesarProductoDirecto = function() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -2514,38 +2473,7 @@ function configurarRedesNav(perfil) {
         console.error("❌ Error al cargar productos:", error);
     });
 }
-/*
- function escucharCambios(id) {
-    if (bloqueoActivo) return;
 
-    const productosRef = ref(db, id + "/productos");
-
-    onValue(productosRef, (snapshot) => {
-        if (bloqueoActivo) return;
-
-        productosRealtime = {};
-
-        snapshot.forEach((child) => {
-            const p = child.val();
-            const refOriginal = p.referencia || p.Referencia || p.nombre || "";
-
-            if (refOriginal) {
-                const claveLimpia = String(refOriginal).trim().toLowerCase();
-
-                productosRealtime[claveLimpia] = p;
-                productosRealtime[claveLimpia].referenciaReal = refOriginal;
-            }
-        });
-
-        // 🔥 AGREGA ESTO AQUÍ
-        console.log("YA CARGÓ TODO REALTIME:", productosRealtime);
-
-        render(); // ← AQUÍ se generan categorías correctamente
-        procesarProductoDirecto();
-    });
-}
-
-*/
 let promoTimer;
 let indiceGrupo = 0;
 
@@ -2626,152 +2554,7 @@ function renderizarPromoBanner() {
     clearInterval(promoTimer);
     promoTimer = setInterval(cambiarCiclo, 6000); // Cambia cada 6 segundos (tiempo suficiente para ver)
 }
-/*
-function render() {
-    if (bloqueoActivo) return;
-    const contenedor = document.getElementById("productos");
-    if (!contenedor) return;
-    
-    // 1. LIMPIEZA TOTAL PARA EVITAR DUPLICADOS
-    contenedor.innerHTML = "";
-    const productosDibujados = new Set();
-    
-    // 2. OBTENER ESTADO DE BÚSQUEDA Y URL
-    const inputBusqueda = document.getElementById('contenedorBusqueda');
-    const textoBusqueda = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : "";
-    const urlParams = new URLSearchParams(window.location.search);
-    const productoEnUrl = urlParams.get('producto')?.trim().toLowerCase();
 
-
- // ============================================================
-    // INICIO: BLOQUE NUEVO PARA CATEGORÍA POR URL
-    // ============================================================
-    if (!urlCategoriaProcesada) {
-        const catURL = urlParams.get('categoria');
-        if (catURL) {
-            const todasLasCats = obtenerCategoriasUnicas();
-            if (todasLasCats.length > 0) {
-                const buscado = decodeURIComponent(catURL).toLowerCase().trim();
-                const match = todasLasCats.find(c => c.toLowerCase().trim() === buscado);
-                if (match) {
-                    categoriaSeleccionada = match;
-                    console.log("%c🎯 Categoría URL detectada: " + match, "color: #25D366; font-weight: bold;");
-                }
-                urlCategoriaProcesada = true; // Candado para que no se repita
-            }
-        } else {
-            urlCategoriaProcesada = true; // Si no hay categoría en URL, también cerramos el candado
-        }
-    }
-    // ============================================================
-    // FIN: BLOQUE NUEVO
-    // ============================================================
-
-
-    // 3. LÓGICA DEL BANNER DE PROMOCIONES
-    const bannerContainer = document.getElementById("promo-banner-container");
-    if (textoBusqueda === "" && (!categoriaSeleccionada || categoriaSeleccionada === "Todas")) {
-        renderizarPromoBanner(); 
-    } else if (bannerContainer) {
-        bannerContainer.style.display = "none"; 
-    }
-
-    renderizarMenuCategorias();
-
-    // 4. BUCLE PRINCIPAL DE PRODUCTOS
-    for (const refP in productosJson) {
-        if (refP === "images") continue;
-       
-        const claveBusqueda = refP.trim().toLowerCase();
-    
-        const real = productosRealtime[claveBusqueda] || { valor: 0, agotado: false, referenciaReal: refP, stock: null };
-        // NUEVA LÓGICA: Un producto está agotado si el switch 'agotado' es true 
-// O si el nodo 'stock' existe y es menor o igual a 0.
-const estaRealmenteAgotado = real.agotado || (real.stock !== null && real.stock !== undefined && real.stock <= 0);
-
-        const nombreReal = (real.referenciaReal || refP);
-        const nombreParaFiltrar = nombreReal.toLowerCase();
-
-        // --- FILTRO DE DUPLICADOS INTERNO ---
-        if (productosDibujados.has(nombreParaFiltrar)) continue;
-
-        // --- FILTRO 1: POR CATEGORÍA ---
-        if (categoriaSeleccionada && categoriaSeleccionada !== "Todas") {
-            const categoriasProducto = (real.categoria || "").split(",").map(c => c.trim().toLowerCase());
-            if (!categoriasProducto.includes(categoriaSeleccionada.toLowerCase())) {
-                continue;
-            }
-        }
-
-        // --- FILTRO 2: POR BUSCADOR ---
-        if (textoBusqueda !== "" && !nombreParaFiltrar.includes(textoBusqueda)) {
-            continue;
-        }
-
-        productosDibujados.add(nombreParaFiltrar);
-
-        const imgUrl = productosJson[refP];
-        let precioHTML = "";
-        let precioFinal = (real.promocion && real.valorPromocion > 0) ? real.valorPromocion : (real.valor || 0);
-        
-        if (real.promocion && real.valorPromocion > 0) {
-            const porcentaje = Math.round(100 - (real.valorPromocion * 100 / real.valor));
-            precioHTML = `
-                <div class="precio-contenedor-premium">
-                    <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
-                    <div class="precioViejo-container">
-                        <span class="precioViejo">${formatearPrecio(real.valor)}</span>
-                        <span class="badge-ahorro-premium">¡Ahorras ${porcentaje}%</span>
-                    </div>
-                </div>`;
-        } else {
-            precioHTML = `<div class="precio">${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}</div>`;
-        }
-
-        const card = document.createElement("div");
-        card.className = `producto ${real.agotado ? 'agotado' : ''} visible`;
-
-        const descProd = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
-        const refProd = nombreReal.replace(/'/g, "\\'");
-
-        let botonesHtml = real.agotado ? 
-           `<button class="btn" style="background:#888; color:white; width:90%; margin:10px auto;" disabled>Agotado</button>` : 
-    `<div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 10px; width: 100%; box-sizing: border-box;">
-        <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})" style="flex: 1; background: #E5C453;">
-            <i class="fas fa-cart-plus"></i>
-        </button>
-        <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;">
-            <i class="fab fa-whatsapp"></i> Me interesa
-        </button>
-    </div>`;
-
-        // LÓGICA DE IMAGEN: Filtro gris/negativo si está agotado + quitar clic
-        const estiloImagen = real.agotado ? 'filter: grayscale(100%) brightness(0.8); opacity: 0.6; cursor: default;' : 'cursor: pointer;';
-        const accionImagen = real.agotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}')"`;
-// Crea una etiqueta pequeña de stock
-let stockEtiqueta = "";
-if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.stock <= 5) {
-    stockEtiqueta = `<div style="color: #FF6600; font-size: 0.8em; font-weight: bold;">¡Solo quedan ${real.stock}!</div>`;
-}
-      card.innerHTML = `
-    <div class="img-container">
-        ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-        <img src="${normalizarImagen(imgUrl)}" 
-             ${estaRealmenteAgotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})"`} 
-             style="${estaRealmenteAgotado ? 'filter: grayscale(100%) opacity: 0.6;' : 'cursor: pointer;'}"
-             loading="lazy"> 
-    </div>
-    <div class="nombre">${nombreReal}</div>
-    <div class="precio-contenedor">${precioHTML}</div>
-    ${stockEtiqueta} ${botonesHtml}
-`;
-
-        contenedor.appendChild(card);
-    }
-
-    const ld = document.getElementById("loader");
-    if (ld) { ld.style.display = "none"; }
-}*/
 
 function render() {
     if (bloqueoActivo) return;
