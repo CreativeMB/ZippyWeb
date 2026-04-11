@@ -3510,15 +3510,28 @@ function enviarPedido() {
 
         set(nuevoRef, pedidoData).then(() => {
             
-            // --- BLOQUE DESCUENTO STOCK ---
-            carrito.forEach(item => {
-                const nombreLimpio = item.nombre.toLowerCase().trim();
-                const infoProd = productosRealtime[nombreLimpio];
-                if (infoProd && infoProd.idFirebase) {
-                    const rutaProducto = ref(db, `${empresaId}/productos/${infoProd.idFirebase}`);
-                    update(rutaProducto, { stock: increment(-item.cantidad) });
-                }
-            });
+         // --- BLOQUE DESCUENTO STOCK (CORREGIDO) ---
+carrito.forEach(item => {
+    const nombreLimpio = item.nombre.toLowerCase().trim();
+    const infoProd = productosRealtime[nombreLimpio];
+
+    // ESCENARIO 1: Solo descontamos si existe el ID y el campo stock está definido
+    // Si infoProd.stock es undefined o null, se considera ilimitado y no se toca.
+    if (infoProd && infoProd.idFirebase && typeof infoProd.stock !== 'undefined' && infoProd.stock !== null) {
+        
+        // ESCENARIO 2 Y 3: Si tiene el nodo, restamos. 
+        // Firebase se encarga de dejarlo en 0 o menos si es necesario.
+        const rutaProducto = ref(db, `${empresaId}/productos/${infoProd.idFirebase}`);
+        update(rutaProducto, { 
+            stock: increment(-item.cantidad) 
+        });
+        
+        console.log(`📉 Descontando stock a: ${item.nombre}`);
+    } else {
+        // ESCENARIO ILIMITADO: No hacemos nada en Firebase
+        console.log(`♾️ Producto ilimitado (sin nodo stock): ${item.nombre}`);
+    }
+});
 
            // --- CONSTRUCCIÓN MENSAJE WHATSAPP (SOLO LO SOLICITADO) ---
             let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre}`).join('\n');
