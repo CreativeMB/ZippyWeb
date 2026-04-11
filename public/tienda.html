@@ -3054,9 +3054,14 @@ window.renderizarCarritoEnForm = () => {
     
     const totalElem = document.getElementById("total-pedido-suma");
     if (totalElem) totalElem.innerText = formatearPrecio(total);
-    // --- NUEVO: Cargar los complementos (Adicionales) ---
-    renderizarAdicionales();
+   // En lugar de llamarlo directo, le damos un micro-retraso para que el modal termine de abrirse
+    setTimeout(() => {
+        if (typeof window.renderizarAdicionales === 'function') {
+            window.renderizarAdicionales();
+        }
+    }, 150); // 150ms es suficiente para que no se note pero cargue estable
 };
+
 window.renderizarAdicionales = () => {
     const carrusel = document.getElementById("carrusel-adicionales");
     const seccion = document.getElementById("seccion-adicionales");
@@ -3065,6 +3070,7 @@ window.renderizarAdicionales = () => {
 
     const datos = window.productosRealtime || productosRealtime;
 
+    // Si no hay datos, ocultamos y esperamos
     if (!datos || Object.keys(datos).length === 0) {
         seccion.style.display = "none";
         return;
@@ -3081,26 +3087,32 @@ window.renderizarAdicionales = () => {
         return;
     }
 
-    // --- EVITAR PARPADEO ---
-    // Si ya hay el mismo número de elementos dibujados, no borramos nada
+    // Evitar el parpadeo si ya están dibujados
     if (carrusel.children.length === adicionales.length) {
         seccion.style.display = "block";
-        return; 
+        return;
     }
 
     seccion.style.display = "block";
     carrusel.innerHTML = ""; 
 
     adicionales.forEach(prod => {
-        const nombreProd = prod.referenciaReal || prod.nombre || "";
+        const nombreReal = (prod.referenciaReal || prod.nombre || "").trim();
         const precioFinal = (prod.promocion && prod.valorPromocion > 0) ? prod.valorPromocion : (prod.valor || 0);
         
-        // --- BUSQUEDA SEGURA DE IMAGEN ---
-        // 1. Prioridad: prod.imagen del realtime
-        // 2. Segunda opción: buscar en productosJson por el nombre exacto
-        let imgUrl = prod.imagen;
+        // --- BUSCADOR DE IMAGEN ROBUSTO ---
+        let imgUrl = prod.imagen; 
+
         if (!imgUrl && typeof productosJson !== 'undefined') {
-            imgUrl = productosJson[nombreProd] || productosJson[nombreProd.trim()];
+            // 1. Intento búsqueda exacta
+            imgUrl = productosJson[nombreReal];
+            
+            // 2. Si no la encuentra, busca ignorando mayúsculas/minúsculas
+            if (!imgUrl) {
+                const nombreBusqueda = nombreReal.toLowerCase();
+                const claveEncontrada = Object.keys(productosJson).find(k => k.toLowerCase().trim() === nombreBusqueda);
+                if (claveEncontrada) imgUrl = productosJson[claveEncontrada];
+            }
         }
 
         const precioFormateado = window.formatearPrecio ? window.formatearPrecio(precioFinal) : '$ ' + precioFinal.toLocaleString();
@@ -3109,29 +3121,28 @@ window.renderizarAdicionales = () => {
         item.className = "card-adicional-item"; 
         
         item.onclick = () => {
-            window.agregarAlCarrito(
-                nombreProd.replace(/'/g, "\\'"), 
-                imgUrl, 
-                precioFinal, 
-                (prod.descripcion || '').replace(/'/g, "\\'"), 
-                prod.stock ?? null
-            );
-            // Al agregar, refrescamos el formulario
+            window.agregarAlCarrito(nombreReal.replace(/'/g, "\\'"), imgUrl, precioFinal, (prod.descripcion || '').replace(/'/g, "\\'"), prod.stock ?? null);
             window.renderizarCarritoEnForm();
         };
 
+        // Si después de todo no hay imagen, usamos un icono de regalo o caja
+        const imagenFinal = imgUrl ? (window.normalizarImagen ? window.normalizarImagen(imgUrl) : imgUrl) : 'https://cdn-icons-png.flaticon.com/512/1162/1162265.png';
+
         item.innerHTML = `
-            <img src="${window.normalizarImagen ? window.normalizarImagen(imgUrl) : imgUrl}" 
-                 onerror="this.src='https://via.placeholder.com/45?text=No+Img'"
-                 loading="lazy"
-                 style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px; display: block; margin: 0 auto 3px auto;">
-            <div style="font-size: 9px; color: #27ae60; font-weight: 800; text-align: center;">
+            <div style="width: 45px; height: 45px; margin: 0 auto 3px auto; position: relative; background: #f9f9f9; border-radius: 4px; overflow: hidden;">
+                <img src="${imagenFinal}" 
+                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/1162/1162265.png'"
+                     style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div style="font-size: 9px; color: #27ae60; font-weight: 800; text-align: center; white-space: nowrap;">
                 ${precioFormateado}
             </div>
         `;
         carrusel.appendChild(item);
     });
 };
+
+
 // 4. CAMBIAR CANTIDADES (+ / -) con Validación de Stock Real
 window.cambiarCantidadCarrito = (index, valor) => {
     const item = carrito[index];
