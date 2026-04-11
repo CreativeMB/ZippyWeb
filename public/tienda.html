@@ -3071,21 +3071,22 @@ window.renderizarCarritoEnForm = () => {
         }
     }, 150); // 150ms es suficiente para que no se note pero cargue estable
 };
+
 window.renderizarAdicionales = () => {
     const carrusel = document.getElementById("carrusel-adicionales");
     const seccion = document.getElementById("seccion-adicionales");
 
     if (!carrusel || !seccion) return;
 
-    // 1. Obtención de datos desde la fuente global compartida con window
-    const datos = window.productosRealtime || (typeof productosRealtime !== 'undefined' ? productosRealtime : null);
+    // 1. Obtención de datos
+    const datos = window.productosRealtime || productosRealtime;
 
     if (!datos || Object.keys(datos).length === 0) {
         seccion.style.display = "none";
         return;
     }
 
-    // 2. Filtrado por categoría "adicional" usando tu lógica de comas
+    // 2. Filtrado
     const adicionales = Object.values(datos).filter(p => {
         if (!p.categoria) return false;
         const categorias = p.categoria.split(",").map(c => c.trim().toLowerCase());
@@ -3097,9 +3098,8 @@ window.renderizarAdicionales = () => {
         return;
     }
 
-    // 3. Sistema Antiparpadeo: Si el contenido es el mismo, no re-dibujar
-    // Usamos un identificador rápido basado en la cantidad y el primer nombre
-    const idContenido = adicionales.length + (adicionales[0].referenciaReal || "");
+    // 3. Sistema Antiparpadeo mejorado
+    const idContenido = adicionales.length + adicionales[0].nombre;
     if (carrusel.getAttribute("data-last-id") === idContenido) {
         seccion.style.display = "block";
         return;
@@ -3109,23 +3109,18 @@ window.renderizarAdicionales = () => {
     carrusel.innerHTML = "";
     carrusel.setAttribute("data-last-id", idContenido);
 
-    // 4. Construcción de tarjetas Micro
+    // 4. Construcción de tarjetas
     adicionales.forEach(prod => {
         const nombreReal = (prod.referenciaReal || prod.nombre || "").trim();
         const precioFinal = (prod.promocion && prod.valorPromocion > 0) ? prod.valorPromocion : (prod.valor || 0);
         
-        // --- BUSCADOR DE IMAGEN ROBUSTO ---
-        let imgUrl = prod.imagen; 
-        if (!imgUrl && typeof productosJson !== 'undefined') {
-            imgUrl = productosJson[nombreReal]; // Intento exacto
-            if (!imgUrl) { // Intento ignorando Mayúsculas
-                const nombreBusqueda = nombreReal.toLowerCase();
-                const claveEncontrada = Object.keys(productosJson).find(k => k.toLowerCase().trim() === nombreBusqueda);
-                if (claveEncontrada) imgUrl = productosJson[claveEncontrada];
-            }
-        }
+        // --- LÓGICA DE IMAGEN IGUAL AL CATÁLOGO ---
+        // Buscamos la imagen directamente como lo haces en la lista principal
+        let imgUrl = prod.imagen || (typeof productosJson !== 'undefined' ? productosJson[nombreReal] : '');
+        
+        // Aplicamos tu función de normalización (la que usas en el render principal)
+        const srcFinal = typeof normalizarImagen === 'function' ? normalizarImagen(imgUrl) : imgUrl;
 
-        // Formato de precio: $ 1.000
         const precioFormateado = window.formatearPrecio ? window.formatearPrecio(precioFinal) : `$ ${precioFinal.toLocaleString()}`;
 
         const item = document.createElement("div");
@@ -3134,36 +3129,20 @@ window.renderizarAdicionales = () => {
         item.onclick = () => {
             window.agregarAlCarrito(
                 nombreReal.replace(/'/g, "\\'"), 
-                imgUrl, 
+                imgUrl, // Pasamos la URL original para el carrito
                 precioFinal, 
                 (prod.descripcion || '').replace(/'/g, "\\'"), 
                 prod.stock ?? null
             );
-            // Refrescar el carrito para que se vea el nuevo item
             window.renderizarCarritoEnForm();
-            
-            // Feedback visual rápido
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Sumado',
-                    showConfirmButton: false,
-                    timer: 700
-                });
-            }
         };
 
-        // Imagen final o Icono de respaldo si no hay foto
-        const imagenFinal = imgUrl ? (window.normalizarImagen ? window.normalizarImagen(imgUrl) : imgUrl) : 'https://cdn-icons-png.flaticon.com/512/1162/1162265.png';
-
         item.innerHTML = `
-            <div style="width: 45px; height: 45px; margin: 0 auto 3px auto; background: #f9f9f9; border-radius: 4px; overflow: hidden;">
-                <img src="${imagenFinal}" 
-                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/1162/1162265.png'"
-                     loading="lazy"
-                     style="width: 100%; height: 100%; object-fit: cover;">
+            <div style="width: 45px; height: 45px; margin: 0 auto 3px auto; background: #eee; border-radius: 4px; overflow: hidden;">
+                <img src="${srcFinal}" 
+                     style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                     onload="this.style.opacity='1'"
+                     style="opacity:0; transition: opacity 0.3s ease;">
             </div>
             <div style="font-size: 9px; color: #27ae60; font-weight: 800; text-align: center; white-space: nowrap;">
                 ${precioFormateado}
@@ -3172,7 +3151,7 @@ window.renderizarAdicionales = () => {
         carrusel.appendChild(item);
     });
 
-    // 5. Soporte para Scroll con la rueda del mouse (Mejora para PC)
+    // Scroll con mouse
     carrusel.onwheel = (evt) => {
         if (evt.deltaY !== 0) {
             evt.preventDefault();
