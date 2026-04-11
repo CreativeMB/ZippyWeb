@@ -2392,6 +2392,23 @@ function configurarRedesNav(perfil) {
     }, 2000);
 }
 
+function verificarDomiciliarios(idEmpresa) {
+    const domRef = ref(db, idEmpresa + "/Domiciliarios");
+    get(domRef).then((snapshot) => {
+        if (!snapshot.exists()) {
+            console.warn("⚠️ No hay domiciliarios registrados.");
+            // Aquí puedes poner tu alerta o bloqueo de botón
+        } else {
+            // Selecciona el primero o activa el flujo
+            const domis = snapshot.val();
+            const primerId = Object.keys(domis)[0];
+            window.domiciliarioAsignado = {
+                id: primerId,
+                nombre: domis[primerId].nombre
+            };
+        }
+    });
+}
     // --- 4. GESTIÓN DE PRODUCTOS ---
     function cargarProductosJSON(contenido) {
         if (bloqueoActivo) return;
