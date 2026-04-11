@@ -3277,7 +3277,7 @@ let lineaDestinatario = esRegalo
 
 // 2. Formatear Notas (CORREGIDO: era notasPedido, no notesPedido)
 // También revisamos si existe en campos.notasPedido
-const notaTexto = campos.notasPedido ? ` ${campos.notasPedido}_` : "";
+const notaTexto = campos.notasPedido ? `${campos.notasPedido}` : "";
 
 // 3. Calcular total y formatear
 const totalSinDomicilio = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
@@ -3288,7 +3288,7 @@ let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre
 
 // 5. Construcción del mensaje final
 const mensajeWa = encodeURIComponent(
-    `_*Pedido Registrado N°_ ${campos.cliente}*\n\n` + 
+    `*_*Pedido Registrado N°*_ *${campos.cliente}*\n\n` + 
     
     `*PRODUCTOS:*\n${listaProductosTexto}\n` +
     `*TOTAL:* $${totalPuntoMil} _(Sin domicilio)_\n\n` +
