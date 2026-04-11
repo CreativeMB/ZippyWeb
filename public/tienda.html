@@ -3268,19 +3268,39 @@ carrito.forEach(item => {
     }
 });
 
-           // --- CONSTRUCCIÓN MENSAJE WHATSAPP (SOLO LO SOLICITADO) ---
-            let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre}`).join('\n');
+         // --- CONSTRUCCIÓN MENSAJE WHATSAPP (REORGANIZADO POR SECCIONES) ---
 
-            const mensajeWa = encodeURIComponent(
-                `*NUEVO PEDIDO REGISTRADO*\n\n` +
-                `*PRODUCTOS:*\n${listaProductosTexto}\n` +
-                `*CLIENTE:* ${campos.nombreComprador}\n` +
-                `*FECHA ENTREGA:* ${fechaFormateada}\n` +
-                `*HORA:* ${campos.horaEntrega}\n` +
-                `*DIRECCIÓN:* ${campos.direccion}\n` +
-                `*MEDIO DE PAGO:* ${campos.medioPago}\n\n` +
-                `_Por favor confirma mi pedido._`
-            );
+// 1. Calculamos el total del carrito (sin domicilio)
+const totalSinDomicilio = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
+
+// 2. Formateamos la lista de productos
+let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre}`).join('\n');
+
+// 3. Formateamos el precio para que se vea bien (ej: $50.000)
+const totalFormateado = window.formatearPrecio ? window.formatearPrecio(totalSinDomicilio) : '$' + totalSinDomicilio;
+
+const mensajeWa = encodeURIComponent(
+    `*NUEVO PEDIDO REGISTRADO*\n\n` +
+    
+    `📦 *PRODUCTOS:*\n${listaProductosTexto}\n\n` +
+    
+    `💰 *VALOR A PAGAR:* ${totalFormateado}\n` +
+    `_(Valor sin domicilio)_\n\n` +
+    
+    `👤 *DATOS DEL CLIENTE:*\n` +
+    `- Nombre: ${campos.nombreComprador}\n` +
+    `- Celular: ${campos.celularComprador}\n\n` +
+    
+    `🗓️ *ENTREGA:*\n` +
+    `- Fecha: ${fechaFormateada}\n` +
+    `- Hora: ${campos.horaEntrega}\n` +
+    `- Dirección: ${campos.direccion}\n\n` +
+    
+    `💳 *MEDIO DE PAGO:*\n` +
+    `${campos.medioPago}\n\n` +
+    
+    `_Por favor confirma mi pedido._`
+);
 
             const linkWa = `https://wa.me/${telefonoEmpresa}?text=${mensajeWa}`;
 
