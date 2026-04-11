@@ -2393,20 +2393,28 @@ function configurarRedesNav(perfil) {
 }
 
 function verificarDomiciliarios(idEmpresa) {
+    // Referencia a la carpeta Domiciliarios de esta empresa específica
     const domRef = ref(db, idEmpresa + "/Domiciliarios");
+    
     get(domRef).then((snapshot) => {
-        if (!snapshot.exists()) {
-            console.warn("⚠️ No hay domiciliarios registrados.");
-            // Aquí puedes poner tu alerta o bloqueo de botón
+        if (snapshot.exists()) {
+            const domiciliarios = snapshot.val();
+            // Tomamos el ID del primer domiciliario que encontremos
+            const primerId = Object.keys(domiciliarios)[0];
+            
+            // 🔥 AQUÍ ESTÁ LA CLAVE: Asignamos el valor a la variable que usa tu validación
+            idDomiciliarioAsignado = primerId; 
+            nombreDomiciliarioAsignado = domiciliarios[primerId].nombre;
+            
+            console.log("✅ Domiciliario asignado con éxito:", nombreDomiciliarioAsignado);
         } else {
-            // Selecciona el primero o activa el flujo
-            const domis = snapshot.val();
-            const primerId = Object.keys(domis)[0];
-            window.domiciliarioAsignado = {
-                id: primerId,
-                nombre: domis[primerId].nombre
-            };
+            // Si no hay ninguno, nos aseguramos de que sea null para que salte tu alerta de Swal
+            idDomiciliarioAsignado = null;
+            console.warn("⚠️ No se encontraron domiciliarios en la base de datos.");
         }
+    }).catch((error) => {
+        console.error("Error al verificar domiciliarios:", error);
+        idDomiciliarioAsignado = null;
     });
 }
     // --- 4. GESTIÓN DE PRODUCTOS ---
