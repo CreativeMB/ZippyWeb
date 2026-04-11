@@ -3277,15 +3277,14 @@ const totalPuntoMil = totalSinDomicilio.toLocaleString('es-CO', { maximumFractio
 let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre}`).join('\n');
 
 const mensajeWa = encodeURIComponent(
-    `*NUEVO PEDIDO REGISTRADO*\n\n` +
+    `*NUEVO PEDIDO REGISTRADO N°${cliente}*\n\n` +
     
-    `📦 *PRODUCTOS:*\n${listaProductosTexto}\n` +
-    `💰 *TOTAL:* $${totalPuntoMil} _(Sin domicilio)_\n\n` +
-    
-    `👤 *CLIENTE:* ${campos.nombreComprador}\n` +
-    `🗓️ *ENTREGA:* ${fechaFormateada} (${campos.horaEntrega})\n` +
-    `📍 *DIR:* ${campos.direccion}\n` +
-    `💳 *PAGO:* ${campos.medioPago}\n\n` +
+    `*PRODUCTOS:*\n${listaProductosTexto}\n` +
+    `*TOTAL:* $${totalPuntoMil} _(Sin domicilio)_\n\n` +
+    `*CLIENTE:* ${campos.nombreComprador}\n` +
+    `*ENTREGA:* ${fechaFormateada} (${campos.horaEntrega})\n` +
+    `*DIRECCION:* ${campos.direccion}\n` +
+    `*PAGO:* ${campos.medioPago}\n\n` +
     
     `_Por favor confirma mi pedido._`
 );
