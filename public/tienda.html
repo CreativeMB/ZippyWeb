@@ -3091,10 +3091,12 @@ window.renderizarAdicionales = () => {
         const imgUrl = prod.imagen || (typeof productosJson !== 'undefined' ? productosJson[nombreProd] : '');
         const descProd = (prod.descripcion || "Sin descripción").replace(/'/g, "\\'");
 
+        // Formateamos el precio usando tu función global
+        const precioFormateado = window.formatearPrecio ? window.formatearPrecio(precioFinal) : '$ ' + precioFinal.toLocaleString();
+
         const item = document.createElement("div");
         item.className = "card-adicional-item"; 
         
-        // El clic sigue funcionando igual, agregando el producto
         item.onclick = () => {
             window.agregarAlCarrito(
                 nombreProd.replace(/'/g, "\\'"), 
@@ -3105,25 +3107,25 @@ window.renderizarAdicionales = () => {
             );
             window.renderizarCarritoEnForm();
             
-            // Un feedback visual más sutil para este diseño micro
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     toast: true,
                     position: 'top-end',
                     icon: 'success',
-                    title: `Sumado`,
+                    title: `Agregado`,
                     showConfirmButton: false,
-                    timer: 800 // Más rápido
+                    timer: 700
                 });
             }
         };
 
-        // --- DISEÑO MICRO: Solo Imagen y Precio ---
+        // DISEÑO MICRO: Imagen y Precio Formateado con punto y signo
         item.innerHTML = `
             <img src="${window.normalizarImagen ? window.normalizarImagen(imgUrl) : imgUrl}" 
-                 onerror="this.src='https://via.placeholder.com/45?text=Prod'">
-            <div style="font-size: 10px; color: #27ae60; font-weight: 700; line-height: 1; padding-top: 2px;">
-                ${window.formatearPrecio ? window.formatearPrecio(precioFinal) : '$' + precioFinal}
+                 onerror="this.src='https://via.placeholder.com/45?text=Prod'"
+                 style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px; display: block; margin: 0 auto 3px auto;">
+            <div style="font-size: 9px; color: #27ae60; font-weight: 800; text-align: center; white-space: nowrap;">
+                ${precioFormateado}
             </div>
         `;
         carrusel.appendChild(item);
