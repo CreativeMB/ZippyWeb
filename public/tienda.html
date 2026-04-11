@@ -3071,14 +3071,14 @@ window.renderizarCarritoEnForm = () => {
         }
     }, 150); // 150ms es suficiente para que no se note pero cargue estable
 };
-
+ 
 window.renderizarAdicionales = () => {
     const carrusel = document.getElementById("carrusel-adicionales");
     const seccion = document.getElementById("seccion-adicionales");
 
     if (!carrusel || !seccion) return;
 
-    // 1. Usar la variable global que ya está cargada
+    // 1. Usamos la variable global de productos que ya tienes funcionando
     const datos = window.productosRealtime || productosRealtime;
 
     if (!datos || Object.keys(datos).length === 0) {
@@ -3086,7 +3086,7 @@ window.renderizarAdicionales = () => {
         return;
     }
 
-    // 2. Filtrar adicionales
+    // 2. Filtramos solo los "adicional"
     const adicionales = Object.values(datos).filter(p => {
         if (!p.categoria) return false;
         const categorias = p.categoria.split(",").map(c => c.trim().toLowerCase());
@@ -3098,57 +3098,59 @@ window.renderizarAdicionales = () => {
         return;
     }
 
-    // 3. Antiparpadeo (Solo refrescar si cambia la cantidad de productos)
+    // 3. Sistema Antiparpadeo (Si ya están los mismos, no borres nada)
     if (carrusel.children.length === adicionales.length) {
         seccion.style.display = "block";
         return;
     }
 
     seccion.style.display = "block";
-    carrusel.innerHTML = "";
+    carrusel.innerHTML = ""; 
 
     adicionales.forEach(prod => {
-        // IMPORTANTE: Usamos el nombre exacto del producto como llave, igual que en el inicio
-        const nombreParaLlave = (prod.referenciaReal || prod.nombre || "").trim();
+        // Obtenemos el nombre tal cual lo usas de "llave"
+        const nombreReal = (prod.referenciaReal || prod.nombre || "").trim();
         const precioFinal = (prod.promocion && prod.valorPromocion > 0) ? prod.valorPromocion : (prod.valor || 0);
         
-        // --- COPIANDO LÓGICA DEL INICIO ---
-        // Si prod.imagen no existe, lo sacamos de productosJson usando el nombre
-        let imgUrl = prod.imagen || (typeof productosJson !== 'undefined' ? productosJson[nombreParaLlave] : "");
+        // --- AQUÍ ESTÁ LA SOLUCIÓN IGUAL AL INICIO ---
+        // Buscamos la imagen en el JSON usando el nombre como llave
+        let imgUrlRaw = prod.imagen || (typeof productosJson !== 'undefined' ? productosJson[nombreReal] : "");
         
-        // Si sigue vacía, intentamos buscarla en productosJson ignorando espacios/mayúsculas
-        if (!imgUrl && typeof productosJson !== 'undefined') {
-            const todasLasLlaves = Object.keys(productosJson);
-            const llaveEncontrada = todasLasLlaves.find(k => k.toLowerCase().trim() === nombreParaLlave.toLowerCase());
-            if (llaveEncontrada) imgUrl = productosJson[llaveEncontrada];
-        }
+        // Aplicamos la función normalizarImagen que tienes en tu código de referencia
+        const srcFinal = (typeof normalizarImagen === 'function') ? normalizarImagen(imgUrlRaw) : imgUrlRaw;
 
-        // Aplicamos normalización igual que en el catálogo
-        const srcFinal = (typeof normalizarImagen === 'function') ? normalizarImagen(imgUrl) : imgUrl;
         const precioFormateado = window.formatearPrecio ? window.formatearPrecio(precioFinal) : `$ ${precioFinal.toLocaleString()}`;
 
         const item = document.createElement("div");
         item.className = "card-adicional-item"; 
         
         item.onclick = () => {
-            window.agregarAlCarrito(nombreParaLlave.replace(/'/g, "\\'"), imgUrl, precioFinal, (prod.descripcion || '').replace(/'/g, "\\'"), prod.stock ?? null);
+            window.agregarAlCarrito(
+                nombreReal.replace(/'/g, "\\'"), 
+                imgUrlRaw, 
+                precioFinal, 
+                (prod.descripcion || '').replace(/'/g, "\\'"), 
+                prod.stock ?? null
+            );
             window.renderizarCarritoEnForm();
         };
 
-        // Renderizado limpio (sin iconos de repuesto, solo la imagen)
+        // Renderizado Micro con la imagen normalizada
         item.innerHTML = `
-            <div style="width: 45px; height: 45px; margin: 0 auto 3px auto; background: #f0f0f0; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 45px; height: 45px; margin: 0 auto 3px auto; background: #f0f0f0; border-radius: 4px; overflow: hidden;">
                 <img src="${srcFinal}" 
-                     style="width: 100%; height: 100%; object-fit: cover;"
-                     onerror="this.parentElement.style.display='none';"> </div>
-            <div style="font-size: 9px; color: #27ae60; font-weight: 800; text-align: center;">
+                     style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                     loading="lazy"
+                     onerror="this.parentElement.style.display='none';">
+            </div>
+            <div style="font-size: 9px; color: #27ae60; font-weight: 800; text-align: center; white-space: nowrap;">
                 ${precioFormateado}
             </div>
         `;
         carrusel.appendChild(item);
     });
 
-    // Soporte para scroll con mouse en PC
+    // Soporte para Scroll con mouse (Rueda)
     carrusel.onwheel = (evt) => {
         if (evt.deltaY !== 0) {
             evt.preventDefault();
@@ -3156,6 +3158,8 @@ window.renderizarAdicionales = () => {
         }
     };
 };
+
+
 // 4. CAMBIAR CANTIDADES (+ / -) con Validación de Stock Real
 window.cambiarCantidadCarrito = (index, valor) => {
     const item = carrito[index];
