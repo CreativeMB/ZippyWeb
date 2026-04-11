@@ -2699,11 +2699,11 @@ window.whatsappDirecto = (nombre, precio, descripcion) => {
                              ? descripcion 
                              : "Ver detalles en catálogo";
 
-    const msg = `*¡Hola!* 👋 Me interesa este producto de tu tienda:\n\n` +
-                `*Producto:* ${nombre}\n` +
+    const msg = `*¡Hola!* _Quiero comprar este producto_\n\n` +
+                `*Nombre:* ${nombre}\n` +
                 `*Precio sin domicilio:* ${textoPrecio}\n` +
                 `*Descripción:* ${textoDescripcion}\n\n` +
-                `¿Me puedes colaborar?`;
+                `_¿me ayudas con el proceso?_`;
     
     const url = `https://wa.me/${telefonoEmpresa}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
