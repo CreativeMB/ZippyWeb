@@ -3089,28 +3089,25 @@ window.renderizarCarritoEnForm = () => {
     }, 150); // 150ms es suficiente para que no se note pero cargue estable
 };
  
+
 window.renderizarAdicionales = () => {
     const carrusel = document.getElementById("carrusel-adicionales");
     const seccion = document.getElementById("seccion-adicionales");
 
     if (!carrusel || !seccion) return;
 
-    // 1. Verificamos si los datos ya existen
+    // 1. Verificación estricta de datos (Igual que en tu inicio)
     const tieneJson = typeof productosJson !== 'undefined' && Object.keys(productosJson).length > 0;
     const tieneRealtime = typeof productosRealtime !== 'undefined' && Object.keys(productosRealtime).length > 0;
 
-    // SI NO ESTÁN LISTOS: Reintentar en 1 segundo y no mostrar nada aún
     if (!tieneJson || !tieneRealtime) {
-        console.warn("⏳ Adicionales esperando mapeo de imágenes...");
-        setTimeout(window.renderizarAdicionales, 1000);
+        setTimeout(window.renderizarAdicionales, 800);
         return;
     }
 
-    // 2. Filtrado de adicionales
     const adicionales = Object.values(productosRealtime).filter(p => {
-        if (!p.categoria) return false;
-        const categorias = p.categoria.split(",").map(c => c.trim().toLowerCase());
-        return categorias.includes("adicional") && !p.agotado;
+        const cats = (p.categoria || "").split(",").map(c => c.trim().toLowerCase());
+        return cats.includes("adicional") && !p.agotado;
     });
 
     if (adicionales.length === 0) {
@@ -3118,60 +3115,66 @@ window.renderizarAdicionales = () => {
         return;
     }
 
-    // 3. Evitar parpadeo (Si ya está dibujado lo mismo, salir)
-    const idUnico = adicionales.length + adicionales[0].referenciaReal;
+    // Sistema antiparpadeo
+    const idUnico = adicionales.length + (adicionales[0].referenciaReal || "adj");
     if (carrusel.getAttribute("data-id") === idUnico) {
         seccion.style.display = "block";
         return;
     }
 
     seccion.style.display = "block";
-    carrusel.innerHTML = "";
+    carrusel.innerHTML = ""; // Limpiamos para cargar de forma sincronizada
     carrusel.setAttribute("data-id", idUnico);
 
     adicionales.forEach(prod => {
         const nombreLlave = (prod.referenciaReal || prod.nombre || "").trim();
         const precioFinal = (prod.promocion && prod.valorPromocion > 0) ? prod.valorPromocion : (prod.valor || 0);
         
-        // --- BUSQUEDA DE IMAGEN SEGURA ---
-        // Buscamos igual que en tu procesador directo (mejorMatch)
+        // Buscamos la imagen en el JSON (donde dices que cargan bien)
         let imgRaw = prod.imagen || productosJson[nombreLlave];
-        
-        // Si no la encuentra por nombre exacto, buscamos ignorando mayúsculas
         if (!imgRaw) {
             const llaveCerrada = Object.keys(productosJson).find(k => k.toLowerCase().trim() === nombreLlave.toLowerCase());
             if (llaveCerrada) imgRaw = productosJson[llaveCerrada];
         }
 
-        // Normalización exacta de tu catálogo
         const srcFinal = typeof normalizarImagen === 'function' ? normalizarImagen(imgRaw) : imgRaw;
-        const precioFormateado = window.formatearPrecio ? window.formatearPrecio(precioFinal) : `$ ${precioFinal.toLocaleString()}`;
 
-        const item = document.createElement("div");
-        item.className = "card-adicional-item";
-        
-        item.onclick = () => {
-            window.agregarAlCarrito(nombreLlave.replace(/'/g, "\\'"), imgRaw, precioFinal, (prod.descripcion || '').replace(/'/g, "\\'"), prod.stock ?? null);
-            window.renderizarCarritoEnForm();
+        // --- LÓGICA SINCRÓNICA: PRECARGA ---
+        const tempImg = new Image();
+        tempImg.src = srcFinal;
+
+        // Solo cuando la imagen carga en memoria, creamos el elemento en el DOM
+        tempImg.onload = () => {
+            const precioFormateado = window.formatearPrecio ? window.formatearPrecio(precioFinal) : `$ ${precioFinal.toLocaleString()}`;
+            
+            const item = document.createElement("div");
+            item.className = "card-adicional-item";
+            item.style.opacity = "0"; // Aparece suavemente
+            item.style.transition = "opacity 0.5s";
+            
+            item.onclick = () => {
+                window.agregarAlCarrito(nombreLlave.replace(/'/g, "\\'"), imgRaw, precioFinal, (prod.descripcion || '').replace(/'/g, "\\'"), prod.stock ?? null);
+                window.renderizarCarritoEnForm();
+            };
+
+            item.innerHTML = `
+                <div style="width: 45px; height: 45px; margin: 0 auto 3px auto; background: #fff; border-radius: 4px; overflow: hidden;">
+                    <img src="${srcFinal}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="font-size: 9px; color: #27ae60; font-weight: 800; text-align: center;">
+                    ${precioFormateado}
+                </div>
+            `;
+            
+            carrusel.appendChild(item);
+            setTimeout(() => item.style.opacity = "1", 50); // Efecto de entrada
         };
 
-        item.innerHTML = `
-            <div class="img-mini-box" style="width: 45px; height: 45px; margin: 0 auto 3px auto; background: #eee; border-radius: 4px; overflow: hidden;">
-                <img src="${srcFinal}" 
-                     style="width: 100%; height: 100%; object-fit: cover;"
-                     onload="this.style.opacity='1'"
-                     onerror="this.src='https://via.placeholder.com/45?text=...'; setTimeout(window.renderizarAdicionales, 2000);"
-                     style="opacity:0; transition: opacity 0.4s;">
-            </div>
-            <div style="font-size: 9px; color: #27ae60; font-weight: 800; text-align: center;">
-                ${precioFormateado}
-            </div>
-        `;
-        carrusel.appendChild(item);
+        // Si la imagen falla definitivamente, no agregamos nada
+        tempImg.onerror = () => {
+            console.error("No se pudo cargar la imagen de: " + nombreLlave);
+        };
     });
-
-    // Scroll horizontal con mouse
-    carrusel.onwheel = (e) => { if(e.deltaY !== 0) { e.preventDefault(); carrusel.scrollLeft += e.deltaY; } };
 };
 
 
