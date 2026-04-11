@@ -3267,37 +3267,25 @@ carrito.forEach(item => {
         console.log(`♾️ Producto ilimitado (sin nodo stock): ${item.nombre}`);
     }
 });
+// --- CONSTRUCCIÓN MENSAJE COMPACTO ---
 
-         // --- CONSTRUCCIÓN MENSAJE WHATSAPP (REORGANIZADO POR SECCIONES) ---
-
-// 1. Calculamos el total del carrito (sin domicilio)
+// 1. Calcular total y formatear con punto de mil
 const totalSinDomicilio = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
+const totalPuntoMil = totalSinDomicilio.toLocaleString('es-CO', { maximumFractionDigits: 0 });
 
-// 2. Formateamos la lista de productos
+// 2. Lista de productos compacta
 let listaProductosTexto = carrito.map(item => `- ${item.cantidad}x ${item.nombre}`).join('\n');
-
-// 3. Formateamos el precio para que se vea bien (ej: $50.000)
-const totalFormateado = window.formatearPrecio ? window.formatearPrecio(totalSinDomicilio) : '$' + totalSinDomicilio;
 
 const mensajeWa = encodeURIComponent(
     `*NUEVO PEDIDO REGISTRADO*\n\n` +
     
-    `📦 *PRODUCTOS:*\n${listaProductosTexto}\n\n` +
+    `📦 *PRODUCTOS:*\n${listaProductosTexto}\n` +
+    `💰 *TOTAL:* $${totalPuntoMil} _(Sin domicilio)_\n\n` +
     
-    `💰 *VALOR A PAGAR:* ${totalFormateado}\n` +
-    `_(Valor sin domicilio)_\n\n` +
-    
-    `👤 *DATOS DEL CLIENTE:*\n` +
-    `- Nombre: ${campos.nombreComprador}\n` +
-    `- Celular: ${campos.celularComprador}\n\n` +
-    
-    `🗓️ *ENTREGA:*\n` +
-    `- Fecha: ${fechaFormateada}\n` +
-    `- Hora: ${campos.horaEntrega}\n` +
-    `- Dirección: ${campos.direccion}\n\n` +
-    
-    `💳 *MEDIO DE PAGO:*\n` +
-    `${campos.medioPago}\n\n` +
+    `👤 *CLIENTE:* ${campos.nombreComprador}\n` +
+    `🗓️ *ENTREGA:* ${fechaFormateada} (${campos.horaEntrega})\n` +
+    `📍 *DIR:* ${campos.direccion}\n` +
+    `💳 *PAGO:* ${campos.medioPago}\n\n` +
     
     `_Por favor confirma mi pedido._`
 );
