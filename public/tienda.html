@@ -2667,13 +2667,23 @@ function render() {
         let precioHTML = "";
         if (real.promocion && real.valorPromocion > 0) {
             const porcentaje = Math.round(100 - (real.valorPromocion * 100 / real.valor));
-            precioHTML = `<div class="precio-contenedor-premium">
-                            <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
-                            <div class="precioViejo-container">
-                                <span class="precioViejo">${formatearPrecio(real.valor)}</span>
-                                <span class="badge-ahorro-premium">¡Ahorras ${porcentaje}%!</span>
-                            </div>
-                         </div>`;
+            precioHTML = `
+    <div class="precio-contenedor-premium">
+        <div class="precio">${formatearPrecio(precioFinal)}</div>
+        
+        <div class="franja-promo-botones" style="display: flex; align-items: center; justify-content: space-between; min-height: 32px;">
+            <div class="bloque-ahorro">
+                ${real.promocion ? `
+                    <span class="precioViejo">${formatearPrecio(real.valor)}</span>
+                    <span class="badge-ahorro-premium">-${porcentaje}%</span>
+                ` : ''}
+            </div>
+            
+            <div class="botones-alineados">
+                ${estaRealmenteAgotado ? '' : botonesHtml}
+            </div>
+        </div>
+    </div>`;
         } else {
             precioHTML = `<div class="precio">${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}</div>`;
         }
@@ -2705,7 +2715,7 @@ if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.st
         card.innerHTML = `
             <div class="img-container">
                 ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-                 ${stockEtiqueta} ${botonesHtml}
+                 ${stockEtiqueta}
                 <img src="${normalizarImagen(imgUrl)}" 
                      ${estaRealmenteAgotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})"`} 
                      style="${estaRealmenteAgotado ? 'filter: grayscale(100%) brightness(0.7); opacity: 0.7;' : 'cursor: pointer;'}"
@@ -2714,7 +2724,7 @@ if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.st
             <div class="nombre">${nombreReal}</div>
             <div class="precio-contenedor">${precioHTML}</div>
             ${stockEtiqueta} 
-           
+            ${botonesHtml}
         `;
 
         contenedor.appendChild(card);
