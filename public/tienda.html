@@ -593,102 +593,80 @@ body {
 /* BOTONES CIRCULARES WhatsApp y carrito sobre carrito  IMAGEN */
 /* ========================================= */
 /* ================================================= */
-/* DISEÑO FINAL: BOTONES CIRCULARES SOBRE LA IMAGEN  */
+/* CSS FINAL: BOTONES EN LA LÍNEA DE AHORRO/PROMO    */
 /* ================================================= */
 
-/* 1. Contenedor de la imagen (El "ancla" de los botones) */
-.card-img-container { 
-    position: relative !important; 
-    display: block; 
-    width: 100%;
-    overflow: hidden; 
-    border-radius: 12px 12px 0 0;
-    line-height: 0; /* Elimina espacios fantasma debajo de la imagen */
+/* 1. Contenedor de la franja (Precio Viejo + Botones) */
+.franja-promo-botones {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 32px; /* Mantiene la altura fija para no agrandar la tarjeta */
+    padding: 0 5px;
+    margin-top: 2px;
 }
 
-/* 2. Estilo base común (Limpia bordes negros y da forma circular) */
+/* 2. Estilo de los botones (Usando tus clases y selectores onclick) */
+.botones-alineados button.btn,
 button[onclick*="agregarAlCarrito"], 
 button[onclick*="whatsappDirecto"] {
-    position: absolute !important;
-    bottom: 15px !important; 
-    width: 42px !important;
-    height: 42px !important;
-    border-radius: 50% !important; /* Círculo perfecto */
+    width: 32px !important;  /* Tamaño pequeño para no estirar la franja */
+    height: 32px !important;
+    border-radius: 50% !important;
     
-    /* ELIMINACIÓN DE BORDES Y TEXTO */
+    /* ELIMINACIÓN DE BORDES NEGROS Y TEXTO */
     border: none !important;
     outline: none !important;
-    font-size: 0 !important; /* Oculta "Me interesa" y "+ Carrito" */
+    font-size: 0 !important; /* Oculta "Me interesa" para que sea circular */
     
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     padding: 0 !important;
-    z-index: 20;
+    margin-left: 5px;
+    z-index: 10;
     
-    /* EFECTO DE SOMBRA SUAVE (Desvanecido) */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+    /* EFECTO DESVANECIDO */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;
+    transition: transform 0.2s ease !important;
     cursor: pointer;
 }
 
-/* 3. Colores y Posiciones Individuales */
-
-/* Botón WhatsApp (Esquina derecha) */
+/* 3. Colores específicos */
 button[onclick*="whatsappDirecto"] {
-    right: 15px !important; 
     background: #25D366 !important;
 }
 
-/* Botón Carrito (A la izquierda de WhatsApp) */
 button[onclick*="agregarAlCarrito"] {
-    right: 65px !important; 
     background: #ffffff !important;
 }
 
-/* 4. Estilo de los Iconos Internos (FontAwesome) */
+/* 4. Iconos internos */
 button[onclick*="whatsappDirecto"] i {
     color: white !important;
-    font-size: 22px !important;
-    margin: 0 !important;
+    font-size: 16px !important;
 }
 
 button[onclick*="agregarAlCarrito"] i {
     color: #E5C453 !important; /* Dorado */
-    font-size: 20px !important;
-    margin: 0 !important;
+    font-size: 16px !important;
 }
 
-/* 5. Efecto Hover (Se agranda suavemente al tocar/pasar el mouse) */
-button[onclick*="whatsappDirecto"]:hover,
-button[onclick*="agregarAlCarrito"]:hover {
-    transform: scale(1.15);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
+/* 5. Efecto al tocar/hover */
+button:hover {
+    transform: scale(1.1);
 }
 
-/* 6. Ajuste para cuando el producto está AGOTADO */
-/* Reemplaza los círculos por un aviso centrado */
-.btn-agotado-layer {
-    position: absolute !important;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.75) !important;
-    color: white !important;
-    padding: 8px 18px !important;
-    border-radius: 20px !important;
-    font-size: 13px !important;
-    font-weight: bold;
+/* 6. Ajuste para el botón Agotado (Si cae en esta línea) */
+.btn-agotado-final {
+    background: #f2f2f2 !important;
+    color: #999 !important;
     border: none !important;
-    z-index: 25;
+    padding: 4px 10px !important;
+    font-size: 10px !important;
+    border-radius: 4px !important;
+    cursor: not-allowed;
     text-transform: uppercase;
-}
-
-/* Asegurar que la imagen no se mueva de su sitio */
-.card-img-container img {
-    width: 100% !important;
-    height: auto !important;
-    display: block !important;
 }
         /* ========================================= */
         /* 7. FOOTER Y AVISOS                        */
