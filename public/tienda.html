@@ -593,44 +593,43 @@ body {
 /* BOTONES CIRCULARES WhatsApp y carrito sobre carrito  IMAGEN */
 /* ========================================= */
 /* ================================================= */
-/* CSS FINAL: BOTONES FIJOS A LA DERECHA             */
+/* CSS FINAL: BOTONES FIJOS Y ESTADO PROFESIONAL     */
 /* ================================================= */
 
-/* 1. Contenedor de la franja (Precio Viejo + Botones) */
+/* 1. Contenedor de la franja (Precio Viejo + Botones/Agotado) */
 .franja-promo-botones {
     display: flex;
     align-items: center;
-    /* justify-content: space-between se mantiene para separar ahorro de botones */
     justify-content: space-between; 
-    min-height: 35px; 
-    padding: 0 5px;
-    margin-top: 2px;
+    min-height: 38px; /* Altura fija para que la tarjeta no salte */
+    padding: 0 8px;
+    margin-top: 4px;
     width: 100%;
+    box-sizing: border-box;
 }
 
 /* 2. Bloque de ahorro (Lado izquierdo) */
 .bloque-ahorro {
     display: flex;
     align-items: center;
-    gap: 5px;
-    flex-grow: 1; /* Ocupa el espacio sobrante para empujar los botones */
+    gap: 6px;
+    flex-grow: 1;
 }
 
-/* 3. Contenedor de botones (Lado derecho - SIEMPRE FIJO) */
+/* 3. Contenedor de botones (Lado derecho - SIEMPRE ANCLADO) */
 .botones-alineados {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    min-width: 75px; /* Evita que el contenedor cambie de tamaño */
-    margin-left: auto; /* Empuje final hacia la derecha */
+    min-width: 80px; /* Reserva el espacio para que nada se mueva */
+    margin-left: auto;
 }
 
-/* 4. Estilo de los botones (Tus clases originales) */
-.botones-alineados button.btn,
-button[onclick*="agregarAlCarrito"], 
-button[onclick*="whatsappDirecto"] {
-    width: 32px !important;
-    height: 32px !important;
+/* 4. Estilo de los botones CIRCULARES (WhatsApp y Carrito) */
+.botones-alineados button[onclick*="agregarAlCarrito"], 
+.botones-alineados button[onclick*="whatsappDirecto"] {
+    width: 34px !important;
+    height: 34px !important;
     border-radius: 50% !important;
     border: none !important;
     outline: none !important;
@@ -640,37 +639,49 @@ button[onclick*="whatsappDirecto"] {
     align-items: center;
     justify-content: center;
     padding: 0 !important;
-    margin-left: 6px !important; /* Espacio constante entre botones */
+    margin-left: 8px !important;
     z-index: 10;
     
     box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;
-    transition: transform 0.2s ease !important;
+    transition: transform 0.2s ease-in-out !important;
     cursor: pointer;
 }
 
-/* 5. Colores e iconos */
+/* 5. Colores e iconos de los botones activos */
 button[onclick*="whatsappDirecto"] { background: #25D366 !important; }
 button[onclick*="agregarAlCarrito"] { background: #ffffff !important; }
 
-button[onclick*="whatsappDirecto"] i { color: white !important; font-size: 16px !important; }
-button[onclick*="agregarAlCarrito"] i { color: #E5C453 !important; font-size: 16px !important; }
+button[onclick*="whatsappDirecto"] i { color: white !important; font-size: 17px !important; }
+button[onclick*="agregarAlCarrito"] i { color: #E5C453 !important; font-size: 17px !important; }
 
-/* 6. Efecto Hover */
-button:hover { transform: scale(1.1); }
+button:hover { transform: scale(1.12); }
 
-/* 7. Botón Agotado (Ahora alineado a la derecha también) */
+/* 6. ETIQUETA PROFESIONAL: Producto sin Stock (Estilo Pill) */
 .btn-agotado-layer, .btn-agotado-final {
-    background: #f2f2f2 !important;
-    color: #999 !important;
-    border: none !important;
-    padding: 6px 10px !important;
-    font-size: 11px !important;
-    border-radius: 6px !important;
-    cursor: not-allowed;
+    background: #f8f9fa !important; /* Gris muy limpio */
+    color: #a0a0a0 !important;    /* Texto suave */
+    border: 1px solid #e0e0e0 !important; /* Borde sutil profesional */
+    padding: 5px 12px !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    border-radius: 50px !important; /* Forma de cápsula, no círculo */
     text-transform: uppercase;
-    font-weight: bold;
-    margin-left: auto; /* Se pega a la derecha */
+    letter-spacing: 0.8px;
+    cursor: not-allowed;
+    margin-left: auto; /* Se pega a la derecha igual que los botones */
     display: inline-block !important;
+    white-space: nowrap;
+    box-shadow: none !important; /* Sin sombra para diferenciarlo de los botones */
+}
+
+/* 7. Efecto visual para la tarjeta agotada */
+.producto.agotado img {
+    filter: grayscale(100%) opacity(0.7);
+    transition: 0.3s ease;
+}
+
+.producto.agotado .nombre {
+    color: #888;
 }
         /* ========================================= */
         /* 7. FOOTER Y AVISOS                        */
@@ -2677,41 +2688,53 @@ function render() {
             </div>`;
 
         // 3. RENDERIZADO DE PRECIO HTML
-       let precioHTML = "";
+      let precioHTML = "";
+
+// Preparamos qué mostrar a la derecha (Botones o Etiqueta de Agotado)
+// Usamos una variable limpia para no repetir lógica
+const contenidoAcciones = estaRealmenteAgotado 
+    ? `<span class="btn-agotado-final">Sin Stock</span>` 
+    : botonesHtml;
+
 if (real.promocion && real.valorPromocion > 0) {
     const porcentaje = Math.round(100 - (real.valorPromocion * 100 / real.valor));
     precioHTML = `
         <div class="precio-contenedor-premium">
             <div class="precio">${formatearPrecio(precioFinal)}</div>
-            <div class="franja-promo-botones" style="display: flex; align-items: center; justify-content: space-between; min-height: 32px;">
+            
+            <div class="franja-promo-botones">
                 <div class="bloque-ahorro">
                     <span class="precioViejo">${formatearPrecio(real.valor)}</span>
                     <span class="badge-ahorro-premium">-${porcentaje}%</span>
                 </div>
                 <div class="botones-alineados">
-                    ${botonesHtml} </div>
+                    ${contenidoAcciones}
+                </div>
             </div>
         </div>`;
 } else {
+    // Si no hay promo, el precio normal y los botones/agotado van en la misma línea
     precioHTML = `
-        <div class="precio-contenedor-premium" style="display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 32px;">
+        <div class="precio-contenedor-premium" style="display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 38px;">
             <div class="precio">${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}</div>
             <div class="botones-alineados">
-                ${botonesHtml} </div>
+                ${contenidoAcciones}
+            </div>
         </div>`;
 }
 
-        // 4. LÓGICA DE STOCK PERSUASIVA
-        let stockEtiqueta = "";
-        if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.stock <= 5) {
-            stockEtiqueta = `<div class="badge-stock-urgente"><i class="fas fa-fire-alt"></i> ¡Solo queda ${real.stock}!</div>`;
-        }
+// --- 4. LÓGICA DE STOCK PERSUASIVA ---
+let stockEtiqueta = "";
+if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.stock <= 5) {
+    stockEtiqueta = `<div class="badge-stock-urgente"><i class="fas fa-fire-alt"></i> ¡Solo queda ${real.stock}!</div>`;
+}
 
-        // 5. CREACIÓN DE LA CARD
-        const card = document.createElement("div");
-        card.className = `producto ${estaRealmenteAgotado ? 'agotado' : ''} visible`;
+// --- 5. CREACIÓN DE LA CARD ---
+const card = document.createElement("div");
+// La clase 'agotado' permite que el CSS aplique el filtro gris a la imagen
+card.className = `producto ${estaRealmenteAgotado ? 'agotado' : ''} visible`;
 
-        card.innerHTML = `
+card.innerHTML = `
     <div class="img-container">
         ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
         ${stockEtiqueta}
@@ -2724,7 +2747,7 @@ if (real.promocion && real.valorPromocion > 0) {
     <div class="precio-contenedor">
         ${precioHTML}
     </div>
-    `;
+`;
 
         contenedor.appendChild(card);
     }
