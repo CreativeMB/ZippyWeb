@@ -592,69 +592,77 @@ body {
 /* ========================================= */
 /* BOTONES CIRCULARES WhatsApp y carrito sobre la IMAGEN */
 /* ========================================= */
-
-/* 1. Este es el paso clave: El contenedor de la imagen debe ser el "ancla" */
-.card-img-container { 
-    position: relative !important; /* Esto obliga a los botones a quedarse aquí dentro */
-    display: block; 
-    width: 100%;
-    line-height: 0; /* Elimina espacios fantasma debajo de la imagen */
-    overflow: hidden; 
-    border-radius: 12px 12px 0 0;
+/* Contenedor de la info debajo de la foto */
+.info-producto-footer {
+    padding: 10px;
+    background: #fff;
 }
 
-/* Forzamos que la imagen ocupe todo el ancho del contenedor */
-.card-img-container img {
-    width: 100%;
+/* Alineación de precios a la izquierda y botones a la derecha */
+.precio-y-botones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.precios-bloque {
+    text-align: left;
+}
+
+.sku-text {
+    font-size: 11px;
+    color: #888;
     display: block;
-    margin: 0;
 }
 
-/* 2. Botones: Ahora sí aparecerán en la esquina de la FOTO */
-button[onclick*="agregarAlCarrito"], 
-button[onclick*="whatsappDirecto"] {
-    position: absolute !important;
-    /* Bajamos un poco el bottom para que no queden tan pegados al borde */
-    bottom: 12px !important; 
-    width: 42px !important;
-    height: 42px !important;
+.precio-actual {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Contenedor de botones circulares */
+.botones-flotantes-linea {
+    display: flex;
+    gap: 8px;
+}
+
+/* Estilo de los botones circulares (SIN BORDES) */
+.btn-circular {
+    width: 38px !important;
+    height: 38px !important;
     border-radius: 50% !important;
-    
-    /* Limpieza visual total */
     border: none !important;
     outline: none !important;
-    font-size: 0 !important; 
-    
     display: flex !important;
     align-items: center;
     justify-content: center;
-    padding: 0 !important;
-    z-index: 20;
-    
-    box-shadow: 0 4px 12px rgba(0,0,0,0.18) !important;
-    transition: all 0.3s ease !important;
     cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    padding: 0 !important;
 }
 
-/* 3. Alineación a la derecha de la imagen */
-button[onclick*="whatsappDirecto"] {
-    right: 12px !important; 
-    background: #25D366 !important;
-}
-
-button[onclick*="agregarAlCarrito"] {
-    right: 58px !important; /* Justo al lado del verde */
-    background: #ffffff !important;
-}
-
-/* Ajuste de iconos */
-button[onclick*="whatsappDirecto"] i { color: white !important; font-size: 22px !important; }
-button[onclick*="agregarAlCarrito"] i { color: #E5C453 !important; font-size: 20px !important; }
-
-/* 4. Efecto al pasar el mouse */
-button:hover {
+.btn-circular:hover {
     transform: scale(1.1);
-    filter: brightness(1.1);
+}
+
+.btn-circular i {
+    font-size: 18px !important;
+}
+
+/* Botón de Agotado (Ocupa el lugar de los circulares) */
+.btn-agotado-final {
+    background: #ececec !important;
+    color: #999 !important;
+    border: none !important;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: not-allowed;
 }
         /* ========================================= */
         /* 7. FOOTER Y AVISOS                        */
@@ -2668,27 +2676,35 @@ function render() {
         }
 
         const card = document.createElement("div");
-        // 3. CLASE CSS: Usamos 'estaRealmenteAgotado' para aplicar el estilo visual
-        card.className = `producto ${estaRealmenteAgotado ? 'agotado' : ''} visible`;
+        // 3. CLASE CSS
+card.className = `producto ${estaRealmenteAgotado ? 'agotado' : ''} visible`;
 
-        const descProd = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
-        const refProd = nombreReal.replace(/'/g, "\\'");
+const descProd = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
+const refProd = nombreReal.replace(/'/g, "\\'");
 
-       // 4. BOTONES: Mantenemos las clases .btn para no romper tu lógica
-let botonesHtml = estaRealmenteAgotado ? 
-    `<button class="btn btn-agotado-layer" disabled>Agotado</button>` : 
-    `<button class="btn btn-circular-cart" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})"><i class="fas fa-cart-plus"></i></button>
-     <button class="btn btn-circular-wa" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')"><i class="fab fa-whatsapp"></i></button>`;
+// 4. LÓGICA DE BOTONES (Solo se muestran si NO está agotado)
+let contenidoAcciones = estaRealmenteAgotado ? 
+    `<button class="btn-agotado-final" disabled>AGOTADO</button>` : 
+    `<div class="botones-flotantes-linea">
+        <button class="btn-circular" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})" style="background: #fff; color: #E5C453;"><i class="fas fa-cart-plus"></i></button>
+        <button class="btn-circular" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="background: #25D366; color: #fff;"><i class="fab fa-whatsapp"></i></button>
+    </div>`;
 
-// 5. ESTRUCTURA FINAL: Metemos botonesHtml dentro de card-img-container
+// 5. HTML FINAL (Precios y Botones en la misma franja)
 card.innerHTML = `
-    <div class="card-img-container" style="position: relative;">
+    <div class="card-img-container">
         <img src="${imgUrl}" class="producto img" alt="${refProd}">
-        ${botonesHtml} 
     </div>
-    <div class="info-producto" style="padding: 5px; text-align: center;">
-        <p class="sku" style="margin: 2px 0; font-size: 11px; color: #888;">${refProd}</p>
-        <h3 class="precio" style="margin: 0; font-size: 1.1rem; font-weight: bold;">$${precioFinal}</h3>
+    <div class="info-producto-footer">
+        <div class="precio-y-botones">
+            <div class="precios-bloque">
+                <span class="sku-text">${refProd}</span>
+                <div class="precios-fila">
+                    <h3 class="precio-actual">$${precioFinal}</h3>
+                    </div>
+            </div>
+            ${contenidoAcciones}
+        </div>
     </div>
 `;
 
