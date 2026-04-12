@@ -2099,24 +2099,9 @@ async function detectarEmpresaPorDominio() {
         }
 
 // ==========================================
-        // 🚀 CORRECCIÓN AQUÍ: OBTENER ID Y ACTIVAR MONITOREO
+        // 🚀 INSERTAR AQUÍ: REGISTRO DE ANALYTICS
         // ==========================================
-        
-        // Buscamos el ID real que corresponde a ese slug para poder reportar
-        const baseRef = ref(db);
-        const consulta = query(baseRef, orderByChild("perfilempresa/slug"), equalTo(slug));
-        const snapshot = await get(consulta);
-
-        if (snapshot.exists()) {
-            const idEmpresa = Object.keys(snapshot.val())[0];
-            empresaId = idEmpresa; // Actualizamos la variable global
-
-            // Ahora sí llamamos a las funciones con los datos correctos
-            registrarVisitaAnalytics(idEmpresa, slug); 
-            gestionarPresenciaEnVivo(idEmpresa); // <--- ESTA ES LA QUE TE FALTABA LLAMAR
-
-            console.log("🟢 Analytics y Presencia activados para ID:", idEmpresa);
-        }
+        registrarVisitaAnalytics(slug); 
 
         // ==========================================
         // INICIAR TIENDA
@@ -2172,12 +2157,11 @@ async function iniciarCargaBase(slugDesdeURL) {
     
     try {
         const baseRef = ref(db); 
-        // Nota: Asegúrate de usar 'query' de Firebase en lugar de 'queryDB' si esa es tu configuración estándar
-        const consultaSlug = query(baseRef, orderByChild("perfilempresa/slug"), equalTo(slugDesdeURL));
+        const consultaSlug = queryDB(baseRef, orderByChild("perfilempresa/slug"), equalTo(slugDesdeURL));
         let snapshot = await get(consultaSlug);
 
         if (!snapshot.exists()) {
-            const consultaDominio = query(baseRef, orderByChild("perfilempresa/dominio"), equalTo(dominioLimpioDB));
+            const consultaDominio = queryDB(baseRef, orderByChild("perfilempresa/dominio"), equalTo(dominioLimpioDB));
             snapshot = await get(consultaDominio);
         }
 
@@ -2189,12 +2173,6 @@ async function iniciarCargaBase(slugDesdeURL) {
 
             empresaId = id;
 
-            // --- 🚀 SOLUCIÓN: ACTIVACIÓN DE MONITOREO ---
-            // Mantenemos las funciones globales que ya definiste arriba
-            registrarVisitaAnalytics(id, perfil.slug); 
-            gestionarPresenciaEnVivo(id);
-            // --------------------------------------------
-
             if (data.productos) {
                 productosRealtime = data.productos;
                 window.productosRealtime = data.productos; 
@@ -2202,6 +2180,7 @@ async function iniciarCargaBase(slugDesdeURL) {
 
             aplicarSEO(perfil);
             
+            // 🔥 IMPORTANTE: validarYContinuar se encarga de llamar a continuarCarga
             validarYContinuar(perfil, data);
             
             renderizarMenuCategorias();
