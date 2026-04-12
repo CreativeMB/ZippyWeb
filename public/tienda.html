@@ -2724,24 +2724,21 @@ if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.st
         </div>`;
 }
 
-   card.innerHTML = `
-    <div class="img-container" style="position: relative;">
-        ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-        ${stockEtiqueta} 
-        <img src="${imgUrl}" class="producto img" alt="${refProd}"
-             ${estaRealmenteAgotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})"`} 
-             style="${estaRealmenteAgotado ? 'filter: grayscale(100%) brightness(0.7); opacity: 0.7;' : 'cursor: pointer;'}">
-    </div>
-    <div class="info-producto" style="padding: 10px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="textos-precio">
-                <span class="sku" style="font-size: 11px; color: #888; display: block;">${refProd}</span>
-                <div class="precio" style="font-size: 1.1rem; font-weight: bold; margin: 0;">$${formatearPrecio(precioFinal)}</div>
+        card.innerHTML = `
+            <div class="img-container">
+                ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+                 ${stockEtiqueta}
+                <img src="${normalizarImagen(imgUrl)}" 
+                     ${estaRealmenteAgotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})"`} 
+                     style="${estaRealmenteAgotado ? 'filter: grayscale(100%) brightness(0.7); opacity: 0.7;' : 'cursor: pointer;'}"
+                     loading="lazy"> 
             </div>
+            <div class="nombre">${nombreReal}</div>
+            <div class="precio-contenedor">${precioHTML}</div>
+            ${stockEtiqueta} 
             ${botonesHtml}
-        </div>
-    </div>
-`;
+        `;
+
         contenedor.appendChild(card);
     }
 
