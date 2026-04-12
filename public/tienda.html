@@ -593,80 +593,84 @@ body {
 /* BOTONES CIRCULARES WhatsApp y carrito sobre carrito  IMAGEN */
 /* ========================================= */
 /* ================================================= */
-/* CSS FINAL: BOTONES EN LA LÍNEA DE AHORRO/PROMO    */
+/* CSS FINAL: BOTONES FIJOS A LA DERECHA             */
 /* ================================================= */
 
 /* 1. Contenedor de la franja (Precio Viejo + Botones) */
 .franja-promo-botones {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    min-height: 32px; /* Mantiene la altura fija para no agrandar la tarjeta */
+    /* justify-content: space-between se mantiene para separar ahorro de botones */
+    justify-content: space-between; 
+    min-height: 35px; 
     padding: 0 5px;
     margin-top: 2px;
+    width: 100%;
 }
 
-/* 2. Estilo de los botones (Usando tus clases y selectores onclick) */
+/* 2. Bloque de ahorro (Lado izquierdo) */
+.bloque-ahorro {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-grow: 1; /* Ocupa el espacio sobrante para empujar los botones */
+}
+
+/* 3. Contenedor de botones (Lado derecho - SIEMPRE FIJO) */
+.botones-alineados {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-width: 75px; /* Evita que el contenedor cambie de tamaño */
+    margin-left: auto; /* Empuje final hacia la derecha */
+}
+
+/* 4. Estilo de los botones (Tus clases originales) */
 .botones-alineados button.btn,
 button[onclick*="agregarAlCarrito"], 
 button[onclick*="whatsappDirecto"] {
-    width: 32px !important;  /* Tamaño pequeño para no estirar la franja */
+    width: 32px !important;
     height: 32px !important;
     border-radius: 50% !important;
-    
-    /* ELIMINACIÓN DE BORDES NEGROS Y TEXTO */
     border: none !important;
     outline: none !important;
-    font-size: 0 !important; /* Oculta "Me interesa" para que sea circular */
+    font-size: 0 !important;
     
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
     padding: 0 !important;
-    margin-left: 5px;
+    margin-left: 6px !important; /* Espacio constante entre botones */
     z-index: 10;
     
-    /* EFECTO DESVANECIDO */
     box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;
     transition: transform 0.2s ease !important;
     cursor: pointer;
 }
 
-/* 3. Colores específicos */
-button[onclick*="whatsappDirecto"] {
-    background: #25D366 !important;
-}
+/* 5. Colores e iconos */
+button[onclick*="whatsappDirecto"] { background: #25D366 !important; }
+button[onclick*="agregarAlCarrito"] { background: #ffffff !important; }
 
-button[onclick*="agregarAlCarrito"] {
-    background: #ffffff !important;
-}
+button[onclick*="whatsappDirecto"] i { color: white !important; font-size: 16px !important; }
+button[onclick*="agregarAlCarrito"] i { color: #E5C453 !important; font-size: 16px !important; }
 
-/* 4. Iconos internos */
-button[onclick*="whatsappDirecto"] i {
-    color: white !important;
-    font-size: 16px !important;
-}
+/* 6. Efecto Hover */
+button:hover { transform: scale(1.1); }
 
-button[onclick*="agregarAlCarrito"] i {
-    color: #E5C453 !important; /* Dorado */
-    font-size: 16px !important;
-}
-
-/* 5. Efecto al tocar/hover */
-button:hover {
-    transform: scale(1.1);
-}
-
-/* 6. Ajuste para el botón Agotado (Si cae en esta línea) */
-.btn-agotado-final {
+/* 7. Botón Agotado (Ahora alineado a la derecha también) */
+.btn-agotado-layer, .btn-agotado-final {
     background: #f2f2f2 !important;
     color: #999 !important;
     border: none !important;
-    padding: 4px 10px !important;
-    font-size: 10px !important;
-    border-radius: 4px !important;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
     cursor: not-allowed;
     text-transform: uppercase;
+    font-weight: bold;
+    margin-left: auto; /* Se pega a la derecha */
+    display: inline-block !important;
 }
         /* ========================================= */
         /* 7. FOOTER Y AVISOS                        */
