@@ -2172,6 +2172,7 @@ async function iniciarCargaBase(slugDesdeURL) {
     
     try {
         const baseRef = ref(db); 
+        // Nota: Asegúrate de usar 'query' de Firebase en lugar de 'queryDB' si esa es tu configuración estándar
         const consultaSlug = query(baseRef, orderByChild("perfilempresa/slug"), equalTo(slugDesdeURL));
         let snapshot = await get(consultaSlug);
 
@@ -2182,24 +2183,17 @@ async function iniciarCargaBase(slugDesdeURL) {
 
         if (snapshot.exists()) {
             const empresasEncontradas = snapshot.val();
-            const id = Object.keys(empresasEncontradas)[0]; // Este es el ID de Firebase
+            const id = Object.keys(empresasEncontradas)[0];
             const data = empresasEncontradas[id];
             const perfil = data.perfilempresa;
 
-            // 1. Asignar ID global
             empresaId = id;
 
-            // 🚀 --- AQUÍ ESTABA EL FALLO: ACTIVAR MONITOREO ---
-            // Ahora que tenemos el 'id' y el 'perfil.slug', activamos todo
-            if (typeof registrarVisitaAnalytics === 'function') {
-                registrarVisitaAnalytics(id, perfil.slug);
-            }
-            
-            if (typeof gestionarPresenciaEnVivo === 'function') {
-                gestionarPresenciaEnVivo(id);
-                console.log("🟢 Presencia en vivo activada para:", id);
-            }
-            // -------------------------------------------------
+            // --- 🚀 SOLUCIÓN: ACTIVACIÓN DE MONITOREO ---
+            // Mantenemos las funciones globales que ya definiste arriba
+            registrarVisitaAnalytics(id, perfil.slug); 
+            gestionarPresenciaEnVivo(id);
+            // --------------------------------------------
 
             if (data.productos) {
                 productosRealtime = data.productos;
