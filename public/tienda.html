@@ -2172,21 +2172,34 @@ async function iniciarCargaBase(slugDesdeURL) {
     
     try {
         const baseRef = ref(db); 
-        const consultaSlug = queryDB(baseRef, orderByChild("perfilempresa/slug"), equalTo(slugDesdeURL));
+        const consultaSlug = query(baseRef, orderByChild("perfilempresa/slug"), equalTo(slugDesdeURL));
         let snapshot = await get(consultaSlug);
 
         if (!snapshot.exists()) {
-            const consultaDominio = queryDB(baseRef, orderByChild("perfilempresa/dominio"), equalTo(dominioLimpioDB));
+            const consultaDominio = query(baseRef, orderByChild("perfilempresa/dominio"), equalTo(dominioLimpioDB));
             snapshot = await get(consultaDominio);
         }
 
         if (snapshot.exists()) {
             const empresasEncontradas = snapshot.val();
-            const id = Object.keys(empresasEncontradas)[0];
+            const id = Object.keys(empresasEncontradas)[0]; // Este es el ID de Firebase
             const data = empresasEncontradas[id];
             const perfil = data.perfilempresa;
 
+            // 1. Asignar ID global
             empresaId = id;
+
+            // 🚀 --- AQUÍ ESTABA EL FALLO: ACTIVAR MONITOREO ---
+            // Ahora que tenemos el 'id' y el 'perfil.slug', activamos todo
+            if (typeof registrarVisitaAnalytics === 'function') {
+                registrarVisitaAnalytics(id, perfil.slug);
+            }
+            
+            if (typeof gestionarPresenciaEnVivo === 'function') {
+                gestionarPresenciaEnVivo(id);
+                console.log("🟢 Presencia en vivo activada para:", id);
+            }
+            // -------------------------------------------------
 
             if (data.productos) {
                 productosRealtime = data.productos;
@@ -2195,7 +2208,6 @@ async function iniciarCargaBase(slugDesdeURL) {
 
             aplicarSEO(perfil);
             
-            // 🔥 IMPORTANTE: validarYContinuar se encarga de llamar a continuarCarga
             validarYContinuar(perfil, data);
             
             renderizarMenuCategorias();
