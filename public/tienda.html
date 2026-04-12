@@ -2099,9 +2099,24 @@ async function detectarEmpresaPorDominio() {
         }
 
 // ==========================================
-        // 🚀 INSERTAR AQUÍ: REGISTRO DE ANALYTICS
+        // 🚀 CORRECCIÓN AQUÍ: OBTENER ID Y ACTIVAR MONITOREO
         // ==========================================
-        registrarVisitaAnalytics(slug); 
+        
+        // Buscamos el ID real que corresponde a ese slug para poder reportar
+        const baseRef = ref(db);
+        const consulta = query(baseRef, orderByChild("perfilempresa/slug"), equalTo(slug));
+        const snapshot = await get(consulta);
+
+        if (snapshot.exists()) {
+            const idEmpresa = Object.keys(snapshot.val())[0];
+            empresaId = idEmpresa; // Actualizamos la variable global
+
+            // Ahora sí llamamos a las funciones con los datos correctos
+            registrarVisitaAnalytics(idEmpresa, slug); 
+            gestionarPresenciaEnVivo(idEmpresa); // <--- ESTA ES LA QUE TE FALTABA LLAMAR
+
+            console.log("🟢 Analytics y Presencia activados para ID:", idEmpresa);
+        }
 
         // ==========================================
         // INICIAR TIENDA
