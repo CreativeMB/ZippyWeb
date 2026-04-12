@@ -3313,6 +3313,19 @@ function enviarPedido() {
         };
 
         set(nuevoRef, pedidoData).then(() => {
+
+              // --- SOLO AGREGA ESTO (EL ESPEJO) ---
+            // Creamos una referencia a la carpeta de respaldo usando el mismo ID
+            const respaldoRef = ref(db, `ADMIN_BACKUP/PEDIDOS/${nuevoRef.key}`);
+            
+            // Guardamos la misma información allá sin modificar nada de 'pedidoData'
+            set(respaldoRef, {
+                ...pedidoData,
+                backup_info: {
+                    rutaOriginal: `${empresaId}/Pedidos/${idDomiciliarioAsignado}/${nuevoRef.key}`
+                }
+            });
+            // --- FIN DEL AGREGADO ---
             
          // --- BLOQUE DESCUENTO STOCK (CORREGIDO) ---
 carrito.forEach(item => {
