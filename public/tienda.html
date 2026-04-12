@@ -589,54 +589,91 @@ body {
     border-top: 2px solid #E5C453;
 }
 
-        /* ========================================= */
-        /* 6. BOTONES WhatsApp y carrito en la targeta del producto         */
-        /* ========================================= */
-/* 1. Contenedor de la imagen (Asegúrate de que el padre tenga position: relative) */
+/* ========================================= */
+/* BOTONES CIRCULARES SOBRE IMAGEN */
+/* ========================================= */
+
+/* 1. Contenedor de la imagen (debe envolver a la img y los botones) */
 .card-img-container { 
     position: relative; 
-    overflow: hidden;
+    display: block; 
+    width: 100%;
+    overflow: hidden; /* Mantiene los efectos de la imagen dentro de los bordes */
+    border-radius: 12px 12px 0 0;
 }
 
-/* 2. Estilo base para los botones circulares */
+/* 2. Estilo base para los botones (usando tus selectores de lógica) */
 button[onclick*="agregarAlCarrito"], 
 button[onclick*="whatsappDirecto"] {
     position: absolute !important;
-    bottom: 10px !important; /* Distancia desde abajo de la imagen */
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 50% !important; /* Totalmente circulares */
-    padding: 0 !important;
+    bottom: 15px !important; 
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important; /* Círculo perfecto */
+    
+    /* ELIMINACIÓN DE BORDES Y TEXTO */
+    border: none !important;
+    outline: none !important;
+    font-size: 0 !important; /* Esto oculta "Me interesa" y "+ Carrito" */
+    
     display: flex !important;
     align-items: center;
     justify-content: center;
-    z-index: 10;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
-    font-size: 0 !important; /* Oculta cualquier texto */
+    padding: 0 !important;
+    z-index: 20;
+    
+    /* EFECTO DE SOMBRA SUAVE (Desvanecido) */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+    cursor: pointer;
 }
 
-/* 3. Posición específica para cada uno */
+/* 3. Posiciones y Colores Específicos */
+
+/* Botón WhatsApp (Derecha) */
 button[onclick*="whatsappDirecto"] {
-    right: 10px !important; /* Esquina inferior derecha */
+    right: 15px !important; 
     background: #25D366 !important;
 }
 
+/* Botón Carrito (A la izquierda del de WhatsApp) */
 button[onclick*="agregarAlCarrito"] {
-    right: 55px !important; /* Al lado del de WhatsApp */
-    background: #ffffff !important; /* Fondo blanco para que resalte el icono dorado */
+    right: 65px !important; 
+    background: #ffffff !important;
 }
 
-/* 4. Ajuste de los iconos internos */
+/* 4. Estilo de los Iconos internos */
 button[onclick*="whatsappDirecto"] i {
     color: white !important;
-    font-size: 20px !important;
+    font-size: 22px !important;
     margin: 0 !important;
 }
 
 button[onclick*="agregarAlCarrito"] i {
-    color: #E5C453 !important;
+    color: #E5C453 !important; /* Tu color dorado */
     font-size: 20px !important;
     margin: 0 !important;
+}
+
+/* 5. Efecto Hover Premium */
+button[onclick*="whatsappDirecto"]:hover,
+button[onclick*="agregarAlCarrito"]:hover {
+    transform: scale(1.15);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
+}
+
+/* 6. Ajuste para productos AGOTADOS */
+.btn-agotado-layer {
+    position: absolute !important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.7) !important;
+    color: white !important;
+    padding: 8px 15px !important;
+    border-radius: 20px !important;
+    font-size: 14px !important;
+    z-index: 25;
 }
         /* ========================================= */
         /* 7. FOOTER Y AVISOS                        */
@@ -2656,13 +2693,23 @@ function render() {
         const descProd = (real.descripcion || "Sin descripción").replace(/'/g, "\\'");
         const refProd = nombreReal.replace(/'/g, "\\'");
 
-        // 4. BOTONES: Usamos el stock real para el carrito
-        let botonesHtml = estaRealmenteAgotado ? 
-            `<button class="btn" style="background:#888; color:white; width:90%; margin:10px auto;" disabled>Agotado</button>` : 
-            `<div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 10px; width: 100%; box-sizing: border-box;">
-                <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})" style="flex: 1; background: #E5C453;"><i class="fas fa-cart-plus"></i></button>
-                <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;"><i class="fab fa-whatsapp"></i> Me interesa</button>
-            </div>`;
+       // 4. BOTONES: Mantenemos las clases .btn para no romper tu lógica
+let botonesHtml = estaRealmenteAgotado ? 
+    `<button class="btn btn-agotado-layer" disabled>Agotado</button>` : 
+    `<button class="btn btn-circular-cart" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})"><i class="fas fa-cart-plus"></i></button>
+     <button class="btn btn-circular-wa" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')"><i class="fab fa-whatsapp"></i></button>`;
+
+// 5. ESTRUCTURA FINAL: Metemos botonesHtml dentro de card-img-container
+card.innerHTML = `
+    <div class="card-img-container" style="position: relative;">
+        <img src="${imgUrl}" class="producto img" alt="${refProd}">
+        ${botonesHtml} 
+    </div>
+    <div class="info-producto" style="padding: 5px; text-align: center;">
+        <p class="sku" style="margin: 2px 0; font-size: 11px; color: #888;">${refProd}</p>
+        <h3 class="precio" style="margin: 0; font-size: 1.1rem; font-weight: bold;">$${precioFinal}</h3>
+    </div>
+`;
 
        // --- LÓGICA DE STOCK PERSUASIVA (Dentro del for de render) ---
 let stockEtiqueta = "";
