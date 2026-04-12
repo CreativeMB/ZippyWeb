@@ -2667,23 +2667,13 @@ function render() {
         let precioHTML = "";
         if (real.promocion && real.valorPromocion > 0) {
             const porcentaje = Math.round(100 - (real.valorPromocion * 100 / real.valor));
-            precioHTML = `
-    <div class="precio-contenedor-premium">
-        <div class="precio">${formatearPrecio(precioFinal)}</div>
-        
-        <div class="franja-promo-botones" style="display: flex; align-items: center; justify-content: space-between; min-height: 32px;">
-            <div class="bloque-ahorro">
-                ${real.promocion ? `
-                    <span class="precioViejo">${formatearPrecio(real.valor)}</span>
-                    <span class="badge-ahorro-premium">-${porcentaje}%</span>
-                ` : ''}
-            </div>
-            
-            <div class="botones-alineados">
-                ${estaRealmenteAgotado ? '' : botonesHtml}
-            </div>
-        </div>
-    </div>`;
+            precioHTML = `<div class="precio-contenedor-premium">
+                            <div class="precio">${formatearPrecio(real.valorPromocion)}</div>
+                            <div class="precioViejo-container">
+                                <span class="precioViejo">${formatearPrecio(real.valor)}</span>
+                                <span class="badge-ahorro-premium">¡Ahorras ${porcentaje}%!</span>
+                            </div>
+                         </div>`;
         } else {
             precioHTML = `<div class="precio">${precioFinal > 0 ? formatearPrecio(precioFinal) : "Consultar"}</div>`;
         }
@@ -2696,12 +2686,12 @@ function render() {
         const refProd = nombreReal.replace(/'/g, "\\'");
 
         // 4. BOTONES: Usamos el stock real para el carrito
-       let botonesHtml = estaRealmenteAgotado ? 
-    `<button class="btn btn-agotado-layer" disabled>Agotado</button>` : 
-    `<div class="btn-container-responsive" style="display: flex; gap: 8px;">
-        <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})" style="background: #ffffff;"><i class="fas fa-cart-plus" style="color: #E5C453;"></i></button>
-        <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="background: #25D366;"><i class="fab fa-whatsapp" style="color: #fff;"></i></button>
-    </div>`;
+        let botonesHtml = estaRealmenteAgotado ? 
+            `<button class="btn" style="background:#888; color:white; width:90%; margin:10px auto;" disabled>Agotado</button>` : 
+            `<div class="btn-container-responsive" style="display: flex; gap: 5px; padding: 10px; width: 100%; box-sizing: border-box;">
+                <button class="btn" onclick="window.agregarAlCarrito('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})" style="flex: 1; background: #E5C453;"><i class="fas fa-cart-plus"></i></button>
+                <button class="btn" onclick="window.whatsappDirecto('${refProd}','${precioFinal}','${descProd}')" style="flex: 2.5; background: #25D366; color:white;"><i class="fab fa-whatsapp"></i> Me interesa</button>
+            </div>`;
 
        // --- LÓGICA DE STOCK PERSUASIVA (Dentro del for de render) ---
 let stockEtiqueta = "";
@@ -2712,18 +2702,20 @@ if (real.stock !== null && real.stock !== undefined && real.stock > 0 && real.st
         </div>`;
 }
 
-     // Estructura de la card (Sin tocar nombre ni imagen)
-card.innerHTML = `
-    <div class="img-container">
-        ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
-        ${stockEtiqueta}
-        <img src="${normalizarImagen(imgUrl)}" 
-             ${estaRealmenteAgotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})"`} 
-             style="${estaRealmenteAgotado ? 'filter: grayscale(100%) brightness(0.7); opacity: 0.7;' : 'cursor: pointer;'}"> 
-    </div>
-    <div class="nombre">${nombreReal}</div>
-    <div class="precio-contenedor">${precioHTML}</div>
-`;
+        card.innerHTML = `
+            <div class="img-container">
+                ${real.promocion ? '<div class="etiquetaPromo">PROMO</div>' : ''}
+                 ${stockEtiqueta}
+                <img src="${normalizarImagen(imgUrl)}" 
+                     ${estaRealmenteAgotado ? '' : `onclick="window.abrirPestañaProducto('${refProd}','${imgUrl}','${precioFinal}','${descProd}', ${real.stock ?? 'null'})"`} 
+                     style="${estaRealmenteAgotado ? 'filter: grayscale(100%) brightness(0.7); opacity: 0.7;' : 'cursor: pointer;'}"
+                     loading="lazy"> 
+            </div>
+            <div class="nombre">${nombreReal}</div>
+            <div class="precio-contenedor">${precioHTML}</div>
+            ${stockEtiqueta} 
+            ${botonesHtml}
+        `;
 
         contenedor.appendChild(card);
     }
@@ -2731,7 +2723,6 @@ card.innerHTML = `
     const ld = document.getElementById("loader");
     if (ld) { ld.style.display = "none"; }
 }
-
 window.render = render;
 
 // 1. WHATSAPP DIRECTO (Botón Verde de la tarjeta)
