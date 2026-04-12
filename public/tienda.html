@@ -590,31 +590,40 @@ body {
 }
 
 /* ========================================= */
-/* BOTONES CIRCULARES SOBRE IMAGEN */
+/* BOTONES CIRCULARES WhatsApp y carrito sobre la IMAGEN */
 /* ========================================= */
 
-/* 1. Contenedor de la imagen (debe envolver a la img y los botones) */
+/* 1. Este es el paso clave: El contenedor de la imagen debe ser el "ancla" */
 .card-img-container { 
-    position: relative; 
+    position: relative !important; /* Esto obliga a los botones a quedarse aquí dentro */
     display: block; 
     width: 100%;
-    overflow: hidden; /* Mantiene los efectos de la imagen dentro de los bordes */
+    line-height: 0; /* Elimina espacios fantasma debajo de la imagen */
+    overflow: hidden; 
     border-radius: 12px 12px 0 0;
 }
 
-/* 2. Estilo base para los botones (usando tus selectores de lógica) */
+/* Forzamos que la imagen ocupe todo el ancho del contenedor */
+.card-img-container img {
+    width: 100%;
+    display: block;
+    margin: 0;
+}
+
+/* 2. Botones: Ahora sí aparecerán en la esquina de la FOTO */
 button[onclick*="agregarAlCarrito"], 
 button[onclick*="whatsappDirecto"] {
     position: absolute !important;
-    bottom: 15px !important; 
+    /* Bajamos un poco el bottom para que no queden tan pegados al borde */
+    bottom: 12px !important; 
     width: 42px !important;
     height: 42px !important;
-    border-radius: 50% !important; /* Círculo perfecto */
+    border-radius: 50% !important;
     
-    /* ELIMINACIÓN DE BORDES Y TEXTO */
+    /* Limpieza visual total */
     border: none !important;
     outline: none !important;
-    font-size: 0 !important; /* Esto oculta "Me interesa" y "+ Carrito" */
+    font-size: 0 !important; 
     
     display: flex !important;
     align-items: center;
@@ -622,58 +631,30 @@ button[onclick*="whatsappDirecto"] {
     padding: 0 !important;
     z-index: 20;
     
-    /* EFECTO DE SOMBRA SUAVE (Desvanecido) */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18) !important;
+    transition: all 0.3s ease !important;
     cursor: pointer;
 }
 
-/* 3. Posiciones y Colores Específicos */
-
-/* Botón WhatsApp (Derecha) */
+/* 3. Alineación a la derecha de la imagen */
 button[onclick*="whatsappDirecto"] {
-    right: 15px !important; 
+    right: 12px !important; 
     background: #25D366 !important;
 }
 
-/* Botón Carrito (A la izquierda del de WhatsApp) */
 button[onclick*="agregarAlCarrito"] {
-    right: 65px !important; 
+    right: 58px !important; /* Justo al lado del verde */
     background: #ffffff !important;
 }
 
-/* 4. Estilo de los Iconos internos */
-button[onclick*="whatsappDirecto"] i {
-    color: white !important;
-    font-size: 22px !important;
-    margin: 0 !important;
-}
+/* Ajuste de iconos */
+button[onclick*="whatsappDirecto"] i { color: white !important; font-size: 22px !important; }
+button[onclick*="agregarAlCarrito"] i { color: #E5C453 !important; font-size: 20px !important; }
 
-button[onclick*="agregarAlCarrito"] i {
-    color: #E5C453 !important; /* Tu color dorado */
-    font-size: 20px !important;
-    margin: 0 !important;
-}
-
-/* 5. Efecto Hover Premium */
-button[onclick*="whatsappDirecto"]:hover,
-button[onclick*="agregarAlCarrito"]:hover {
-    transform: scale(1.15);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
-}
-
-/* 6. Ajuste para productos AGOTADOS */
-.btn-agotado-layer {
-    position: absolute !important;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.7) !important;
-    color: white !important;
-    padding: 8px 15px !important;
-    border-radius: 20px !important;
-    font-size: 14px !important;
-    z-index: 25;
+/* 4. Efecto al pasar el mouse */
+button:hover {
+    transform: scale(1.1);
+    filter: brightness(1.1);
 }
         /* ========================================= */
         /* 7. FOOTER Y AVISOS                        */
