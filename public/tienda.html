@@ -590,54 +590,54 @@ body {
 }
 
         /* ========================================= */
-        /* 6. BOTONES Y CONTACTO                     */
+        /* 6. BOTONES WhatsApp y carrito en la targeta del producto         */
         /* ========================================= */
-      /* 1. Ajuste General: Botones más grandes y limpios */
-.btn {
-    height: 45px !important;   /* Aumentamos la altura para que sean más grandes */
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
+/* 1. Contenedor de la imagen (Asegúrate de que el padre tenga position: relative) */
+.card-img-container { 
+    position: relative; 
+    overflow: hidden;
+}
+
+/* 2. Estilo base para los botones circulares */
+button[onclick*="agregarAlCarrito"], 
+button[onclick*="whatsappDirecto"] {
+    position: absolute !important;
+    bottom: 10px !important; /* Distancia desde abajo de la imagen */
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important; /* Totalmente circulares */
+    padding: 0 !important;
     display: flex !important;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    border-radius: 10px;       /* Bordes un poco más redondeados y modernos */
-    transition: transform 0.1s ease;
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+    font-size: 0 !important; /* Oculta cualquier texto */
 }
 
-.btn:active {
-    transform: scale(0.96);    /* Efecto de pulsado */
-}
-
-/* 2. Botón Carrito: SIN FONDO y solo el icono */
-button[onclick*="agregarAlCarrito"] {
-    background: transparent !important; /* Quitamos el fondo dorado */
-    flex: 0 0 50px !important;          /* Ancho fijo para que sea cuadrado */
-    font-size: 0 !important;             /* Escondemos el texto "+ Carrito" */
-    padding: 0 !important;
-}
-
-/* Color y tamaño del icono del carrito */
-button[onclick*="agregarAlCarrito"] i {
-    color: #E5C453 !important;          /* El dorado ahora va solo en el icono */
-    font-size: 24px !important;          /* Icono más grande y visible */
-}
-
-/* 3. Botón WhatsApp: Más grande y llamativo */
+/* 3. Posición específica para cada uno */
 button[onclick*="whatsappDirecto"] {
-    flex: 1 !important;                  /* Ocupa el resto del ancho */
-    background: #25D366 !important;      /* Fondo verde sólido */
-    color: white !important;
-    font-size: 14px !important;          /* Texto un poco más grande */
-    font-weight: bold;
+    right: 10px !important; /* Esquina inferior derecha */
+    background: #25D366 !important;
 }
 
+button[onclick*="agregarAlCarrito"] {
+    right: 55px !important; /* Al lado del de WhatsApp */
+    background: #ffffff !important; /* Fondo blanco para que resalte el icono dorado */
+}
+
+/* 4. Ajuste de los iconos internos */
 button[onclick*="whatsappDirecto"] i {
-    font-size: 18px !important;
-    margin-right: 8px;
+    color: white !important;
+    font-size: 20px !important;
+    margin: 0 !important;
 }
 
+button[onclick*="agregarAlCarrito"] i {
+    color: #E5C453 !important;
+    font-size: 20px !important;
+    margin: 0 !important;
+}
         /* ========================================= */
         /* 7. FOOTER Y AVISOS                        */
         /* ========================================= */
