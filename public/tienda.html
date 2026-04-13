@@ -911,31 +911,41 @@ button:hover { transform: scale(1.12); }
 }
 
 /* 4. MEDIOS DE PAGO (DISEÑO LIMPIO) */
+/* 4. MEDIOS DE PAGO (UNA TARJETA POR FILA) */
 #perfil-medios-pago {
     width: 90%;
     max-width: 800px;
-    margin: 20px auto 0;     /* Centra el grid de pagos */
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
+    margin: 20px auto 0;
+    display: flex !important;    /* Cambiamos a Flex para mejor control vertical */
+    flex-direction: column;      /* Apila uno debajo de otro */
+    gap: 12px;                   /* Espacio entre cada tarjeta */
 }
 
 #perfil-medios-pago div {
+    width: 100%;                 /* Ocupa todo el ancho del contenedor */
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(229, 196, 83, 0.2);
-    padding: 15px;
+    padding: 18px;               /* Un poco más de espacio interno */
     border-radius: 12px;
     color: #f1f5f9 !important;
     font-weight: 500;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* Alinea el contenido a la izquierda */
     transition: 0.3s ease;
+    box-sizing: border-box;      /* Asegura que el padding no rompa el ancho */
+}
+
+#perfil-medios-pago div:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(229, 196, 83, 0.5);
+    transform: translateX(5px);  /* Pequeño efecto de deslizamiento al pasar el mouse */
 }
 
 #perfil-medios-pago div i {
     color: #E5C453;
-    margin-right: 10px;
+    margin-right: 15px;          /* Más espacio entre icono y texto */
+    font-size: 1.2rem;           /* Icono un poco más grande */
 }
 
 /* 5. SECCIÓN DE CONTACTO Y BOTÓN SEPARADO */
