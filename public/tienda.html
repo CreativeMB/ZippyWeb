@@ -886,19 +886,18 @@ button:hover { transform: scale(1.12); }
 
 /* --- ESTILO DEL MAPA --- */
 #contenedor-mapa {
-    width: 100%;
-    max-width: 900px; /* Para que no sea infinito en pantallas grandes */
-    margin: 20px auto 0;
-    padding: 0 20px;
-    box-sizing: border-box;
+    width: 100vw;       /* 100% del ancho de la ventana */
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    overflow: hidden;
 }
 
 #google-map-iframe {
-    border-radius: 15px; /* Cuadrado suavizado igual que el logo */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    /* Filtro para que el mapa se vea más oscuro/moderno */
-    filter: grayscale(0.8) invert(0.9) hue-rotate(180deg) brightness(0.9);
-    transition: filter 0.5s ease;
+    width: 100%;        /* Ocupa todo el contenedor expandido */
+    display: block;     /* Elimina espacios en blanco inferiores */
 }
 
 #google-map-iframe:hover {
