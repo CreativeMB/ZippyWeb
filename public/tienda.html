@@ -912,7 +912,7 @@ button:hover { transform: scale(1.12); }
 
 /* 4. MEDIOS DE PAGO (DISEÑO LIMPIO) */
 #perfil-medios-pago {
-    width: 100vw;           /* También lo sacamos a la orilla */
+    width: 100vw;
     position: relative;
     left: 50%;
     right: 50%;
@@ -920,31 +920,35 @@ button:hover { transform: scale(1.12); }
     margin-right: -50vw;
     display: flex !important;
     flex-direction: column;
-    gap: 10px;
+    gap: 0; /* Quitamos el gap para que las líneas divisorias se toquen */
 }
 
 #perfil-medios-pago div {
     width: 100%;
     background: rgba(255, 255, 255, 0.03);
-    border-top: 1px solid rgba(229, 196, 83, 0.2);    /* Líneas divisorias */
     border-bottom: 1px solid rgba(229, 196, 83, 0.2);
-    padding: 20px;
+    padding: 20px 10%; /* Agregamos 10% de padding a los lados para centrar el contenido */
     color: #f1f5f9 !important;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-start; /* Mantenemos el inicio pero el padding lo empuja al centro */
     
-    /* Evita que el texto baje a otro renglón */
     white-space: nowrap; 
-    overflow: hidden;       /* Si es demasiado largo, se oculta (puedes usar text-overflow) */
+    overflow: hidden;
     text-overflow: ellipsis; 
     box-sizing: border-box;
+}
+
+/* Si quieres que el texto esté TOTALMENTE centrado en la franja */
+#perfil-medios-pago div {
+    justify-content: center; /* Cambia esto si prefieres que todo esté en el puro medio */
 }
 
 #perfil-medios-pago div i {
     color: #E5C453;
     margin-right: 15px;
-    min-width: 25px;        /* Evita que el icono se aplaste */
+    min-width: 25px;
+    font-size: 1.2rem;
 }
 
 /* 5. SECCIÓN DE CONTACTO Y BOTÓN SEPARADO */
