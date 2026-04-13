@@ -2418,12 +2418,19 @@ function configurarRedesNav(perfil) {
 
     // 2. Mantenemos tu lógica de Logo e Interfaz (Home)
     const imgElement = document.getElementById('logoEmpresa');
-    if (perfil.urlLogo && perfil.urlLogo.trim() !== "") {
-        const urlFinal = obtenerLinkDirecto(perfil.urlLogo);
-        imgElement.src = urlFinal;
-        imgElement.style.display = 'inline-block';
-        imgElement.style.opacity = '1';
-    }
+
+console.log("URL original del perfil:", perfil.urlLogo); // Verifica si llega el dato
+
+if (perfil.urlLogo && perfil.urlLogo.trim() !== "") {
+    const urlFinal = obtenerLinkDirecto(perfil.urlLogo);
+    console.log("URL final procesada:", urlFinal); // Verifica si el link es correcto
+    
+    imgElement.src = urlFinal;
+    imgElement.style.display = 'inline-block';
+    imgElement.style.opacity = '1';
+} else {
+    console.warn("No se encontró urlLogo en el perfil de Firebase");
+}
 
     // 3. Llenamos los textos de la Home (IDs antiguos)
     document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
