@@ -885,23 +885,29 @@ button:hover { transform: scale(1.12); }
 }
 
 /* --- ESTILO DEL MAPA --- */
+/* --- ESTILO DEL MAPA (ESTILO FRANJA TOTAL) --- */
 #contenedor-mapa {
-    width: 100vw;       /* 100% del ancho de la ventana */
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    overflow: hidden;
+    width: 100%;           /* Ocupa todo el ancho disponible */
+    max-width: none;       /* Eliminamos el tope de 900px */
+    margin: 20px 0 0;      /* Quitamos el 'auto' para que no se centre, se pegue arriba */
+    padding: 0;            /* Quitamos el espacio de 20px de los lados */
+    box-sizing: border-box;
+    overflow: hidden;      /* Evita que el radio de las esquinas cause problemas */
 }
 
 #google-map-iframe {
-    width: 100%;        /* Ocupa todo el contenedor expandido */
-    display: block;     /* Elimina espacios en blanco inferiores */
+    width: 100%;           /* Obliga al iframe a ser tan ancho como la pantalla */
+    display: block;        /* Elimina espacios vacíos debajo del iframe */
+    border-radius: 0;      /* OJO: Para efecto franja total, es mejor sin esquinas redondeadas */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    
+    /* Mantenemos tu estilo oscuro/moderno */
+    filter: grayscale(0.8) invert(0.9) hue-rotate(180deg) brightness(0.9);
+    transition: filter 0.5s ease;
 }
 
 #google-map-iframe:hover {
-    filter: grayscale(0); /* Se pone a color cuando el usuario pasa el mouse */
+    filter: grayscale(0); /* Se pone a color al pasar el mouse */
 }
 
 /* 4. MEDIOS DE PAGO (DISEÑO LIMPIO) */
@@ -2415,7 +2421,7 @@ function configurarRedesNav(perfil) {
         verificarDomiciliarios(empresaId); 
     }
 
-    // 2. Mantenemos tu lógica de Logo e Interfaz (Home)
+   // 2. LÓGICA DEL LOGO (Corregida con el método que sí te funciona)
     const imgElement = document.getElementById('logoEmpresa');
     
     if (imgElement && perfil.urlLogo && perfil.urlLogo.trim() !== "") {
@@ -2438,7 +2444,6 @@ function configurarRedesNav(perfil) {
         const el = document.getElementById(id);
         if (el) el.innerText = texto || '';
     };
-
     // 3. Llenamos los textos de la Home (IDs antiguos)
     document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
     document.getElementById("eslogan").innerText = perfil.eslogan;
