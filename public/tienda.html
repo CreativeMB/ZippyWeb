@@ -2418,19 +2418,27 @@ function configurarRedesNav(perfil) {
 
     // 2. Mantenemos tu lógica de Logo e Interfaz (Home)
     const imgElement = document.getElementById('logoEmpresa');
-
-console.log("URL original del perfil:", perfil.urlLogo); // Verifica si llega el dato
-
-if (perfil.urlLogo && perfil.urlLogo.trim() !== "") {
-    const urlFinal = obtenerLinkDirecto(perfil.urlLogo);
-    console.log("URL final procesada:", urlFinal); // Verifica si el link es correcto
     
-    imgElement.src = urlFinal;
-    imgElement.style.display = 'inline-block';
-    imgElement.style.opacity = '1';
-} else {
-    console.warn("No se encontró urlLogo en el perfil de Firebase");
-}
+    if (imgElement && perfil.urlLogo && perfil.urlLogo.trim() !== "") {
+        // Usamos la fórmula ganadora: Drive ID + Weserv Proxy
+        const urlDrive = `https://drive.google.com/uc?export=view&id=${perfil.urlLogo}`;
+        const urlFinal = `https://images.weserv.nl/?url=${encodeURIComponent(urlDrive)}`;
+        
+        console.log("🚀 Cargando logo principal:", urlFinal);
+        
+        imgElement.src = urlFinal;
+        imgElement.style.display = 'inline-block';
+        imgElement.style.opacity = '1';
+    } else {
+        console.warn("⚠️ No se pudo cargar el logo: ID ausente o elemento no encontrado.");
+    }
+
+    // 3. Llenamos los textos de la Home
+    // Agregamos comprobaciones básicas para evitar errores si un elemento no existe
+    const actualizarTexto = (id, texto) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = texto || '';
+    };
 
     // 3. Llenamos los textos de la Home (IDs antiguos)
     document.getElementById("nombreEmpresa").innerText = perfil.nombreEmpresa;
