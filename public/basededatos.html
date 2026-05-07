@@ -1840,9 +1840,14 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     `;
 
     // --- LÓGICA DE EDICIÓN INLINE (SIN MODIFICAR LO DEMÁS) ---
+    // --- LÓGICA DE EDICIÓN INLINE CORREGIDA (BLOQUEA EL LINK) ---
     const botonesEdit = card.querySelectorAll('.btn-edit-inline');
     botonesEdit.forEach(btn => {
-        btn.onclick = () => {
+        btn.onclick = (e) => {
+            // 1. Evita que el hipervínculo del mapa se active al tocar el lápiz
+            e.preventDefault();
+            e.stopPropagation();
+
             const campo = btn.getAttribute('data-campo');
             const span = card.querySelector(`.txt-edit[data-campo="${campo}"]`);
             const valorActual = span.innerText;
@@ -1852,6 +1857,12 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             input.value = valorActual;
             input.style.width = "90%";
             
+            // 2. Evita que el hipervínculo se active al hacer clic dentro del cuadro de texto
+            input.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            };
+
             const parent = span.parentNode;
             parent.replaceChild(input, span);
             input.focus();
@@ -1863,8 +1874,10 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                         .set(nuevoValor)
                         .then(() => {
                             span.innerText = nuevoValor;
+                            // 3. Si es dirección, actualizamos el href del mapa para el próximo click real
                             if (campo === 'direccion') {
-                                card.querySelector('.maps-link').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nuevoValor)}`;
+                                const linkMapa = card.querySelector('.maps-link');
+                                if (linkMapa) linkMapa.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nuevoValor)}`;
                             }
                         });
                 }
@@ -1872,9 +1885,9 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             };
 
             input.onblur = terminarEdicion;
-            input.onkeydown = (e) => {
-                if (e.key === 'Enter') terminarEdicion();
-                if (e.key === 'Escape') parent.replaceChild(span, input);
+            input.onkeydown = (ev) => {
+                if (ev.key === 'Enter') terminarEdicion();
+                if (ev.key === 'Escape') parent.replaceChild(span, input);
             };
         };
     });
