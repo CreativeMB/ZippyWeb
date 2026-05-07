@@ -1747,11 +1747,9 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     const COLOR_RECIBIDO = "#E0E0E0";   // Gris
     
     let colorFinal = p.color || "#FFFFFF";
-
     if (p.diaEntrega === hoy && colorFinal.toUpperCase() === COLOR_PROGRAMADO) {
         colorFinal = COLOR_RECIBIDO; 
     }
-
     card.style.backgroundColor = colorFinal;
 
     // --- INDICADOR VISUAL PARA LA FECHA ---
@@ -1760,7 +1758,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         ? `<span style="color: #d32f2f; font-weight: 800;">⭐ HOY ${p.diaEntrega}</span>` 
         : (p.diaEntrega || '');
 
-  card.innerHTML = `
+    card.innerHTML = `
         <div class="pedido-top">
             <div class="pedido-img-wrapper">
                 ${generarMosaicoHTML(p)}
@@ -1781,24 +1779,20 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                         #️⃣N°: <a class="whatsapp-link" href="https://wa.me/${(p.cliente || '').replace(/\D/g, '')}" target="_blank">${p.cliente || ''}</a>
                     </div>
                 </div>
-
                 <div class="linea">
                     🎁 ${p.nombreDestinatario || ''}
                     <div class="sub-linea">📞 ${p.destinatario || ''}</div>
                 </div>
-
                 <div class="linea">
                     <button class="btn-edit-inline" data-campo="direccion" style="margin-right: 5px;">✏️</button>
                     <a class="maps-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion || '')}" target="_blank">
                         <span class="txt-edit" data-campo="direccion">${p.direccion || ''}</span>
                     </a>
                 </div>
-
                 <div class="linea">
                     <button class="btn-edit-inline" data-campo="notas" style="margin-right: 5px;">✏️</button>
-                    <strong></strong> <span class="txt-edit" data-campo="notas">${p.notas || ''}</span>
+                    <span class="txt-edit" data-campo="notas">${p.notas || ''}</span>
                 </div>
-
                 <div class="linea">
                     ${textoFechaUI}
                     <div class="sub-linea">⏰ ${p.horaEntrega || ''}</div>
@@ -1810,12 +1804,11 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             <div class="linea ref" style="font-size: 15px; font-weight: 800; color: #000; margin-bottom: 5px;">
                 🎁 ${p.referencia || 'Pedido'}
             </div>
+            
+            <!-- SECCIÓN MENSAJE CON ACORDEÓN -->
             <div class="linea mensaje-linea" style="margin-bottom: 10px;">
                 <div style="display: flex; align-items: flex-start; width: 100%;">
-                    <!-- Botón de editar al inicio -->
                     <button class="btn-edit-inline" data-campo="mensaje" style="margin-right: 8px; flex-shrink: 0;">✏️</button>
-                    
-                    <!-- Contenedor Acordeón -->
                     <div class="msg-container-acordion" style="flex-grow: 1; overflow: hidden; cursor: pointer; background: rgba(0,0,0,0.03); padding: 4px; border-radius: 4px;">
                         <span class="mensaje-texto txt-edit" data-campo="mensaje" 
                               style="display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; line-height: 1.2;">
@@ -1823,13 +1816,10 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                         </span>
                     </div>
                 </div>
-                
-                <!-- Botones de acción debajo del mensaje -->
                 <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px; padding-left: 30px;">
                     <button class="btn-imprimir">🖨 Imprimir</button>
-                    <label class="switch-ruta">
-                        <input type="checkbox" class="chkRuta">
-                        🚗 En Ruta
+                    <label class="switch-ruta" style="cursor:pointer;">
+                        <input type="checkbox" class="chkRuta"> 🚗 En Ruta
                     </label>
                 </div>
             </div>
@@ -1837,7 +1827,6 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             <div class="linea">
                 <button class="btn-edit-inline" data-campo="de" style="margin-right: 5px;">✏️</button> 
                 De: <span class="txt-edit" data-campo="de">${p.de || ''}</span> 
-                
                 <button class="btn-edit-inline" data-campo="para" style="margin-left: 10px; margin-right: 5px;">✏️</button> 
                 Para: <span class="txt-edit" data-campo="para">${p.para || ''}</span>
             </div>
@@ -1853,35 +1842,24 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         </div>
     `;
 
-    // --- LÓGICA DE EDICIÓN INLINE (SIN MODIFICAR LO DEMÁS) ---
+    // --- 1. LÓGICA DE EDICIÓN INLINE ---
     const botonesEdit = card.querySelectorAll('.btn-edit-inline');
     botonesEdit.forEach(btn => {
         btn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-
             const campo = btn.getAttribute('data-campo');
             const span = card.querySelector(`.txt-edit[data-campo="${campo}"]`);
             const valorActual = span.innerText;
 
-            // 1. Cambiamos 'input' por 'textarea' para ver todo el texto
             const input = document.createElement('textarea');
             input.value = valorActual;
-            
-            // Estilos para que sea cómodo editar textos largos
             input.style.width = "100%";
-            input.style.minHeight = "80px"; // Altura mínima para mensajes largos
+            input.style.minHeight = "80px";
             input.style.display = "block";
-            input.style.fontFamily = "inherit";
-            input.style.fontSize = "inherit";
             input.style.padding = "5px";
-            input.style.boxSizing = "border-box";
             
-            // Evitamos que el click dentro del textarea active el link del mapa
-            input.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-            };
+            input.onclick = (ev) => { ev.preventDefault(); ev.stopPropagation(); };
 
             const parent = span.parentNode;
             parent.replaceChild(input, span);
@@ -1895,61 +1873,46 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                         .then(() => {
                             span.innerText = nuevoValor;
                             if (campo === 'direccion') {
-                                const linkMapa = card.querySelector('.maps-link');
-                                if (linkMapa) linkMapa.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nuevoValor)}`;
+                                card.querySelector('.maps-link').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nuevoValor)}`;
                             }
                         });
                 }
                 if (input.parentNode === parent) parent.replaceChild(span, input);
             };
 
-            // Guardar al hacer clic fuera
             input.onblur = terminarEdicion;
-
-            // En un textarea, ENTER suele ser para bajar de línea. 
-            // Si quieres que ENTER guarde, dejamos esto. 
-            // Si prefieres usar ENTER para saltos de línea, quita la validación de 'Enter'.
             input.onkeydown = (ev) => {
-                if (ev.key === 'Enter' && !ev.shiftKey) { 
-                    ev.preventDefault();
-                    terminarEdicion(); 
-                }
+                if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); terminarEdicion(); }
                 if (ev.key === 'Escape') parent.replaceChild(span, input);
             };
         };
     });
 
-// --- LÓGICA ACORDEÓN PARA MENSAJE (MOSTRAR/OCULTAR) ---
+    // --- 2. LÓGICA ACORDEÓN MENSAJE ---
     const msgTrigger = card.querySelector('.msg-container-acordion');
-    const msgInner = msgTrigger.querySelector('.mensaje-texto');
-    
-    msgTrigger.onclick = (e) => {
-        // Evitamos que se dispare si estamos en modo edición (si el input/textarea existe)
-        if (msgTrigger.querySelector('textarea')) return;
+    if (msgTrigger) {
+        const msgInner = msgTrigger.querySelector('.mensaje-texto');
+        msgTrigger.onclick = (e) => {
+            if (msgTrigger.querySelector('textarea')) return;
+            const estaColapsado = msgInner.style.whiteSpace === 'nowrap' || !msgInner.style.whiteSpace;
+            msgInner.style.whiteSpace = estaColapsado ? 'normal' : 'nowrap';
+            msgInner.style.overflow = estaColapsado ? 'visible' : 'hidden';
+        };
+    }
 
-        const estaColapsado = msgInner.style.whiteSpace === 'nowrap';
-        if (estaColapsado) {
-            msgInner.style.whiteSpace = 'normal'; // Muestra todo el texto
-            msgInner.style.overflow = 'visible';
-        } else {
-            msgInner.style.whiteSpace = 'nowrap'; // Vuelve a una sola línea
-            msgInner.style.overflow = 'hidden';
-        }
-    };
-
-    // --- LÓGICA PAGO ---
-    const checkbox = card.querySelector('.chk-pago-realtime');
-    const etiquetaTexto = card.querySelector('.txt-pago');
-    checkbox.addEventListener('change', (e) => {
+    // --- 3. LÓGICA PAGO ---
+    const checkboxPago = card.querySelector('.chk-pago-realtime');
+    const etiquetaTextoPago = card.querySelector('.txt-pago');
+    checkboxPago.addEventListener('change', (e) => {
         const nuevoEstado = e.target.checked;
         db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}/pagoConfirmado`).set(nuevoEstado)
             .then(() => {
-                etiquetaTexto.innerText = nuevoEstado ? 'PAGO CONFIRMADO ✅' : 'PAGO PENDIENTE ⏳';
-                etiquetaTexto.style.color = nuevoEstado ? '#2E7D32' : '#D32F2F';
+                etiquetaTextoPago.innerText = nuevoEstado ? 'PAGO CONFIRMADO ✅' : 'PAGO PENDIENTE ⏳';
+                etiquetaTextoPago.style.color = nuevoEstado ? '#2E7D32' : '#D32F2F';
             });
     });
 
-    // --- IMPRIMIR ---
+    // --- 4. IMPRIMIR ---
     const btnImprimir = card.querySelector('.btn-imprimir');
     if (btnImprimir) {
         btnImprimir.onclick = () => {
@@ -1961,7 +1924,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         };
     }
 
-    // --- DOMICILIARIOS ---
+    // --- 5. DOMICILIARIOS ---
     const select = card.querySelector('.domi-select');
     const telSpan = card.querySelector('.domi-telefono');
     Object.entries(domiciliarios).forEach(([id, d]) => {
@@ -1978,16 +1941,13 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             await moverPedidoDomiciliario(idPedido, idDomiActual, idDomiNuevo, p);
             telSpan.textContent = `📞 ${domiciliarios[idDomiNuevo]?.telefono || ''}`;
             idDomiActual = idDomiNuevo;
-        } catch (e) {
-            alert('Error al cambiar domiciliario');
-            select.value = idDomiActual;
-        }
+        } catch (e) { alert('Error al cambiar domiciliario'); select.value = idDomiActual; }
     });
 
-    // --- EN RUTA ---
+    // --- 6. EN RUTA (PERSISTENCIA) ---
     const chkRuta = card.querySelector('.chkRuta');
-    const rutas = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
-    if (rutas[idPedido]) {
+    const rutasPersistidas = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
+    if (rutasPersistidas[idPedido]) {
         chkRuta.checked = true;
         card.classList.add('en-ruta');
     }
@@ -2003,108 +1963,21 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         localStorage.setItem('pedidosEnRuta', JSON.stringify(rutasActuales));
     });
 
-    /* ====== EDITAR MENSAJE ====== */
-    function activarEdicionMensaje() {
-        const btnEditar = card.querySelector('.btn-editar-mensaje');
-        const mensajeSpan = card.querySelector('.mensaje-texto');
-        if (!btnEditar || !mensajeSpan) return;
-
-        btnEditar.onclick = () => {
-            const textoOriginal = mensajeSpan.textContent;
-
-            const textarea = document.createElement('textarea');
-            textarea.value = textoOriginal;
-            textarea.style.width = '100%';
-            textarea.rows = 3;
-
-            const btnGuardar = document.createElement('button');
-            btnGuardar.textContent = '💾 Guardar';
-            btnGuardar.style.marginRight = '6px';
-
-            const btnCancelar = document.createElement('button');
-            btnCancelar.textContent = '❌ Cancelar';
-
-            const contenedorBtns = document.createElement('div');
-            contenedorBtns.style.marginTop = '5px';
-            contenedorBtns.append(btnGuardar, btnCancelar);
-
-            mensajeSpan.replaceWith(textarea);
-            btnEditar.replaceWith(contenedorBtns);
-
-            /* ====== GUARDAR ====== */
-            btnGuardar.onclick = async () => {
-                const nuevoMensaje = textarea.value.trim();
-                try {
-                    await db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`)
-                        .update({ mensaje: nuevoMensaje });
-
-                    const nuevoSpan = document.createElement('span');
-                    nuevoSpan.className = 'mensaje-texto';
-                    nuevoSpan.textContent = nuevoMensaje;
-
-                    const nuevoBtnEditar = document.createElement('button');
-                    nuevoBtnEditar.className = 'btn-editar-mensaje';
-                    nuevoBtnEditar.textContent = '✏️';
-
-                    textarea.replaceWith(nuevoSpan);
-                    contenedorBtns.replaceWith(nuevoBtnEditar);
-
-                    activarEdicionMensaje(); // reactivar
-                } catch (e) {
-                    alert('Error guardando mensaje');
-                }
-            };
-
-            /* ====== CANCELAR ====== */
-            btnCancelar.onclick = () => {
-                const spanOriginal = document.createElement('span');
-                spanOriginal.className = 'mensaje-texto';
-                spanOriginal.textContent = textoOriginal;
-
-                const nuevoBtnEditar = document.createElement('button');
-                nuevoBtnEditar.className = 'btn-editar-mensaje';
-                nuevoBtnEditar.textContent = '✏️';
-
-                textarea.replaceWith(spanOriginal);
-                contenedorBtns.replaceWith(nuevoBtnEditar);
-
-                activarEdicionMensaje(); // reactivar
-            };
-        };
+    // --- 7. MARQUEE CINTA ADICIONAL ---
+    const cinta = card.querySelector('.cinta-adicional');
+    if (cinta) {
+        setTimeout(() => {
+            const span = cinta.querySelector('span');
+            if (span && span.scrollWidth > cinta.clientWidth) {
+                cinta.classList.add('marquee');
+            } else if (cinta) {
+                cinta.style.justifyContent = 'center'; 
+            }
+        }, 300); 
     }
-    activarEdicionMensaje();
 
-// Busca la cinta dentro de la tarjeta
-const cinta = card.querySelector('.cinta-adicional');
-
-// Usamos un pequeño retraso para asegurar que el navegador ya dibujó el texto
-if (cinta) {
-    setTimeout(() => {
-        activarMarqueeSiNecesario(cinta);
-    }, 100); 
-}
-
-function activarMarqueeSiNecesario(cintaElement) {
-    const span = cintaElement.querySelector('span');
-    if (!span) return;
-
-    // Medimos el ancho real del texto vs el ancho visible del contenedor
-    const anchoTexto = span.scrollWidth;
-    const anchoContenedor = cintaElement.clientWidth;
-
-    console.log("Midiendo cinta:", anchoTexto, "vs", anchoContenedor); // Para que revises en la consola
-
-    if (anchoTexto > anchoContenedor) {
-        cintaElement.classList.add('marquee');
-    } else {
-        cintaElement.classList.remove('marquee');
-        // Opcional: Centrar si el texto es corto
-        cintaElement.style.justifyContent = 'center'; 
-    }
-}
     return card;
 }
-
 
 async function moverPedidoDomiciliario(idPedido, idDomiViejo, idDomiNuevo, pedido) {
 
