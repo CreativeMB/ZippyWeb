@@ -1760,7 +1760,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         ? `<span style="color: #d32f2f; font-weight: 800;">⭐ HOY ${p.diaEntrega}</span>` 
         : (p.diaEntrega || '');
 
-    card.innerHTML = `
+  card.innerHTML = `
         <div class="pedido-top">
             <div class="pedido-img-wrapper">
                 ${generarMosaicoHTML(p)}
@@ -1788,16 +1788,15 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                 </div>
 
                 <div class="linea">
-                    📍 
+                    <button class="btn-edit-inline" data-campo="direccion" style="margin-right: 5px;">✏️</button>
                     <a class="maps-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion || '')}" target="_blank">
                         <span class="txt-edit" data-campo="direccion">${p.direccion || ''}</span>
                     </a>
-                    <button class="btn-edit-inline" data-campo="direccion">✏️</button>
                 </div>
 
                 <div class="linea">
+                    <button class="btn-edit-inline" data-campo="notas" style="margin-right: 5px;">✏️</button>
                     <strong>🏠:</strong> <span class="txt-edit" data-campo="notas">${p.notas || ''}</span>
-                    <button class="btn-edit-inline" data-campo="notas">✏️</button>
                 </div>
 
                 <div class="linea">
@@ -1812,10 +1811,11 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                 🎁 ${p.referencia || 'Pedido'}
             </div>
             <div class="linea mensaje-linea">
+                <button class="btn-edit-inline" data-campo="mensaje" style="margin-right: 5px;">✏️</button>
                 <strong>📝:</strong>
                 <span class="mensaje-texto txt-edit" data-campo="mensaje">${p.mensaje || ''}</span>
-                <button class="btn-edit-inline" data-campo="mensaje">✏️</button>
-                <button class="btn-imprimir">🖨 Imprimir</button>
+                
+                <button class="btn-imprimir" style="margin-left: 10px;">🖨 Imprimir</button>
                 <label class="switch-ruta">
                     <input type="checkbox" class="chkRuta">
                     🚗 En Ruta
@@ -1824,8 +1824,11 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             </div>
 
             <div class="linea">
-                👉 De: <span class="txt-edit" data-campo="de">${p.de || ''}</span> <button class="btn-edit-inline" data-campo="de">✏️</button> 
-                👉 Para: <span class="txt-edit" data-campo="para">${p.para || ''}</span> <button class="btn-edit-inline" data-campo="para">✏️</button>
+                <button class="btn-edit-inline" data-campo="de" style="margin-right: 5px;">✏️</button> 
+                De: <span class="txt-edit" data-campo="de">${p.de || ''}</span> 
+                
+                <button class="btn-edit-inline" data-campo="para" style="margin-left: 10px; margin-right: 5px;">✏️</button> 
+                Para: <span class="txt-edit" data-campo="para">${p.para || ''}</span>
             </div>
 
             <div class="linea domiciliario-linea">
