@@ -1737,62 +1737,42 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     card.className = 'pedido-card';
 
     // Definir el estado inicial del checkbox
-const checkedAtributo = p.pagoConfirmado ? 'checked' : '';
-const textoEstadoPago = p.pagoConfirmado ? 'PAGO CONFIRMADO ✅' : 'PAGO PENDIENTE ⏳';
-const colorEstadoPago = p.pagoConfirmado ? '#2E7D32' : '#D32F2F';
-   // --- LÓGICA DE COLOR AUTOMÁTICO ---
+    const checkedAtributo = p.pagoConfirmado ? 'checked' : '';
+    const textoEstadoPago = p.pagoConfirmado ? 'PAGO CONFIRMADO ✅' : 'PAGO PENDIENTE ⏳';
+    const colorEstadoPago = p.pagoConfirmado ? '#2E7D32' : '#D32F2F';
+
+    // --- LÓGICA DE COLOR AUTOMÁTICO ---
     const hoy = obtenerFechaHoyFormateada();
     const COLOR_PROGRAMADO = "#FFF9C4"; // Amarillo
     const COLOR_RECIBIDO = "#E0E0E0";   // Gris
     
     let colorFinal = p.color || "#FFFFFF";
 
-    // Si es para hoy y el estado actual es "Programado" (Amarillo)
     if (p.diaEntrega === hoy && colorFinal.toUpperCase() === COLOR_PROGRAMADO) {
-        colorFinal = COLOR_RECIBIDO; // Cambia visualmente a Gris
+        colorFinal = COLOR_RECIBIDO; 
     }
 
-    // Aplicamos el color (usando tu función existente o el colorFinal calculado)
     card.style.backgroundColor = colorFinal;
-
-    // --- INDICADOR VISUAL PARA LA FECHA ---
-    const esHoy = p.diaEntrega === hoy;
-    const textoFechaUI = esHoy 
-        ? `<span style="color: #d32f2f; font-weight: 800;">⭐ HOY ${p.diaEntrega}</span>` 
-        : (p.diaEntrega || '');
 
     card.innerHTML = `
         <div class="pedido-top">
             <div class="pedido-img-wrapper">
                 ${generarMosaicoHTML(p)}
-
-                ${
-                    p.adicional && p.adicional.trim() !== ''
-                    ? `<div class="cinta-adicional">
-                            <span>${p.adicional}</span>
-                       </div>`
-                    : ''
-                }
+                ${p.adicional && p.adicional.trim() !== '' ? `<div class="cinta-adicional"><span>${p.adicional}</span></div>` : ''}
             </div>
             <div class="pedido-info">
-           <div class="linea-pago-mini" style="margin: 2px 0; display: flex; align-items: center;">
-        <label style="display: flex; align-items: center; cursor: pointer; gap: 5px; width: 100%;">
-            <input type="checkbox" class="chk-pago-realtime" ${checkedAtributo} 
-                style="width: 14px; height: 14px; margin: 0;">
-            <span class="txt-pago" style="font-size: 11px; font-weight: 900; color: ${colorEstadoPago}; letter-spacing: -0.3px;">
-                ${textoEstadoPago}
-            </span>
-        </label>
-    </div>
+                <div class="linea-pago-mini" style="margin: 2px 0; display: flex; align-items: center;">
+                    <label style="display: flex; align-items: center; cursor: pointer; gap: 5px; width: 100%;">
+                        <input type="checkbox" class="chk-pago-realtime" ${checkedAtributo} style="width: 14px; height: 14px; margin: 0;">
+                        <span class="txt-pago" style="font-size: 11px; font-weight: 900; color: ${colorEstadoPago}; letter-spacing: -0.3px;">
+                            ${textoEstadoPago}
+                        </span>
+                    </label>
+                </div>
                 <div class="linea">
                     👤 ${p.nombreCliente || ''}
                     <div class="sub-linea">
-                        #️⃣N°:
-                        <a class="whatsapp-link"
-                           href="https://wa.me/${(p.cliente || '').replace(/\D/g, '')}"
-                           target="_blank">
-                           ${p.cliente || ''}
-                        </a>
+                        #️⃣N°: <a class="whatsapp-link" href="https://wa.me/${(p.cliente || '').replace(/\D/g, '')}" target="_blank">${p.cliente || ''}</a>
                     </div>
                 </div>
 
@@ -1803,13 +1783,17 @@ const colorEstadoPago = p.pagoConfirmado ? '#2E7D32' : '#D32F2F';
 
                 <div class="linea">
                     📍 
-                    <a class="maps-link"
-                       href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion || '')}"
-                       target="_blank">
-                        ${p.direccion || ''}
+                    <a class="maps-link" id="link-maps-${idPedido}" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion || '')}" target="_blank">
+                        <span class="txt-direccion">${p.direccion || ''}</span>
                     </a>
+                    <button class="btn-edit-mini btn-edit-direccion" style="border:none; background:none; cursor:pointer; font-size:10px;">✏️</button>
                 </div>
- <div class="linea"><strong>🏠:</strong> ${p.notas || ''}</div>
+                
+                <div class="linea">
+                    <strong>🏠:</strong> <span class="txt-notas">${p.notas || ''}</span>
+                    <button class="btn-edit-mini btn-edit-notas" style="border:none; background:none; cursor:pointer; font-size:10px;">✏️</button>
+                </div>
+
                 <div class="linea">
                     📅 ${p.diaEntrega || ''}
                     <div class="sub-linea">⏰ ${p.horaEntrega || ''}</div>
@@ -1818,32 +1802,28 @@ const colorEstadoPago = p.pagoConfirmado ? '#2E7D32' : '#D32F2F';
         </div>
 
         <div class="pedido-bottom">
-           
             <div class="linea ref" style="font-size: 15px; font-weight: 800; color: #000; margin-bottom: 5px;">
                 🎁 ${p.referencia || 'Pedido'}
             </div>
             <div class="linea mensaje-linea">
                 <strong>📝:</strong>
-                <span class="mensaje-texto">${p.mensaje || ''}</span>
-                <button class="btn-editar-mensaje">✏️</button>
+                <span class="mensaje-texto txt-mensaje">${p.mensaje || ''}</span>
+                <button class="btn-editar-mensaje btn-edit-mensaje">✏️</button>
                 <button class="btn-imprimir">🖨 Imprimir</button>
                 <label class="switch-ruta">
                     <input type="checkbox" class="chkRuta">
                     🚗 En Ruta
                 </label>
-                <div class="etiqueta-ruta">
-                    <span>En</span>
-                    <span>Ruta</span>
-                </div>
+                <div class="etiqueta-ruta"><span>En</span><span>Ruta</span></div>
             </div>
 
             <div class="linea">
-                👉 De: ${p.de || ''} 👉 Para: ${p.para || ''}
+                👉 De: <span class="txt-de">${p.de || ''}</span> <button class="btn-edit-mini btn-edit-de" style="border:none; background:none; cursor:pointer; font-size:10px;">✏️</button>
+                👉 Para: <span class="txt-para">${p.para || ''}</span> <button class="btn-edit-mini btn-edit-para" style="border:none; background:none; cursor:pointer; font-size:10px;">✏️</button>
             </div>
 
             <div class="linea domiciliario-linea">
-                🚗 
-                <select class="domi-select"></select>
+                🚗 <select class="domi-select"></select>
                 <span class="domi-telefono">📞 ${domiActual.telefono || ''}</span>
             </div>
 
@@ -1853,31 +1833,58 @@ const colorEstadoPago = p.pagoConfirmado ? '#2E7D32' : '#D32F2F';
         </div>
     `;
 
-// --- LÓGICA DE ACTUALIZACIÓN EN TIEMPO REAL pago confirmado ---
-const checkbox = card.querySelector('.chk-pago-realtime');
-const etiquetaTexto = card.querySelector('.txt-pago');
+    // --- LÓGICA DE EDICIÓN EN TIEMPO REAL (GENERALIZADA) ---
+    const configurarEdicion = (claseBoton, campoFirebase, claseTexto, esDireccion = false) => {
+        card.querySelector(`.${claseBoton}`).onclick = () => {
+            const spanTexto = card.querySelector(`.${claseTexto}`);
+            const valorActual = spanTexto.innerText;
+            const nuevoValor = prompt(`Editar ${campoFirebase}:`, valorActual);
 
-checkbox.addEventListener('change', (e) => {
-    const nuevoEstado = e.target.checked;
-    
-    db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}/pagoConfirmado`)
-        .set(nuevoEstado)
-        .then(() => {
-            // Texto corto para ahorrar espacio
-            etiquetaTexto.innerText = nuevoEstado ? 'PAGADO' : 'PENDIENTE';
-            etiquetaTexto.style.color = nuevoEstado ? '#2E7D32' : '#D32F2F';
-        });
-});
+            if (nuevoValor !== null) {
+                db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}/${campoFirebase}`)
+                    .set(nuevoValor.trim())
+                    .then(() => {
+                        spanTexto.innerText = nuevoValor.toUpperCase();
+                        if (esDireccion) {
+                            const mapLink = card.querySelector(`.maps-link`);
+                            mapLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nuevoValor)}`;
+                        }
+                    })
+                    .catch(err => console.error("Error actualizando:", err));
+            }
+        };
+    };
 
+    // Activamos los botones de edición
+    configurarEdicion('btn-edit-direccion', 'direccion', 'txt-direccion', true);
+    configurarEdicion('btn-edit-notas', 'notas', 'txt-notas');
+    configurarEdicion('btn-edit-mensaje', 'mensaje', 'txt-mensaje');
+    configurarEdicion('btn-edit-de', 'de', 'txt-de');
+    configurarEdicion('btn-edit-para', 'para', 'txt-para');
+
+
+    // --- LÓGICA DE ACTUALIZACIÓN PAGO ---
+    const checkbox = card.querySelector('.chk-pago-realtime');
+    const etiquetaTexto = card.querySelector('.txt-pago');
+
+    checkbox.addEventListener('change', (e) => {
+        const nuevoEstado = e.target.checked;
+        db.ref(`${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}/pagoConfirmado`)
+            .set(nuevoEstado)
+            .then(() => {
+                etiquetaTexto.innerText = nuevoEstado ? 'PAGADO' : 'PENDIENTE';
+                etiquetaTexto.style.color = nuevoEstado ? '#2E7D32' : '#D32F2F';
+            });
+    });
 
     /* ====== IMPRIMIR TARJETA ====== */
     const btnImprimir = card.querySelector('.btn-imprimir');
     if (btnImprimir) {
         btnImprimir.onclick = () => {
             abrirImpresion({
-                mensaje: p.mensaje || '',
-                para: p.para || '',
-                de: p.de || ''
+                mensaje: card.querySelector('.txt-mensaje').innerText || '',
+                para: card.querySelector('.txt-para').innerText || '',
+                de: card.querySelector('.txt-de').innerText || ''
             });
         };
     }
@@ -1898,7 +1905,6 @@ checkbox.addEventListener('change', (e) => {
     select.addEventListener('change', async () => {
         const idDomiNuevo = select.value;
         if (idDomiNuevo === idDomiActual) return;
-
         try {
             await moverPedidoDomiciliario(idPedido, idDomiActual, idDomiNuevo, p);
             telSpan.textContent = `📞 ${domiciliarios[idDomiNuevo]?.telefono || ''}`;
@@ -1909,15 +1915,13 @@ checkbox.addEventListener('change', (e) => {
         }
     });
 
-    /* ====== EN RUTA (EFECTO VISUAL PERSISTENTE) ====== */
+    /* ====== EN RUTA ====== */
     const chkRuta = card.querySelector('.chkRuta');
     const rutas = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
-
     if (rutas[idPedido]) {
         chkRuta.checked = true;
         card.classList.add('en-ruta');
     }
-
     chkRuta.addEventListener('change', () => {
         const rutasActuales = JSON.parse(localStorage.getItem('pedidosEnRuta')) || {};
         if (chkRuta.checked) {
