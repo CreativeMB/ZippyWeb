@@ -1745,25 +1745,7 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     const hoy = obtenerFechaHoyFormateada();
     const COLOR_PROGRAMADO = "#FFF9C4"; // Amarillo
     const COLOR_RECIBIDO = "#E0E0E0";   // Gris
-    // --- LÓGICA ACORDEÓN PARA MENSAJE (MOSTRAR/OCULTAR) ---
-    const msgTrigger = card.querySelector('.msg-container-acordion');
-    const msgInner = msgTrigger.querySelector('.mensaje-texto');
     
-    msgTrigger.onclick = (e) => {
-        // Evitamos que se dispare si estamos en modo edición (si el input/textarea existe)
-        if (msgTrigger.querySelector('textarea')) return;
-
-        const estaColapsado = msgInner.style.whiteSpace === 'nowrap';
-        if (estaColapsado) {
-            msgInner.style.whiteSpace = 'normal'; // Muestra todo el texto
-            msgInner.style.overflow = 'visible';
-        } else {
-            msgInner.style.whiteSpace = 'nowrap'; // Vuelve a una sola línea
-            msgInner.style.overflow = 'hidden';
-        }
-    };
-
-
     let colorFinal = p.color || "#FFFFFF";
 
     if (p.diaEntrega === hoy && colorFinal.toUpperCase() === COLOR_PROGRAMADO) {
@@ -1936,6 +1918,25 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             };
         };
     });
+
+// --- LÓGICA ACORDEÓN PARA MENSAJE (MOSTRAR/OCULTAR) ---
+    const msgTrigger = card.querySelector('.msg-container-acordion');
+    const msgInner = msgTrigger.querySelector('.mensaje-texto');
+    
+    msgTrigger.onclick = (e) => {
+        // Evitamos que se dispare si estamos en modo edición (si el input/textarea existe)
+        if (msgTrigger.querySelector('textarea')) return;
+
+        const estaColapsado = msgInner.style.whiteSpace === 'nowrap';
+        if (estaColapsado) {
+            msgInner.style.whiteSpace = 'normal'; // Muestra todo el texto
+            msgInner.style.overflow = 'visible';
+        } else {
+            msgInner.style.whiteSpace = 'nowrap'; // Vuelve a una sola línea
+            msgInner.style.overflow = 'hidden';
+        }
+    };
+
     // --- LÓGICA PAGO ---
     const checkbox = card.querySelector('.chk-pago-realtime');
     const etiquetaTexto = card.querySelector('.txt-pago');
