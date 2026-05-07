@@ -1745,7 +1745,25 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
     const hoy = obtenerFechaHoyFormateada();
     const COLOR_PROGRAMADO = "#FFF9C4"; // Amarillo
     const COLOR_RECIBIDO = "#E0E0E0";   // Gris
+    // --- LÓGICA ACORDEÓN PARA MENSAJE (MOSTRAR/OCULTAR) ---
+    const msgTrigger = card.querySelector('.msg-container-acordion');
+    const msgInner = msgTrigger.querySelector('.mensaje-texto');
     
+    msgTrigger.onclick = (e) => {
+        // Evitamos que se dispare si estamos en modo edición (si el input/textarea existe)
+        if (msgTrigger.querySelector('textarea')) return;
+
+        const estaColapsado = msgInner.style.whiteSpace === 'nowrap';
+        if (estaColapsado) {
+            msgInner.style.whiteSpace = 'normal'; // Muestra todo el texto
+            msgInner.style.overflow = 'visible';
+        } else {
+            msgInner.style.whiteSpace = 'nowrap'; // Vuelve a una sola línea
+            msgInner.style.overflow = 'hidden';
+        }
+    };
+
+
     let colorFinal = p.color || "#FFFFFF";
 
     if (p.diaEntrega === hoy && colorFinal.toUpperCase() === COLOR_PROGRAMADO) {
@@ -1810,17 +1828,28 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             <div class="linea ref" style="font-size: 15px; font-weight: 800; color: #000; margin-bottom: 5px;">
                 🎁 ${p.referencia || 'Pedido'}
             </div>
-            <div class="linea mensaje-linea">
-                <button class="btn-edit-inline" data-campo="mensaje" style="margin-right: 5px;">✏️</button>
-                <strong></strong>
-                <span class="mensaje-texto txt-edit" data-campo="mensaje">${p.mensaje || ''}</span>
+            <div class="linea mensaje-linea" style="margin-bottom: 10px;">
+                <div style="display: flex; align-items: flex-start; width: 100%;">
+                    <!-- Botón de editar al inicio -->
+                    <button class="btn-edit-inline" data-campo="mensaje" style="margin-right: 8px; flex-shrink: 0;">✏️</button>
+                    
+                    <!-- Contenedor Acordeón -->
+                    <div class="msg-container-acordion" style="flex-grow: 1; overflow: hidden; cursor: pointer; background: rgba(0,0,0,0.03); padding: 4px; border-radius: 4px;">
+                        <span class="mensaje-texto txt-edit" data-campo="mensaje" 
+                              style="display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; line-height: 1.2;">
+                            ${p.mensaje || ''}
+                        </span>
+                    </div>
+                </div>
                 
-                <button class="btn-imprimir" style="margin-left: 10px;">🖨 Imprimir</button>
-                <label class="switch-ruta">
-                    <input type="checkbox" class="chkRuta">
-                    🚗 En Ruta
-                </label>
-                <div class="etiqueta-ruta"><span>En</span><span>Ruta</span></div>
+                <!-- Botones de acción debajo del mensaje -->
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px; padding-left: 30px;">
+                    <button class="btn-imprimir">🖨 Imprimir</button>
+                    <label class="switch-ruta">
+                        <input type="checkbox" class="chkRuta">
+                        🚗 En Ruta
+                    </label>
+                </div>
             </div>
 
             <div class="linea">
