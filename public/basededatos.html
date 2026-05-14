@@ -2041,29 +2041,33 @@ btnFinalizar.onclick = () => {
         if (result.isConfirmed) {
             Swal.showLoading();
 
-            // 🕒 CONSTRUCCIÓN MANUAL DEL FORMATO: dd/MM/yyyy hh:mm:ss AM/PM
+            // 🕒 CONSTRUCCIÓN DEL FORMATO ESTÁNDAR: dd/MM/yyyy hh:mm:ss AM/PM
             const ahora = new Date();
             
             // Fecha
             const dia = String(ahora.getDate()).padStart(2, '0');
-            const mes = String(ahora.getMonth() + 1).padStart(2, '0'); // Enero es 0
+            const mes = String(ahora.getMonth() + 1).padStart(2, '0');
             const anio = ahora.getFullYear();
             
             // Hora
             let horas = ahora.getHours();
-           const ampm = horas >= 12 ? 'p. m.' : 'a. m.';
+            // CAMBIO AQUÍ: Usamos AM/PM en mayúsculas y sin puntos para coincidir con Android
+            const ampm = horas >= 12 ? 'PM' : 'AM'; 
+            
             horas = horas % 12;
-            horas = horas ? horas : 12; // La hora '0' debería ser '12'
+            horas = horas ? horas : 12; // El 0 se convierte en 12
+            
             const horasStr = String(horas).padStart(2, '0');
             const minutos = String(ahora.getMinutes()).padStart(2, '0');
             const segundos = String(ahora.getSeconds()).padStart(2, '0');
 
+            // Formato exacto: "14/05/2026 09:21:52 AM"
             const fechaHoraEntrega = `${dia}/${mes}/${anio} ${horasStr}:${minutos}:${segundos} ${ampm}`;
 
             // 📦 OBJETO DEL PEDIDO
             const pedidoFinalizado = {
                 ...p,
-                timestampEntrega: fechaHoraEntrega, // Ahora sí va con el formato correcto
+                timestampEntrega: fechaHoraEntrega, 
                 notificado: true
             };
 
