@@ -2051,7 +2051,7 @@ btnFinalizar.onclick = () => {
             
             // Hora
             let horas = ahora.getHours();
-            const ampm = horas >= 12 ? 'PM' : 'AM';
+           const ampm = horas >= 12 ? 'p. m.' : 'a. m.';
             horas = horas % 12;
             horas = horas ? horas : 12; // La hora '0' debería ser '12'
             const horasStr = String(horas).padStart(2, '0');
