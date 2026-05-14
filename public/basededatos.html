@@ -2023,54 +2023,63 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
         }, 300); 
     }
 
-// --- 8. LÓGICA PARA FINALIZAR PEDIDO (Mover a Entregas con SweetAlert2) ---
+// --- 8. LÓGICA PARA FINALIZAR PEDIDO (Con formato de fecha idéntico a Android) ---
 const btnFinalizar = card.querySelector('.btn-finalizar-web');
 
 btnFinalizar.onclick = () => {
     Swal.fire({
         title: '¿Finalizar entrega?',
-        text: `El pedido N° ${p.cliente || ''} se moverá al historial de entregas.`,
+        text: `El pedido N° ${p.cliente || ''} se moverá al historial.`,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#2E7D32', // Verde para indicar finalización exitosa
+        confirmButtonColor: '#2E7D32',
         cancelButtonColor: '#6e7881',
         confirmButtonText: 'Sí, finalizar ✅',
         cancelButtonText: 'Cancelar',
         reverseButtons: true
     }).then(async (result) => {
         if (result.isConfirmed) {
-            
-            // 1. Mostrar un pequeño loader para que el usuario sepa que está procesando
             Swal.showLoading();
 
-            // 2. Preparar Fecha y Hora (Formato idéntico al de Android)
+            // 🕒 CONSTRUCCIÓN MANUAL DEL FORMATO: dd/MM/yyyy hh:mm:ss AM/PM
             const ahora = new Date();
-            const fechaHoraEntrega = ahora.toLocaleDateString('es-CO') + " " + 
-                                     ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            
+            // Fecha
+            const dia = String(ahora.getDate()).padStart(2, '0');
+            const mes = String(ahora.getMonth() + 1).padStart(2, '0'); // Enero es 0
+            const anio = ahora.getFullYear();
+            
+            // Hora
+            let horas = ahora.getHours();
+            const ampm = horas >= 12 ? 'PM' : 'AM';
+            horas = horas % 12;
+            horas = horas ? horas : 12; // La hora '0' debería ser '12'
+            const horasStr = String(horas).padStart(2, '0');
+            const minutos = String(ahora.getMinutes()).padStart(2, '0');
+            const segundos = String(ahora.getSeconds()).padStart(2, '0');
 
-            // 3. Crear el objeto del pedido (Copia exacta + metadatos de entrega)
+            const fechaHoraEntrega = `${dia}/${mes}/${anio} ${horasStr}:${minutos}:${segundos} ${ampm}`;
+
+            // 📦 OBJETO DEL PEDIDO
             const pedidoFinalizado = {
-                ...p, // Incluye fotos de evidencia si las hay
-                timestampEntrega: fechaHoraEntrega,
+                ...p,
+                timestampEntrega: fechaHoraEntrega, // Ahora sí va con el formato correcto
                 notificado: true
             };
 
-            // 4. Rutas de Firebase
             const pathOrigen = `${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`;
             const pathDestino = `${idEmpresa}/Entregas/${idDomiActual}/${idPedido}`;
 
             try {
-                // 5. Ejecutar movimiento en Firebase
                 await db.ref(pathDestino).set(pedidoFinalizado);
                 await db.ref(pathOrigen).remove();
 
-                // 6. Éxito: Quitar la tarjeta y avisar
                 card.remove();
                 
                 Swal.fire({
                     icon: 'success',
                     title: '¡Pedido Entregado!',
-                    text: 'Se ha movido al historial correctamente.',
+                    text: 'Historial actualizado.',
                     timer: 2000,
                     showConfirmButton: false,
                     toast: true,
@@ -2078,13 +2087,8 @@ btnFinalizar.onclick = () => {
                 });
 
             } catch (error) {
-                console.error("Error al finalizar:", error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error de red',
-                    text: 'No se pudo mover el pedido. Intenta de nuevo.',
-                    confirmButtonColor: '#d33'
-                });
+                console.error("Error:", error);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo mover el pedido.' });
             }
         }
     });
