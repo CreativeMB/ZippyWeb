@@ -1779,9 +1779,12 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                 </div>
                 <div class="linea">
                     👤 ${p.nombreCliente || ''}
-                    <div class="sub-linea">
-                        #️⃣N°: <a class="whatsapp-link" href="https://wa.me/${(p.cliente || '').replace(/\D/g, '')}" target="_blank">${p.cliente || ''}</a>
-                    </div>
+                   <div class="sub-linea">
+    <button class="btn-edit-inline" data-campo="cliente" style="margin-right: 5px;">✏️</button>
+    #️⃣N°: <a class="whatsapp-link" href="https://wa.me/${(p.cliente || '').replace(/\D/g, '')}" target="_blank">
+        <span class="txt-edit" data-campo="cliente">${p.cliente || ''}</span>
+    </a>
+</div>
                 </div>
                 <div class="linea">
                     🎁 ${p.nombreDestinatario || ''}
@@ -1844,6 +1847,12 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                 🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
             </div>
         </div>
+        // ... dentro del innerHTML de la card, al final de pedido-bottom
+<div class="linea-finalizar" style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px; display: flex; justify-content: flex-end;">
+    <span class="btn-finalizar-web" style="cursor:pointer; color: #2563EB; font-size: 12px; font-weight: 800; letter-spacing: 0.5px;">
+        FINALIZAR ENTREGA ✅
+    </span>
+</div>
     `;
 
     // --- 1. LÓGICA DE EDICIÓN INLINE ---
@@ -1876,6 +1885,16 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                         .set(nuevoValor)
                         .then(() => {
                             span.innerText = nuevoValor;
+// --- ACTUALIZACIÓN DINÁMICA DEL LINK ---
+                if (campo === 'cliente') {
+                    const linkWA = card.querySelector('.whatsapp-link');
+                    if (linkWA) {
+                        // Quitamos todo lo que no sea número para el link
+                        const numeroLimpio = nuevoValor.replace(/\D/g, '');
+                        linkWA.href = `https://wa.me/${numeroLimpio}`;
+                    }
+                }
+
                             if (campo === 'direccion') {
                                 card.querySelector('.maps-link').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nuevoValor)}`;
                             }
@@ -1979,6 +1998,43 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             }
         }, 300); 
     }
+    // --- 8. LÓGICA PARA FINALIZAR PEDIDO (Mover a Entregas) ---
+const btnFinalizar = card.querySelector('.btn-finalizar-web');
+btnFinalizar.onclick = async () => {
+    if (!confirm("¿Deseas marcar este pedido como ENTREGADO? Se moverá al historial.")) return;
+
+    // A. Preparar Fecha y Hora (Formato similar al de Android)
+    const ahora = new Date();
+    const fechaHoraEntrega = ahora.toLocaleDateString('es-CO') + " " + ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+    // B. Crear el objeto del pedido para Entregas (Copia exacta + timestamp)
+    const pedidoFinalizado = {
+        ...p, // Trae todos los datos actuales (incluyendo evidencias/fotos)
+        timestampEntrega: fechaHoraEntrega,
+        notificado: true
+    };
+
+    // C. Rutas de Firebase
+    const pathOrigen = `${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`;
+    const pathDestino = `${idEmpresa}/Entregas/${idDomiActual}/${idPedido}`;
+
+    try {
+        // 1. Guardar en Entregas
+        await db.ref(pathDestino).set(pedidoFinalizado);
+        
+        // 2. Eliminar de Pedidos Activos
+        await db.ref(pathOrigen).remove();
+
+        // 3. Opcional: Reordenar posiciones en la web si tienes la función
+        // reordenarPosicionesWeb(idDomiActual); 
+
+        console.log("Pedido movido a Entregas con éxito");
+        card.remove(); // Quita la tarjeta de la vista actual inmediatamente
+    } catch (error) {
+        console.error("Error al finalizar pedido:", error);
+        alert("No se pudo finalizar el pedido. Revisa la consola.");
+    }
+};
 
     return card;
 }
