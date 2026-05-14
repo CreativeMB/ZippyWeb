@@ -1847,7 +1847,6 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
                 🕒 ${p.fechaRegistro || ''} · ${p.horaRegistro || ''}
             </div>
         </div>
-        // ... dentro del innerHTML de la card, al final de pedido-bottom
 <div class="linea-finalizar" style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px; display: flex; justify-content: flex-end;">
     <span class="btn-finalizar-web" style="cursor:pointer; color: #2563EB; font-size: 12px; font-weight: 800; letter-spacing: 0.5px;">
         FINALIZAR ENTREGA ✅
@@ -1998,42 +1997,72 @@ function crearPedidoCard(idPedido, idDomiActual, p, domiActual, domiciliarios) {
             }
         }, 300); 
     }
-    // --- 8. LÓGICA PARA FINALIZAR PEDIDO (Mover a Entregas) ---
+
+// --- 8. LÓGICA PARA FINALIZAR PEDIDO (Mover a Entregas con SweetAlert2) ---
 const btnFinalizar = card.querySelector('.btn-finalizar-web');
-btnFinalizar.onclick = async () => {
-    if (!confirm("¿Deseas marcar este pedido como ENTREGADO? Se moverá al historial.")) return;
 
-    // A. Preparar Fecha y Hora (Formato similar al de Android)
-    const ahora = new Date();
-    const fechaHoraEntrega = ahora.toLocaleDateString('es-CO') + " " + ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+btnFinalizar.onclick = () => {
+    Swal.fire({
+        title: '¿Finalizar entrega?',
+        text: `El pedido N° ${p.cliente || ''} se moverá al historial de entregas.`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2E7D32', // Verde para indicar finalización exitosa
+        cancelButtonColor: '#6e7881',
+        confirmButtonText: 'Sí, finalizar ✅',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            
+            // 1. Mostrar un pequeño loader para que el usuario sepa que está procesando
+            Swal.showLoading();
 
-    // B. Crear el objeto del pedido para Entregas (Copia exacta + timestamp)
-    const pedidoFinalizado = {
-        ...p, // Trae todos los datos actuales (incluyendo evidencias/fotos)
-        timestampEntrega: fechaHoraEntrega,
-        notificado: true
-    };
+            // 2. Preparar Fecha y Hora (Formato idéntico al de Android)
+            const ahora = new Date();
+            const fechaHoraEntrega = ahora.toLocaleDateString('es-CO') + " " + 
+                                     ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
-    // C. Rutas de Firebase
-    const pathOrigen = `${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`;
-    const pathDestino = `${idEmpresa}/Entregas/${idDomiActual}/${idPedido}`;
+            // 3. Crear el objeto del pedido (Copia exacta + metadatos de entrega)
+            const pedidoFinalizado = {
+                ...p, // Incluye fotos de evidencia si las hay
+                timestampEntrega: fechaHoraEntrega,
+                notificado: true
+            };
 
-    try {
-        // 1. Guardar en Entregas
-        await db.ref(pathDestino).set(pedidoFinalizado);
-        
-        // 2. Eliminar de Pedidos Activos
-        await db.ref(pathOrigen).remove();
+            // 4. Rutas de Firebase
+            const pathOrigen = `${idEmpresa}/Pedidos/${idDomiActual}/${idPedido}`;
+            const pathDestino = `${idEmpresa}/Entregas/${idDomiActual}/${idPedido}`;
 
-        // 3. Opcional: Reordenar posiciones en la web si tienes la función
-        // reordenarPosicionesWeb(idDomiActual); 
+            try {
+                // 5. Ejecutar movimiento en Firebase
+                await db.ref(pathDestino).set(pedidoFinalizado);
+                await db.ref(pathOrigen).remove();
 
-        console.log("Pedido movido a Entregas con éxito");
-        card.remove(); // Quita la tarjeta de la vista actual inmediatamente
-    } catch (error) {
-        console.error("Error al finalizar pedido:", error);
-        alert("No se pudo finalizar el pedido. Revisa la consola.");
-    }
+                // 6. Éxito: Quitar la tarjeta y avisar
+                card.remove();
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Pedido Entregado!',
+                    text: 'Se ha movido al historial correctamente.',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+
+            } catch (error) {
+                console.error("Error al finalizar:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de red',
+                    text: 'No se pudo mover el pedido. Intenta de nuevo.',
+                    confirmButtonColor: '#d33'
+                });
+            }
+        }
+    });
 };
 
     return card;
