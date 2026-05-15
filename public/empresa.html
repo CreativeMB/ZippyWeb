@@ -9,637 +9,289 @@
         :root {
             --zippy-blue: #3b82f6;
             --zippy-orange: #ff9f43;
-            --zippy-orange-dark: #e68a2e;
-            --bg-dark: #0f172a; /* Negro azulado muy oscuro */
-            --bg-card: #1e293b; /* Gris oscuro para tarjetas */
-            --bg-input: #111827;
-            --text-main: #f1f5f9; /* Blanco grisáceo */
-            --text-muted: #94a3b8; /* Gris para textos secundarios */
-            --white: #ffffff;
-            --black-pure: #000000;
+            --zippy-gold: #E5C453;
+            --bg-dark: #0a0b0d;
+            --bg-card: #16181c;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
         }
 
         * { box-sizing: border-box; scroll-behavior: smooth; }
-        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg-dark); color: var(--text-main); line-height: 1.6; }
+        body { 
+            margin: 0; 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--bg-dark); 
+            color: var(--text-main); 
+            overflow-x: hidden;
+        }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-        .text-center { text-align: center; }
-        .highlight { color: var(--zippy-orange); font-weight: 700; }
+        .container-full { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         
         /* --- NAVEGACIÓN --- */
         header {
-            background: rgba(15, 23, 42, 0.95);
-            padding: 10px 0;
+            background: rgba(10, 11, 13, 0.9);
+            padding: 15px 0;
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .nav-container { display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 26px; font-weight: 800; color: var(--white); text-decoration: none; }
-        .logo span { color: var(--zippy-orange); }
 
         /* --- HERO --- */
-        .hero { padding: 160px 0 80px; text-align: center; background: radial-gradient(circle, #1e293b 0%, #0f172a 100%); position: relative;}
-        .hero h1 { font-size: 48px; font-weight: 800; color: var(--white); margin-bottom: 15px; line-height: 1.1; }
-        .hero p { font-size: 18px; max-width: 800px; margin: 0 auto 30px; color: var(--text-muted); }
-        .hero::after { content:''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--zippy-orange), transparent); }
+        .hero { padding: 180px 0 100px; text-align: center; background: radial-gradient(circle at top, #1e293b 0%, #0a0b0d 100%); }
+        .hero h1 { font-size: clamp(32px, 6vw, 60px); font-weight: 800; margin: 0 0 20px; line-height: 1.1; }
+        .hero p { font-size: clamp(16px, 2vw, 20px); color: var(--text-muted); max-width: 800px; margin: 0 auto 40px; }
 
         /* --- BOTONES --- */
-        .btn { display: inline-block; padding: 14px 30px; border-radius: 10px; font-weight: 800; text-decoration: none; transition: 0.3s; cursor: pointer; border: none; text-align: center; font-size: 14px;}
-        .btn-blue { background: var(--zippy-blue); color: var(--white); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
-        .btn-blue:hover { background: #2563eb; transform: translateY(-2px); }
-        .btn-orange { background: var(--zippy-orange); color: var(--black-pure); box-shadow: 0 4px 15px rgba(255, 159, 67, 0.3); }
-        .btn-orange:hover { background: var(--zippy-orange-dark); transform: translateY(-2px); }
-        .btn-red { background: #ef4444; color: var(--white); }
+        .btn { display: inline-block; padding: 15px 35px; border-radius: 12px; font-weight: 700; text-decoration: none; transition: 0.3s; font-size: 14px; border: none; cursor: pointer; text-align: center; }
+        .btn-blue { background: var(--zippy-blue); color: white; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2); }
+        .btn-orange { background: var(--zippy-orange); color: #000; box-shadow: 0 10px 20px rgba(255, 159, 67, 0.2); }
+        .btn-red { background: #ef4444; color: white; }
+        .btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
 
-        /* --- BANNER PERSUASIVO --- */
-        .venta-banner { background: var(--white); color: var(--black-pure); padding: 50px 0; margin: 60px 0; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .venta-banner h2 { font-size: 32px; font-weight: 800; margin-bottom: 15px; color: var(--dark); }
-        .venta-banner p { max-width: 700px; margin: 0 auto 30px; font-size: 16px; opacity: 0.9; }
-
-        /* --- ACORDEONES (PESTAÑAS OCULTAS) --- */
-        .manual-section { padding: 60px 0; }
-        details {
-            background: var(--bg-card);
-            margin-bottom: 20px;
-            border-radius: 15px;
+        /* --- GRID DE CONTENIDO --- */
+        .main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin: 50px 0; }
+        
+        .card-pro { 
+            background: var(--bg-card); 
+            padding: 40px; 
+            border-radius: 24px; 
             border: 1px solid rgba(255,255,255,0.05);
             transition: 0.3s;
         }
-        details[open] {
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            border-color: rgba(255,255,255,0.1);
-        }
-        summary {
-            padding: 25px;
-            font-weight: 700;
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 20px;
-            color: var(--white);
-        }
-        summary::after {
-            content: '+';
-            font-size: 24px;
-            color: var(--zippy-orange);
-            transition: 0.3s;
-        }
-        details[open] summary::after {
-            content: '-';
-            transform: rotate(180deg);
-        }
-        .content {
-            padding: 0 25px 30px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-        .content h4 { color: var(--white); margin-top: 25px; margin-bottom: 10px; font-size: 16px;}
-        .content p { margin-bottom: 15px; }
-        .content ul { padding-left: 20px; margin-bottom: 15px; }
-        .content li { margin-bottom: 8px; }
-        .content b { color: var(--white); }
-        
-        /* Reglas Catálogo */
-        .req-box { background: rgba(255, 159, 67, 0.1); padding: 20px; border-radius: 10px; border-left: 5px solid var(--zippy-orange); color: var(--white); margin-top: 20px; font-size: 14px; }
-        .example { background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 5px; font-family: monospace; color: var(--zippy-orange); }
 
-        /* --- DESCARGAS (FRANJA NEGRA) --- */
-        .descargas-franja { background: var(--black-pure); color: var(--white); padding: 100px 0; position: relative; }
-        .descargas-franja h2 { text-align: center; font-size: 36px; margin-bottom: 10px; font-weight: 800; }
-        .descargas-franja::before { content:''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
+        /* --- MANUALES (DETAILS) --- */
+        details { background: var(--bg-card); border-radius: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        summary { padding: 25px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; font-size: 18px; }
+        summary::after { content: '+'; color: var(--zippy-orange); }
+        details[open] summary::after { content: '-'; }
+        .details-content { padding: 0 25px 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
 
-        .download-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 50px; }
-        .dl-card { background: rgba(255,255,255,0.03); padding: 35px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .dl-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
-        .dl-card i { font-size: 40px; color: var(--zippy-orange); display: block; margin-bottom: 15px; }
-        .dl-card h4 { margin: 10px 0; font-size: 18px; color: var(--white); }
-        .dl-card p { font-size: 12px; color: var(--text-muted); margin-bottom: 25px; min-height: 40px;}
+        /* --- ESTILOS DE LISTAS --- */
+        .step-list { list-style: none; padding: 0; }
+        .step-list li { margin-bottom: 20px; display: flex; gap: 15px; }
+        .step-num { background: var(--zippy-blue); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 800; font-size: 14px; }
 
-        /* --- FOOTER --- */
-        footer { padding: 60px 0; text-align: center; font-size: 13px; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); }
+        /* --- PRICING --- */
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .p-card { background: white; color: #0f172a; padding: 40px 30px; border-radius: 20px; text-align: center; transition: 0.3s; }
+        .p-card.featured { border: 3px solid var(--zippy-blue); transform: scale(1.05); z-index: 2; }
+        .p-card.dark { background: #1e293b; color: white; border: 1px solid #334155; }
+
+        @media (max-width: 768px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .p-card.featured { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
 
-<header style="padding: 10px 0;">
-        <div class="container nav-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-            
-            <a href="#" class="logo" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-                <img src="https://lh3.googleusercontent.com/d/1HZ0qceUsv2QMnkj1I8K0aqyj4lSk_Nc9" 
-                     alt="Logo Zippy" 
-                     style="width: 32px; height: 32px; object-fit: contain;">
-                <span style="font-weight: 800; font-size: 22px; color: white; letter-spacing: 1px;">Zippy</span>
+    <header>
+        <div class="container-full nav-container">
+            <a href="#" class="logo" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: white; font-weight: 800; font-size: 24px;">
+                <img src="https://lh3.googleusercontent.com/d/1HZ0qceUsv2QMnkj1I8K0aqyj4lSk_Nc9" alt="Logo" style="width: 35px;">
+                Zippy<span style="color: var(--zippy-orange);">Empresas</span>
             </a>
-
-            <nav style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-                <a href="#descargas" class="btn btn-blue" 
-                   style="font-size: 11px; padding: 8px 15px; min-width: 100px; text-align: center;">
-                   DESCARGAS
-                </a>
-                <a href="https://www.youtube.com/@Zippyempresas" target="_blank" class="btn btn-red" 
-                   style="font-size: 11px; padding: 8px 15px; min-width: 100px; text-align: center;">
-                   TUTORIALES
-                </a>
+            <nav style="display: flex; gap: 15px;">
+                <a href="#descargas" class="btn btn-blue" style="padding: 10px 20px; font-size: 12px;">DESCARGAS</a>
+                <a href="https://www.youtube.com/@Zippyempresas" target="_blank" class="btn btn-red" style="padding: 10px 20px; font-size: 12px;">TUTORIALES</a>
             </nav>
         </div>
     </header>
 
     <section class="hero">
-        <div class="container">
-            <h1>Ecosistema Digital <span class="highlight">Zippy</span></h1>
+        <div class="container-full">
+            <h1>Ecosistema Digital <span style="color: var(--zippy-orange);">Zippy</span></h1>
             <p>Toma el control total de tu negocio desde tu móvil. Vende más, gestiona pedidos, contabilidad y domicilios con facilidad.</p>
-            <div style="display: flex; gap: 15px; justify-content: center;">
-                <a href="#afiliacion" class="btn btn-blue">¿CÓMO EMPEZAR?</a>
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <a href="#inicio" class="btn btn-blue">¿CÓMO EMPEZAR?</a>
                 <a href="#descargas" class="btn btn-orange">DESCARGAR APPS</a>
             </div>
         </div>
     </section>
 
-  <section id="afiliacion" class="container" style="margin-top: 50px; margin-bottom: 50px;">
-        <div class="venta-banner" style="
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 30px;
-            padding: 80px 40px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;">
-            
-            <div style="position: absolute; top: -50%; left: -10%; width: 300px; height: 300px; background: var(--zippy-blue); filter: blur(120px); opacity: 0.15; z-index: 0;"></div>
+    <main class="container-full" id="inicio">
+        
+        <!-- BANNER PERSUASIVO -->
+        <div style="background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 30px; padding: 60px; text-align: center; margin-bottom: 60px;">
+            <h2 style="font-size: 32px; margin-bottom: 20px;">Si tienes un local, vendes por internet o tienes una idea...</h2>
+            <p style="color: var(--text-muted); font-size: 18px; max-width: 800px; margin: 0 auto 30px;">Zippy es el motor tecnológico que digitaliza tu talento en minutos. Escalamos contigo sin trámites ni barreras técnicas.</p>
+            <div style="background: rgba(255, 159, 67, 0.1); border: 1px dashed var(--zippy-orange); padding: 10px 25px; border-radius: 50px; display: inline-block; color: var(--zippy-orange); font-weight: 700;">
+                🎁 1 MES GRATIS POR TU REGISTRO
+            </div>
+        </div>
 
-            <div class="container" style="position: relative; z-index: 1;">
-                <span style="
-                    color: var(--zippy-blue); 
-                    font-weight: 900; 
-                    font-size: 13px; 
-                    text-transform: uppercase; 
-                    letter-spacing: 4px; 
-                    display: inline-block; 
-                    margin-bottom: 25px;
-                    border-bottom: 2px solid var(--zippy-blue);
-                    padding-bottom: 5px;">
-                    TU NEGOCIO NO TIENE LÍMITES
-                </span>
+        <!-- MANUAL PRO SECTION -->
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h2 style="font-size: 38px; font-weight: 800;">📘 Manual de Usuario Pro</h2>
+            <p style="color: var(--text-muted);">Sincronización total para tu crecimiento.</p>
+        </div>
 
-                <h2 style="
-                    font-size: clamp(28px, 5vw, 42px); 
-                    line-height: 1.1; 
-                    margin-bottom: 30px; 
-                    color: white; 
-                    font-family: 'Cormorant Garamond', serif; 
-                    font-weight: 300;
-                    max-width: 950px;
-                    margin-left: auto;
-                    margin-right: auto;">
-                    Si tienes un local, vendes por internet, tienes una idea o <span style="color: var(--zippy-blue); font-weight: 700; font-style: italic;">aún no tienes tienda física...</span>
-                </h2>
+        <!-- MULTIUSUARIO CARD -->
+        <div style="background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%); border-left: 6px solid var(--zippy-blue); padding: 30px; border-radius: 15px; margin-bottom: 50px;">
+            <h3 style="margin: 0 0 10px;">🚀 Potencia Multiusuario</h3>
+            <p style="margin: 0; color: #ccc;">Abre sesión en móviles y tablets simultáneamente. Administración, Producción y Empaque sincronizados en tiempo real.</p>
+        </div>
 
-                <p style="
-                    font-size: 19px; 
-                    max-width: 750px; 
-                    margin: 0 auto 40px; 
-                    color: #cbd5e1; 
-                    line-height: 1.6;
-                    font-weight: 300;">
-                    Zippy es el motor tecnológico que digitaliza tu talento en minutos. Escalamos contigo <b>sin trámites ni barreras técnicas.</b>
-                </p>
+        <!-- GRID PASO 1 Y 2 -->
+        <div class="main-grid">
+            <div class="card-pro">
+                <h4 style="color: var(--zippy-blue); text-transform: uppercase; letter-spacing: 2px; font-size: 14px; margin-bottom: 25px;">Paso 1: Configuración Inicial</h4>
+                <ul class="step-list">
+                    <li><span class="step-num">1</span> <div><b>Descarga y Acceso:</b> Regístrate con Google en la App Zippy.</div></li>
+                    <li><span class="step-num">2</span> <div><b>Identidad:</b> Configura Nombre, Redes y Métodos de Pago.</div></li>
+                    <li><span class="step-num">3</span> <div><b>WhatsApp Sync:</b> Vincula tu chat para recibir pedidos.</div></li>
+                </ul>
+                <a href="https://wa.me/573150725566" class="btn" style="background: rgba(37, 211, 102, 0.1); color: #25d366; width: 100%; border: 1px solid #25d366;">SOPORTE 24/7: 3150725566</a>
+            </div>
 
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
-                    <a href="#descargas" class="btn btn-blue" style="
-                        padding: 18px 50px; 
-                        font-size: 16px; 
-                        font-weight: 700; 
-                        letter-spacing: 1px;
-                        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
-                        border-radius: 50px;
-                        transition: all 0.3s ease;">
-                        IMPULSAR MI NEGOCIO AHORA
-                    </a>
+            <div class="card-pro" style="border-color: rgba(230, 126, 34, 0.3);">
+                <h4 style="color: var(--zippy-orange); text-transform: uppercase; letter-spacing: 2px; font-size: 14px; margin-bottom: 25px;">Paso 2: Catálogo Inteligente</h4>
+                <div style="background: rgba(230, 126, 34, 0.1); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <b style="color: var(--zippy-orange); display: block; margin-bottom: 10px;">📸 Carga Masiva (Galería)</b>
+                    <p style="font-size: 13px; margin: 0;">Selecciona <b>más de 200 fotos</b> de tu galería y súbelas de una sola vez. Sin complicaciones.</p>
+                </div>
+                <ul style="font-size: 14px; color: #ccc; line-height: 1.8;">
+                    <li>✅ <b>Gestión:</b> Activa o elimina en "Actualizar Productos".</li>
+                    <li>✅ <b>Formato:</b> Usa fotos tipo Retrato (verticales).</li>
+                    <li>✅ <b>Limpieza:</b> Sube imágenes solo del producto, sin textos.</li>
+                </ul>
+            </div>
+        </div>
 
-                    <div style="
-                        background: rgba(255, 159, 67, 0.15); 
-                        padding: 8px 25px; 
-                        border-radius: 50px; 
-                        border: 1px dashed var(--zippy-orange);
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 10px;">
-                        <span style="font-size: 18px;">🎁</span>
-                        <span style="color: var(--zippy-orange); font-weight: 700; font-size: 14px; text-transform: uppercase;">
-                            1 MES GRATIS POR TU REGISTRO
-                        </span>
+        <!-- CENTRO DE MANDO -->
+        <div style="margin: 80px 0; padding: 60px; background: linear-gradient(145deg, #16181c, #000); border: 1px solid var(--zippy-gold); border-radius: 30px; text-align: center;">
+            <h2 style="color: var(--zippy-gold); font-size: 28px; letter-spacing: 2px; margin-bottom: 40px;">💎 CENTRO DE MANDO DIGITAL ZIPPY</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div style="padding: 20px; background: rgba(255,255,255,0.03); border-radius: 15px;"><b>🌐 SITIO WEB PRO</b><br><small>Ecommerce de alto impacto</small></div>
+                <div style="padding: 20px; background: rgba(255,255,255,0.03); border-radius: 15px;"><b>🛒 CARRITO ACTIVO</b><br><small>Pedidos inteligentes</small></div>
+                <div style="padding: 20px; background: rgba(255,255,255,0.03); border-radius: 15px;"><b>📲 WHATSAPP SYNC</b><br><small>Ventas directas al chat</small></div>
+                <div style="padding: 20px; background: rgba(255,255,255,0.03); border-radius: 15px;"><b>🚚 LOGÍSTICA APP</b><br><small>Domicilios bajo control</small></div>
+            </div>
+            <a href="#descargas" class="btn btn-orange" style="margin-top: 40px; width: 100%; max-width: 400px;">¡CONFIGURAR Y VENDER AHORA!</a>
+        </div>
+
+        <!-- MÓDULOS DEL ECOSISTEMA -->
+        <section style="margin-bottom: 80px;">
+            <details open>
+                <summary>🌐 Tu Vitrina Digital: Tienda Online + WhatsApp</summary>
+                <div class="details-content">
+                    <p>E-commerce profesional diseñado para convertir. Incluye un <b>formulario de entrega</b> que captura datos automáticamente para que no los pidas por WhatsApp.</p>
+                    <ul>
+                        <li>🛍️ Venta 24/7</li>
+                        <li>📱 Fácil de compartir en redes</li>
+                        <li>📦 Catálogo visual sincronizado</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>💻 Zippy Web: Panel para Computadora</summary>
+                <div class="details-content">
+                    <p>Administra a gran escala desde tu PC:</p>
+                    <ul>
+                        <li>📊 Contabilidad integral (Ventas/Gastos)</li>
+                        <li>🖨️ Impresión de tarjetas de regalo y facturas</li>
+                        <li>🚴 Asignación masiva de pedidos a domiciliarios</li>
+                    </ul>
+                    <a href="https://zippy-727d5.web.app/login.html" target="_blank" class="btn btn-blue" style="margin-top: 15px;">ABRIR PANEL WEB</a>
+                </div>
+            </details>
+
+            <details>
+                <summary>🚴 ZippyEntregas: App para Domiciliarios</summary>
+                <div class="details-content">
+                    <div style="background: rgba(239, 68, 68, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid #ef4444; margin-bottom: 15px;">
+                        ⚠️ El domiciliario debe seleccionar tu empresa al registrarse.
                     </div>
+                    <ul>
+                        <li>📍 Mapas y rutas GPS integradas</li>
+                        <li>💬 Contacto directo con el cliente</li>
+                        <li>✅ Confirmación de entrega en un clic</li>
+                    </ul>
                 </div>
-            </div>
-        </div>
-    </section>
-   
-    <!-- TÍTULO PRINCIPAL -->
-    <div style="text-align: center; margin-bottom: 50px;">
-        <h2 style="font-size: 38px; font-weight: 800; color: #ffffff; margin-bottom: 15px;">📘 Manual de Usuario Pro</h2>
-        <p style="color: #888; font-size: 18px; max-width: 100%; margin: 0 auto;">Todo lo que necesitas para digitalizar tu talento y gestionar tu imperio comercial desde la palma de tu mano.</p>
-    </div>
+            </details>
 
-    <!-- TARJETA DE VALOR: MULTIUSUARIO -->
-    <div style="background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.05) 100%); border-left: 6px solid #3b82f6; padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 15px;">
-            <span style="font-size: 30px;">🚀</span>
-            <h3 style="margin: 0; font-size: 22px; color: #fff;">Potencia Multiusuario y Multidispositivo</h3>
-        </div>
-        <p style="font-size: 15px; line-height: 1.7; color: #ccc; margin: 0;">
-            Zippy permite sesiones simultáneas en móviles y tablets. Mientras <b>Administración</b> recibe pedidos, <b>Producción</b> visualiza las comandas y <b>Empaque</b> alista los envíos. ¡Sincronización total en tiempo real!
-        </p>
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start;">
-        
-        <!-- COLUMNA IZQUIERDA: REGISTRO Y CONFIGURACIÓN -->
-        <div>
-            <h4 style="color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; margin-bottom: 20px;">Paso 1: Configuración Inicial</h4>
-            
-            <div style="background: #16181c; padding: 25px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    <li style="margin-bottom: 20px; display: flex; gap: 15px;">
-                        <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 14px;">1</span>
-                        <div>
-                            <b style="display: block; color: #fff; margin-bottom: 5px;">Descarga y Acceso</b>
-                            <p style="font-size: 13px; color: #aaa; margin: 0;">Baja la App Zippy y regístrate con tu cuenta de Google para un acceso blindado y rápido.</p>
-                        </div>
-                    </li>
-                    <li style="margin-bottom: 20px; display: flex; gap: 15px;">
-                        <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 14px;">2</span>
-                        <div>
-                            <b style="display: block; color: #fff; margin-bottom: 5px;">Identidad de Marca</b>
-                            <p style="font-size: 13px; color: #aaa; margin: 0;">Completa los datos de tu empresa: Nombre, eslogan, redes sociales y métodos de pago (Nequi, Daviplata, etc.).</p>
-                        </div>
-                    </li>
-                    <li style="display: flex; gap: 15px;">
-                        <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 14px;">3</span>
-                        <div>
-                            <b style="display: block; color: #fff; margin-bottom: 5px;">Punto de Venta Directo</b>
-                            <p style="font-size: 13px; color: #aaa; margin: 0;">Vincula tu WhatsApp de atención. Aquí recibirás cada pedido listo para procesar.</p>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- BOTÓN WHATSAPP SOPORTE -->
-            <div style="margin-top: 25px; background: rgba(37, 211, 102, 0.1); border: 1px dashed #25d366; padding: 20px; border-radius: 15px; text-align: center;">
-                <p style="color: #25d366; font-weight: 600; margin-bottom: 10px; font-size: 14px;">¿Dudas con tu afiliación? Soporte 24/7</p>
-                <a href="https://wa.me/573150725566?text=Hola%20Zippy,%20necesito%20ayuda" target="_blank" style="text-decoration: none; background: #25d366; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 700; display: inline-block; font-size: 13px;">
-                    CHAT SOPORTE 3150725566
-                </a>
-            </div>
-        </div>
-
-        <!-- COLUMNA DERECHA: EL NUEVO CATÁLOGO -->
-        <div>
-            <h4 style="color: #e67e22; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; margin-bottom: 20px;">Paso 2: Catálogo Inteligente</h4>
-            
-            <div style="background: #16181c; padding: 25px; border-radius: 16px; border: 1px solid rgba(230, 126, 34, 0.2);">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                    <div style="background: #e67e22; padding: 8px; border-radius: 8px;">
-                        <svg width="20" height="20" fill="white" viewBox="0 0 16 16"><path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2zM14 11.5V4.667a.5.5 0 0 0-.447-.498L5.947 3.328a.5.5 0 0 0-.553.496v4.105L14 11.5zm-9-1.874V4.61l-2.053.256a.5.5 0 0 0-.447.498V12c0 .221.124.412.308.51L5 10.391v-.765z"/></svg>
-                    </div>
-                    <b style="color: #fff; font-size: 16px;">Carga masiva desde Galería</b>
+            <details>
+                <summary>📟 ZippyCatálogo: Tablet Punto Físico</summary>
+                <div class="details-content">
+                    <p>Moderniza tu local. Deja que tus clientes pidan de forma autónoma desde una Tablet en la mesa o mostrador.</p>
                 </div>
-                
-                <ul style="font-size: 13px; color: #ccc; line-height: 1.8; padding-left: 18px;">
-                    <li>📸 <b>Selección Total:</b> Marca todas tus fotos en la galería (¡más de 200!) y súbelas de una sola vez.</li>
-                    <li>🔄 <b>Gestión Dinámica:</b> En la sección <b>"Actualizar Productos"</b>, activa fotos, elimina las que ya no vendes o edita precios y descripciones.</li>
-                    <li>📏 <b>Diseño Vertical:</b> Recomendamos fotos tipo <b>Retrato</b> para una experiencia móvil inmersiva.</li>
-                    <li>✨ <b>Estética Pro:</b> Sube imágenes limpias, sin textos ni logos estorbando el producto.</li>
-                </ul>
-                <p style="margin-top: 15px; font-size: 12px; color: #e67e22; font-weight: 600; text-align: center;">¡Estarás en línea en cuestión de segundos!</p>
+            </details>
+        </section>
+
+        <!-- SUSCRIPCIONES -->
+        <section style="margin-bottom: 80px;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h2 style="font-size: 32px;">Planes de Suscripción</h2>
+                <p style="color: var(--text-muted);">Infraestructura robusta para escalar tus ventas.</p>
             </div>
-        </div>
-    </div>
-
-    <!-- CENTRO DE MANDO (MATRIZ DE SERVICIOS) -->
-    <div style="margin-top: 50px; padding: 40px; background: linear-gradient(145deg, #16181c 0%, #0a0b0d 100%); border: 1px solid rgba(229, 196, 83, 0.3); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);">
-        
-        <h3 style="color: #E5C453; margin: 0 0 25px 0; font-size: 24px; font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 2px;">
-            💎 Centro de Mando Digital Zippy
-        </h3>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px;">
-            
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">🌐 SITIO WEB PROFESIONAL</div>
-                <div style="color: #aaa; font-size: 12px;">Tu marca con presencia global y ecommerce de alto impacto.</div>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">🛒 CARRITO INTELIGENTE</div>
-                <div style="color: #aaa; font-size: 12px;">Gestión de pedidos automática con formulario de datos.</div>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">📲 WHATSAPP SYNC</div>
-                <div style="color: #aaa; font-size: 12px;">Ventas directas desde la web hasta tu chat personal.</div>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">🚚 ECOSISTEMA LOGÍSTICO</div>
-                <div style="color: #aaa; font-size: 12px;">Apps exclusivas para Domiciliarios y Tablet en punto físico.</div>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">♾️ SIN RESTRICCIONES</div>
-                <div style="color: #aaa; font-size: 12px;">Productos ilimitados, sin publicidad de terceros ni comisiones.</div>
-            </div>
-            
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">📍 UBICACIÓN GPS</div>
-                <div style="color: #aaa; font-size: 12px;">Tus clientes sabrán exactamente dónde estás y cómo llegar.</div>
-            </div>
-        </div>
-
-        <!-- BANNER FINAL ACCIÓN -->
-        <div style="background: linear-gradient(90deg, #E5C453 0%, #caa93a 100%); padding: 20px; border-radius: 12px; text-align: center;">
-            <p style="color: #000; margin: 0; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 1px;">
-                ✨ Configura, guarda y vende hoy mismo
-            </p>
-            <p style="color: #000; margin: 5px 0 15px 0; font-size: 13px; font-weight: 500; opacity: 0.8;">
-                Sin escribir código, sin complicaciones técnicas.
-            </p>
-            <a href="#descargas" style="display: inline-block; background: #000; color: #fff; padding: 12px 35px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; transition: 0.3s;">
-                DESCARGAR APP Y COMENZAR
-            </a>
-        </div>
-    </div>
-
-    <p style="text-align: center; color: #555; font-size: 12px; margin-top: 40px;">Zippy Empresas - Gestión Comercial Masiva y Simplificada</p>
-</section>
-   
-            <summary>🌐 Tu Vitrina Digital: Tienda Online + WhatsApp</summary>
-            <div class="content">
-                <p>Con Zippy, obtienes un e-commerce profesional diseñado para convertir. No necesitas hosting ni programadores.</p>
-                
-                <div class="req-box" style="background: rgba(59, 130, 246, 0.1); border-color: var(--zippy-blue);">
-                    <h4 style="margin-top:0; color: var(--zippy-blue);">🚀 Pedidos Inteligentes</h4>
-                    <p>Incluye un <b>formulario de entrega</b> que captura los datos del cliente (nombre, dirección) <b>Para que no los pidas por WhatsApp</b> ¡Ahorra tiempo y vende más!</p>
+            <div class="pricing-grid">
+                <div class="p-card">
+                    <span style="text-transform: uppercase; font-size: 12px; font-weight: 800; color: #64748b;">Prueba</span>
+                    <h3 style="font-size: 36px; margin: 10px 0;">$0 <small style="font-size: 14px; color: #94a3b8;">/30 días</small></h3>
+                    <ul style="list-style: none; padding: 0; text-align: left; font-size: 14px; margin-bottom: 30px;">
+                        <li>✓ Todas las funciones desbloqueadas</li>
+                        <li>✓ Soporte inicial</li>
+                    </ul>
+                    <a href="#descargas" class="btn btn-blue" style="width: 100%;">EMPEZAR</a>
                 </div>
 
-                <h4>Ventajas Principales</h4>
-                <ul>
-                    <li>🛍️ <b>Venta 24/7:</b> Tu tienda nunca cierra.</li>
-                    <li>📱 <b>Fácil de compartir:</b> Comparte tu link en Instagram, TikTok o Estados de WhatsApp.</li>
-                    <li>📦 <b>Todo Organizado:</b> Catálogo visual y profesional sincronizado con tu App.</li>
-                </ul>
-                <div style="text-align: center; margin-top: 20px;">
-                    <a href="#descargas" class="btn btn-orange">¡ACTIVAR MI TIENDA AHORA!</a>
+                <div class="p-card featured">
+                    <span style="text-transform: uppercase; font-size: 12px; font-weight: 800; color: var(--zippy-blue);">Recomendado</span>
+                    <h3 style="font-size: 36px; margin: 10px 0;">$30k <small style="font-size: 14px; color: #94a3b8;">/mes</small></h3>
+                    <p style="color: #10b981; font-weight: 700; font-size: 13px;">⚡ $1.000 COP AL DÍA</p>
+                    <ul style="list-style: none; padding: 0; text-align: left; font-size: 14px; margin-bottom: 30px;">
+                        <li>✓ Continuidad operativa 24/7</li>
+                        <li>✓ Actualizaciones constantes</li>
+                    </ul>
+                    <a href="#descargas" class="btn btn-blue" style="width: 100%;">SELECCIONAR</a>
+                </div>
+
+                <div class="p-card dark">
+                    <div style="background: #f97316; color: white; display: inline-block; padding: 2px 12px; border-radius: 10px; font-size: 10px; margin-bottom: 10px;">AHORRAS $60.000</div>
+                    <h3 style="font-size: 36px; margin: 10px 0;">$300k <small style="font-size: 14px; color: #94a3b8;">/año</small></h3>
+                    <ul style="list-style: none; padding: 0; text-align: left; font-size: 14px; margin-bottom: 30px;">
+                        <li>✓ Prioridad en soporte</li>
+                        <li>✓ Garantía de precio</li>
+                    </ul>
+                    <a href="#descargas" class="btn btn-orange" style="width: 100%;">ADQUIRIR ANUAL</a>
                 </div>
             </div>
-        </details>
+        </section>
 
-        <details>
-            <summary>💻 Manual Completo: Zippy Web (Panel PC)</summary>
-            <div class="content">
-                <p>Administra tu negocio a gran escala. Gestiona pedidos, contabilidad y asignación de Pedidos des de la comodidad de tu computadora.</p>
-                <ul>
-                    <li>📊 <b>Contabilidad Total:</b> Ventas, gastos</li>
-                    <li>🖨️ <b>Impresión Pro:</b> Herramienta para imprimir tarjetas de regalo directamente des de el navegador.</li>
-                    <li>🚴 <b>Logística:</b> Asigna pedidos masivos a tus domiciliarios.</li>
-                </ul>
-            </div>
-        </details>
-
-        <details>
-            <summary>🚴 Manual: ZippyEntregas (App Domiciliario)</summary>
-            <div class="content">
-                <p>Optimiza tus repartos. Los domiciliarios reciben pedidos en tiempo real y confirman entregas con un clic.</p>
-                <div style="background: rgba(239, 68, 68, 0.1); padding: 15px; border-radius: 10px; border-left: 5px solid #ef4444; margin-bottom: 15px;">
-                    <b>⚠️ Vinculación:</b> El domiciliario debe seleccionar la empresa correcta al registrarse para ver los pedidos asignados.
+        <!-- DESCARGAS -->
+        <section id="descargas" style="background: #000; border-radius: 30px; padding: 60px 20px; margin-bottom: 60px;">
+            <h2 style="text-align: center; margin-bottom: 40px;">Descargas de Aplicaciones</h2>
+            <div class="main-grid" style="margin: 0;">
+                <div style="text-align: center; background: rgba(255,255,255,0.03); padding: 30px; border-radius: 20px;">
+                    <span style="font-size: 40px;">📱</span>
+                    <h4>Zippy App (Principal)</h4>
+                    <a href="https://github.com/CreativeMB/center/releases/download/apk/zippy-debug.apk" class="btn btn-blue" style="width: 100%;">DESCARGAR APK</a>
                 </div>
-                <ul>
-                    <li>📍 Mapas y rutas de entrega integradas.</li>
-                    <li>💬 Contacto directo con el cliente desde la App.</li>
-                </ul>
-            </div>
-        </details>
-
-        <details>
-            <summary>📟 Manual: ZippyCatálogo (Tablet Punto Físico)</summary>
-            <div class="content">
-                <p>Moderniza tu local. Deja que los clientes exploren y pidan de forma autónoma desde una Tablet en tu punto de venta.</p>
-                <p><b>Activación:</b> Configura con tu App Principal -> Perfil de Empresa y luego conéctalo en la Tablet Android.</p>
-                <ul>
-                    <li>✨ Mejora la experiencia del cliente.</li>
-                    <li>📉 Reduce errores al tomar pedidos manualmente.</li>
-                </ul>
-            </div>
-        </details>
-    </section>
-    
-    <section style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
-        
-        <div style="text-align: center; margin-bottom: 35px;">
-            <h2 style="color: #ffffff; font-size: 2.2em; margin-bottom: 10px; letter-spacing: -1px; font-weight: 800;">Ecosistema de Suscripciones Zippy</h2>
-            <p style="color: #94a3b8; font-size: 1.1em; max-width: 700px; margin: 0 auto; line-height: 1.5;">
-                Infraestructura robusta diseñada para escalar tus ventas sin complicaciones técnicas.
-            </p>
-        </div>
-        <div class="zippy-grid" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: stretch;">
-            
-            <div class="z-card" style="flex: 1; min-width: 280px; max-width: 350px; background: #ffffff; padding: 30px 25px; border-radius: 16px; border: 1px solid #1e293b; display: flex; flex-direction: column; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);">
-                <span style="color: #64748b; font-size: 0.75em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Experiencia Inicial</span>
-                <h4 style="margin: 8px 0; color: #1e293b; font-size: 1.4em; font-weight: 700;">Mes de Cortesía</h4>
-                <div style="margin: 15px 0;">
-                    <span style="font-size: 2.5em; font-weight: 800; color: #0f172a;">$0</span>
-                    <span style="color: #94a3b8; font-size: 1em;">/30 días</span>
+                <div style="text-align: center; background: rgba(255,255,255,0.03); padding: 30px; border-radius: 20px;">
+                    <span style="font-size: 40px;">🚴</span>
+                    <h4>Zippy Entregas</h4>
+                    <a href="https://github.com/CreativeMB/center/releases/download/apk/zippyentregas-debug.apk" class="btn btn-blue" style="width: 100%;">DESCARGAR APK</a>
                 </div>
-                <ul style="text-align: left; font-size: 0.9em; padding: 0; list-style: none; margin: 0 0 25px 0; color: #475569; flex-grow: 1; line-height: 1.4;">
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Despliegue de tienda inmediata</li>
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Catálogo digital corporativo</li>
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Panel de gestión administrativa</li>
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> 100% funciones desbloqueadas</li>
-                </ul>
-                <a href="#descargas" style="text-decoration: none; text-align: center; padding: 12px; border: 2px solid #e2e8f0; color: #1e293b; border-radius: 8px; font-weight: bold; font-size: 0.95em;">Empezar Prueba</a>
-            </div>
-
-            <div class="z-card" style="flex: 1; min-width: 280px; max-width: 350px; background: #ffffff; padding: 30px 25px; border-radius: 16px; border: 2px solid #3b82f6; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4); position: relative;">
-                <span style="color: #3b82f6; font-size: 0.75em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Crecimiento Ágil</span>
-                <h4 style="margin: 8px 0; color: #1e293b; font-size: 1.4em; font-weight: 700;">Mensual</h4>
-                <div style="margin: 15px 0;">
-                    <span style="font-size: 2.5em; font-weight: 800; color: #0f172a;">$30k</span>
-                    <span style="color: #94a3b8; font-size: 1em;">/mes</span>
+                <div style="text-align: center; background: rgba(255,255,255,0.03); padding: 30px; border-radius: 20px;">
+                    <span style="font-size: 40px;">📟</span>
+                    <h4>Zippy Catálogo</h4>
+                    <a href="https://github.com/CreativeMB/center/releases/download/apk/catalogo-debug.apk" class="btn btn-blue" style="width: 100%;">DESCARGAR APK</a>
                 </div>
-                <p style="font-size: 0.85em; color: #10b981; font-weight: 600; margin-bottom: 15px;">⚡ Solo $1.000 COP por día</p>
-                <ul style="text-align: left; font-size: 0.9em; padding: 0; list-style: none; margin: 0 0 25px 0; color: #475569; flex-grow: 1; line-height: 1.4;">
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Continuidad operativa 24/7</li>
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Pedidos vía WhatsApp</li>
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Actualizaciones de sistema</li>
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Soporte especializado</li>
-                </ul>
-                <a href="#descargas" style="text-decoration: none; text-align: center; padding: 12px; background: #3b82f6; color: white; border-radius: 8px; font-weight: bold; font-size: 0.95em;">Seleccionar Plan</a>
             </div>
+        </section>
 
-            <div class="z-card-annual" style="flex: 1; min-width: 280px; max-width: 350px; background: #1e293b; padding: 30px 25px; border-radius: 16px; border: 1px solid #334155; display: flex; flex-direction: column; position: relative; color: white; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
-                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #f97316; color: white; padding: 4px 15px; border-radius: 20px; font-size: 0.7em; font-weight: bold; letter-spacing: 1px; white-space: nowrap;">AHORRAS $60.000</div>
-                <span style="color: #94a3b8; font-size: 0.75em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Visión a Largo Plazo</span>
-                <h4 style="margin: 8px 0; color: white; font-size: 1.4em; font-weight: 700;">Anual</h4>
-                <div style="margin: 15px 0;">
-                    <span style="font-size: 2.5em; font-weight: 800; color: white;">$300k</span>
-                    <span style="color: #94a3b8; font-size: 1em;">/año</span>
-                </div>
-                <p style="font-size: 0.85em; color: #fb923c; font-weight: 600; margin-bottom: 15px;">🏆 La inversión más inteligente</p>
-                <ul style="text-align: left; font-size: 0.9em; padding: 0; list-style: none; margin: 0 0 25px 0; color: #cbd5e1; flex-grow: 1; line-height: 1.4;">
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Prioridad en infraestructura</li>
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Garantía de precio anual</li>
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Acceso anticipado a funciones</li>
-                    <li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;"><b>✓</b> Marca consolidada</li>
-                </ul>
-                <a href="#descargas" style="text-decoration: none; text-align: center; padding: 12px; background: #f97316; color: white; border-radius: 8px; font-weight: bold; font-size: 0.95em;">Adquirir Anual</a>
-            </div>
+    </main>
 
+    <footer style="padding: 60px 0; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; color: var(--text-muted); font-size: 13px;">
+        <div class="container-full">
+            <p>Zippy Empresas © 2024 - Gestión Comercial Masiva y Simplificada</p>
+            <p>Soporte Técnico WhatsApp: 3150725566</p>
         </div>
-    </section>
-</div>
-
-<style>
-    @media (max-width: 768px) {
-        .z-card, .z-card-annual { min-width: 100% !important; margin-bottom: 10px; }
-        h2 { font-size: 1.8em !important; }
-    }
-</style>
-    <section id="descargas" class="descargas-franja">
-        <div class="container">
-          <h3 style="text-align: center; margin-top: 30px;">Descarga nuestras Apps</h3>
-<div class="download-grid">
-    <div class="dl-card">
-        <i>📱</i>
-        <h4>Zippy App (Principal)</h4>
-        <p>Gestión de negocio, ventas y tienda online.</p>
-        <a href="https://github.com/CreativeMB/center/releases/download/apk/zippy-debug.apk" class="btn btn-blue btn-sm btn-full">DESCARGAR APK</a>
-    </div>
-
-    <div class="dl-card">
-        <i>🚴</i>
-        <h4>Zippy Entregas</h4>
-        <p>App exclusiva para domiciliarios.</p>
-        <a href="https://github.com/CreativeMB/center/releases/download/apk/zippyentregas-debug.apk" class="btn btn-blue btn-sm btn-full">DESCARGAR APK</a>
-    </div>
-
-    <div class="dl-card">
-        <i>📟</i>
-        <h4>Zippy Catálogo</h4>
-        <p>Para tablets en punto físico.</p>
-        <a href="https://github.com/CreativeMB/center/releases/download/apk/catalogo-debug.apk" class="btn btn-blue btn-sm btn-full">DESCARGAR APK</a>
-    </div>
-</div>
-<hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 40px 0;">
-
-<h3 style="text-align: center; font-family: 'Poppins', sans-serif; color: #ffffff; margin-bottom: 30px; letter-spacing: 1px; text-transform: uppercase; font-size: 1.2rem;">
-    Plataformas y Servicios Web
-</h3>
-
-<div style="
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 20px; 
-    justify-content: center; 
-    align-items: stretch; 
-    max-width: 1100px; /* Aumentado para dar más espacio horizontal */
-    margin: 0 auto; 
-    padding: 10px;">
-
-    <!-- TARJETA 1: ECOMMERCE -->
-    <div style="
-        flex: 1;
-        min-width: 320px; /* Un poco más ancha en móvil */
-        max-width: 500px; /* Mucho más ancha en PC para que no sea tan larga */
-        background: #1a1a24; 
-        border: 1px solid rgba(255, 159, 67, 0.2); 
-        border-radius: 20px; 
-        padding: 35px; 
-        text-align: center;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        transition: transform 0.3s ease;">
-        
-        <div>
-            <div style="font-size: 4rem; margin-bottom: 15px;">🌐</div>
-            <h4 style="color: #ffffff; margin: 0 0 15px 0; font-size: 1.5rem; font-weight: 700; font-family: sans-serif;">
-                Plataforma Ecommerce de Alto Impacto
-            </h4>
-            <p style="color: #b0b0b0; font-size: 1rem; line-height: 1.6; margin-bottom: 25px; font-family: sans-serif;">
-                <b>Activación Instantánea:</b> Al registrarte, despliegas automáticamente un Sitio Web Ecommerce profesional con Carrito de Compras inteligente, Catálogo Ilimitado, Identidad Corporativa y una infraestructura de ventas 24/7 diseñada para dominar el mercado digital.
-            </p>
-        </div>
-        
-        <div style="margin-top: 10px;">
-            <span style="
-                display: inline-block;
-                background: rgba(255, 159, 67, 0.1); 
-                color: #ff9f43; 
-                padding: 10px 22px; 
-                border-radius: 50px; 
-                font-weight: 700; 
-                font-size: 0.8rem; 
-                letter-spacing: 1.5px;
-                border: 1px solid rgba(255, 159, 67, 0.3);
-                text-transform: uppercase;">
-                ⚙️ Gestión desde la App
-            </span>
-        </div>
-    </div>
-
-    <!-- TARJETA 2: CONTROL CENTER -->
-    <div style="
-        flex: 1;
-        min-width: 320px;
-        max-width: 500px;
-        background: #1a1a24; 
-        border: 1px solid rgba(255, 255, 255, 0.1); 
-        border-radius: 20px; 
-        padding: 35px; 
-        text-align: center;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        transition: transform 0.3s ease;">
-        
-        <div>
-            <div style="font-size: 4rem; margin-bottom: 15px;">💻</div>
-            <h4 style="color: #ffffff; margin: 0 0 15px 0; font-size: 1.5rem; font-weight: 700; font-family: sans-serif;">
-                Zippy Control Center (PC & Desktop)
-            </h4>
-            <p style="color: #b0b0b0; font-size: 1rem; line-height: 1.6; margin-bottom: 25px; font-family: sans-serif;">
-                <b>Torre de Control Administrativa:</b> Gestiona la contabilidad integral, despacha pedidos masivos, asigna rutas a domiciliarios e imprime tarjetas de regalo en tiempo real. Supervisa todo tu flujo logístico con sincronización absoluta desde cualquier navegador.
-            </p>
-        </div>
-        
-        <a href="https://zippy-727d5.web.app/login.html" target="_blank" style="
-            background: #e67e22; 
-            color: white; 
-            display: block; 
-            padding: 16px; 
-            border-radius: 12px; 
-            text-decoration: none; 
-            font-weight: 700; 
-            font-size: 1rem;
-            box-shadow: 0 4px 0 #b35d10;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            font-family: sans-serif;">
-            Abrir Panel Web
-        </a>
-    </div>
-
-</div>
     </footer>
 
 </body>
