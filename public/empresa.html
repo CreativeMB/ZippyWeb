@@ -242,206 +242,254 @@
             </div>
         </div>
     </section>
-<section class="manual-section container" style="background-color: #0a0b0d; padding: 60px 20px; font-family: 'Poppins', 'Segoe UI', sans-serif; color: #fff;">
-    
-    <!-- TÍTULO PRINCIPAL -->
-    <div style="text-align: center; margin-bottom: 50px;">
-        <h2 style="font-size: 38px; font-weight: 800; color: #ffffff; margin-bottom: 15px;">📘 Manual de Usuario Pro</h2>
-        <p style="color: #888; font-size: 18px; max-width: 700px; margin: 0 auto;">Todo lo que necesitas para digitalizar tu talento y gestionar tu imperio comercial desde la palma de tu mano.</p>
-    </div>
+<style>
+    :root {
+        --zippy-blue: #3b82f6;
+        --zippy-orange: #e67e22;
+        --zippy-gold: #E5C453;
+        --dark-bg: #0a0b0d;
+        --card-bg: #16181c;
+    }
 
-    <!-- TARJETA DE VALOR: MULTIUSUARIO -->
-    <div style="background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.05) 100%); border-left: 6px solid #3b82f6; padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 15px;">
-            <span style="font-size: 30px;">🚀</span>
-            <h3 style="margin: 0; font-size: 22px; color: #fff;">Potencia Multiusuario y Multidispositivo</h3>
-        </div>
-        <p style="font-size: 15px; line-height: 1.7; color: #ccc; margin: 0;">
-            Zippy permite sesiones simultáneas en móviles y tablets. Mientras <b>Administración</b> recibe pedidos, <b>Producción</b> visualiza las comandas y <b>Empaque</b> alista los envíos. ¡Sincronización total en tiempo real!
+    .zippy-wrapper {
+        width: 100%;
+        max-width: 1400px; /* Ancho máximo para pantallas grandes */
+        margin: 0 auto;
+        padding: 40px 20px;
+        background-color: var(--dark-bg);
+        font-family: 'Poppins', sans-serif;
+        color: #eee;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin-bottom: 50px;
+    }
+
+    /* Estilo Premium para los Details/Summary */
+    details {
+        background: var(--card-bg);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 12px;
+        margin-bottom: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    details[open] {
+        border-color: var(--zippy-blue);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    summary {
+        padding: 20px;
+        list-style: none;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255,255,255,0.02);
+    }
+
+    summary::after {
+        content: "＋";
+        color: var(--zippy-blue);
+        transition: 0.3s;
+    }
+
+    details[open] summary::after {
+        content: "－";
+        transform: rotate(180deg);
+        color: var(--zippy-orange);
+    }
+
+    .details-content {
+        padding: 25px;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        line-height: 1.6;
+    }
+
+    .btn-action {
+        display: inline-block;
+        padding: 12px 30px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 13px;
+        transition: 0.3s;
+        text-align: center;
+    }
+
+    .btn-blue { background: var(--zippy-blue); color: white; }
+    .btn-orange { background: var(--zippy-orange); color: white; }
+
+    @media (max-width: 768px) {
+        .grid-container { grid-template-columns: 1fr; }
+        .zippy-wrapper { padding: 20px 10px; }
+    }
+</style>
+
+<section class="zippy-wrapper">
+    
+    <!-- TÍTULO PRINCIPAL FULL WIDTH -->
+    <div style="text-align: center; margin-bottom: 60px;">
+        <h2 style="font-size: clamp(32px, 5vw, 48px); font-weight: 900; color: #fff; margin-bottom: 15px;">📘 Ecosistema Digital Zippy</h2>
+        <p style="color: #888; font-size: clamp(16px, 2vw, 20px); max-width: 900px; margin: 0 auto;">
+            Tu imperio comercial centralizado. Gestiona ventas, logística y atención al cliente desde una sola plataforma multidispositivo.
         </p>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start;">
+    <!-- SECCIÓN 1: CONFIGURACIÓN Y CATÁLOGO (GRID 2 COLUMNAS) -->
+    <div class="grid-container">
         
-        <!-- COLUMNA IZQUIERDA: REGISTRO Y CONFIGURACIÓN -->
+        <!-- BLOQUE IZQUIERDO: AFILIACIÓN -->
         <div>
-            <h4 style="color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; margin-bottom: 20px;">Paso 1: Configuración Inicial</h4>
-            
-            <div style="background: #16181c; padding: 25px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    <li style="margin-bottom: 20px; display: flex; gap: 15px;">
-                        <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 14px;">1</span>
-                        <div>
-                            <b style="display: block; color: #fff; margin-bottom: 5px;">Descarga y Acceso</b>
-                            <p style="font-size: 13px; color: #aaa; margin: 0;">Baja la App Zippy y regístrate con tu cuenta de Google para un acceso blindado y rápido.</p>
-                        </div>
+            <h4 style="color: var(--zippy-blue); text-transform: uppercase; letter-spacing: 1px; font-size: 14px; margin-bottom: 20px;">🚀 Paso 1: Activación</h4>
+            <div style="background: var(--card-bg); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); height: 100%;">
+                <p style="font-size: 14px; color: #ccc; margin-bottom: 25px;">
+                    <b>Multiusuario:</b> Abre sesión en móviles, tablets y PC simultáneamente para que tu equipo (Ventas, Producción y Despachos) trabaje en sincronía.
+                </p>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 15px; display: flex; gap: 15px;">
+                        <span style="background: var(--zippy-blue); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: bold;">1</span>
+                        <span style="font-size: 13px;"><b>Registro Google:</b> Acceso rápido y seguro.</span>
                     </li>
-                    <li style="margin-bottom: 20px; display: flex; gap: 15px;">
-                        <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 14px;">2</span>
-                        <div>
-                            <b style="display: block; color: #fff; margin-bottom: 5px;">Identidad de Marca</b>
-                            <p style="font-size: 13px; color: #aaa; margin: 0;">Completa los datos de tu empresa: Nombre, eslogan, redes sociales y métodos de pago (Nequi, Daviplata, etc.).</p>
-                        </div>
+                    <li style="margin-bottom: 15px; display: flex; gap: 15px;">
+                        <span style="background: var(--zippy-blue); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: bold;">2</span>
+                        <span style="font-size: 13px;"><b>Perfil de Marca:</b> Nombre, redes sociales y medios de pago (Nequi, etc).</span>
                     </li>
                     <li style="display: flex; gap: 15px;">
-                        <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 14px;">3</span>
-                        <div>
-                            <b style="display: block; color: #fff; margin-bottom: 5px;">Punto de Venta Directo</b>
-                            <p style="font-size: 13px; color: #aaa; margin: 0;">Vincula tu WhatsApp de atención. Aquí recibirás cada pedido listo para procesar.</p>
-                        </div>
+                        <span style="background: var(--zippy-blue); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: bold;">3</span>
+                        <span style="font-size: 13px;"><b>WhatsApp:</b> Vincula tu número para recibir pedidos automáticos.</span>
                     </li>
                 </ul>
             </div>
-
-            <!-- BOTÓN WHATSAPP SOPORTE -->
-            <div style="margin-top: 25px; background: rgba(37, 211, 102, 0.1); border: 1px dashed #25d366; padding: 20px; border-radius: 15px; text-align: center;">
-                <p style="color: #25d366; font-weight: 600; margin-bottom: 10px; font-size: 14px;">¿Dudas con tu afiliación? Soporte 24/7</p>
-                <a href="https://wa.me/573150725566?text=Hola%20Zippy,%20necesito%20ayuda" target="_blank" style="text-decoration: none; background: #25d366; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 700; display: inline-block; font-size: 13px;">
-                    CHAT SOPORTE 3150725566
-                </a>
-            </div>
         </div>
 
-        <!-- COLUMNA DERECHA: EL NUEVO CATÁLOGO -->
+        <!-- BLOQUE DERECHO: EL NUEVO CATÁLOGO -->
         <div>
-            <h4 style="color: #e67e22; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; margin-bottom: 20px;">Paso 2: Catálogo Inteligente</h4>
-            
-            <div style="background: #16181c; padding: 25px; border-radius: 16px; border: 1px solid rgba(230, 126, 34, 0.2);">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                    <div style="background: #e67e22; padding: 8px; border-radius: 8px;">
-                        <svg width="20" height="20" fill="white" viewBox="0 0 16 16"><path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2zM14 11.5V4.667a.5.5 0 0 0-.447-.498L5.947 3.328a.5.5 0 0 0-.553.496v4.105L14 11.5zm-9-1.874V4.61l-2.053.256a.5.5 0 0 0-.447.498V12c0 .221.124.412.308.51L5 10.391v-.765z"/></svg>
-                    </div>
-                    <b style="color: #fff; font-size: 16px;">Carga masiva desde Galería</b>
+            <h4 style="color: var(--zippy-orange); text-transform: uppercase; letter-spacing: 1px; font-size: 14px; margin-bottom: 20px;">📸 Paso 2: Catálogo Masivo</h4>
+            <div style="background: var(--card-bg); padding: 30px; border-radius: 16px; border: 1px solid rgba(230, 126, 34, 0.2); height: 100%;">
+                <div style="background: rgba(230, 126, 34, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <b style="color: var(--zippy-orange); font-size: 14px;">¡NUEVA FUNCIÓN!</b>
+                    <p style="font-size: 12px; color: #ddd; margin-top: 5px;">Sube más de 200 productos de una sola vez seleccionando desde tu galería.</p>
                 </div>
-                
-                <ul style="font-size: 13px; color: #ccc; line-height: 1.8; padding-left: 18px;">
-                    <li>📸 <b>Selección Total:</b> Marca todas tus fotos en la galería (¡más de 200!) y súbelas de una sola vez.</li>
-                    <li>🔄 <b>Gestión Dinámica:</b> En la sección <b>"Actualizar Productos"</b>, activa fotos, elimina las que ya no vendes o edita precios y descripciones.</li>
-                    <li>📏 <b>Diseño Vertical:</b> Recomendamos fotos tipo <b>Retrato</b> para una experiencia móvil inmersiva.</li>
-                    <li>✨ <b>Estética Pro:</b> Sube imágenes limpias, sin textos ni logos estorbando el producto.</li>
+                <ul style="font-size: 13px; color: #ccc; line-height: 1.8;">
+                    <li>✅ <b>Selección Total:</b> Marca todas tus fotos y súbelas al instante.</li>
+                    <li>✅ <b>Actualizar Productos:</b> Activa, elimina o edita precios en tiempo real.</li>
+                    <li>✅ <b>Formato Vertical:</b> Usa fotos tipo retrato para mejor visualización.</li>
+                    <li>✅ <b>Sin Interrupciones:</b> Imágenes limpias para una tienda profesional.</li>
                 </ul>
-                <p style="margin-top: 15px; font-size: 12px; color: #e67e22; font-weight: 600; text-align: center;">¡Estarás en línea en cuestión de segundos!</p>
             </div>
         </div>
     </div>
 
-    <!-- CENTRO DE MANDO (MATRIZ DE SERVICIOS) -->
-    <div style="margin-top: 50px; padding: 40px; background: linear-gradient(145deg, #16181c 0%, #0a0b0d 100%); border: 1px solid rgba(229, 196, 83, 0.3); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);">
+    <!-- CENTRO DE MANDO (BANNER DORADO FULL WIDTH) -->
+    <div style="margin-bottom: 60px; padding: 40px; background: linear-gradient(145deg, #16181c 0%, #0a0b0d 100%); border: 1px solid rgba(229, 196, 83, 0.3); border-radius: 20px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+        <h3 style="color: var(--zippy-gold); font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px;">💎 Centro de Mando Activo</h3>
         
-        <h3 style="color: #E5C453; margin: 0 0 25px 0; font-size: 24px; font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 2px;">
-            💎 Centro de Mando Digital Zippy
-        </h3>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px;">
-            
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">🌐 SITIO WEB PROFESIONAL</div>
-                <div style="color: #aaa; font-size: 12px;">Tu marca con presencia global y ecommerce de alto impacto.</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div style="padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(229, 196, 83, 0.1);">
+                <span style="font-size: 20px; display: block; margin-bottom: 10px;">🌐</span>
+                <b style="font-size: 12px; color: var(--zippy-gold);">SITIO WEB PRO</b>
             </div>
-
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">🛒 CARRITO INTELIGENTE</div>
-                <div style="color: #aaa; font-size: 12px;">Gestión de pedidos automática con formulario de datos.</div>
+            <div style="padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(229, 196, 83, 0.1);">
+                <span style="font-size: 20px; display: block; margin-bottom: 10px;">🛒</span>
+                <b style="font-size: 12px; color: var(--zippy-gold);">CARRITO ACTIVO</b>
             </div>
-
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">📲 WHATSAPP SYNC</div>
-                <div style="color: #aaa; font-size: 12px;">Ventas directas desde la web hasta tu chat personal.</div>
+            <div style="padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(229, 196, 83, 0.1);">
+                <span style="font-size: 20px; display: block; margin-bottom: 10px;">📲</span>
+                <b style="font-size: 12px; color: var(--zippy-gold);">SYNC WHATSAPP</b>
             </div>
-
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">🚚 ECOSISTEMA LOGÍSTICO</div>
-                <div style="color: #aaa; font-size: 12px;">Apps exclusivas para Domiciliarios y Tablet en punto físico.</div>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">♾️ SIN RESTRICCIONES</div>
-                <div style="color: #aaa; font-size: 12px;">Productos ilimitados, sin publicidad de terceros ni comisiones.</div>
-            </div>
-            
-            <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border-top: 2px solid #E5C453;">
-                <div style="color: #E5C453; font-size: 14px; font-weight: 700; margin-bottom: 8px;">📍 UBICACIÓN GPS</div>
-                <div style="color: #aaa; font-size: 12px;">Tus clientes sabrán exactamente dónde estás y cómo llegar.</div>
+            <div style="padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(229, 196, 83, 0.1);">
+                <span style="font-size: 20px; display: block; margin-bottom: 10px;">🚚</span>
+                <b style="font-size: 12px; color: var(--zippy-gold);">DOMICILIOS APP</b>
             </div>
         </div>
-
-        <!-- BANNER FINAL ACCIÓN -->
-        <div style="background: linear-gradient(90deg, #E5C453 0%, #caa93a 100%); padding: 20px; border-radius: 12px; text-align: center;">
-            <p style="color: #000; margin: 0; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 1px;">
-                ✨ Configura, guarda y vende hoy mismo
-            </p>
-            <p style="color: #000; margin: 5px 0 15px 0; font-size: 13px; font-weight: 500; opacity: 0.8;">
-                Sin escribir código, sin complicaciones técnicas.
-            </p>
-            <a href="#descargas" style="display: inline-block; background: #000; color: #fff; padding: 12px 35px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; transition: 0.3s;">
-                DESCARGAR APP Y COMENZAR
-            </a>
-        </div>
+        
+        <a href="#descargas" class="btn-action" style="background: var(--zippy-gold); color: #000; width: 100%; max-width: 400px;">ACTIVAR MI EMPRESA AHORA</a>
     </div>
 
-    <p style="text-align: center; color: #555; font-size: 12px; margin-top: 40px;">Zippy Empresas - Gestión Comercial Masiva y Simplificada</p>
+    <!-- SECCIÓN DE MANUALES DESPLEGABLES (ECOSISTEMA) -->
+    <h4 style="color: #fff; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; margin-bottom: 25px; text-align: center;">Módulos del Sistema Zippy</h4>
+    
+    <details>
+        <summary>🌐 Vitrina Digital: Tu Tienda Online</summary>
+        <div class="details-content">
+            <div class="grid-container" style="margin-bottom: 0;">
+                <div>
+                    <p>Obtén un e-commerce profesional diseñado para convertir visitantes en clientes sin necesidad de programadores.</p>
+                    <ul style="font-size: 14px;">
+                        <li>🛍️ <b>Venta 24/7:</b> Tu catálogo siempre disponible.</li>
+                        <li>📦 <b>Pedidos Inteligentes:</b> Formulario automático para capturar datos de envío.</li>
+                    </ul>
+                </div>
+                <div style="text-align: center; display: flex; align-items: center; justify-content: center;">
+                    <a href="#" class="btn-action btn-orange">Ver Demo de Tienda</a>
+                </div>
+            </div>
+        </div>
+    </details>
+
+    <details>
+        <summary>💻 Zippy Web: Panel para Computadora</summary>
+        <div class="details-content">
+            <p>Administra tu negocio a gran escala desde la comodidad de tu PC o Laptop.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px;">
+                    <b style="color: var(--zippy-blue);">📊 Contabilidad</b>
+                    <p style="font-size: 12px; margin: 5px 0 0;">Control total de ventas y gastos diarios.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px;">
+                    <b style="color: var(--zippy-blue);">🖨️ Impresión</b>
+                    <p style="font-size: 12px; margin: 5px 0 0;">Imprime tarjetas de regalo y facturas.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px;">
+                    <b style="color: var(--zippy-blue);">🚴 Logística</b>
+                    <p style="font-size: 12px; margin: 5px 0 0;">Asignación masiva a domiciliarios.</p>
+                </div>
+            </div>
+        </div>
+    </details>
+
+    <details>
+        <summary>🚴 ZippyEntregas: App para Domiciliarios</summary>
+        <div class="details-content">
+            <p>Optimiza tus repartos con la App exclusiva para tu equipo de logística.</p>
+            <div style="background: rgba(239, 68, 68, 0.1); padding: 15px; border-radius: 10px; border-left: 5px solid #ef4444; margin-bottom: 15px;">
+                <p style="font-size: 13px; margin: 0; color: #ff9999;"><b>IMPORTANTE:</b> El repartidor debe seleccionar el nombre de tu empresa al registrarse para recibir tus pedidos.</p>
+            </div>
+            <ul>
+                <li>📍 Mapas y rutas GPS integradas.</li>
+                <li>💬 Botón de contacto directo con el cliente.</li>
+                <li>✅ Confirmación de entrega con un solo clic.</li>
+            </ul>
+        </div>
+    </details>
+
+    <details>
+        <summary>📟 ZippyCatálogo: Tablet para Punto Físico</summary>
+        <div class="details-content">
+            <p>Moderniza tu local. Convierte cualquier Tablet Android en un menú digital interactivo para tus clientes.</p>
+            <div style="background: var(--dark-bg); padding: 20px; border-radius: 12px; border: 1px solid #333;">
+                <b style="color: var(--zippy-blue);">¿Cómo activarlo?</b>
+                <p style="font-size: 13px;">Configura desde tu App Principal (Perfil) y abre la sesión en la Tablet del local. ¡Los clientes podrán pedir de forma autónoma!</p>
+            </div>
+        </div>
+    </details>
+
+    <!-- FOOTER DE SOPORTE -->
+    <div style="margin-top: 50px; text-align: center; border-top: 1px solid #222; padding-top: 30px;">
+        <p style="color: #666; font-size: 14px;">¿Necesitas asistencia técnica personalizada?</p>
+        <a href="https://wa.me/573150725566" style="color: #25d366; text-decoration: none; font-weight: 700;">WhatsApp Soporte: 3150725566</a>
+    </div>
+
 </section>
-   
-            <summary>🌐 Tu Vitrina Digital: Tienda Online + WhatsApp</summary>
-            <div class="content">
-                <p>Con Zippy, obtienes un e-commerce profesional diseñado para convertir. No necesitas hosting ni programadores.</p>
-                
-                <div class="req-box" style="background: rgba(59, 130, 246, 0.1); border-color: var(--zippy-blue);">
-                    <h4 style="margin-top:0; color: var(--zippy-blue);">🚀 Pedidos Inteligentes</h4>
-                    <p>Incluye un <b>formulario de entrega</b> que captura los datos del cliente (nombre, dirección) <b>Para que no los pidas por WhatsApp</b> ¡Ahorra tiempo y vende más!</p>
-                </div>
-
-                <h4>Ventajas Principales</h4>
-                <ul>
-                    <li>🛍️ <b>Venta 24/7:</b> Tu tienda nunca cierra.</li>
-                    <li>📱 <b>Fácil de compartir:</b> Comparte tu link en Instagram, TikTok o Estados de WhatsApp.</li>
-                    <li>📦 <b>Todo Organizado:</b> Catálogo visual y profesional sincronizado con tu App.</li>
-                </ul>
-                <div style="text-align: center; margin-top: 20px;">
-                    <a href="#descargas" class="btn btn-orange">¡ACTIVAR MI TIENDA AHORA!</a>
-                </div>
-            </div>
-        </details>
-
-        <details>
-            <summary>💻 Manual Completo: Zippy Web (Panel PC)</summary>
-            <div class="content">
-                <p>Administra tu negocio a gran escala. Gestiona pedidos, contabilidad y asignación de Pedidos des de la comodidad de tu computadora.</p>
-                <ul>
-                    <li>📊 <b>Contabilidad Total:</b> Ventas, gastos</li>
-                    <li>🖨️ <b>Impresión Pro:</b> Herramienta para imprimir tarjetas de regalo directamente des de el navegador.</li>
-                    <li>🚴 <b>Logística:</b> Asigna pedidos masivos a tus domiciliarios.</li>
-                </ul>
-            </div>
-        </details>
-
-        <details>
-            <summary>🚴 Manual: ZippyEntregas (App Domiciliario)</summary>
-            <div class="content">
-                <p>Optimiza tus repartos. Los domiciliarios reciben pedidos en tiempo real y confirman entregas con un clic.</p>
-                <div style="background: rgba(239, 68, 68, 0.1); padding: 15px; border-radius: 10px; border-left: 5px solid #ef4444; margin-bottom: 15px;">
-                    <b>⚠️ Vinculación:</b> El domiciliario debe seleccionar la empresa correcta al registrarse para ver los pedidos asignados.
-                </div>
-                <ul>
-                    <li>📍 Mapas y rutas de entrega integradas.</li>
-                    <li>💬 Contacto directo con el cliente desde la App.</li>
-                </ul>
-            </div>
-        </details>
-
-        <details>
-            <summary>📟 Manual: ZippyCatálogo (Tablet Punto Físico)</summary>
-            <div class="content">
-                <p>Moderniza tu local. Deja que los clientes exploren y pidan de forma autónoma desde una Tablet en tu punto de venta.</p>
-                <p><b>Activación:</b> Configura con tu App Principal -> Perfil de Empresa y luego conéctalo en la Tablet Android.</p>
-                <ul>
-                    <li>✨ Mejora la experiencia del cliente.</li>
-                    <li>📉 Reduce errores al tomar pedidos manualmente.</li>
-                </ul>
-            </div>
-        </details>
-    </section>
-<div style="width: 100%; background-color: #0f172a; padding: 40px 0; font-family: 'Segoe UI', Roboto, sans-serif;">
     
     <section style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
         
