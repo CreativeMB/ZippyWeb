@@ -2324,84 +2324,57 @@ function abrirImpresion(pedido) {
 }
 
 
-/* ===== IMPRIMIR TARJETA (CORREGIDO) ===== */
+/* ===== IMPRIMIR TARJETA ===== */
 function imprimirTarjeta() {
+
     ajustarTextoMensaje();
 
-    // 1. Obtener el contenedor a imprimir
-    const printArea = document.getElementById('printArea');
-    if (!printArea) return;
+    // Obtiene el contenido de la tarjeta
+    const contenido = document.getElementById('printArea').outerHTML;
 
-    const contenido = printArea.innerHTML;
-
-    // 2. Obtener estilos existentes
+    // Obtiene todos los estilos de la página para conservar formatos
     const estilos = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
                          .map(node => node.outerHTML)
                          .join('\n');
 
-    // 3. Abrir ventana auxiliar
-    const ventana = window.open('', '_blank', 'width=900,height=650');
+    // Abre ventana nueva para impresión
+    const ventana = window.open('', '', 'width=1000,height=600');
 
     ventana.document.write(`
-        <!DOCTYPE html>
         <html>
         <head>
-            <meta charset="UTF-8">
             <title>Imprimir Tarjeta</title>
-            <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-            ${estilos}
+            ${estilos} <!-- Incluye los estilos de la página -->
             <style>
-                /* Forzar carga de colores y gráficos exactos en impresión */
-                * {
-                    -webkit-print-color-adjust: exact !important;
-                    print-color-adjust: exact !important;
-                    color-adjust: exact !important;
-                    box-sizing: border-box;
-                }
+                @media print {
+                    body * {
+                        visibility: hidden; /* oculta todo */
+                    }
 
-                @page {
-                    size: 152.4mm 101.6mm landscape; /* 6 x 4 pulgadas horizontal */
-                    margin: 0;
-                }
+                    #printArea, #printArea * {
+                        visibility: visible; /* solo mostrar tarjeta */
+                    }
 
-                html, body {
-                    margin: 0;
-                    padding: 0;
-                    width: 152.4mm;
-                    height: 101.6mm;
-                    background: #fff;
-                }
+                    #printArea {
+                        position: fixed;       /* evita repetición */
+                        top: 0;
+                        left: 0;
+                        width: 152.4mm;        /* 6 pulgadas */
+                        height: 101.6mm;       /* 4 pulgadas */
+                        margin: 0;
+                        box-sizing: border-box;
+                        page-break-inside: avoid;
+                        page-break-after: always;
+                        border: none;      
+                        box-shadow: none; 
+                    }
 
-                .tarjeta-impresion {
-                    width: 152.4mm !important;
-                    height: 101.6mm !important;
-                    position: relative !important;
-                    overflow: hidden !important;
-                    display: flex !important;
-                    flex-direction: column !important;
-                    padding-left: 38mm !important;
-                    margin: 0 !important;
-                    border: none !important;
-                }
-
-                .logo-empresa {
-                    position: absolute !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    height: 100% !important;
-                    z-index: 1 !important;
-                    display: block !important;
-                }
-
-                .logo-empresa img {
-                    height: 100% !important;
-                    width: auto !important;
-                    display: block !important;
-                    object-fit: contain !important;
-                }
-
-                .placeholder {
-                    display: none !important;
+                    .tarjeta-impresion {
+                        width: 152.4mm;
+                        height: 101.6mm;
+                        box-sizing: border-box;
+                        position: relative; /* conserva la posición interna */
+                    }
                 }
             </style>
         </head>
@@ -2413,44 +2386,35 @@ function imprimirTarjeta() {
 
     ventana.document.close();
 
-    // 4. ESPERAR A QUE LAS IMÁGENES CARGUEN ANTES DE IMPRIMIR
-    ventana.onload = function() {
-        const imgs = ventana.document.images;
-        
-        // Si hay imágenes, esperamos a que estén listas
-        if (imgs.length > 0) {
-            let imagenesCargadas = 0;
-            const totalImagenes = imgs.length;
+    // --- ESPERAR A QUE EL LOGO TERMINE DE CARGAR EN LA VENTANA ---
+    const imgLogo = ventana.document.getElementById('logoEmpresa');
 
-            const verificarYCargar = () => {
-                imagenesCargadas++;
-                if (imagenesCargadas >= totalImagenes) {
-                    setTimeout(() => {
-                        ventana.focus();
-                        ventana.print();
-                        ventana.close();
-                    }, 250); // Pequeña pausa para asegurar el render
-                }
-            };
+    const ejecutarImpresion = () => {
+        setTimeout(() => {
+            ventana.focus();
+            ventana.print();
+            ventana.close();
+        }, 150); // Tiempo suficiente para que Chrome pinte el logo
+    };
 
-            for (let i = 0; i < totalImagenes; i++) {
-                if (imgs[i].complete) {
-                    verificarYCargar();
-                } else {
-                    imgs[i].onload = verificarYCargar;
-                    imgs[i].onerror = verificarYCargar;
-                }
+    if (imgLogo) {
+        if (imgLogo.complete && imgLogo.naturalWidth !== 0) {
+            // Si ya está en memoria, aseguramos que se renderice
+            if (imgLogo.decode) {
+                imgLogo.decode().then(ejecutarImpresion).catch(ejecutarImpresion);
+            } else {
+                ejecutarImpresion();
             }
         } else {
-            // Si no hay imágenes, imprime directamente
-            setTimeout(() => {
-                ventana.focus();
-                ventana.print();
-                ventana.close();
-            }, 250);
+            // Si aún no termina de cargar, esperamos el evento
+            imgLogo.onload = ejecutarImpresion;
+            imgLogo.onerror = ejecutarImpresion;
         }
-    };
+    } else {
+        ejecutarImpresion();
+    }
 }
+
 
 /* ===== CERRAR MODAL ===== */
 function cerrarPrint() {
