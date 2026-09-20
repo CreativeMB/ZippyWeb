@@ -2324,57 +2324,84 @@ function abrirImpresion(pedido) {
 }
 
 
-/* ===== IMPRIMIR TARJETA ===== */
+/* ===== IMPRIMIR TARJETA (CORREGIDO) ===== */
 function imprimirTarjeta() {
+    ajustarTextoMensaje();
 
-ajustarTextoMensaje();
+    // 1. Obtener el contenedor a imprimir
+    const printArea = document.getElementById('printArea');
+    if (!printArea) return;
 
-    // Obtiene el contenido de la tarjeta
-    const contenido = document.getElementById('printArea').outerHTML;
+    const contenido = printArea.innerHTML;
 
-    // Obtiene todos los estilos de la página para conservar formatos
+    // 2. Obtener estilos existentes
     const estilos = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
                          .map(node => node.outerHTML)
                          .join('\n');
 
-    // Abre ventana nueva para impresión
-    const ventana = window.open('', '', 'width=1000,height=600');
+    // 3. Abrir ventana auxiliar
+    const ventana = window.open('', '_blank', 'width=900,height=650');
 
     ventana.document.write(`
+        <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="UTF-8">
             <title>Imprimir Tarjeta</title>
-            ${estilos} <!-- Incluye los estilos de la página -->
+            <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+            ${estilos}
             <style>
-                @media print {
-                    body * {
-                        visibility: hidden; /* oculta todo */
-                    }
+                /* Forzar carga de colores y gráficos exactos en impresión */
+                * {
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                    box-sizing: border-box;
+                }
 
-                    #printArea, #printArea * {
-                        visibility: visible; /* solo mostrar tarjeta */
-                    }
+                @page {
+                    size: 152.4mm 101.6mm landscape; /* 6 x 4 pulgadas horizontal */
+                    margin: 0;
+                }
 
-                    #printArea {
-                        position: fixed;       /* evita repetición */
-                        top: 0;
-                        left: 0;
-                        width: 152.4mm;        /* 6 pulgadas */
-                        height: 101.6mm;       /* 4 pulgadas */
-                        margin: 0;
-                        box-sizing: border-box;
-                        page-break-inside: avoid;
-                        page-break-after: always;
-                        border: none;      
-                        box-shadow: none; 
-                    }
+                html, body {
+                    margin: 0;
+                    padding: 0;
+                    width: 152.4mm;
+                    height: 101.6mm;
+                    background: #fff;
+                }
 
-                    .tarjeta-impresion {
-                        width: 152.4mm;
-                        height: 101.6mm;
-                        box-sizing: border-box;
-                        position: relative; /* conserva la posición interna */
-                    }
+                .tarjeta-impresion {
+                    width: 152.4mm !important;
+                    height: 101.6mm !important;
+                    position: relative !important;
+                    overflow: hidden !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    padding-left: 38mm !important;
+                    margin: 0 !important;
+                    border: none !important;
+                }
+
+                .logo-empresa {
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    height: 100% !important;
+                    z-index: 1 !important;
+                    display: block !important;
+                }
+
+                .logo-empresa img {
+                    height: 100% !important;
+                    width: auto !important;
+                    display: block !important;
+                    object-fit: contain !important;
+                }
+
+                .placeholder {
+                    display: none !important;
                 }
             </style>
         </head>
@@ -2385,11 +2412,45 @@ ajustarTextoMensaje();
     `);
 
     ventana.document.close();
-    ventana.focus();
-    ventana.print();
-    ventana.close();
-}
 
+    // 4. ESPERAR A QUE LAS IMÁGENES CARGUEN ANTES DE IMPRIMIR
+    ventana.onload = function() {
+        const imgs = ventana.document.images;
+        
+        // Si hay imágenes, esperamos a que estén listas
+        if (imgs.length > 0) {
+            let imagenesCargadas = 0;
+            const totalImagenes = imgs.length;
+
+            const verificarYCargar = () => {
+                imagenesCargadas++;
+                if (imagenesCargadas >= totalImagenes) {
+                    setTimeout(() => {
+                        ventana.focus();
+                        ventana.print();
+                        ventana.close();
+                    }, 250); // Pequeña pausa para asegurar el render
+                }
+            };
+
+            for (let i = 0; i < totalImagenes; i++) {
+                if (imgs[i].complete) {
+                    verificarYCargar();
+                } else {
+                    imgs[i].onload = verificarYCargar;
+                    imgs[i].onerror = verificarYCargar;
+                }
+            }
+        } else {
+            // Si no hay imágenes, imprime directamente
+            setTimeout(() => {
+                ventana.focus();
+                ventana.print();
+                ventana.close();
+            }, 250);
+        }
+    };
+}
 
 /* ===== CERRAR MODAL ===== */
 function cerrarPrint() {
